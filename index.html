@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="우리동네 근처 병원찾기, 야간진료, 주말진료, 약국, 응급실 안내와 건강 생활정보를 제공하는 무료 의료정보 웹앱입니다." />
+    <meta name="theme-color" content="#eef7f6" />
+    <meta property="og:title" content="우리동네 근처 병원찾기" />
+    <meta property="og:description" content="진료과, 지역, 야간진료 조건으로 가까운 병원과 약국을 찾고 건강 정보를 확인하세요." />
+    <meta property="og:type" content="website" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>우리동네 근처 병원찾기 | Hospital Near Me</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Hospital Near Me 홈">
+        <span class="brand-mark" aria-hidden="true">+</span>
+        <span>우리동네 병원찾기</span>
+      </a>
+      <nav aria-label="주요 메뉴">
+        <a href="#finder">찾기</a>
+        <a href="#tools">도구</a>
+        <a href="#articles">건강정보</a>
+        <a href="#faq">FAQ</a>
+        <a href="#saved">저장</a>
+        <a href="#emergency">응급</a>
+        <a href="about.html">소개</a>
+        <a href="privacy.html">개인정보</a>
+      </nav>
+    </header>
+
+    <main id="home">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Nearby Care Finder</p>
+          <h1>우리동네 근처 병원과 약국을 빠르게 찾으세요.</h1>
+          <p class="lead">
+            내과, 소아과, 정형외과, 치과, 이비인후과, 약국을 지역과 진료시간 조건으로 정리하고 응급 상황에서 확인할 공식 경로까지 안내합니다.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-link" href="#finder">병원 찾기</a>
+            <a class="secondary-link" href="#articles">건강정보 보기</a>
+            <a class="secondary-link" href="#emergency">응급 안내</a>
+          </div>
+        </div>
+        <aside class="status-card" aria-label="검색 요약">
+          <span>검색 결과</span>
+          <strong id="matchCount">0곳</strong>
+          <p id="statusHint">조건을 선택하면 방문 가능한 곳을 보여드립니다.</p>
+          <div class="trust-list">
+            <span>야간진료</span>
+            <span>주말진료</span>
+            <span>약국</span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="trust-band" aria-label="서비스 특징">
+        <article>
+          <strong>진료과 필터</strong>
+          <span>증상에 맞는 과를 빠르게 좁힙니다.</span>
+        </article>
+        <article>
+          <strong>응급 안내</strong>
+          <span>위급 상황은 119와 E-Gen 공식 정보를 우선합니다.</span>
+        </article>
+        <article>
+          <strong>브라우저 저장</strong>
+          <span>저장한 병원은 내 기기에만 보관됩니다.</span>
+        </article>
+      </section>
+
+      <section class="ad-slot" aria-label="광고 영역">
+        <span>Advertisement</span>
+        <p>광고 승인 후 콘텐츠와 명확히 구분되는 광고 영역으로 사용할 자리입니다.</p>
+      </section>
+
+      <section class="filters" id="finder" aria-label="병원 검색 조건">
+        <label>
+          검색어
+          <input id="keyword" type="search" placeholder="예: 내과, 소아과, 약국" autocomplete="off" />
+        </label>
+        <label>
+          지역
+          <select id="area"></select>
+        </label>
+        <label>
+          진료과
+          <select id="department"></select>
+        </label>
+        <label class="check-field">
+          <input id="nightOnly" type="checkbox" />
+          야간/주말 가능
+        </label>
+        <button id="resetButton" class="secondary" type="button">초기화</button>
+      </section>
+
+      <section class="content-grid">
+        <section class="panel results-panel" aria-labelledby="resultsTitle">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Results</p>
+              <h2 id="resultsTitle">추천 병원</h2>
+            </div>
+            <select id="sortBy" aria-label="정렬">
+              <option value="distance">가까운순</option>
+              <option value="rating">평점순</option>
+              <option value="night">야간우선</option>
+            </select>
+          </div>
+          <div class="result-list" id="resultList" aria-live="polite"></div>
+        </section>
+
+        <aside class="side-stack">
+          <section class="panel quick-tool" id="tools" aria-labelledby="toolTitle">
+            <p class="eyebrow">Quick Tool</p>
+            <h2 id="toolTitle">증상별 진료과 가이드</h2>
+            <label>
+              주요 증상
+              <select id="symptomSelect"></select>
+            </label>
+            <div class="tool-result" id="symptomResult"></div>
+          </section>
+
+          <section class="panel checklist-panel" aria-labelledby="checklistTitle">
+            <p class="eyebrow">Visit Checklist</p>
+            <h2 id="checklistTitle">방문 전 체크</h2>
+            <label class="todo"><input type="checkbox" data-visit-task="id" /> 신분증 또는 모바일 신분증 준비</label>
+            <label class="todo"><input type="checkbox" data-visit-task="medicine" /> 복용 중인 약 이름 확인</label>
+            <label class="todo"><input type="checkbox" data-visit-task="symptom" /> 증상 시작 시점 메모</label>
+            <label class="todo"><input type="checkbox" data-visit-task="call" /> 운영시간 전화 확인</label>
+            <progress id="visitProgress" value="0" max="4"></progress>
+            <span id="visitProgressText">0 / 4 완료</span>
+          </section>
+
+          <section class="panel call-panel" aria-labelledby="callTitle">
+            <p class="eyebrow">Call Script</p>
+            <h2 id="callTitle">전화 확인 문장</h2>
+            <p>“오늘 현재 진료 접수가 가능한가요? 제 증상은 ___이고, 초진입니다. 대기시간과 필요한 서류가 있을까요?”</p>
+            <button id="copyScriptButton" type="button">문장 복사</button>
+          </section>
+
+          <section class="panel saved-panel" id="saved" aria-labelledby="savedTitle">
+            <p class="eyebrow">Saved</p>
+            <h2 id="savedTitle">저장한 곳</h2>
+            <div id="savedList" class="saved-list"></div>
+          </section>
+
+          <section class="panel emergency-panel" id="emergency" aria-labelledby="emergencyTitle">
+            <p class="eyebrow">Emergency</p>
+            <h2 id="emergencyTitle">응급 상황</h2>
+            <p>심한 흉통, 호흡곤란, 의식저하, 심한 출혈 등은 가까운 병원 검색보다 119 신고가 우선입니다.</p>
+            <div class="emergency-actions">
+              <a href="tel:119">119 전화</a>
+              <a href="https://www.e-gen.or.kr/" target="_blank" rel="noreferrer">응급의료포털</a>
+            </div>
+          </section>
+        </aside>
+      </section>
+
+      <section class="article-section" id="articles" aria-labelledby="articlesTitle">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Health Guide</p>
+            <h2 id="articlesTitle">우리동네 병원 이용 가이드</h2>
+          </div>
+          <a class="text-link" href="articles.html">전체 글 보기</a>
+        </div>
+        <div class="article-grid">
+          <article class="article-card">
+            <span>야간진료</span>
+            <h3>밤에 아플 때 병원과 약국을 찾는 순서</h3>
+            <p>가벼운 증상이라도 야간에는 진료 가능 여부가 자주 바뀝니다. 전화 확인, 위치 확인, 응급 여부 판단 순서로 움직이는 것이 좋습니다.</p>
+            <a href="articles.html#night-care">읽기</a>
+          </article>
+          <article class="article-card">
+            <span>응급</span>
+            <h3>응급실을 바로 가야 하는 대표 신호</h3>
+            <p>호흡곤란, 의식저하, 심한 흉통, 마비 증상, 조절되지 않는 출혈은 병원 검색보다 119 신고가 우선입니다.</p>
+            <a href="articles.html#emergency-signs">읽기</a>
+          </article>
+          <article class="article-card">
+            <span>감염예방</span>
+            <h3>병원 방문 전 감염 예방 체크리스트</h3>
+            <p>발열이나 호흡기 증상이 있다면 마스크, 손위생, 동선 최소화가 중요합니다. 접수 전 증상을 먼저 알려주세요.</p>
+            <a href="articles.html#infection-check">읽기</a>
+          </article>
+          <article class="article-card">
+            <span>진료준비</span>
+            <h3>초진 때 설명을 잘하는 방법</h3>
+            <p>증상 시작일, 악화되는 시간, 복용약, 알레르기, 과거 진단명을 짧게 정리하면 진료가 더 효율적입니다.</p>
+            <a href="articles.html#first-visit">읽기</a>
+          </article>
+          <article class="article-card">
+            <span>서류</span>
+            <h3>진료 후 챙기면 좋은 서류</h3>
+            <p>보험 청구나 회사 제출이 필요하다면 진료확인서, 영수증, 세부내역서 필요 여부를 접수창구에 확인하세요.</p>
+            <a href="articles.html#documents">읽기</a>
+          </article>
+          <article class="article-card">
+            <span>약국</span>
+            <h3>처방전과 약국 이용 팁</h3>
+            <p>약국 방문 전 운영시간을 확인하고, 복용 중인 약과 알레르기 정보를 약사에게 알려주는 것이 안전합니다.</p>
+            <a href="articles.html#pharmacy">읽기</a>
+          </article>
+          <article class="article-card">
+            <span>심야병원</span>
+            <h3>심야병원과 심야약국 찾는 방법</h3>
+            <p>밤늦게 아플 때는 응급 여부를 먼저 판단하고, E-Gen·지도앱·전화 확인 순서로 실제 운영 여부를 확인하세요.</p>
+            <a href="articles.html#late-night-care">읽기</a>
+          </article>
+          <article class="article-card">
+            <span>진료과</span>
+            <h3>증상별 어느 과로 가야 할까?</h3>
+            <p>내과, 이비인후과, 정형외과, 치과, 안과 등 자주 헷갈리는 진료과 선택 기준을 정리했습니다.</p>
+            <a href="articles.html#internal-medicine">읽기</a>
+          </article>
+          <article class="article-card">
+            <span>보험청구</span>
+            <h3>실손보험 청구 전 확인할 서류</h3>
+            <p>진료비 영수증, 세부내역서, 진단서 필요 여부 등 병원 방문 후 챙길 자료를 확인하세요.</p>
+            <a href="articles.html#insurance">읽기</a>
+          </article>
+          <article class="article-card">
+            <span>고령자</span>
+            <h3>어르신 병원 동행 전 확인할 것</h3>
+            <p>복용약, 진단명, 보청기·안경, 보호자 연락처 등 병원 동행 전 준비 항목을 정리했습니다.</p>
+            <a href="articles.html#elderly-care">읽기</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="article-section" aria-labelledby="localTitle">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Local Guide</p>
+            <h2 id="localTitle">지역별 병원 찾기 포인트</h2>
+          </div>
+        </div>
+        <div class="article-grid">
+          <article class="article-card">
+            <span>서울</span>
+            <h3>서울에서 야간진료 병원 찾기</h3>
+            <p>서울은 의원 수가 많지만 야간 접수 마감이 빠른 곳도 많습니다. 방문 전 전화로 접수 가능 여부와 대기시간을 확인하세요.</p>
+          </article>
+          <article class="article-card">
+            <span>경기</span>
+            <h3>경기권 주말 진료 확인법</h3>
+            <p>지역이 넓어 이동 시간이 길 수 있으므로 거리보다 실제 운영시간과 주차 가능 여부를 함께 확인하는 편이 좋습니다.</p>
+          </article>
+          <article class="article-card">
+            <span>부산/대구</span>
+            <h3>광역시 병원 선택 기준</h3>
+            <p>도심과 주거지의 운영시간 차이가 큽니다. 증상별 진료과를 먼저 고르고, 지도 앱으로 이동 동선을 확인하세요.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="faq-section" id="faq" aria-labelledby="faqTitle">
+        <p class="eyebrow">FAQ</p>
+        <h2 id="faqTitle">자주 묻는 질문</h2>
+        <details open>
+          <summary>이 사이트의 병원 정보는 실시간인가요?</summary>
+          <p>현재 데이터는 예시 데이터와 병원 찾기 도구 구조를 보여주는 용도입니다. 실제 방문 전에는 병원 전화, 지도 서비스, E-Gen, 건강보험심사평가원 등 공식 경로로 운영시간을 확인해야 합니다.</p>
+        </details>
+        <details>
+          <summary>응급실과 야간진료 의원 중 무엇을 선택해야 하나요?</summary>
+          <p>호흡곤란, 의식저하, 심한 흉통, 마비, 심한 출혈 같은 응급 신호가 있으면 119 또는 응급실이 우선입니다. 가벼운 증상은 야간진료 의원이나 약국을 확인할 수 있습니다.</p>
+        </details>
+        <details>
+          <summary>심야약국은 어떻게 찾는 게 가장 빠른가요?</summary>
+          <p>응급의료포털 E-Gen과 지도 앱에서 심야 운영 약국을 확인한 뒤, 실제 조제 가능 여부와 마감 시간을 전화로 확인하는 것이 가장 안전합니다. 야간에는 운영 정보가 바뀔 수 있습니다.</p>
+        </details>
+        <details>
+          <summary>개인 위치 정보가 저장되나요?</summary>
+          <p>현재 버전은 GPS 위치를 수집하지 않습니다. 사용자가 선택한 지역과 저장한 병원 목록은 브라우저 localStorage에만 저장됩니다.</p>
+        </details>
+        <details>
+          <summary>광고가 콘텐츠처럼 보이지 않나요?</summary>
+          <p>광고 영역은 Advertisement로 표시하고 콘텐츠와 구분되도록 배치합니다. 광고 클릭을 유도하거나 보상하는 문구는 사용하지 않습니다.</p>
+        </details>
+      </section>
+
+      <section class="source-section" aria-labelledby="sourceTitle">
+        <p class="eyebrow">Official Links</p>
+        <h2 id="sourceTitle">공식 의료정보 확인 경로</h2>
+        <div class="source-grid">
+          <a href="https://www.e-gen.or.kr/" target="_blank" rel="noreferrer">응급의료포털 E-Gen</a>
+          <a href="https://www.hira.or.kr/" target="_blank" rel="noreferrer">건강보험심사평가원</a>
+          <a href="https://www.kdca.go.kr/" target="_blank" rel="noreferrer">질병관리청</a>
+          <a href="https://www.mohw.go.kr/" target="_blank" rel="noreferrer">보건복지부</a>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <strong>우리동네 병원찾기</strong>
+        <p>본 사이트는 일반 의료정보와 병원 찾기 편의 기능을 제공하며, 의료진의 진단과 처방을 대신하지 않습니다.</p>
+        <nav aria-label="하단 메뉴">
+          <a href="about.html">사이트 소개</a>
+          <a href="contact.html">문의</a>
+          <a href="privacy.html">개인정보 처리방침</a>
+          <a href="articles.html">건강정보</a>
+        </nav>
+      </footer>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>
