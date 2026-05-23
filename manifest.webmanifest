@@ -1,0 +1,12 @@
+{
+  "name": "Hospital Near Me",
+  "short_name": "Hospital",
+  "description": "가까운 병원과 약국을 조건별로 찾는 정적 웹앱",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#eef7f6",
+  "theme_color": "#0f8a83",
+  "orientation": "portrait",
+  "lang": "ko-KR",
+  "categories": ["medical", "health", "navigation"]
+}
