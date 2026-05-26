@@ -1,17 +1,17 @@
 # TeenClimate Action
 
-청소년이 기후 위기를 아는 것에서 그치지 않고 AI 맞춤형 챌린지를 통해 직접 실천하도록 돕는 기후 행동 플랫폼입니다.
+청소년이 기후 위기를 배우고 AI 맞춤형 챌린지, 학교 프로젝트, 실천 기록으로 직접 행동하도록 돕는 교육형 기후 행동 플랫폼입니다.
 
-## 주요 기능
+## 주요 페이지
 
-- 생활패턴 기반 챌린지 추천
-- 기후 행동 챌린지 라이브러리
-- 7일 실천 플랜
-- 완료 기록, 예상 탄소 절감량, 배지
-- 오늘의 실천 일지
-- 청소년 기후 행동 가이드
+- `index.html`: AI 코치, 챌린지, 7일 플랜, 실천 일지, 학교 프로젝트
+- `articles.html`: 청소년 기후 행동 글 20개
+- `resources.html`: 수업/동아리용 자료실
+- `about.html`: 사이트 소개와 운영 원칙
+- `contact.html`: 문의와 제안 안내
+- `privacy.html`: 개인정보 처리방침과 광고 안내
 
-## Cloudflare Pages 배포
+## Cloudflare Pages
 
 - Framework preset: None
 - Build command: 비워두기
