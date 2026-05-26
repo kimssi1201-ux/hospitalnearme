@@ -50,10 +50,97 @@ const newsList = document.querySelector("#newsList");
 const newsStatus = document.querySelector("#newsStatus");
 const newsTopicSelect = document.querySelector("#newsTopic");
 const loadNewsButton = document.querySelector("#loadNewsButton");
+const ktvFeeds = [
+  { name: "KTV 주간 정책&이슈", url: "https://www.ktv.go.kr/guide/programRssPage?pCode=PG2230004D" },
+  { name: "KTV 주간 정책 바로보기", url: "https://www.ktv.go.kr/guide/programRssPage?pCode=PG2230071D" },
+  { name: "KTV 주간 글로벌 인사이트", url: "https://www.ktv.go.kr/guide/programRssPage?pCode=PG2240029D" },
+];
+const ktvFallback = [
+  {
+    title: "KTV 주간 정책&이슈",
+    link: "https://www.ktv.go.kr/program/home/PG2230004D/main",
+    source: "KTV 정책뉴스",
+    date: "공식 프로그램",
+    summary: "정부 정책과 사회 이슈를 종합적으로 다루는 KTV 프로그램입니다. 기후 정책과 탄소중립 이슈가 나올 때 함께 확인하기 좋습니다.",
+  },
+  {
+    title: "KTV 주간 정책 바로보기",
+    link: "https://www.ktv.go.kr/program/home/PG2230071D/main",
+    source: "KTV 정책뉴스",
+    date: "공식 프로그램",
+    summary: "정책 이슈를 해설하는 프로그램입니다. 기후 정책 뉴스의 배경과 제도 변화를 확인하는 보조 자료로 사용할 수 있습니다.",
+  },
+  {
+    title: "KTV 주간 글로벌 인사이트",
+    link: "https://www.ktv.go.kr/program/home/PG2240029D/main",
+    source: "KTV 정책뉴스",
+    date: "공식 프로그램",
+    summary: "국제 이슈와 정책 흐름을 다루는 프로그램입니다. 글로벌 기후 대응과 에너지 전환 흐름을 살펴볼 때 연결할 수 있습니다.",
+  },
+];
+const topicKeywords = {
+  climate: ["기후", "탄소", "환경", "온실가스", "녹색", "에너지"],
+  extreme: ["폭염", "폭우", "기상", "재난", "호우", "날씨"],
+  energy: ["에너지", "전력", "재생", "태양광", "풍력", "전기"],
+  school: ["청소년", "학생", "학교", "교육", "미래세대", "아동"],
+  policy: ["정책", "정부", "탄소중립", "국가", "예산", "제도"],
+};
+let newsSourceSelect = document.querySelector("#newsSource");
+
+function enhanceNewsUi() {
+  if (!document.querySelector("#airyNewsStyles")) {
+    const style = document.createElement("style");
+    style.id = "airyNewsStyles";
+    style.textContent = `
+      main{max-width:1480px;margin:0 auto}.topbar{min-height:78px;box-shadow:0 10px 28px rgba(31,66,55,.05)}.topbar nav{gap:8px}.topbar nav a{padding:8px 10px;border-radius:8px}.topbar nav a:hover{background:rgba(31,138,91,.1);color:var(--deep)}.section-block,.faq-section,.site-footer{padding:clamp(26px,4vw,46px)}.section-head{margin-bottom:28px}.content-grid,.dashboard-grid,.analytics-grid,.project-grid,.article-grid,.news-grid,.news-guide,.fitness-grid{gap:18px}.tool-panel,.chart-card,.news-card,.challenge-card,.recommend-card,.project-grid article,.article-grid article,.evidence-strip article{box-shadow:none}.tool-panel,.chart-card,.news-card{padding:22px}.news-controls{padding:12px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.66)}.news-guide{grid-template-columns:repeat(4,minmax(0,1fr))}@media(max-width:760px){.news-guide{grid-template-columns:1fr}}
+    `;
+    document.head.appendChild(style);
+  }
+  if (!newsSourceSelect && newsTopicSelect) {
+    const label = document.createElement("label");
+    label.innerHTML = `뉴스 소스
+      <select id="newsSource">
+        <option value="mixed">통합 보기</option>
+        <option value="ktv">KTV 정책뉴스</option>
+        <option value="google">Google 뉴스</option>
+      </select>`;
+    newsTopicSelect.closest(".news-controls")?.prepend(label);
+    newsSourceSelect = document.querySelector("#newsSource");
+  }
+  const guide = document.querySelector(".news-guide");
+  if (guide && !document.querySelector("[data-ktv-guide]")) {
+    const card = document.createElement("article");
+    card.dataset.ktvGuide = "true";
+    card.innerHTML = "<strong>KTV 정책뉴스</strong><p>KTV 국민방송의 공개 RSS를 함께 연결해 기후 정책, 탄소중립, 에너지, 청소년 정책처럼 공공 정책 맥락을 확인할 수 있습니다.</p>";
+    guide.insertBefore(card, guide.lastElementChild);
+  }
+}
 
 function buildGoogleNewsRss(query) {
   const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko`;
   return `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
+}
+
+function proxyCandidates(url) {
+  return [
+    url,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  ];
+}
+
+async function fetchTextWithFallback(url, signal) {
+  let lastError;
+  for (const candidate of proxyCandidates(url)) {
+    try {
+      const response = await fetch(candidate, { signal, cache: "no-store" });
+      if (!response.ok) throw new Error(`RSS 응답 오류 ${response.status}`);
+      return await response.text();
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error("RSS 연결 실패");
 }
 
 function newsSearchUrl(query) {
@@ -99,6 +186,44 @@ async function fetchClimateNews(topic) {
   }
 }
 
+function parseRssItems(xmlText, fallbackSource, topic, limit = 6) {
+  const xml = new DOMParser().parseFromString(xmlText, "text/xml");
+  const keywords = topicKeywords[newsTopicSelect?.value || "climate"] || topicKeywords.climate;
+  const items = Array.from(xml.querySelectorAll("item")).map((item) => {
+    const title = cleanNewsText(item.querySelector("title")?.textContent);
+    const summary = cleanNewsText(item.querySelector("description")?.textContent) || `${topic.label}와 연결되는 정책 이슈를 확인해 보세요.`;
+    const combined = `${title} ${summary}`;
+    return {
+      title,
+      link: item.querySelector("link")?.textContent || "https://www.ktv.go.kr/",
+      date: formatNewsDate(item.querySelector("pubDate")?.textContent),
+      source: cleanNewsText(item.querySelector("source")?.textContent) || fallbackSource,
+      summary: summary.length > 120 ? `${summary.slice(0, 118)}...` : summary,
+      score: keywords.some((word) => combined.includes(word)) ? 1 : 0,
+    };
+  }).filter((item) => item.title);
+  return items
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+}
+
+async function fetchKtvNews(topic) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 7000);
+  try {
+    const feedResults = await Promise.allSettled(ktvFeeds.map(async (feed) => {
+      const xmlText = await fetchTextWithFallback(feed.url, controller.signal);
+      return parseRssItems(xmlText, feed.name, topic, 4);
+    }));
+    return feedResults
+      .flatMap((result) => result.status === "fulfilled" ? result.value : [])
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 6);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function renderNewsCards(items, topic, isFallback = false) {
   newsList.innerHTML = items.map((item) => {
     const title = Array.isArray(item) ? item[0] : item.title;
@@ -107,7 +232,7 @@ function renderNewsCards(items, topic, isFallback = false) {
     const source = Array.isArray(item) ? "브리핑 주제" : `${item.source} · ${item.date}`;
     return `
       <article class="news-card">
-        <span>${isFallback ? "Briefing" : "Latest"}</span>
+        <span>${isFallback ? "Briefing" : item.source?.includes("KTV") ? "KTV" : "Latest"}</span>
         <h3><a href="${link}" target="_blank" rel="noopener">${title}</a></h3>
         <p>${summary}</p>
         <p class="news-source">${source}</p>
@@ -119,16 +244,27 @@ function renderNewsCards(items, topic, isFallback = false) {
 async function loadClimateNews() {
   if (!newsList || !newsStatus || !newsTopicSelect) return;
   const topic = newsTopics[newsTopicSelect.value] || newsTopics.climate;
-  newsStatus.textContent = `${topic.label} 관련 최신 뉴스를 불러오는 중입니다.`;
+  const source = newsSourceSelect?.value || "mixed";
+  const sourceLabel = source === "ktv" ? "KTV 정책뉴스" : source === "google" ? "Google 뉴스" : "KTV와 Google 뉴스";
+  newsStatus.textContent = `${topic.label} 관련 ${sourceLabel}를 불러오는 중입니다.`;
   if (loadNewsButton) loadNewsButton.disabled = true;
   try {
-    const items = await fetchClimateNews(topic);
+    const requests = [];
+    if (source === "google" || source === "mixed") requests.push(fetchClimateNews(topic));
+    if (source === "ktv" || source === "mixed") requests.push(fetchKtvNews(topic));
+    const settled = await Promise.allSettled(requests);
+    const items = settled.flatMap((result) => result.status === "fulfilled" ? result.value : []).slice(0, 6);
     if (!items.length) throw new Error("뉴스 항목 없음");
     renderNewsCards(items, topic);
-    newsStatus.textContent = `${topic.label} 관련 최신 기사 ${items.length}개를 불러왔습니다. 기사 원문은 새 창에서 열립니다.`;
+    newsStatus.textContent = `${sourceLabel}에서 ${topic.label} 관련 기사 ${items.length}개를 불러왔습니다. 기사 원문은 새 창에서 열립니다.`;
   } catch (error) {
-    renderNewsCards(topic.fallback, topic, true);
-    newsStatus.textContent = `외부 뉴스 연결이 원활하지 않아 ${topic.label} 브리핑 주제를 먼저 보여줍니다. 카드 제목을 누르면 최신 뉴스 검색으로 이동합니다.`;
+    if (source === "ktv") {
+      renderNewsCards(ktvFallback, topic);
+      newsStatus.textContent = "브라우저에서 KTV RSS 실시간 호출이 막혀 공식 KTV 프로그램 링크를 표시합니다. Cloudflare Worker를 붙이면 RSS를 안정적으로 자동 변환할 수 있습니다.";
+    } else {
+      renderNewsCards(source === "mixed" ? [...ktvFallback, ...topic.fallback].slice(0, 6) : topic.fallback, topic, source !== "mixed");
+      newsStatus.textContent = `KTV/외부 뉴스 연결이 원활하지 않아 ${topic.label} 브리핑과 KTV 공식 링크를 먼저 보여줍니다.`;
+    }
   } finally {
     if (loadNewsButton) loadNewsButton.disabled = false;
   }
@@ -136,4 +272,6 @@ async function loadClimateNews() {
 
 if (loadNewsButton) loadNewsButton.addEventListener("click", loadClimateNews);
 if (newsTopicSelect) newsTopicSelect.addEventListener("change", loadClimateNews);
+enhanceNewsUi();
+if (newsSourceSelect) newsSourceSelect.addEventListener("change", loadClimateNews);
 loadClimateNews();
