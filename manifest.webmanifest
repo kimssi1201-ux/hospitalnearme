@@ -1,11 +1,11 @@
 {
   "name": "틴클라임 액션",
   "short_name": "TeenClimate",
-  "description": "청소년을 위한 AI 맞춤형 기후 행동 챌린지 플랫폼",
+  "description": "청소년 기후 행동 챌린지, 학교 프로젝트, 실천 기록 플랫폼",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#eaf6ef",
-  "theme_color": "#19794d",
+  "background_color": "#edf4ee",
+  "theme_color": "#123d2f",
   "orientation": "portrait",
   "lang": "ko-KR",
   "categories": ["education", "lifestyle", "productivity"]
