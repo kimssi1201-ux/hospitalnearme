@@ -1,12 +1,12 @@
 {
-  "name": "Hospital Near Me",
-  "short_name": "Hospital",
-  "description": "가까운 병원과 약국을 조건별로 찾는 정적 웹앱",
+  "name": "틴클라임 액션",
+  "short_name": "TeenClimate",
+  "description": "청소년을 위한 AI 맞춤형 기후 행동 챌린지 플랫폼",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#eef7f6",
-  "theme_color": "#0f8a83",
+  "background_color": "#eaf6ef",
+  "theme_color": "#19794d",
   "orientation": "portrait",
   "lang": "ko-KR",
-  "categories": ["medical", "health", "navigation"]
+  "categories": ["education", "lifestyle", "productivity"]
 }
