@@ -1,314 +1,99 @@
-const hospitals = [
-  {
-    id: "care-001",
-    name: "서울하늘내과의원",
-    area: "서울",
-    department: "내과",
-    distance: 0.7,
-    rating: 4.7,
-    hours: "평일 09:00-20:00, 토 09:00-14:00",
-    night: true,
-    phone: "0212345678",
-    address: "서울 중구 세종대로 100",
-    note: "감기, 소화기, 만성질환 진료. 평일 저녁 진료 가능.",
-  },
-  {
-    id: "care-002",
-    name: "연세아이소아청소년과",
-    area: "서울",
-    department: "소아과",
-    distance: 1.2,
-    rating: 4.6,
-    hours: "평일 09:00-18:30, 일 10:00-13:00",
-    night: false,
-    phone: "0298765432",
-    address: "서울 마포구 월드컵북로 25",
-    note: "영유아 진료, 예방접종, 주말 오전 진료.",
-  },
-  {
-    id: "care-003",
-    name: "경기365정형외과",
-    area: "경기",
-    department: "정형외과",
-    distance: 2.4,
-    rating: 4.5,
-    hours: "매일 09:00-21:00",
-    night: true,
-    phone: "0311234567",
-    address: "경기 성남시 분당구 판교역로 10",
-    note: "관절, 척추, 스포츠 손상. 야간 물리치료 운영.",
-  },
-  {
-    id: "care-004",
-    name: "부산바른치과",
-    area: "부산",
-    department: "치과",
-    distance: 1.8,
-    rating: 4.8,
-    hours: "평일 10:00-19:00, 목 10:00-21:00",
-    night: true,
-    phone: "0511239876",
-    address: "부산 해운대구 해운대로 200",
-    note: "충치, 스케일링, 임플란트 상담. 목요일 야간진료.",
-  },
-  {
-    id: "care-005",
-    name: "대구맑은이비인후과",
-    area: "대구",
-    department: "이비인후과",
-    distance: 0.9,
-    rating: 4.4,
-    hours: "평일 09:00-19:00, 토 09:00-13:00",
-    night: false,
-    phone: "0535551212",
-    address: "대구 중구 달구벌대로 50",
-    note: "비염, 중이염, 목감기 진료.",
-  },
-  {
-    id: "care-006",
-    name: "우리동네온누리약국",
-    area: "서울",
-    department: "약국",
-    distance: 0.4,
-    rating: 4.3,
-    hours: "매일 08:30-22:30",
-    night: true,
-    phone: "0277778888",
-    address: "서울 종로구 종로 20",
-    note: "야간 운영 약국. 일반의약품, 처방 조제.",
-  },
+const challenges = [
+  { id: "food-leftover", title: "급식 잔반 0에 가까워지기", category: "food", level: "easy", time: 10, impact: 0.45, badge: "잔반 줄이기", description: "먹을 만큼만 받고 남긴 이유를 기록해 다음 식사 선택을 조정합니다.", steps: ["처음에는 평소보다 20% 적게 받기", "부족하면 추가 배식 이용하기", "남긴 음식 종류를 기록하기"] },
+  { id: "food-vegday", title: "주 1회 저탄소 식단 선택", category: "food", level: "medium", time: 20, impact: 1.2, badge: "저탄소 식탁", description: "가능한 날에 채소 중심 식단을 선택하고 친구와 이유를 공유합니다.", steps: ["급식 메뉴 확인하기", "채소 반찬 먼저 먹기", "선택 이유를 한 문장으로 기록하기"] },
+  { id: "energy-standby", title: "교실 대기전력 순찰", category: "energy", level: "easy", time: 10, impact: 0.35, badge: "전기 탐정", description: "쉬는 시간이나 하교 전 사용하지 않는 전자기기 전원을 확인합니다.", steps: ["충전기와 멀티탭 확인", "사용하지 않는 화면 끄기", "담당 친구와 체크표 만들기"] },
+  { id: "energy-temp", title: "냉난방 온도 지킴이", category: "energy", level: "medium", time: 20, impact: 0.7, badge: "에너지 가디언", description: "교실 온도와 체감 상태를 기록해 무리한 냉난방을 줄입니다.", steps: ["교실 온도 기록", "창문 개폐 상태 확인", "담임 선생님과 적정 온도 논의"] },
+  { id: "transport-walk", title: "한 정거장 걷기 또는 자전거", category: "transport", level: "medium", time: 20, impact: 0.9, badge: "초록 이동", description: "안전한 구간에서 자동차 이동을 줄이고 걷기 또는 자전거를 선택합니다.", steps: ["안전한 경로 확인", "친구나 가족에게 이동 계획 알리기", "이동거리 기록"] },
+  { id: "transport-carpool", title: "등하교 이동 탄소 지도 만들기", category: "transport", level: "hard", time: 40, impact: 1.6, badge: "이동 데이터 분석가", description: "반 친구들의 이동 방식을 익명으로 조사해 줄일 수 있는 지점을 찾습니다.", steps: ["익명 설문 만들기", "도보/대중교통/차량 비율 계산", "개선 아이디어 발표"] },
+  { id: "waste-tumbler", title: "일회용 컵 대신 텀블러", category: "waste", level: "easy", time: 10, impact: 0.25, badge: "다회용 컵", description: "하루 동안 일회용 컵 사용을 피하고 사용하지 않은 컵 수를 기록합니다.", steps: ["텀블러 챙기기", "매점이나 카페에서 사용하기", "피한 일회용품 개수 기록"] },
+  { id: "waste-buy", title: "사지 않기 24시간 챌린지", category: "waste", level: "medium", time: 20, impact: 0.8, badge: "소비 멈춤", description: "꼭 필요하지 않은 물건 구매를 하루 미루고 이유를 기록합니다.", steps: ["사고 싶은 물건 적기", "24시간 뒤 다시 판단", "대여/수리/공유 대안 찾기"] },
+  { id: "school-campaign", title: "학급 기후 행동 포스터", category: "school", level: "hard", time: 40, impact: 2.0, badge: "캠페인 메이커", description: "친구들이 바로 따라 할 수 있는 하나의 행동을 포스터로 제안합니다.", steps: ["행동 하나 정하기", "짧은 문구 만들기", "실천 인증 방법 정하기"] },
+  { id: "school-club", title: "우리 학교 기후 회의 열기", category: "school", level: "hard", time: 40, impact: 2.4, badge: "기후 리더", description: "급식, 에너지, 쓰레기 중 하나를 골라 학생 제안서를 만듭니다.", steps: ["문제 하나 선택", "학생 의견 모으기", "실행 가능한 제안 3개 작성"] },
 ];
 
-const areas = ["전체", "서울", "경기", "부산", "대구"];
-const departments = ["전체", "내과", "소아과", "정형외과", "치과", "이비인후과", "약국"];
-const state = {
-  keyword: "",
-  area: "전체",
-  department: "전체",
-  nightOnly: false,
-  sortBy: "distance",
-};
-const symptomGuides = [
-  {
-    symptom: "발열/몸살",
-    department: "내과 또는 소아과",
-    guide: "고열이 지속되거나 탈수, 호흡곤란이 동반되면 즉시 진료가 필요합니다.",
-  },
-  {
-    symptom: "기침/목통증",
-    department: "이비인후과 또는 내과",
-    guide: "호흡기 증상이 있으면 마스크를 착용하고 접수 전 증상을 알려주세요.",
-  },
-  {
-    symptom: "복통/설사",
-    department: "내과",
-    guide: "심한 복통, 혈변, 반복 구토, 탈수 증상이 있으면 빠르게 진료를 받으세요.",
-  },
-  {
-    symptom: "삐끗함/관절통",
-    department: "정형외과",
-    guide: "부기, 변형, 보행 불가가 있으면 영상검사가 필요할 수 있습니다.",
-  },
-  {
-    symptom: "치통",
-    department: "치과",
-    guide: "얼굴 부종, 발열, 삼킴 곤란이 있으면 응급 진료가 필요할 수 있습니다.",
-  },
-  {
-    symptom: "약 조제/복약상담",
-    department: "약국",
-    guide: "처방전, 현재 복용 중인 약, 알레르기 정보를 함께 준비하면 좋습니다.",
-  },
-];
-const saved = new Set(JSON.parse(localStorage.getItem("hospitalnearme.saved") || "[]"));
-
+const categoryNames = { food: "급식/음식", energy: "전기/에너지", transport: "등하교/이동", waste: "쓰레기/소비", school: "학교 캠페인" };
+const storageKey = "teenclimate.completed";
+const journalKey = "teenclimate.journal";
+const completed = new Set(JSON.parse(localStorage.getItem(storageKey) || "[]"));
+const journals = JSON.parse(localStorage.getItem(journalKey) || "[]");
 const $ = (selector) => document.querySelector(selector);
-const keyword = $("#keyword");
-const area = $("#area");
-const department = $("#department");
-const nightOnly = $("#nightOnly");
-const sortBy = $("#sortBy");
-const resultList = $("#resultList");
-const savedList = $("#savedList");
-const matchCount = $("#matchCount");
-const statusHint = $("#statusHint");
-const resetButton = $("#resetButton");
+const challengeList = $("#challengeList");
+const categoryFilter = $("#categoryFilter");
+const impactTotal = $("#impactTotal");
+const completedCount = $("#completedCount");
+const badgeCount = $("#badgeCount");
+const badgeGrid = $("#badgeGrid");
+const weeklyPlan = $("#weeklyPlan");
+const recommendation = $("#recommendation");
 const toast = $("#toast");
-const symptomSelect = $("#symptomSelect");
-const symptomResult = $("#symptomResult");
-const copyScriptButton = $("#copyScriptButton");
-const visitProgress = $("#visitProgress");
-const visitProgressText = $("#visitProgressText");
-const visitTasks = JSON.parse(localStorage.getItem("hospitalnearme.visitTasks") || "{}");
-
-function fillSelect(select, values) {
-  select.innerHTML = values.map((value) => `<option value="${value}">${value}</option>`).join("");
-}
 
 function showToast(message) {
   toast.textContent = message;
   toast.classList.add("show");
   clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => toast.classList.remove("show"), 2000);
+  showToast.timer = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+function persist() { localStorage.setItem(storageKey, JSON.stringify([...completed])); }
+function getFilteredChallenges() { return challenges.filter((challenge) => categoryFilter.value === "all" || challenge.category === categoryFilter.value); }
+
+function renderChallenges() {
+  challengeList.innerHTML = getFilteredChallenges().map((challenge) => {
+    const isDone = completed.has(challenge.id);
+    return `<article class="challenge-card"><div class="card-top"><div><span>${categoryNames[challenge.category]}</span><h3>${challenge.title}</h3></div><strong>${challenge.impact.toFixed(2)}kg</strong></div><p>${challenge.description}</p><ol>${challenge.steps.map((step) => `<li>${step}</li>`).join("")}</ol><button class="${isDone ? "is-done" : ""}" type="button" data-complete="${challenge.id}">${isDone ? "완료됨" : "완료 기록"}</button></article>`;
+  }).join("");
+  renderStats();
 }
 
-function persistSaved() {
-  localStorage.setItem("hospitalnearme.saved", JSON.stringify([...saved]));
+function renderStats() {
+  const doneItems = challenges.filter((challenge) => completed.has(challenge.id));
+  const impact = doneItems.reduce((sum, item) => sum + item.impact, 0);
+  const badges = new Set(doneItems.map((item) => item.badge));
+  impactTotal.textContent = `${impact.toFixed(1)}kg`;
+  completedCount.textContent = doneItems.length;
+  badgeCount.textContent = badges.size;
+  badgeGrid.innerHTML = challenges.map((challenge) => `<div class="badge ${completed.has(challenge.id) ? "earned" : ""}"><span>${completed.has(challenge.id) ? "획득" : "대기"}</span><strong>${challenge.badge}</strong></div>`).join("");
 }
 
-function renderVisitTasks() {
-  const boxes = document.querySelectorAll("[data-visit-task]");
-  let done = 0;
-  boxes.forEach((box) => {
-    box.checked = Boolean(visitTasks[box.dataset.visitTask]);
-    if (box.checked) done += 1;
-  });
-  visitProgress.value = done;
-  visitProgressText.textContent = `${done} / ${boxes.length} 완료`;
+function renderWeeklyPlan() {
+  weeklyPlan.innerHTML = challenges.slice(0, 7).map((challenge, index) => `<label class="plan-item"><input type="checkbox" data-complete="${challenge.id}" ${completed.has(challenge.id) ? "checked" : ""} /><span>DAY ${index + 1}</span><strong>${challenge.title}</strong></label>`).join("");
 }
 
-function filteredHospitals() {
-  const text = state.keyword.trim();
-  return hospitals
-    .filter((item) => {
-      const keywordMatch = !text || `${item.name} ${item.department} ${item.address} ${item.note}`.includes(text);
-      const areaMatch = state.area === "전체" || item.area === state.area;
-      const departmentMatch = state.department === "전체" || item.department === state.department;
-      const nightMatch = !state.nightOnly || item.night;
-      return keywordMatch && areaMatch && departmentMatch && nightMatch;
-    })
-    .sort((a, b) => {
-      if (state.sortBy === "rating") return b.rating - a.rating;
-      if (state.sortBy === "night") return Number(b.night) - Number(a.night) || a.distance - b.distance;
-      return a.distance - b.distance;
-    });
+function recommendChallenge() {
+  const interest = $("#interest").value;
+  const level = $("#level").value;
+  const time = Number($("#time").value);
+  const grade = $("#grade").value;
+  const candidates = challenges.filter((challenge) => challenge.category === interest).filter((challenge) => challenge.time <= time || level === "hard").sort((a, b) => Number(b.level === level) - Number(a.level === level) || b.impact - a.impact);
+  const pick = candidates[0] || challenges.find((challenge) => challenge.category === interest) || challenges[0];
+  recommendation.innerHTML = `<article class="recommend-card"><span>${grade} 맞춤 추천</span><h3>${pick.title}</h3><p>${pick.description}</p><div class="meta-row"><span>${categoryNames[pick.category]}</span><span>${pick.time}분</span><span>예상 ${pick.impact.toFixed(2)}kg 절감</span></div><button type="button" data-complete="${pick.id}">이 챌린지 완료 기록</button></article>`;
 }
 
-function mapLink(item) {
-  return `https://map.naver.com/p/search/${encodeURIComponent(item.name + " " + item.address)}`;
+function renderJournal() {
+  const list = $("#journalList");
+  list.innerHTML = journals.length ? journals.map((item) => `<article><strong>${item.date}</strong><p>${item.text}</p></article>`).join("") : '<p class="empty">아직 기록이 없습니다.</p>';
 }
 
-function renderResults() {
-  const items = filteredHospitals();
-  matchCount.textContent = `${items.length}곳`;
-  statusHint.textContent = items.length ? `가장 가까운 곳은 ${items[0].distance}km 거리입니다.` : "조건을 넓혀 다시 검색해보세요.";
-
-  resultList.innerHTML = items.length
-    ? items.map((item) => `
-      <article class="hospital-card">
-        <div class="card-top">
-          <div>
-            <h3>${item.name}</h3>
-            <p>${item.address}</p>
-          </div>
-          <button class="save-button ${saved.has(item.id) ? "is-saved" : ""}" type="button" data-save="${item.id}">
-            ${saved.has(item.id) ? "저장됨" : "저장"}
-          </button>
-        </div>
-        <div class="meta-row">
-          <span>${item.department}</span>
-          <span>${item.distance}km</span>
-          <span>평점 ${item.rating}</span>
-          <span class="${item.night ? "night" : "open"}">${item.night ? "야간 가능" : "일반 진료"}</span>
-        </div>
-        <p>${item.hours}</p>
-        <p>${item.note}</p>
-        <div class="card-actions">
-          <a href="tel:${item.phone}">전화</a>
-          <a href="${mapLink(item)}" target="_blank" rel="noreferrer">지도</a>
-        </div>
-      </article>
-    `).join("")
-    : '<p class="empty">조건에 맞는 병원/약국이 없습니다.</p>';
-
-  renderSaved();
-}
-
-function renderSaved() {
-  const items = hospitals.filter((item) => saved.has(item.id));
-  savedList.innerHTML = items.length
-    ? items.map((item) => `<article class="saved-item"><strong>${item.name}</strong><span>${item.department} · ${item.distance}km · ${item.hours}</span></article>`).join("")
-    : '<p class="empty">아직 저장한 곳이 없습니다.</p>';
-}
-
-function updateState() {
-  state.keyword = keyword.value;
-  state.area = area.value;
-  state.department = department.value;
-  state.nightOnly = nightOnly.checked;
-  state.sortBy = sortBy.value;
-  renderResults();
-}
-
-fillSelect(area, areas);
-fillSelect(department, departments);
-fillSelect(symptomSelect, symptomGuides.map((item) => item.symptom));
-renderResults();
-renderSymptomGuide();
-renderVisitTasks();
-
-[keyword, area, department, nightOnly, sortBy].forEach((input) => input.addEventListener("input", updateState));
-[area, department, nightOnly, sortBy].forEach((input) => input.addEventListener("change", updateState));
-
-resetButton.addEventListener("click", () => {
-  keyword.value = "";
-  area.value = "전체";
-  department.value = "전체";
-  nightOnly.checked = false;
-  sortBy.value = "distance";
-  updateState();
-});
-
-symptomSelect.addEventListener("change", renderSymptomGuide);
-
-function renderSymptomGuide() {
-  const guide = symptomGuides.find((item) => item.symptom === symptomSelect.value) || symptomGuides[0];
-  symptomResult.innerHTML = `
-    <strong>${guide.department}</strong>
-    <span>${guide.guide}</span>
-    <button type="button" class="secondary" id="applyDepartment">이 진료과로 검색</button>
-  `;
-  $("#applyDepartment").addEventListener("click", () => {
-    const target = guide.department.includes("소아과")
-      ? "소아과"
-      : guide.department.includes("이비인후과")
-        ? "이비인후과"
-        : guide.department.includes("정형외과")
-          ? "정형외과"
-          : guide.department.includes("치과")
-            ? "치과"
-            : guide.department.includes("약국")
-              ? "약국"
-              : "내과";
-    department.value = target;
-    updateState();
-    document.querySelector("#finder").scrollIntoView({ behavior: "smooth" });
-  });
-}
-
-resultList.addEventListener("click", (event) => {
-  const id = event.target.dataset.save;
+document.addEventListener("click", (event) => {
+  const id = event.target.dataset.complete;
   if (!id) return;
-  if (saved.has(id)) {
-    saved.delete(id);
-    showToast("저장을 해제했습니다.");
-  } else {
-    saved.add(id);
-    showToast("저장했습니다.");
-  }
-  persistSaved();
-  renderResults();
+  if (completed.has(id)) { completed.delete(id); showToast("완료 기록을 취소했습니다."); }
+  else { completed.add(id); showToast("기후 행동을 기록했습니다."); }
+  persist(); renderChallenges(); renderWeeklyPlan();
 });
-
 document.addEventListener("change", (event) => {
-  const task = event.target.dataset.visitTask;
-  if (!task) return;
-  visitTasks[task] = event.target.checked;
-  localStorage.setItem("hospitalnearme.visitTasks", JSON.stringify(visitTasks));
-  renderVisitTasks();
+  const id = event.target.dataset.complete;
+  if (!id) return;
+  if (event.target.checked) completed.add(id); else completed.delete(id);
+  persist(); renderChallenges(); renderWeeklyPlan();
 });
-
-copyScriptButton.addEventListener("click", () => {
-  const text = "오늘 현재 진료 접수가 가능한가요? 제 증상은 ___이고, 초진입니다. 대기시간과 필요한 서류가 있을까요?";
-  navigator.clipboard.writeText(text).then(() => showToast("전화 확인 문장을 복사했습니다."));
+categoryFilter.addEventListener("change", renderChallenges);
+$("#recommendButton").addEventListener("click", recommendChallenge);
+$("#saveJournal").addEventListener("click", () => {
+  const text = $("#journalText").value.trim();
+  if (!text) { showToast("기록할 내용을 먼저 적어주세요."); return; }
+  journals.unshift({ date: new Date().toLocaleDateString("ko-KR"), text });
+  localStorage.setItem(journalKey, JSON.stringify(journals.slice(0, 8)));
+  $("#journalText").value = "";
+  renderJournal(); showToast("오늘의 실천 기록을 저장했습니다.");
 });
+renderChallenges(); renderWeeklyPlan(); renderJournal(); recommendChallenge();
