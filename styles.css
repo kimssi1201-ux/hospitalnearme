@@ -1662,3 +1662,66 @@ textarea {
     font-size: 15px;
   }
 }
+
+/* Helpful video links */
+.video-links {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  width: min(980px, calc(100vw - 36px));
+  margin: 0 auto 26px;
+  padding: 18px 20px;
+  border: 1px solid #dbe7f7;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.035);
+}
+
+.video-links div {
+  display: grid;
+  gap: 4px;
+}
+
+.video-links span {
+  color: #1977f3;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.video-links strong {
+  color: #111827;
+  font-size: 17px;
+}
+
+.video-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #eef5ff;
+  color: #1668d8;
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.video-links a:hover {
+  background: #1977f3;
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .video-links {
+    grid-template-columns: 1fr;
+    width: min(100% - 24px, 980px);
+  }
+
+  .video-links a {
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
+}
