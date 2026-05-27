@@ -281,26 +281,23 @@ function saveUiSettings() {
 }
 
 function applyUiSettings() {
-  const isDark = uiSettings.theme === "dark";
-  document.documentElement.dataset.theme = isDark ? "dark" : "light";
-  document.documentElement.style.colorScheme = isDark ? "dark" : "light";
-  document.body.classList.toggle("theme-dark", isDark);
-  document.body.classList.toggle("view-mobile", uiSettings.viewport === "mobile");
+  uiSettings.theme = "light";
+  uiSettings.viewport = "desktop";
+  document.documentElement.dataset.theme = "light";
+  document.documentElement.style.colorScheme = "light";
+  document.body.classList.remove("theme-dark", "view-mobile");
 
   const themeMeta = document.querySelector('meta[name="theme-color"]');
-  if (themeMeta) themeMeta.setAttribute("content", isDark ? "#12201d" : "#f7faf8");
+  if (themeMeta) themeMeta.setAttribute("content", "#f5f7fb");
 
   const themeToggle = $("#themeToggle");
   if (themeToggle) {
-    themeToggle.textContent = isDark ? "다크모드" : "화이트모드";
-    themeToggle.setAttribute("aria-pressed", String(isDark));
-    themeToggle.setAttribute("title", isDark ? "화이트모드로 전환" : "다크모드로 전환");
+    themeToggle.remove();
   }
 
   const viewportToggle = $("#viewportToggle");
   if (viewportToggle) {
-    viewportToggle.textContent = uiSettings.viewport === "mobile" ? "모바일" : "PC";
-    viewportToggle.setAttribute("aria-pressed", String(uiSettings.viewport === "mobile"));
+    viewportToggle.remove();
   }
 }
 
@@ -521,17 +518,6 @@ $("#saveGoalsButton").addEventListener("click", saveGoalInputs);
 $("#showMapButton").addEventListener("click", () => renderMap(Number($("#mapLat").value), Number($("#mapLng").value)));
 $("#useCurrentMapButton").addEventListener("click", useCurrentLocationForMap);
 $("#resetDashboardButton").addEventListener("click", resetTodayDashboard);
-$("#themeToggle").addEventListener("click", () => {
-  uiSettings.theme = uiSettings.theme === "dark" ? "light" : "dark";
-  saveUiSettings();
-  applyUiSettings();
-});
-$("#viewportToggle").addEventListener("click", () => {
-  uiSettings.viewport = uiSettings.viewport === "mobile" ? "desktop" : "mobile";
-  saveUiSettings();
-  applyUiSettings();
-});
-
 applyUiSettings();
 renderChallenges();
 renderPlan();
