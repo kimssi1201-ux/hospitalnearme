@@ -900,10 +900,10 @@ body {
   --panel: #ffffff;
   --soft-panel: #f9fbff;
   --line: #e7ebf2;
-  --green: #16a37b;
+  --green: #1977f3;
   --deep: #111827;
   --blue: #1977f3;
-  --lime: #d9f99d;
+  --lime: #dbeafe;
   --sun: #f59e0b;
   --rust: #ef6f5e;
   --shadow: 0 12px 34px rgba(15, 23, 42, 0.06);
@@ -919,7 +919,7 @@ body.theme-dark {
   --panel: #ffffff;
   --soft-panel: #f9fbff;
   --line: #e7ebf2;
-  --green: #16a37b;
+  --green: #1977f3;
   --deep: #111827;
   --blue: #1977f3;
   --button: #1977f3;
@@ -974,6 +974,8 @@ main {
 
 .topbar nav a {
   padding: 8px 9px;
+  border-radius: 8px;
+  background: #f2f6fb;
   color: #475467;
   font-size: 12px;
   font-weight: 800;
@@ -1019,7 +1021,7 @@ main {
 .hero::after {
   right: -60px;
   bottom: 0;
-  background: linear-gradient(135deg, transparent 0 45%, #93e7b0 45% 70%, #b18df8 70%);
+  background: linear-gradient(135deg, transparent 0 45%, #dbeafe 45% 70%, #b18df8 70%);
 }
 
 .hero-copy,
@@ -1196,7 +1198,7 @@ details {
 }
 
 .eyebrow {
-  color: #ef6f5e;
+  color: #1977f3;
   font-size: 12px;
 }
 
@@ -1256,6 +1258,42 @@ button {
 
 .metric-card strong,
 .card-top strong {
+  color: #1977f3;
+}
+
+.ad-slot span,
+.challenge-card span,
+.recommend-card span,
+.project-grid span,
+.article-grid span,
+.badge span,
+.badge.earned,
+.news-card .news-source {
+  background: #eef5ff;
+  color: #1977f3;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #1977f3;
+  box-shadow: 0 0 0 3px rgba(25, 119, 243, 0.14);
+}
+
+.plan-item input {
+  accent-color: #1977f3;
+}
+
+.primary-link,
+button,
+.progress-fill,
+.bar-fill {
+  background: #1977f3;
+}
+
+.text-link,
+.site-footer a,
+.news-card a:hover {
   color: #1977f3;
 }
 
