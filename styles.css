@@ -1416,3 +1416,176 @@ textarea {
     width: min(100% - 24px, 980px);
   }
 }
+
+/* Readability pass */
+:root {
+  --muted: #4f5f72;
+  --line: #dfe6f0;
+}
+
+body {
+  font-size: 16px;
+  line-height: 1.72;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.topbar {
+  min-height: 64px;
+}
+
+.brand {
+  font-size: 16px;
+  letter-spacing: 0;
+}
+
+.topbar nav a {
+  padding: 10px 12px;
+  color: #2f3a4a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.hero {
+  padding-top: 42px;
+  padding-bottom: 42px;
+}
+
+.hero h1 {
+  max-width: 760px;
+  font-size: clamp(34px, 4vw, 54px);
+  line-height: 1.18;
+  word-break: keep-all;
+}
+
+.hero .lead {
+  max-width: 740px;
+  color: #f7fbff;
+  font-size: 18px;
+  line-height: 1.78;
+  word-break: keep-all;
+}
+
+.hero .eyebrow {
+  color: #eef6ff;
+  font-size: 13px;
+}
+
+.hero .primary-link,
+.hero .secondary-link {
+  min-height: 42px;
+  padding: 0 18px;
+  font-size: 14px;
+}
+
+.impact-card {
+  padding: 24px;
+}
+
+.impact-card strong {
+  font-size: 52px;
+}
+
+.impact-card p {
+  color: #f7fbff;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.evidence-strip article,
+.project-grid article,
+.article-grid article,
+.tool-panel,
+.chart-card,
+.news-card,
+.challenge-card,
+.recommend-card,
+.panel,
+details {
+  padding: 22px;
+}
+
+.evidence-strip strong,
+.project-grid h3,
+.article-grid h3,
+.tool-panel h3,
+.chart-card h3,
+.news-card h3,
+.challenge-card h3,
+.recommend-card h3,
+.panel h2,
+details summary {
+  color: #111827;
+}
+
+.evidence-strip span,
+.project-grid p,
+.article-grid p,
+.challenge-card p,
+.challenge-card li,
+.panel p,
+.tool-panel p,
+.news-card p,
+.news-guide p,
+.empty,
+details p,
+.journal-list p,
+.section-head p {
+  color: #4f5f72;
+  font-size: 16px;
+  line-height: 1.75;
+  word-break: keep-all;
+}
+
+.section-head h2,
+h2 {
+  color: #111827;
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+.eyebrow {
+  font-size: 13px;
+}
+
+label {
+  color: #344054;
+  font-size: 14px;
+}
+
+input,
+select,
+textarea {
+  color: #111827;
+  font-size: 16px;
+}
+
+.ad-slot {
+  background: #1d2939;
+}
+
+@media (max-width: 900px) {
+  .hero h1 {
+    font-size: clamp(32px, 9vw, 44px);
+  }
+
+  .hero .lead,
+  .evidence-strip span,
+  .project-grid p,
+  .article-grid p,
+  .challenge-card p,
+  .challenge-card li,
+  .panel p,
+  .tool-panel p,
+  .news-card p,
+  .news-guide p,
+  .section-head p {
+    font-size: 15px;
+  }
+}
