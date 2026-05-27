@@ -1725,3 +1725,117 @@ textarea {
     text-align: center;
   }
 }
+
+/* Simple color system */
+:root {
+  --ink: #172033;
+  --muted: #5f6b7a;
+  --paper: #f6f8fb;
+  --panel: #ffffff;
+  --soft-panel: #f9fafc;
+  --line: #e1e6ee;
+  --green: #2563eb;
+  --deep: #172033;
+  --blue: #2563eb;
+  --button: #2563eb;
+  --button-text: #ffffff;
+}
+
+body {
+  background: #f6f8fb;
+}
+
+.topbar {
+  background: #ffffff;
+}
+
+.topbar nav a {
+  background: #f1f4f8;
+  color: #263244;
+}
+
+.topbar nav a:hover {
+  background: #e8eef8;
+  color: #1d4ed8;
+}
+
+.hero {
+  background: #2563eb;
+}
+
+.hero::before,
+.hero::after {
+  display: none;
+}
+
+.hero .primary-link {
+  background: #ffffff;
+  color: #1d4ed8;
+}
+
+.hero .secondary-link {
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.impact-card {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.evidence-strip article,
+.project-grid article,
+.article-grid article,
+.tool-panel,
+.chart-card,
+.news-card,
+.challenge-card,
+.recommend-card,
+.panel,
+details,
+.video-links {
+  border-color: #e1e6ee;
+  background: #ffffff;
+}
+
+.ad-slot span,
+.challenge-card span,
+.recommend-card span,
+.project-grid span,
+.article-grid span,
+.badge span,
+.badge.earned,
+.news-card .news-source,
+.video-links span {
+  background: #eef3ff;
+  color: #2563eb;
+}
+
+.primary-link,
+button,
+.progress-fill,
+.bar-fill {
+  background: #2563eb;
+}
+
+.secondary-link,
+.secondary-button,
+.video-links a {
+  border-color: #d8e2f2;
+  background: #f4f7fc;
+  color: #1d4ed8;
+}
+
+.video-links a:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.metric-card strong,
+.card-top strong,
+.text-link,
+.site-footer a,
+.news-card a:hover {
+  color: #2563eb;
+}
