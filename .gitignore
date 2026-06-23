@@ -1,0 +1,13 @@
+# Local secrets
+.env
+.env.local
+.dev.vars
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.cache/
+.wrangler/
