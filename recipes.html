@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="식약처 조리식품 레시피 DB를 활용한 한식 레시피 검색 사이트입니다. 메뉴명, 재료, 카테고리별로 레시피와 영양정보를 확인할 수 있습니다." />
+    <meta property="og:title" content="오늘 뭐 먹지 | 레시피 검색" />
+    <meta property="og:description" content="공공데이터 레시피 API로 메뉴명, 재료, 칼로리 정보를 빠르게 찾아보세요." />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="recipe-site.css" />
+    <title>오늘 뭐 먹지 | 레시피 검색</title>
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="top-nav" aria-label="상단 메뉴">
+        <a class="brand" href="recipes.html">오늘 뭐 먹지</a>
+        <div>
+          <a href="#search">레시피 검색</a>
+          <a href="#collections">추천 모음</a>
+          <a href="README-RECIPE.md">설정 안내</a>
+        </div>
+      </nav>
+      <section class="hero-grid">
+        <div>
+          <p class="eyebrow">FoodSafety Korea Recipe API</p>
+          <h1>냉장고 재료로 찾는<br />간단 레시피 검색</h1>
+          <p class="hero-copy">메뉴명, 재료명, 요리 종류를 입력하면 조리법과 영양정보를 한 번에 확인할 수 있습니다. 다이어트, 자취요리, 아이반찬 콘텐츠로 확장하기 좋게 구성했습니다.</p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#search">바로 검색하기</a>
+            <a class="secondary-button" href="#collections">키워드 모음 보기</a>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="사이트 핵심 기능">
+          <strong>사이트 기능</strong>
+          <ul>
+            <li>메뉴명·재료명 검색</li>
+            <li>열량·단백질·나트륨 확인</li>
+            <li>조리순서 이미지 표시</li>
+            <li>애드센스용 모음글 확장 가능</li>
+          </ul>
+        </aside>
+      </section>
+    </header>
+
+    <main>
+      <section class="search-panel" id="search">
+        <div class="section-title">
+          <p class="eyebrow">Recipe Search</p>
+          <h2>레시피 검색</h2>
+          <p>예시: 김치, 닭가슴살, 두부, 계란, 저염식, 반찬</p>
+        </div>
+        <form id="recipeSearchForm" class="search-form">
+          <label>
+            메뉴명
+            <input id="keywordInput" name="keyword" type="search" placeholder="예: 김치찌개" autocomplete="off" />
+          </label>
+          <label>
+            재료명
+            <input id="ingredientInput" name="ingredient" type="search" placeholder="예: 닭가슴살" autocomplete="off" />
+          </label>
+          <label>
+            카테고리
+            <select id="categoryInput" name="category">
+              <option value="">전체</option>
+              <option value="밥">밥</option>
+              <option value="국&찌개">국&amp;찌개</option>
+              <option value="반찬">반찬</option>
+              <option value="후식">후식</option>
+              <option value="일품">일품</option>
+            </select>
+          </label>
+          <button type="submit">검색하기</button>
+        </form>
+        <div class="quick-tags" aria-label="빠른 검색어">
+          <button type="button" data-keyword="김치">김치</button>
+          <button type="button" data-ingredient="닭가슴살">닭가슴살</button>
+          <button type="button" data-ingredient="두부">두부</button>
+          <button type="button" data-keyword="비빔">비빔</button>
+          <button type="button" data-category="반찬">반찬</button>
+        </div>
+      </section>
+
+      <section class="status-box" id="statusBox" role="status" aria-live="polite">레시피 데이터를 불러오는 중입니다.</section>
+      <section class="recipe-grid" id="recipeGrid" aria-label="레시피 결과"></section>
+
+      <section class="collections" id="collections">
+        <div class="section-title">
+          <p class="eyebrow">SEO Collections</p>
+          <h2>검색 유입용 콘텐츠 아이디어</h2>
+          <p>API 데이터로 아래 같은 모음 페이지를 만들면 애드센스용 페이지를 확장하기 좋습니다.</p>
+        </div>
+        <div class="collection-grid">
+          <article><span>01</span><strong>닭가슴살 다이어트 레시피</strong><p>고단백, 저지방 키워드와 함께 운동·식단 검색 유입을 노릴 수 있습니다.</p></article>
+          <article><span>02</span><strong>자취생 간단 반찬 모음</strong><p>재료 적고 조리 과정이 짧은 레시피를 묶어 모바일 유입에 적합합니다.</p></article>
+          <article><span>03</span><strong>아이 반찬 레시피</strong><p>나트륨, 단백질 정보를 함께 보여주면 체류시간을 늘리기 좋습니다.</p></article>
+          <article><span>04</span><strong>저녁 메뉴 추천</strong><p>매일 검색되는 생활형 키워드라 메인 콘텐츠로 활용하기 좋습니다.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <template id="recipeCardTemplate">
+      <article class="recipe-card">
+        <img class="recipe-image" alt="" loading="lazy" />
+        <div class="recipe-body">
+          <div class="recipe-meta"></div>
+          <h3></h3>
+          <p class="ingredients"></p>
+          <dl class="nutrition"></dl>
+          <details>
+            <summary>조리순서 보기</summary>
+            <ol class="steps"></ol>
+          </details>
+        </div>
+      </article>
+    </template>
+
+    <script src="recipe-site.js" defer></script>
+  </body>
+</html>
