@@ -65,7 +65,7 @@ export async function onRequestGet({ request, env }) {
       recipes,
       items: recipes
     });
-  } catch (error) {
+  } catch {
     return jsonResponse(
       {
         ok: false,
@@ -96,7 +96,7 @@ function normalizeRecipe(row, index) {
   const protein = toNumber(row.INFO_PRO);
 
   return {
-    id: `api-${row.RCP_SEQ || row.RCP_NM || index}`.replace(/[^a-zA-Z0-9가-힣_-]/g, "-"),
+    id: `api-${row.RCP_SEQ || row.RCP_NM || index}`.replace(/[^a-zA-Z0-9가-힣-]/g, "-"),
     title: row.RCP_NM || "공공 레시피",
     name: row.RCP_NM || "공공 레시피",
     category: row.RCP_PAT2 || "공공 레시피",
@@ -131,17 +131,10 @@ function pickSteps(row) {
   const steps = [];
   for (let i = 1; i <= 20; i += 1) {
     const key = `MANUAL${String(i).padStart(2, "0")}`;
-    const imageKey = `MANUAL_IMG${String(i).padStart(2, "0")}`;
     const text = (row[key] || "").trim();
-    if (text) {
-      steps.push({
-        text,
-        image: row[imageKey] || ""
-      });
-    }
+    if (text) steps.push(text);
   }
-
-  return steps.map((step) => step.text);
+  return steps;
 }
 
 function splitIngredients(value) {
@@ -149,7 +142,7 @@ function splitIngredients(value) {
   if (!text) return ["재료 정보는 API 원문을 확인하세요."];
 
   return text
-    .split(/,|·|ㆍ|\n|\r|;/)
+    .split(/,|·|\n|\r|;/)
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 20);
