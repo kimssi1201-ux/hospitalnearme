@@ -95,7 +95,7 @@ function normalizeRecipe(row, index) {
   const ingredients = splitIngredients(row.RCP_PARTS_DTLS);
 
   return {
-    id: `api-${row.RCP_SEQ || row.RCP_NM || index}`.replace(/[^a-zA-Z0-9가-힣_-]/g, "-"),
+    id: `api-${row.RCP_SEQ || row.RCP_NM || index}`.replace(/[^a-zA-Z0-9가-힣-]/g, "-"),
     title: row.RCP_NM || "공공 레시피",
     name: row.RCP_NM || "공공 레시피",
     category: row.RCP_PAT2 || "공공 레시피",
@@ -140,7 +140,7 @@ function splitIngredients(value) {
   const text = String(value || "").trim();
   if (!text) return ["재료 정보는 API 원문을 확인하세요."];
   return text
-    .split(/,|·|ㆍ|\n|\r|;/)
+    .split(/,|·|\n|\r|;/)
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 20);
