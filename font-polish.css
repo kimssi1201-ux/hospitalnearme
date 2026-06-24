@@ -287,3 +287,70 @@ summary,
     filter: contrast(1.025) saturate(1.035) brightness(1.01);
   }
 }
+
+/* Balanced latest recipe grid */
+.latest-section .recipe-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 30px 22px !important;
+  align-items: stretch !important;
+}
+
+.latest-section .recipe-grid .recipe-card,
+.latest-section .recipe-grid .recipe-card:first-child {
+  grid-column: auto !important;
+  display: grid !important;
+  grid-template-rows: auto 1fr !important;
+  min-width: 0 !important;
+  height: 100% !important;
+}
+
+.latest-section .recipe-grid .recipe-card--simple .recipe-media,
+.latest-section .recipe-grid .recipe-card:first-child .recipe-media {
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 18px !important;
+}
+
+.latest-section .recipe-grid .recipe-card--simple .recipe-card__body,
+.latest-section .recipe-grid .recipe-card:first-child .recipe-card__body {
+  display: grid !important;
+  align-content: start !important;
+  min-height: 72px !important;
+  padding: 14px 4px 0 !important;
+  text-align: center !important;
+}
+
+.latest-section .recipe-grid .recipe-card--simple h3,
+.latest-section .recipe-grid .recipe-card:first-child h3 {
+  display: -webkit-box !important;
+  overflow: hidden !important;
+  min-height: 54px !important;
+  margin: 0 !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+@media (max-width: 1080px) {
+  .latest-section .recipe-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .latest-section .recipe-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 22px 14px !important;
+  }
+
+  .latest-section .recipe-grid .recipe-card--simple .recipe-media,
+  .latest-section .recipe-grid .recipe-card:first-child .recipe-media {
+    border-radius: 15px !important;
+  }
+
+  .latest-section .recipe-grid .recipe-card--simple .recipe-card__body,
+  .latest-section .recipe-grid .recipe-card:first-child .recipe-card__body {
+    min-height: 64px !important;
+    padding-top: 10px !important;
+  }
+}
