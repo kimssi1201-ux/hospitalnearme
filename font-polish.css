@@ -20,6 +20,8 @@ select,
 textarea {
   font-family: var(--sans) !important;
   color: var(--text);
+  font-size: 17px;
+  font-weight: 400;
 }
 
 h1,
@@ -38,13 +40,13 @@ h4,
 .collection-card h3 {
   font-family: var(--sans) !important;
   color: #17110d;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-weight: 650;
+  letter-spacing: 0;
   word-break: keep-all;
 }
 
 .hero-copy h1 {
-  font-weight: 850;
+  font-weight: 680;
   line-height: 1.08;
 }
 
@@ -59,7 +61,7 @@ summary,
 .recipe-faq-list p,
 .site-footer p {
   color: var(--muted);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.78;
 }
 
@@ -77,7 +79,7 @@ summary,
 .calorie-total strong,
 .calorie-list strong {
   font-family: var(--sans) !important;
-  font-weight: 750;
+  font-weight: 600;
 }
 
 .nav-links a,
@@ -98,6 +100,7 @@ summary,
 .related-card strong {
   color: #17110d;
   font-size-adjust: 0.52;
+  font-weight: 620;
 }
 
 .hero-search input,
@@ -107,7 +110,43 @@ summary,
 .calorie-form input,
 .custom-calorie-grid input {
   color: #17110d;
-  font-weight: 650;
+  font-weight: 400;
+}
+
+.nav-links a {
+  font-size: 17px !important;
+  font-weight: 600 !important;
+}
+
+.compact-brand {
+  font-size: 20px;
+  font-weight: 650 !important;
+}
+
+.masthead-brand strong {
+  font-size: clamp(38px, 6vw, 68px);
+}
+
+.section-heading h2,
+.search-panel h2,
+.calorie-calculator h2 {
+  font-size: clamp(34px, 5vw, 54px);
+}
+
+.hero-copy p,
+.search-panel p,
+.calorie-calculator .section-heading p,
+.section-heading p {
+  font-size: 18px;
+}
+
+.recipe-card__body h3 {
+  font-size: clamp(20px, 2.4vw, 26px);
+}
+
+.popular-item h3,
+.related-card strong {
+  font-size: 18px;
 }
 
 .hero-search input::placeholder,
@@ -136,6 +175,6 @@ summary,
   label,
   summary,
   .detail-story-section p {
-    font-size: 16px;
+    font-size: 17px;
   }
 }
