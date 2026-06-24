@@ -232,3 +232,58 @@ summary,
     font-size: 13px !important;
   }
 }
+
+/* Image clarity polish */
+.recipe-media,
+.detail-media,
+.hero-pick,
+.popular-item,
+.related-card,
+.detail-gallery-card .recipe-image {
+  background: #f6efe5;
+}
+
+.recipe-media img,
+.detail-media img,
+.hero-pick img,
+.popular-item img,
+.related-card img,
+.detail-gallery-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  image-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  filter: contrast(1.035) saturate(1.045) brightness(1.01);
+}
+
+.recipe-card--simple .recipe-media {
+  aspect-ratio: 4 / 3 !important;
+  overflow: hidden;
+}
+
+.detail-article-media {
+  max-height: 680px;
+}
+
+.detail-article-media img {
+  object-fit: contain !important;
+  background: #f6efe5;
+}
+
+@media (max-width: 720px) {
+  .recipe-card--simple .recipe-media {
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  .recipe-media img,
+  .hero-pick img,
+  .popular-item img,
+  .related-card img {
+    filter: contrast(1.025) saturate(1.035) brightness(1.01);
+  }
+}
