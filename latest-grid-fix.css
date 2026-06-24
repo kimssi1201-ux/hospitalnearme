@@ -1,0 +1,99 @@
+/* Keep today's new recipe cards in an even magazine grid. */
+.latest-section .recipe-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
+  grid-auto-rows: auto !important;
+  gap: 30px 22px !important;
+  align-items: start !important;
+}
+
+.latest-section .recipe-grid .recipe-card,
+.latest-section .recipe-grid .recipe-card:first-child,
+.latest-section .recipe-grid .recipe-card:nth-child(6n + 4) {
+  grid-column: auto !important;
+  grid-row: auto !important;
+  align-self: start !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow: hidden !important;
+}
+
+.latest-section .recipe-grid .recipe-card .recipe-media,
+.latest-section .recipe-grid .recipe-card:first-child .recipe-media,
+.latest-section .recipe-grid .recipe-card:nth-child(6n + 4) .recipe-media {
+  width: 100% !important;
+  aspect-ratio: 1 / 1 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  border-radius: 18px 18px 0 0 !important;
+  overflow: hidden !important;
+}
+
+.latest-section .recipe-grid .recipe-card .recipe-media img,
+.latest-section .recipe-grid .recipe-card:first-child .recipe-media img,
+.latest-section .recipe-grid .recipe-card:nth-child(6n + 4) .recipe-media img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+.latest-section .recipe-grid .recipe-card .recipe-card__body,
+.latest-section .recipe-grid .recipe-card:first-child .recipe-card__body,
+.latest-section .recipe-grid .recipe-card:nth-child(6n + 4) .recipe-card__body {
+  display: grid !important;
+  place-items: center !important;
+  min-height: 74px !important;
+  padding: 14px 10px 16px !important;
+  text-align: center !important;
+}
+
+.latest-section .recipe-grid .recipe-card h3,
+.latest-section .recipe-grid .recipe-card:first-child h3,
+.latest-section .recipe-grid .recipe-card:nth-child(6n + 4) h3 {
+  display: -webkit-box !important;
+  overflow: hidden !important;
+  min-height: 54px !important;
+  margin: 0 !important;
+  font-size: 20px !important;
+  line-height: 1.35 !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+@media (max-width: 1080px) {
+  .latest-section .recipe-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .latest-section .recipe-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 22px 14px !important;
+  }
+
+  .latest-section .recipe-grid .recipe-card .recipe-media,
+  .latest-section .recipe-grid .recipe-card:first-child .recipe-media,
+  .latest-section .recipe-grid .recipe-card:nth-child(6n + 4) .recipe-media {
+    border-radius: 15px 15px 0 0 !important;
+  }
+
+  .latest-section .recipe-grid .recipe-card .recipe-card__body,
+  .latest-section .recipe-grid .recipe-card:first-child .recipe-card__body,
+  .latest-section .recipe-grid .recipe-card:nth-child(6n + 4) .recipe-card__body {
+    min-height: 66px !important;
+    padding: 10px 8px 12px !important;
+  }
+
+  .latest-section .recipe-grid .recipe-card h3,
+  .latest-section .recipe-grid .recipe-card:first-child h3,
+  .latest-section .recipe-grid .recipe-card:nth-child(6n + 4) h3 {
+    min-height: 50px !important;
+    font-size: 18px !important;
+  }
+}
