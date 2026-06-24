@@ -14,42 +14,51 @@ export default {
 };
 
 async function handleRecipeApi(request, env) {
-  const key = env.RECIPE_API_KEY || env.API_KEY;
-
-  if (!key) {
-    return jsonResponse(
-      {
-        ok: false,
-        source: "not_configured",
-        recipes: [],
-        items: [],
-        message: "RECIPE_API_KEY 환경변수가 설정되지 않았습니다."
-      },
-      500
-    );
-  }
-
-  const url = new URL(request.url);
-  const keyword = (url.searchParams.get("keyword") || url.searchParams.get("q") || "").trim();
-  const ingredient = (url.searchParams.get("ingredient") || url.searchParams.get("ingredients") || "").trim();
-  const category = (url.searchParams.get("category") || "").trim();
-  const start = safeNumber(url.searchParams.get("start"), 1, 1, 999);
-  const count = safeNumber(url.searchParams.get("count") || url.searchParams.get("limit"), DEFAULT_COUNT, 1, 50);
-  const end = start + count - 1;
-
-  const filters = [];
-  if (keyword) filters.push(`RCP_NM=${encodeURIComponent(keyword)}`);
-  if (ingredient) filters.push(`RCP_PARTS_DTLS=${encodeURIComponent(ingredient)}`);
-  if (category) filters.push(`RCP_PAT2=${encodeURIComponent(category)}`);
-
-  const filterPath = filters.length ? `/${filters.join("/")}` : "";
-  const apiUrl = `https://openapi.foodsafetykorea.go.kr/api/${key}/${API_NAME}/json/${start}/${end}${filterPath}`;
-
   try {
+    const url = new URL(request.url);
+    const key = String(env.RECIPE_API_KEY || env.API_KEY || "").trim();
+
+    if (url.searchParams.get("health") === "1") {
+      return jsonResponse({
+        ok: true,
+        runtime: "cloudflare-pages-worker",
+        hasKey: Boolean(key),
+        keyLength: key.length
+      });
+    }
+
+    if (!key) {
+      return jsonResponse(
+        {
+          ok: false,
+          source: "not_configured",
+          recipes: [],
+          items: [],
+          message: "RECIPE_API_KEY 환경변수가 설정되지 않았습니다."
+        },
+        200
+      );
+    }
+
+    const keyword = (url.searchParams.get("keyword") || url.searchParams.get("q") || "").trim();
+    const ingredient = (url.searchParams.get("ingredient") || url.searchParams.get("ingredients") || "").trim();
+    const category = (url.searchParams.get("category") || "").trim();
+    const start = safeNumber(url.searchParams.get("start"), 1, 1, 999);
+    const count = safeNumber(url.searchParams.get("count") || url.searchParams.get("limit"), DEFAULT_COUNT, 1, 50);
+    const end = start + count - 1;
+
+    const filters = [];
+    if (keyword) filters.push(`RCP_NM=${encodeURIComponent(keyword)}`);
+    if (ingredient) filters.push(`RCP_PARTS_DTLS=${encodeURIComponent(ingredient)}`);
+    if (category) filters.push(`RCP_PAT2=${encodeURIComponent(category)}`);
+
+    const filterPath = filters.length ? `/${filters.join("/")}` : "";
+    const apiUrl = `https://openapi.foodsafetykorea.go.kr/api/${encodeURIComponent(key)}/${API_NAME}/json/${start}/${end}${filterPath}`;
     const response = await fetch(apiUrl, {
       headers: { accept: "application/json" }
     });
 
+    const text = await response.text();
     if (!response.ok) {
       return jsonResponse(
         {
@@ -58,13 +67,30 @@ async function handleRecipeApi(request, env) {
           recipes: [],
           items: [],
           message: "레시피 API 호출에 실패했습니다.",
-          status: response.status
+          status: response.status,
+          bodyPreview: text.slice(0, 220)
         },
-        502
+        200
       );
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return jsonResponse(
+        {
+          ok: false,
+          source: "foodsafetykorea",
+          recipes: [],
+          items: [],
+          message: "레시피 API가 JSON이 아닌 응답을 반환했습니다.",
+          bodyPreview: text.slice(0, 220)
+        },
+        200
+      );
+    }
+
     const body = data[API_NAME] || {};
     const rows = Array.isArray(body.row) ? body.row : [];
     const recipes = rows.map(normalizeRecipe);
@@ -74,18 +100,20 @@ async function handleRecipeApi(request, env) {
       source: "foodsafetykorea",
       totalCount: Number(body.total_count || rows.length || 0),
       recipes,
-      items: recipes
+      items: recipes,
+      result: body.RESULT || null
     });
-  } catch {
+  } catch (error) {
     return jsonResponse(
       {
         ok: false,
-        source: "foodsafetykorea",
+        source: "worker_error",
         recipes: [],
         items: [],
-        message: "레시피 데이터를 불러오는 중 오류가 발생했습니다."
+        message: "레시피 API 처리 중 오류가 발생했습니다.",
+        error: error && error.message ? error.message : String(error)
       },
-      500
+      200
     );
   }
 }
@@ -162,7 +190,7 @@ function jsonResponse(payload, status = 200) {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "cache-control": "public, max-age=300",
+      "cache-control": "no-store",
       "access-control-allow-origin": "*"
     }
   });
