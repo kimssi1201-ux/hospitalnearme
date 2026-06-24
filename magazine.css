@@ -331,6 +331,32 @@ main {
   color: var(--brown);
 }
 
+.nutrition-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.nutrition-summary span {
+  display: grid;
+  gap: 2px;
+  min-height: 54px;
+  place-items: center;
+  padding: 8px 6px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fffaf2;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.nutrition-summary strong {
+  color: var(--green);
+  font-size: 16px;
+}
+
 .recipe-card__actions {
   margin-top: 4px;
 }
@@ -496,6 +522,42 @@ main {
   background: #fffaf2;
 }
 
+.nutrition-panel {
+  margin: 22px 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #fffaf2;
+}
+
+.nutrition-panel h3 {
+  margin-bottom: 14px;
+  font-size: 24px;
+}
+
+.nutrition-panel div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.nutrition-panel span {
+  display: grid;
+  gap: 3px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.nutrition-panel strong {
+  color: var(--green);
+  font-size: 20px;
+}
+
 .site-footer {
   margin-top: 24px;
 }
@@ -558,13 +620,19 @@ main {
   }
 
   .header-note {
-    justify-content: space-between;
-    padding-right: 12px;
-    padding-left: 12px;
+    display: none;
   }
 
-  .masthead-brand strong {
-    font-size: 38px;
+  .masthead-brand {
+    display: none;
+  }
+
+  .site-header {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .top-nav {
+    min-height: 64px;
   }
 
   .hero-copy {
@@ -574,6 +642,18 @@ main {
 
   .hero-copy h1 {
     font-size: 40px;
+  }
+
+  .nav-links {
+    inset: 76px 12px auto;
+  }
+
+  .nutrition-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .nutrition-panel div {
+    grid-template-columns: 1fr;
   }
 
   .hero-search {
