@@ -1,0 +1,103 @@
+.detail-image-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: -4px 0 8px;
+}
+
+.detail-gallery-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.detail-gallery-card .recipe-image,
+.detail-gallery-card .image-placeholder {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 18px;
+  aspect-ratio: 1 / 1;
+  background: #f5eadc;
+  object-fit: cover;
+  box-shadow: 0 10px 24px rgba(45, 34, 25, 0.1);
+}
+
+.detail-gallery-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 180ms ease;
+}
+
+.detail-gallery-card span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.detail-gallery-card:hover img,
+.detail-gallery-card:focus-visible img {
+  transform: scale(1.035);
+}
+
+.detail-gallery-card:focus-visible {
+  outline: 3px solid rgba(190, 91, 56, 0.32);
+  outline-offset: 5px;
+  border-radius: 20px;
+}
+
+.detail-related .related-grid {
+  gap: 16px;
+}
+
+.detail-related .related-card {
+  align-content: start;
+}
+
+.detail-related .related-card .recipe-image,
+.detail-related .related-card .image-placeholder {
+  aspect-ratio: 4 / 3;
+}
+
+@media (min-width: 860px) {
+  .detail-image-gallery {
+    grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .detail-gallery-card.is-featured {
+    grid-row: span 2;
+  }
+
+  .detail-gallery-card.is-featured .recipe-image,
+  .detail-gallery-card.is-featured .image-placeholder {
+    aspect-ratio: 4 / 5;
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 720px) {
+  .detail-image-gallery {
+    gap: 10px;
+  }
+
+  .detail-gallery-card .recipe-image,
+  .detail-gallery-card .image-placeholder {
+    border-radius: 15px;
+  }
+
+  .detail-gallery-card span {
+    font-size: 12px;
+  }
+}
