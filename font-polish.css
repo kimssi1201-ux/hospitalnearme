@@ -149,6 +149,21 @@ summary,
   font-size: 18px;
 }
 
+.recipe-card--simple h3,
+.recipe-card.recipe-card--simple h3,
+.recipe-grid .recipe-card--simple h3,
+.recipe-grid .recipe-card:first-child.recipe-card--simple h3 {
+  color: #241c17 !important;
+  font-size: clamp(18px, 2.1vw, 22px) !important;
+  font-weight: 520 !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0 !important;
+}
+
+.recipe-card--simple .recipe-card__body {
+  padding: 22px 20px 24px !important;
+}
+
 .hero-search input::placeholder,
 .filter-bar input::placeholder,
 .custom-calorie-grid input::placeholder {
