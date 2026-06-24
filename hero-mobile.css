@@ -1,0 +1,72 @@
+@media (max-width: 720px) {
+  main {
+    padding-top: 18px;
+  }
+
+  .hero-section {
+    gap: 14px;
+    padding-top: 0;
+  }
+
+  .hero-feature {
+    order: 1;
+  }
+
+  .feature-label,
+  .hero-feature > p {
+    display: none;
+  }
+
+  .hero-picks {
+    display: grid;
+    grid-auto-columns: minmax(240px, 84%);
+    grid-auto-flow: column;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 2px 2px 8px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .hero-pick {
+    border-radius: 22px;
+    scroll-snap-align: start;
+  }
+
+  .hero-pick img,
+  .hero-pick .image-placeholder {
+    aspect-ratio: 1 / 1;
+  }
+
+  .hero-pick > span {
+    padding: 13px 14px 15px;
+  }
+
+  .hero-pick strong {
+    font-size: 23px;
+  }
+
+  .hero-copy {
+    order: 2;
+    padding: 20px 18px;
+    border-radius: 22px;
+  }
+
+  .hero-copy .eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .hero-copy h1 {
+    font-size: 31px;
+    line-height: 1.12;
+  }
+
+  .hero-copy p:not(.eyebrow) {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .hero-search {
+    margin-top: 18px;
+  }
+}
