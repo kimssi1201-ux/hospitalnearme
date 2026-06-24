@@ -208,3 +208,51 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Balanced calculator proportions */
+.calorie-tool {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.calorie-form,
+.calorie-results {
+  min-height: 280px;
+}
+
+.calorie-results {
+  grid-column: 2;
+  grid-row: 1;
+  align-content: start;
+}
+
+.custom-calorie {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+.calorie-total span {
+  min-height: 78px;
+}
+
+.calorie-list {
+  min-height: 104px;
+}
+
+@media (max-width: 900px) {
+  .calorie-tool {
+    grid-template-columns: 1fr;
+  }
+
+  .calorie-form,
+  .calorie-results {
+    min-height: 0;
+  }
+
+  .custom-calorie,
+  .calorie-results {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
