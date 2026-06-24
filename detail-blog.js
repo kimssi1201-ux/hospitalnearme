@@ -4,7 +4,7 @@ renderDetail = function renderDetail() {
 
   if (!recipe) {
     detail.innerHTML = `
-      <p class="eyebrow">Recipe Detail</p>
+      <p class="eyebrow">레시피 상세 🍳</p>
       <h2 id="detailTitle">레시피를 선택하세요</h2>
       <p>검색 결과가 들어오면 상세 조리법, 재료, 팁이 이곳에 표시됩니다.</p>
     `;
@@ -57,13 +57,13 @@ renderDetail = function renderDetail() {
       <div class="detail-article-grid">
         <div class="detail-story">
           <section class="detail-story-section" id="detailIntro">
-            <p class="eyebrow">Recipe Note</p>
+            <p class="eyebrow">요리 노트 📝</p>
             <h3>이 레시피 소개</h3>
             <p>${escapeHtml(recipe.intro || "오늘 식탁에 올리기 좋은 집밥 레시피입니다.")}</p>
           </section>
 
           <section class="detail-story-section" id="detailIngredients">
-            <p class="eyebrow">Ingredients</p>
+            <p class="eyebrow">재료 준비 🧄</p>
             <h3>필요한 재료</h3>
             <ul class="ingredient-list">
               ${recipe.ingredients.map((item) => `
@@ -75,7 +75,7 @@ renderDetail = function renderDetail() {
           </section>
 
           <section class="detail-story-section" id="detailSteps">
-            <p class="eyebrow">How To Cook</p>
+            <p class="eyebrow">만드는 법 🍳</p>
             <h3>조리 순서</h3>
             <ol class="step-list">
               ${recipe.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
@@ -83,14 +83,14 @@ renderDetail = function renderDetail() {
           </section>
 
           <section class="detail-story-section" id="detailTips">
-            <p class="eyebrow">Kitchen Tip</p>
+            <p class="eyebrow">요리 팁 ✨</p>
             <h3>맛있게 만드는 팁</h3>
             <p>${escapeHtml(recipe.intro || "재료 상태에 따라 간과 익힘 정도를 조절해 주세요.")}</p>
           </section>
         </div>
 
         <aside class="recipe-summary-card" aria-label="레시피 요약">
-          <h3>Recipe Card</h3>
+          <h3>레시피 요약 🍽️</h3>
           <div class="detail-stats">
             <span><strong>${recipe.time || 30}</strong>분</span>
             <span><strong>${recipe.servings || 2}</strong>인분</span>
@@ -98,7 +98,7 @@ renderDetail = function renderDetail() {
             <span><strong>${recipe.protein || "-"}</strong>g 단백질</span>
           </div>
           <section class="nutrition-panel" id="detailNutrition" aria-label="열량 및 영양 정보">
-            <h3>열량 및 영양 정보</h3>
+            <h3>열량 및 영양 정보 🥗</h3>
             <div>
               <span><strong>${escapeHtml(recipe.calories || nutritionValue(recipe, "calories") || "-")}</strong>kcal 열량</span>
               <span><strong>${escapeHtml(nutritionValue(recipe, "carbohydrate") || "-")}</strong>g 탄수화물</span>
@@ -107,15 +107,12 @@ renderDetail = function renderDetail() {
               <span><strong>${escapeHtml(nutritionValue(recipe, "sodium") || "-")}</strong>mg 나트륨</span>
             </div>
           </section>
-          <button class="detail-action" type="button" data-save="${escapeAttribute(recipe.id)}">
-            ${state.saved.has(recipe.id) ? "저장됨" : "레시피 저장"}
-          </button>
         </aside>
       </div>
 
       <section class="detail-story-section detail-related">
-        <p class="eyebrow">More Recipes</p>
-        <h3>관련 레시피</h3>
+        <p class="eyebrow">추천 레시피 📌</p>
+        <h3>함께 보면 좋은 레시피</h3>
         <div class="related-grid">
           ${
             related.length
