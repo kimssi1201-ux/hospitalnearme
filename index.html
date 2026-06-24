@@ -16,7 +16,7 @@
     <meta property="og:type" content="website" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="stylesheet" href="recipe.css?v=20260624-magazine-1" />
-    <link rel="stylesheet" href="magazine.css?v=20260624-nutrition-1" />
+    <link rel="stylesheet" href="magazine.css?v=20260624-no-api-1" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
     <title>오늘의 레시피 키친 | 집밥 레시피 검색</title>
   </head>
@@ -34,7 +34,6 @@
       <nav class="top-nav" aria-label="주요 메뉴">
         <a class="compact-brand" href="#top" aria-label="오늘의 레시피 키친 홈">레시피 키친</a>
         <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="navLinks">
-          <span></span>
           <span></span>
           <span></span>
           <span class="sr-only">메뉴 열기</span>
@@ -57,8 +56,8 @@
           <p class="eyebrow">Editor's Note</p>
           <h1 id="heroTitle">오늘 뭐 먹지 고민될 때,<br />집밥 레시피를 쉽게 찾아보세요</h1>
           <p>
-            재료, 상황, 카테고리별로 간편하게 요리를 검색할 수 있습니다. 다양한 조리법을
-            읽기 쉬운 카드와 상세 보기로 정리해 드려요.
+            재료, 상황, 카테고리별로 간편하게 요리를 검색할 수 있습니다. 조리법과 영양 정보를
+            읽기 좋은 카드와 상세 보기로 정리해 드려요.
           </p>
           <form class="hero-search" id="heroSearchForm" role="search">
             <label for="heroQuery">레시피 검색</label>
@@ -80,26 +79,11 @@
         </aside>
       </section>
 
-      <section class="trust-strip" aria-label="사이트 특징">
-        <article>
-          <strong>엄선한 레시피</strong>
-          <span>필요한 정보만 보기 좋게</span>
-        </article>
-        <article>
-          <strong>집밥 중심</strong>
-          <span>재료와 카테고리 탐색</span>
-        </article>
-        <article>
-          <strong>영양 정보 확인</strong>
-          <span>열량과 주요 영양 성분 표시</span>
-        </article>
-      </section>
-
       <section class="latest-section" id="latest" aria-labelledby="latestTitle">
         <div class="section-heading">
           <p class="eyebrow">New Recipes</p>
-          <h2 id="latestTitle">새로 불러온 레시피</h2>
-          <p>새로 찾은 레시피를 사진, 조리 정보, 재료 힌트와 함께 블로그 카드처럼 정리했습니다.</p>
+          <h2 id="latestTitle">오늘의 새 레시피</h2>
+          <p>사진, 조리 정보, 재료 힌트와 영양 정보를 함께 볼 수 있도록 읽기 좋은 카드로 정리했습니다.</p>
         </div>
         <p class="result-count" id="resultCount" role="status">레시피 준비 중</p>
         <div class="recipe-grid" id="recipeGrid" aria-live="polite"></div>
@@ -215,6 +199,6 @@
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="recipe.js?v=20260624-nutrition-1"></script>
+    <script src="recipe.js?v=20260624-no-api-1"></script>
   </body>
 </html>
