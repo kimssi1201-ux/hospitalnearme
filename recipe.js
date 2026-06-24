@@ -323,8 +323,7 @@ function renderCategories() {
       type="button"
       data-preset="${escapeAttribute(preset.label)}"
       data-query="${escapeAttribute(preset.query || "")}"
-      data-category="${escapeAttribute(preset.category || "")}"
-    >
+      data-category="${escapeAttribute(preset.category || "")}">
       <span class="category-icon" aria-hidden="true">${escapeHtml(preset.icon)}</span>
       <span>
         <strong>${escapeHtml(preset.label)}</strong>
@@ -365,41 +364,22 @@ function renderRecipeGrid() {
 
   grid.innerHTML = state.recipes.map((recipe) => renderRecipeCard(recipe)).join("");
   bindOpenButtons(grid);
-  bindSaveButtons(grid);
 }
 
 function renderRecipeCard(recipe, rank = "") {
-  const saved = state.saved.has(recipe.id);
-  const calories = recipe.calories || nutritionValue(recipe, "calories") || "-";
-  const protein = recipe.protein || nutritionValue(recipe, "protein") || "-";
-  const sodium = nutritionValue(recipe, "sodium") || "-";
   return `
-    <article class="recipe-card">
+    <article
+      class="recipe-card recipe-card--simple"
+      data-open="${escapeAttribute(recipe.id)}"
+      role="button"
+      tabindex="0"
+      aria-label="${escapeAttribute(`${recipe.title} 상세 보기`)}">
       <div class="recipe-media">
         ${renderImage(recipe)}
-        <span class="time-badge">${recipe.time || 30}분</span>
         ${rank ? `<span class="rank-badge">#${rank}</span>` : ""}
       </div>
       <div class="recipe-card__body">
-        <div class="recipe-meta">
-          <span>${escapeHtml(recipe.category)}</span>
-          ${recipe.method ? `<span>${escapeHtml(recipe.method)}</span>` : ""}
-          <span>${recipe.servings || 2}인분</span>
-        </div>
         <h3>${escapeHtml(recipe.title)}</h3>
-        <p>${escapeHtml(shortText(recipe.intro, 88))}</p>
-        <div class="nutrition-summary" aria-label="영양 정보 요약">
-          <span><strong>${escapeHtml(calories)}</strong>kcal</span>
-          <span><strong>${escapeHtml(protein)}</strong>g 단백질</span>
-          <span><strong>${escapeHtml(sodium)}</strong>mg 나트륨</span>
-        </div>
-        <div class="recipe-tags">
-          ${recipe.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}
-        </div>
-        <div class="recipe-card__actions">
-          <button type="button" data-open="${escapeAttribute(recipe.id)}">자세히 보기</button>
-          <button type="button" class="ghost" data-save="${escapeAttribute(recipe.id)}">${saved ? "저장됨" : "저장"}</button>
-        </div>
       </div>
     </article>
   `;
@@ -659,12 +639,23 @@ function toggleSaved(id) {
 }
 
 function bindOpenButtons(root = document) {
-  root.querySelectorAll("[data-open]").forEach((button) => {
-    button.addEventListener("click", () => {
-      state.selectedRecipeId = button.dataset.open;
+  root.querySelectorAll("[data-open]").forEach((trigger) => {
+    const openRecipe = () => {
+      state.selectedRecipeId = trigger.dataset.open;
       renderDetail();
       $("#recipeDetail").scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    };
+
+    trigger.addEventListener("click", openRecipe);
+
+    if (trigger.tagName !== "BUTTON") {
+      trigger.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openRecipe();
+        }
+      });
+    }
   });
 }
 
