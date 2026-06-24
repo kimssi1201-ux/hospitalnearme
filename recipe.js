@@ -370,6 +370,9 @@ function renderRecipeGrid() {
 
 function renderRecipeCard(recipe, rank = "") {
   const saved = state.saved.has(recipe.id);
+  const calories = recipe.calories || nutritionValue(recipe, "calories") || "-";
+  const protein = recipe.protein || nutritionValue(recipe, "protein") || "-";
+  const sodium = nutritionValue(recipe, "sodium") || "-";
   return `
     <article class="recipe-card">
       <div class="recipe-media">
@@ -385,6 +388,11 @@ function renderRecipeCard(recipe, rank = "") {
         </div>
         <h3>${escapeHtml(recipe.title)}</h3>
         <p>${escapeHtml(shortText(recipe.intro, 88))}</p>
+        <div class="nutrition-summary" aria-label="영양 정보 요약">
+          <span><strong>${escapeHtml(calories)}</strong>kcal</span>
+          <span><strong>${escapeHtml(protein)}</strong>g 단백질</span>
+          <span><strong>${escapeHtml(sodium)}</strong>mg 나트륨</span>
+        </div>
         <div class="recipe-tags">
           ${recipe.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}
         </div>
@@ -395,6 +403,11 @@ function renderRecipeCard(recipe, rank = "") {
       </div>
     </article>
   `;
+}
+
+function nutritionValue(recipe, key) {
+  const value = recipe.nutrition?.[key];
+  return value === undefined || value === null || value === "" ? "" : String(value);
 }
 
 function renderPopular() {
@@ -504,6 +517,16 @@ function renderDetail() {
           <span><strong>${recipe.calories || "-"}</strong>kcal</span>
           <span><strong>${recipe.protein || "-"}</strong>g 단백질</span>
         </div>
+        <section class="nutrition-panel" aria-label="열량 및 영양 정보">
+          <h3>열량 및 영양 정보</h3>
+          <div>
+            <span><strong>${escapeHtml(recipe.calories || nutritionValue(recipe, "calories") || "-")}</strong>kcal 열량</span>
+            <span><strong>${escapeHtml(nutritionValue(recipe, "carbohydrate") || "-")}</strong>g 탄수화물</span>
+            <span><strong>${escapeHtml(recipe.protein || nutritionValue(recipe, "protein") || "-")}</strong>g 단백질</span>
+            <span><strong>${escapeHtml(nutritionValue(recipe, "fat") || "-")}</strong>g 지방</span>
+            <span><strong>${escapeHtml(nutritionValue(recipe, "sodium") || "-")}</strong>mg 나트륨</span>
+          </div>
+        </section>
         <button class="detail-action" type="button" data-save="${escapeAttribute(recipe.id)}">
           ${state.saved.has(recipe.id) ? "저장됨" : "레시피 저장"}
         </button>
