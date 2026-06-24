@@ -14,22 +14,6 @@ renderDetail = function renderDetail() {
   const related = state.recipes
     .filter((item) => item.id !== recipe.id && item.category === recipe.category)
     .slice(0, 4);
-  const galleryItems = [
-    recipe,
-    ...state.recipes.filter((item) => item.id !== recipe.id && item.image).slice(0, 7),
-  ].filter((item) => item.image);
-  const galleryMarkup = galleryItems.length
-    ? `
-      <section class="detail-image-gallery" aria-label="레시피 사진 모음">
-        ${galleryItems.map((item, index) => `
-          <button class="detail-gallery-card${index === 0 ? " is-featured" : ""}" type="button" data-open="${escapeAttribute(item.id)}">
-            ${renderImage(item)}
-            <span>${escapeHtml(item.title)}</span>
-          </button>
-        `).join("")}
-      </section>
-    `
-    : "";
 
   detail.innerHTML = `
     <article class="detail-article">
@@ -52,7 +36,6 @@ renderDetail = function renderDetail() {
       </header>
 
       <div class="detail-media detail-article-media">${renderImage(recipe)}</div>
-      ${galleryMarkup}
 
       <div class="detail-article-grid">
         <div class="detail-story">
