@@ -1,2 +1,284 @@
-/* Public agency portal UI for TeenClimate */
-:root{color-scheme:light}.magazine-page{--green:#1f9d55;--green-dark:#08743a;--blue:#1675d1;--blue-dark:#0b4e91;--sky:#eaf5ff;--mint:#ebf8f0;--ink:#111827;--muted:#5d6675;--line:#dce3ea;--bg:#f4f7fa;--card:#fff;margin:0;padding-top:62px;background:linear-gradient(180deg,#fff 0 190px,var(--bg) 190px 100%);color:var(--ink);font-family:"Nanum Gothic","Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;overflow-x:hidden;scroll-padding-top:86px}.magazine-page *{box-sizing:border-box}.magazine-page a{text-decoration:none}.magazine-page main{max-width:none;margin:0;overflow:visible}.magazine-header{position:relative;z-index:1500;background:#fff;border-bottom:1px solid var(--line)}.magazine-header nav{position:fixed;top:0;left:0;right:0;z-index:3000;display:flex;align-items:center;gap:0;min-height:62px;width:100%;max-width:none;margin:0;padding-left:max(24px,calc((100% - 1220px)/2));padding-right:max(24px,calc((100% - 1220px)/2));overflow-x:auto;border:0;border-bottom:1px solid var(--line);background:rgba(255,255,255,.96);box-shadow:0 10px 26px rgba(15,23,42,.1);backdrop-filter:blur(12px)}.magazine-header nav a{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;min-height:62px;padding:0 18px;border-bottom:4px solid transparent;color:var(--ink);font-size:16px;font-weight:900;white-space:nowrap}.magazine-header nav a:hover,.magazine-header nav a:focus-visible{border-bottom-color:var(--green);color:var(--green-dark)}.masthead-row{display:flex;align-items:center;gap:18px;width:min(1220px,calc(100% - 48px));min-height:88px;margin-inline:auto;background:#fff}.masthead-row .brand{display:flex;align-items:center;gap:12px;color:var(--ink);font-size:24px;font-weight:900}.brand-mark{display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:radial-gradient(circle at 62% 38%,#fff 0 26%,transparent 27%),linear-gradient(135deg,var(--green),var(--blue));color:#fff;box-shadow:0 8px 18px rgba(31,157,85,.22)}.masthead-row p{margin-left:auto;color:var(--muted);font-size:14px;font-weight:800}.masthead-row>a:last-child{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 16px;border-radius:999px;background:#f1f6fb;color:var(--ink);font-size:14px;font-weight:900}.masthead{display:flex;align-items:end;justify-content:space-between;width:min(1220px,calc(100% - 48px));margin-inline:auto;padding:18px 0 24px;border-top:1px solid #edf2f7;background:#fff}.masthead strong{font-size:30px;font-weight:900}.masthead span{max-width:520px;color:var(--muted);font-size:15px;font-weight:700;line-height:1.7;text-align:right}.magazine-cover{position:relative;display:grid;grid-template-columns:minmax(0,1.05fr) 340px;gap:34px;align-items:center;min-height:540px;width:100%;margin:0;padding:74px max(32px,calc((100% - 1220px)/2)) 128px;overflow:hidden;background:linear-gradient(90deg,rgba(4,22,42,.9),rgba(7,69,112,.64) 52%,rgba(15,23,42,.34)),url("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1600&q=80") center/cover no-repeat,linear-gradient(135deg,rgba(31,157,85,.82),rgba(22,117,209,.8));color:#fff}.cover-photo{display:block;position:absolute;inset:0;z-index:0;margin:0;border:0;border-radius:0;overflow:hidden;background:#0f172a}.cover-photo img{width:100%;height:100%;object-fit:cover;opacity:.5;filter:saturate(1.05) contrast(1.05)}.cover-photo figcaption{position:absolute;right:max(24px,calc((100% - 1220px)/2));bottom:28px;z-index:2;max-width:360px;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font-size:13px;font-weight:800;backdrop-filter:blur(8px)}.cover-story,.cover-sidebar{position:relative;z-index:2}.cover-story{max-width:680px}.cover-story .issue-label,.cover-sidebar .issue-label{display:inline-flex;width:fit-content;margin:0 0 18px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font-size:13px;font-weight:900}.cover-story h1{margin:0 0 24px;color:#fff;font-size:clamp(38px,5.4vw,70px);font-weight:900;line-height:1.08;text-shadow:0 4px 20px rgba(0,0,0,.34)}.cover-story h1 span,.cover-story .lead span{display:block}.cover-story .lead{max-width:640px;color:rgba(255,255,255,.94);font-size:18px;font-weight:800;line-height:1.9}.cover-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}.primary-link,.magazine-page button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;border:1px solid var(--green-dark);border-radius:999px;background:var(--green);color:#fff;font-size:15px;font-weight:900;box-shadow:0 10px 22px rgba(31,157,85,.22);cursor:pointer}.secondary-link,.secondary-button{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;border:1px solid rgba(255,255,255,.72);border-radius:999px;background:rgba(255,255,255,.94);color:var(--ink);font-size:15px;font-weight:900}.secondary-button{border-color:var(--line);box-shadow:none}.cover-sidebar{min-height:330px;padding:30px;border:1px solid rgba(255,255,255,.55);border-radius:26px;background:rgba(10,27,46,.42);box-shadow:0 20px 54px rgba(0,0,0,.22);backdrop-filter:blur(14px)}.cover-sidebar strong{display:block;color:#fff;font-size:48px;font-weight:900}.cover-sidebar>span,.cover-sidebar .mini-stats span{color:rgba(255,255,255,.94)}.cover-sidebar .mini-stats{display:grid;gap:10px;margin-top:24px}.cover-sidebar .mini-stats span{padding:14px 16px;border:1px solid rgba(255,255,255,.28);border-radius:14px;background:rgba(255,255,255,.12)}.issue-index{position:relative;z-index:10;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;width:min(1220px,calc(100% - 48px));margin:-82px auto 36px;padding:0}.issue-index article{position:relative;min-height:150px;padding:26px 24px 24px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 16px 36px rgba(15,23,42,.12)}.issue-index article:after{content:"";position:absolute;right:22px;top:24px;width:42px;height:42px;border-radius:16px;background:linear-gradient(135deg,rgba(31,157,85,.16),rgba(22,117,209,.14))}.issue-index article span{color:var(--green-dark);font-size:13px;font-weight:900}.issue-index article strong{display:block;margin-top:16px;color:var(--ink);font-size:24px;font-weight:900}.issue-index article p{margin-top:12px;color:var(--muted);font-size:15px;line-height:1.65}.magazine-page .section-block,.magazine-page .faq-section,.magazine-page .site-footer,.netzero-brief,.feature-grid,.video-links,.content-grid{width:min(1220px,calc(100% - 48px));margin-left:auto;margin-right:auto}.netzero-brief{display:grid;grid-template-columns:280px minmax(0,1fr);gap:22px;align-items:stretch;margin-top:36px;padding:0;border:0;background:transparent;box-shadow:none}.netzero-brief:before{content:"탄소중립 생활실천\A탄소중립이란?\A생활 속 감축방법\A청소년 실천과제";display:block;white-space:pre-line;min-height:100%;padding:26px 24px;border:1px solid var(--line);border-radius:18px;background:#fff;color:var(--muted);font-size:15px;font-weight:900;line-height:2.25;box-shadow:0 10px 26px rgba(15,23,42,.06)}.brief-intro{grid-column:2;padding:34px 38px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 26px rgba(15,23,42,.06)}.issue-label,.magazine-page .eyebrow,.brief-intro .issue-label,.video-links span,.feature-grid article span,.project-grid article span,.article-grid article span{color:var(--green-dark);font-size:13px;font-weight:900;letter-spacing:0}.brief-intro h2,.section-head h2,.feature-grid h2,.faq-section h2{color:var(--ink);font-weight:900;letter-spacing:0}.brief-intro p,.section-head p,.feature-grid p,.project-grid p,.article-grid p,.panel p,.faq-section p,.site-footer p{color:var(--muted);line-height:1.75}.brief-intro a,.feature-grid a,.text-link,.site-footer a,.news-guide a{color:var(--blue-dark);font-weight:900;text-decoration:none}.brief-balance{grid-column:2;display:grid;place-items:center;gap:10px;min-height:150px;padding:24px;border:1px solid #cfe2f6;border-radius:18px;background:linear-gradient(90deg,var(--mint),#fff 46%,var(--sky));box-shadow:0 10px 26px rgba(15,23,42,.05);text-align:center}.brief-balance strong{color:var(--blue-dark);font-size:36px}.brief-balance span{width:100%;padding:10px 12px;border-radius:999px;background:#f2f7fb;color:var(--ink);font-weight:900}.brief-points{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.brief-points article,.feature-grid article,.tool-panel,.chart-card,.news-guide article,.project-grid article,.article-grid article,.panel,.metric-card,.challenge-card,.recommend-card,details{border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.055)}.brief-points article{padding:24px}.brief-points span{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:12px;background:var(--mint);color:var(--green-dark);font-size:13px;font-weight:900}.brief-points h3{margin:12px 0 8px;color:var(--ink);font-size:19px}.brief-points p{margin:0;color:var(--muted);line-height:1.75}.feature-grid{display:grid;grid-template-columns:1.3fr repeat(3,minmax(0,1fr));gap:16px;margin-top:36px}.feature-grid article{padding:28px}.feature-main{grid-row:span 2;background:linear-gradient(145deg,#fff,#f2fbf5)}.feature-main h2{font-size:34px;line-height:1.25}.video-links{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;margin-top:28px;padding:22px 26px;border:1px solid #cfe2f6;border-radius:18px;background:linear-gradient(90deg,#f6fbff,#fff);box-shadow:0 10px 24px rgba(15,23,42,.05)}.video-links strong{display:block;margin-top:4px;color:var(--ink);font-size:20px}.video-links a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 18px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--blue-dark);font-size:14px;font-weight:900}.section-block{margin-top:36px;padding:34px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.055)}.section-head{display:flex;align-items:end;justify-content:space-between;gap:22px;margin-bottom:24px}.coach-grid,.fitness-grid,.calculator-grid,.dashboard-grid,.analytics-grid,.project-grid,.article-grid,.news-guide,.challenge-list{display:grid;gap:16px}.coach-grid,.calculator-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.fitness-grid,.analytics-grid,.project-grid,.article-grid,.news-guide{grid-template-columns:repeat(4,minmax(0,1fr))}.dashboard-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.tool-panel,.chart-card,.metric-card,.project-grid article,.article-grid article,.news-guide article,.panel,.challenge-card,.recommend-card{padding:22px}.tool-columns,.content-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;margin-top:36px}.tool-columns .section-block,.content-grid .section-block,.content-grid .side-stack{width:100%;margin:0}.content-grid{grid-template-columns:minmax(0,1fr) 340px}.side-stack{display:grid;gap:16px}.news-controls,.button-row{display:flex;gap:10px;flex-wrap:wrap}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.magazine-page label{display:grid;gap:7px;color:var(--ink);font-weight:900}input,select,textarea{width:100%;border:1px solid #cfd8e3;border-radius:12px;background:#fff;color:var(--ink);padding:12px 13px;font:inherit}.journal-list,.compact-list,.plan-list{display:grid;gap:10px;margin-top:14px}.progress-stack,.bar-chart{display:grid;gap:10px}.map-frame{display:grid;place-items:center;min-height:220px;margin-top:14px;border:1px dashed #b8c7d6;border-radius:16px;background:#f7fafc;color:var(--muted);text-align:center}.news-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.news-card{padding:22px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.055)}.news-status{color:var(--muted);font-weight:800}.badge-grid{display:flex;flex-wrap:wrap;gap:8px}.badge-grid span,.badge,.tag{display:inline-flex;align-items:center;min-height:30px;padding:0 10px;border-radius:999px;background:var(--mint);color:var(--green-dark);font-size:13px;font-weight:900}.faq-section{margin-top:36px;padding:34px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.055)}details{padding:18px;margin-top:12px}summary{cursor:pointer;color:var(--ink);font-weight:900}.site-footer{margin-top:46px;padding:34px;border:1px solid var(--line);border-top:4px solid var(--green);border-radius:18px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.055)}.site-footer nav{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}.toast{position:fixed;right:20px;bottom:20px;z-index:5000;max-width:320px;padding:14px 16px;border-radius:14px;background:#111827;color:#fff;box-shadow:0 14px 34px rgba(0,0,0,.22);opacity:0;pointer-events:none;transform:translateY(12px);transition:.2s}.toast.show{opacity:1;transform:translateY(0)}@media(max-width:980px){.magazine-page{padding-top:56px}.magazine-header nav{min-height:56px;padding-left:14px;padding-right:14px}.magazine-header nav a{min-height:56px;padding:0 14px;font-size:14px}.masthead-row,.masthead,.magazine-page .section-block,.magazine-page .faq-section,.magazine-page .site-footer,.netzero-brief,.feature-grid,.video-links,.content-grid,.issue-index{width:min(100% - 28px,1220px)}.masthead-row{min-height:76px}.masthead{display:block;padding:16px 0 20px}.masthead span{display:block;margin-top:8px;text-align:left}.magazine-cover{grid-template-columns:1fr;min-height:auto;padding:54px 18px 110px}.cover-sidebar{max-width:520px}.issue-index{grid-template-columns:repeat(2,minmax(0,1fr))}.netzero-brief,.brief-points,.feature-grid,.video-links,.content-grid,.coach-grid,.fitness-grid,.calculator-grid,.dashboard-grid,.analytics-grid,.project-grid,.article-grid,.news-guide,.news-grid{grid-template-columns:1fr}.brief-intro,.brief-balance{grid-column:auto}.netzero-brief:before{min-height:auto}.content-grid{gap:22px}}@media(max-width:640px){.magazine-page{padding-top:52px}.magazine-header nav{min-height:52px}.magazine-header nav a{min-height:52px;padding:0 12px;font-size:13px}.masthead-row{width:calc(100% - 24px);min-height:70px}.masthead-row .brand{font-size:18px}.brand-mark{width:40px;height:40px;border-radius:13px}.masthead-row p,.masthead-row>a:last-child{display:none}.masthead{width:calc(100% - 24px)}.masthead strong{font-size:24px}.magazine-cover{padding:40px 16px 92px}.cover-story h1{font-size:34px}.cover-story .lead{font-size:16px}.cover-actions,.section-head,.news-controls,.form-grid{display:grid;grid-template-columns:1fr}.primary-link,.secondary-link,.magazine-page button{width:100%}.cover-sidebar{min-height:auto;padding:22px}.issue-index{grid-template-columns:1fr;margin-top:-54px}.issue-index article{min-height:128px}.brief-intro,.brief-points article,.feature-grid article,.section-block,.tool-panel,.panel,.site-footer,.faq-section{padding:22px 18px}.feature-main h2{font-size:26px}.video-links{padding:20px 18px}}
+body {
+  background:
+    linear-gradient(90deg, rgba(229, 216, 198, 0.38) 1px, transparent 1px) 0 0 / 96px 96px,
+    var(--ivory);
+}
+
+.site-header {
+  box-shadow: 0 4px 18px rgba(75, 48, 28, 0.04);
+}
+
+.header-note {
+  justify-content: space-between;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.masthead-brand {
+  padding: 24px 16px 18px;
+}
+
+.masthead-brand strong {
+  font-size: clamp(42px, 8vw, 76px);
+}
+
+.masthead-brand small {
+  margin-top: 5px;
+}
+
+.top-nav {
+  justify-content: center;
+  min-height: 48px;
+}
+
+.nav-links a {
+  color: #3d332c;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-search {
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+
+main {
+  padding-top: 22px;
+}
+
+.hero-section {
+  gap: 18px;
+  padding-top: 22px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-copy,
+.hero-feature {
+  box-shadow: none;
+}
+
+.hero-copy {
+  min-height: 0;
+  padding: clamp(24px, 4vw, 42px);
+  background: var(--paper);
+}
+
+.hero-copy h1 {
+  font-size: clamp(32px, 5.4vw, 54px);
+}
+
+.hero-copy p:not(.eyebrow) {
+  font-size: 15px;
+}
+
+.hero-feature {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.feature-label {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  padding: 0 0 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.feature-label strong {
+  font-size: clamp(24px, 4vw, 38px);
+}
+
+.hero-feature > p {
+  margin: 14px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.hero-picks {
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.hero-pick {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+
+.hero-pick img,
+.hero-pick .image-placeholder {
+  aspect-ratio: 16 / 10;
+}
+
+.hero-pick > span {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+}
+
+.hero-pick strong {
+  font-size: 23px;
+}
+
+.trust-strip {
+  margin-top: 0;
+  margin-bottom: 62px;
+  background: var(--paper);
+}
+
+.section-heading {
+  position: relative;
+  max-width: none;
+  margin-bottom: 28px;
+  padding-top: 18px;
+  border-top: 3px double var(--line);
+}
+
+.section-heading h2 {
+  font-size: clamp(34px, 6vw, 58px);
+}
+
+.recipe-card,
+.category-section,
+.search-panel,
+.utility-card,
+.sponsor-slot,
+.collection-card,
+.detail-panel,
+.popular-item {
+  border-color: #d8c8b3;
+}
+
+.recipe-card,
+.category-section,
+.detail-panel,
+.utility-card,
+.collection-card,
+.popular-item {
+  box-shadow: none;
+}
+
+.recipe-card:hover {
+  box-shadow: 0 20px 44px rgba(75, 48, 28, 0.1);
+}
+
+.recipe-card__body {
+  padding: 19px 18px 22px;
+}
+
+.recipe-card h3 {
+  font-size: 26px;
+}
+
+.recipe-card__actions {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.recipe-meta span,
+.recipe-tags span {
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+.search-panel {
+  background: #efe4d3;
+}
+
+.category-section,
+.detail-panel,
+.utility-card,
+.collection-card,
+.popular-item {
+  background: rgba(255, 253, 248, 0.92);
+}
+
+.category-list {
+  gap: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.category-button {
+  border-top: 0;
+  border-left: 0;
+}
+
+.popular-list {
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.popular-item {
+  border-top: 0;
+}
+
+.collection-card {
+  min-height: 280px;
+}
+
+@media (min-width: 920px) {
+  .hero-section {
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+    align-items: start;
+  }
+
+  .hero-feature {
+    order: 1;
+  }
+
+  .hero-copy {
+    order: 2;
+    position: sticky;
+    top: 174px;
+  }
+
+  .hero-picks {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.56fr);
+  }
+
+  .hero-pick:first-child {
+    grid-row: span 2;
+  }
+
+  .hero-pick:first-child img,
+  .hero-pick:first-child .image-placeholder {
+    aspect-ratio: 4 / 3;
+  }
+
+  .hero-pick:first-child strong {
+    font-size: clamp(30px, 4vw, 44px);
+    line-height: 1.06;
+  }
+
+  .recipe-grid {
+    align-items: start;
+  }
+
+  .recipe-grid .recipe-card:first-child {
+    grid-column: span 2;
+  }
+
+  .recipe-grid .recipe-card:first-child .recipe-media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .recipe-grid .recipe-card:first-child h3 {
+    font-size: 40px;
+    line-height: 1.08;
+  }
+
+  .latest-section {
+    margin-top: 70px;
+  }
+}
