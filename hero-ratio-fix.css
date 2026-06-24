@@ -1,0 +1,116 @@
+/* Balance the top cover recipe layout without changing the recipe data. */
+@media (min-width: 920px) {
+  .hero-section {
+    max-width: 1120px !important;
+    grid-template-columns: minmax(0, 1.18fr) minmax(360px, 0.82fr) !important;
+    gap: 28px !important;
+    align-items: stretch !important;
+  }
+
+  .hero-feature,
+  .hero-copy {
+    min-height: clamp(500px, 44vw, 610px) !important;
+  }
+
+  .hero-feature {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    align-content: stretch !important;
+    gap: 14px !important;
+  }
+
+  .feature-label {
+    margin: 0 !important;
+    min-height: 28px !important;
+  }
+
+  .hero-picks {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+    min-height: 0 !important;
+    height: 100% !important;
+  }
+
+  .hero-pick,
+  .hero-pick:first-child {
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    padding: 0 !important;
+    border-radius: 22px !important;
+  }
+
+  .hero-pick:first-child {
+    grid-column: 1 !important;
+    grid-row: 1 / span 2 !important;
+  }
+
+  .hero-pick:nth-child(2),
+  .hero-pick:nth-child(3) {
+    grid-column: 2 !important;
+    grid-row: auto !important;
+  }
+
+  .hero-pick img,
+  .hero-pick .image-placeholder,
+  .hero-pick:first-child img,
+  .hero-pick:first-child .image-placeholder {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    aspect-ratio: auto !important;
+    object-fit: cover !important;
+    object-position: center !important;
+  }
+
+  .hero-pick > span {
+    min-height: 96px !important;
+    padding: 18px 20px 20px !important;
+  }
+
+  .hero-pick:first-child > span {
+    min-height: 170px !important;
+    padding: 24px 24px 28px !important;
+  }
+
+  .hero-pick strong {
+    font-size: clamp(25px, 2.5vw, 34px) !important;
+    line-height: 1.08 !important;
+  }
+
+  .hero-pick:first-child strong {
+    font-size: clamp(42px, 4.1vw, 56px) !important;
+    line-height: 1.06 !important;
+  }
+
+  .hero-copy {
+    display: grid !important;
+    align-content: center !important;
+    justify-items: center !important;
+    padding: clamp(36px, 4.2vw, 56px) !important;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(44px, 4.6vw, 62px) !important;
+    line-height: 1.08 !important;
+  }
+
+  .hero-search {
+    width: min(100%, 360px) !important;
+  }
+}
+
+@media (max-width: 919px) {
+  .hero-section {
+    align-items: start !important;
+  }
+
+  .hero-feature,
+  .hero-copy {
+    min-height: 0 !important;
+  }
+}
