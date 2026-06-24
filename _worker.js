@@ -28,16 +28,13 @@ async function handleRecipeApi(request, env) {
     }
 
     if (!key) {
-      return jsonResponse(
-        {
-          ok: false,
-          source: "not_configured",
-          recipes: [],
-          items: [],
-          message: "RECIPE_API_KEY 환경변수가 설정되지 않았습니다."
-        },
-        200
-      );
+      return jsonResponse({
+        ok: false,
+        source: "not_configured",
+        recipes: [],
+        items: [],
+        message: "RECIPE_API_KEY 환경변수가 설정되지 않았습니다."
+      });
     }
 
     const keyword = (url.searchParams.get("keyword") || url.searchParams.get("q") || "").trim();
@@ -45,77 +42,89 @@ async function handleRecipeApi(request, env) {
     const category = (url.searchParams.get("category") || "").trim();
     const start = safeNumber(url.searchParams.get("start"), 1, 1, 999);
     const count = safeNumber(url.searchParams.get("count") || url.searchParams.get("limit"), DEFAULT_COUNT, 1, 50);
-    const end = start + count - 1;
+    const hasLocalFilter = Boolean(keyword || ingredient || category);
+    const apiEnd = hasLocalFilter ? 999 : start + count - 1;
+    const apiUrl = `https://openapi.foodsafetykorea.go.kr/api/${encodeURIComponent(key)}/${API_NAME}/json/1/${apiEnd}`;
 
-    const filters = [];
-    if (keyword) filters.push(`RCP_NM=${encodeURIComponent(keyword)}`);
-    if (ingredient) filters.push(`RCP_PARTS_DTLS=${encodeURIComponent(ingredient)}`);
-    if (category) filters.push(`RCP_PAT2=${encodeURIComponent(category)}`);
-
-    const filterPath = filters.length ? `/${filters.join("/")}` : "";
-    const apiUrl = `https://openapi.foodsafetykorea.go.kr/api/${encodeURIComponent(key)}/${API_NAME}/json/${start}/${end}${filterPath}`;
     const response = await fetch(apiUrl, {
       headers: { accept: "application/json" }
     });
-
     const text = await response.text();
+
     if (!response.ok) {
-      return jsonResponse(
-        {
-          ok: false,
-          source: "foodsafetykorea",
-          recipes: [],
-          items: [],
-          message: "레시피 API 호출에 실패했습니다.",
-          status: response.status,
-          bodyPreview: text.slice(0, 220)
-        },
-        200
-      );
+      return jsonResponse({
+        ok: false,
+        source: "foodsafetykorea",
+        recipes: [],
+        items: [],
+        message: "레시피 API 호출에 실패했습니다.",
+        status: response.status,
+        bodyPreview: text.slice(0, 220)
+      });
     }
 
     let data;
     try {
       data = JSON.parse(text);
     } catch {
-      return jsonResponse(
-        {
-          ok: false,
-          source: "foodsafetykorea",
-          recipes: [],
-          items: [],
-          message: "레시피 API가 JSON이 아닌 응답을 반환했습니다.",
-          bodyPreview: text.slice(0, 220)
-        },
-        200
-      );
+      return jsonResponse({
+        ok: false,
+        source: "foodsafetykorea",
+        recipes: [],
+        items: [],
+        message: "레시피 API가 JSON이 아닌 응답을 반환했습니다.",
+        bodyPreview: text.slice(0, 220)
+      });
     }
 
     const body = data[API_NAME] || {};
     const rows = Array.isArray(body.row) ? body.row : [];
-    const recipes = rows.map(normalizeRecipe);
+    const filteredRows = filterRows(rows, { keyword, ingredient, category });
+    const pagedRows = hasLocalFilter ? filteredRows.slice(start - 1, start - 1 + count) : filteredRows;
+    const recipes = pagedRows.map(normalizeRecipe);
 
     return jsonResponse({
       ok: true,
       source: "foodsafetykorea",
-      totalCount: Number(body.total_count || rows.length || 0),
+      totalCount: hasLocalFilter ? filteredRows.length : Number(body.total_count || rows.length || 0),
       recipes,
       items: recipes,
       result: body.RESULT || null
     });
   } catch (error) {
-    return jsonResponse(
-      {
-        ok: false,
-        source: "worker_error",
-        recipes: [],
-        items: [],
-        message: "레시피 API 처리 중 오류가 발생했습니다.",
-        error: error && error.message ? error.message : String(error)
-      },
-      200
-    );
+    return jsonResponse({
+      ok: false,
+      source: "worker_error",
+      recipes: [],
+      items: [],
+      message: "레시피 API 처리 중 오류가 발생했습니다.",
+      error: error && error.message ? error.message : String(error)
+    });
   }
+}
+
+function filterRows(rows, { keyword, ingredient, category }) {
+  const keywordNeedle = normalizeSearchText(keyword);
+  const ingredientNeedle = normalizeSearchText(ingredient);
+  const categoryNeedle = normalizeSearchText(category);
+
+  return rows.filter((row) => {
+    const title = normalizeSearchText(row.RCP_NM);
+    const parts = normalizeSearchText(row.RCP_PARTS_DTLS);
+    const rowCategory = normalizeSearchText(row.RCP_PAT2);
+    const method = normalizeSearchText(row.RCP_WAY2);
+    const tags = normalizeSearchText(row.HASH_TAG);
+
+    const keywordMatch = !keywordNeedle || [title, parts, rowCategory, method, tags].some((value) => value.includes(keywordNeedle));
+    const ingredientMatch = !ingredientNeedle || parts.includes(ingredientNeedle);
+    const categoryMatch = !categoryNeedle || rowCategory.includes(categoryNeedle);
+
+    return keywordMatch && ingredientMatch && categoryMatch;
+  });
+}
+
+function normalizeSearchText(value) {
+  return String(value || "").replace(/\s+/g, "").toLowerCase();
 }
 
 function normalizeRecipe(row, index) {
