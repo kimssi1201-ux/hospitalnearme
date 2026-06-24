@@ -84,7 +84,7 @@ function normalizeRecipe(recipe, index) {
 
   return {
     id: recipe.id || `api-${index}`,
-    title: recipe.title || recipe.name || "API 레시피",
+    title: recipe.title || recipe.name || "레시피",
     category: recipe.category || recipe.method || "레시피",
     method: recipe.method || "",
     time: Number(recipe.time) || 30,
@@ -92,10 +92,10 @@ function normalizeRecipe(recipe, index) {
     calories: Number(recipe.calories) || numberFrom(recipe.nutrition?.calories),
     protein: Number(recipe.protein) || numberFrom(recipe.nutrition?.protein),
     image: normalizeImageUrl(recipe.image || recipe.thumbnail || ""),
-    intro: recipe.intro || recipe.tip || "API에서 불러온 레시피입니다.",
+    intro: recipe.intro || recipe.tip || "소개 문구가 준비 중인 레시피입니다.",
     tags: Array.isArray(recipe.tags) ? recipe.tags.filter(Boolean).slice(0, 5) : [],
-    ingredients: ingredients.length ? ingredients : ["재료 정보가 API 응답에 포함되지 않았습니다."],
-    steps: steps.length ? steps : ["조리 과정이 API 응답에 포함되지 않았습니다."],
+    ingredients: ingredients.length ? ingredients : ["재료 정보가 아직 준비되지 않았습니다."],
+    steps: steps.length ? steps : ["조리 과정이 아직 준비되지 않았습니다."],
     nutrition: recipe.nutrition || {},
     source: recipe.source || "api"
   };
@@ -108,10 +108,10 @@ function normalizeFoodSafetyRecipe(row, index) {
     if (text) steps.push(text);
   }
 
-  const category = row.RCP_PAT2 || "공공 레시피";
+  const category = row.RCP_PAT2 || "레시피";
   return {
     id: `foodsafety-${row.RCP_SEQ || index}`.replace(/[^a-zA-Z0-9가-힣-]/g, "-"),
-    title: row.RCP_NM || "공공 레시피",
+    title: row.RCP_NM || "레시피",
     category,
     method: row.RCP_WAY2 || "",
     time: 30,
@@ -119,10 +119,10 @@ function normalizeFoodSafetyRecipe(row, index) {
     calories: numberFrom(row.INFO_ENG),
     protein: numberFrom(row.INFO_PRO),
     image: normalizeImageUrl(row.ATT_FILE_NO_MAIN || row.ATT_FILE_NO_MK || ""),
-    intro: row.RCP_NA_TIP || `${category} 방식으로 정리된 공공 레시피입니다.`,
+    intro: row.RCP_NA_TIP || `${category} 방식으로 정리된 레시피입니다.`,
     tags: [row.RCP_PAT2, row.RCP_WAY2, row.HASH_TAG].filter(Boolean).slice(0, 5),
     ingredients: splitIngredientText(row.RCP_PARTS_DTLS),
-    steps: steps.length ? steps : ["API 응답에 조리 순서가 포함되지 않았습니다."],
+    steps: steps.length ? steps : ["조리 순서가 아직 준비되지 않았습니다."],
     nutrition: {
       calories: row.INFO_ENG || "",
       carbohydrate: row.INFO_CAR || "",
@@ -259,31 +259,31 @@ function renderStatus() {
   const resultCount = $("#resultCount");
 
   if (state.status === "loading") {
-    summary.textContent = "API 연결 중";
-    summaryText.textContent = "레시피 데이터를 불러오고 있습니다.";
-    resultCount.textContent = "API 응답 대기 중";
+    summary.textContent = "레시피 준비 중";
+    summaryText.textContent = "잘 어울리는 레시피를 불러오고 있습니다.";
+    resultCount.textContent = "레시피 준비 중";
     return;
   }
 
   if (state.status === "error") {
-    summary.textContent = "API 확인 필요";
-    summaryText.textContent = "레시피 API 응답을 받지 못했습니다. 잠시 뒤 다시 검색해 주세요.";
-    resultCount.textContent = "API 응답 없음";
+    summary.textContent = "레시피를 불러오지 못했습니다";
+    summaryText.textContent = "잠시 뒤 다시 검색해 주세요.";
+    resultCount.textContent = "검색 결과 없음";
     return;
   }
 
   if (state.status === "unconfigured") {
-    summary.textContent = "API 키 연결 필요";
-    summaryText.textContent = "Cloudflare Pages 환경변수 RECIPE_API_KEY를 확인해 주세요.";
-    resultCount.textContent = "API 연결 대기";
+    summary.textContent = "레시피 준비 중";
+    summaryText.textContent = "레시피 정보를 확인하는 중입니다. 잠시 뒤 다시 시도해 주세요.";
+    resultCount.textContent = "레시피 준비 중";
     return;
   }
 
   summary.textContent = count ? `${count}개 추천` : "레시피 없음";
   summaryText.textContent = count
-    ? "API에서 받은 레시피를 카드와 상세 보기로 정리했습니다."
+    ? "추천 레시피를 카드와 상세 보기로 정리했습니다."
     : "검색어를 바꿔 다시 불러와 보세요.";
-  resultCount.textContent = `${count}개 API 레시피`;
+  resultCount.textContent = `${count}개 레시피`;
 }
 
 function renderLoading() {
@@ -333,7 +333,7 @@ function renderCategories() {
     </button>
   `).join("");
 
-  $$('[data-preset]').forEach((button) => {
+  $$("[data-preset]").forEach((button) => {
     button.addEventListener("click", () => {
       $("#queryInput").value = button.dataset.query || "";
       $("#ingredientInput").value = "";
@@ -453,7 +453,7 @@ function renderCollections() {
     `;
   }).join("");
 
-  $$('[data-collection-query]').forEach((button) => {
+  $$("[data-collection-query]").forEach((button) => {
     button.addEventListener("click", () => {
       $("#queryInput").value = button.dataset.collectionQuery || "";
       $("#ingredientInput").value = "";
@@ -571,7 +571,7 @@ function renderShopping() {
     `)
     .join("");
 
-  $$('[data-remove-shopping]').forEach((button) => {
+  $$("[data-remove-shopping]").forEach((button) => {
     button.addEventListener("click", () => {
       state.shopping = state.shopping.filter((item) => item !== button.dataset.removeShopping);
       saveJson(storageKeys.shopping, state.shopping);
