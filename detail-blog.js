@@ -52,7 +52,6 @@ renderDetail = function renderDetail() {
               ${recipe.ingredients.map((item) => `
                 <li>
                   <span>${escapeHtml(item)}</span>
-                  <button type="button" data-add-shopping="${escapeAttribute(item)}">추가</button>
                 </li>
               `).join("")}
             </ul>
@@ -121,7 +120,6 @@ renderDetail = function renderDetail() {
 
   bindOpenButtons(detail);
   bindSaveButtons(detail);
-  bindShoppingButtons(detail);
 };
 
 renderDetail();
