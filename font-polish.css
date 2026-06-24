@@ -1,0 +1,141 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css");
+
+:root {
+  --sans: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", Arial, sans-serif;
+  --serif: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", Arial, sans-serif;
+  --text: #1f1712;
+  --muted: #5f5148;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--sans) !important;
+  color: var(--text);
+}
+
+h1,
+h2,
+h3,
+h4,
+.masthead-brand strong,
+.compact-brand,
+.section-heading h2,
+.hero-copy h1,
+.detail-article-header h2,
+.recipe-summary-card h3,
+.detail-story-section h3,
+.recipe-card h3,
+.popular-item h3,
+.collection-card h3 {
+  font-family: var(--sans) !important;
+  color: #17110d;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+.hero-copy h1 {
+  font-weight: 850;
+  line-height: 1.08;
+}
+
+p,
+li,
+label,
+summary,
+.detail-lede,
+.detail-story-section p,
+.recipe-extra-grid article p,
+.nutrition-note p,
+.recipe-faq-list p,
+.site-footer p {
+  color: var(--muted);
+  font-weight: 500;
+  line-height: 1.78;
+}
+
+.eyebrow,
+.nav-links a,
+.hero-search button,
+.filter-bar button,
+.calorie-form button,
+.primary-link,
+.secondary-link,
+.detail-jump-links a,
+.category-button strong,
+.detail-stats strong,
+.nutrition-panel strong,
+.calorie-total strong,
+.calorie-list strong {
+  font-family: var(--sans) !important;
+  font-weight: 750;
+}
+
+.nav-links a,
+.compact-brand,
+.masthead-brand small,
+.header-note,
+.result-count,
+.recipe-card__body h3,
+.popular-item p,
+.related-card strong,
+.related-card .muted {
+  -webkit-font-smoothing: antialiased;
+  text-shadow: none;
+}
+
+.recipe-card__body h3,
+.popular-item h3,
+.related-card strong {
+  color: #17110d;
+  font-size-adjust: 0.52;
+}
+
+.hero-search input,
+.filter-bar input,
+.filter-bar select,
+.calorie-form select,
+.calorie-form input,
+.custom-calorie-grid input {
+  color: #17110d;
+  font-weight: 650;
+}
+
+.hero-search input::placeholder,
+.filter-bar input::placeholder,
+.custom-calorie-grid input::placeholder {
+  color: #9a8b7f;
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  .hero-copy h1 {
+    font-size: clamp(36px, 10vw, 54px);
+    line-height: 1.12;
+  }
+
+  .section-heading h2,
+  .search-panel h2,
+  .calorie-calculator h2,
+  .detail-article-header h2 {
+    font-size: clamp(28px, 8vw, 40px);
+    line-height: 1.18;
+  }
+
+  p,
+  li,
+  label,
+  summary,
+  .detail-story-section p {
+    font-size: 16px;
+  }
+}
