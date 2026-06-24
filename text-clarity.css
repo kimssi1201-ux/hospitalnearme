@@ -1,0 +1,118 @@
+:root {
+  --ink: #18110d;
+  --muted: #4f4138;
+  --brown: #65442e;
+  --green: #123f2f;
+  --terracotta: #934027;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  color: var(--ink);
+  font-family: "Nanum Gothic", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: subpixel-antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+.masthead-brand strong,
+.compact-brand,
+.recipe-card h3,
+.popular-item h3,
+.collection-card h3,
+.detail-article-header h2,
+.detail-story-section h3,
+.recipe-summary-card h3 {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+p,
+li,
+input,
+select,
+button,
+.nav-links a,
+.header-note,
+.recipe-card p,
+.detail-story-section p,
+.step-list li,
+.ingredient-list li,
+.nutrition-panel span,
+.detail-stats span,
+.saved-card span,
+.muted,
+.site-footer,
+.site-footer p,
+.site-footer nav a {
+  font-weight: 700;
+}
+
+.hero-copy p:not(.eyebrow),
+.section-heading p,
+.recipe-card p,
+.detail-copy p,
+.detail-lede,
+.detail-story-section p,
+.site-footer p,
+.collection-card p,
+.hero-feature p,
+.sponsor-slot p,
+.step-list li,
+.popular-item p,
+.category-button span:not(.category-icon),
+.saved-card span,
+.muted {
+  color: var(--muted);
+}
+
+.eyebrow,
+.result-count,
+.detail-meta,
+.feature-label span,
+.recipe-meta span,
+.recipe-tags span,
+.time-badge,
+.rank-badge {
+  font-weight: 900;
+}
+
+.recipe-summary-card,
+.nutrition-panel span,
+.detail-stats span,
+.ingredient-list li,
+.step-list li,
+.related-card,
+.category-button,
+.hero-search input,
+.filter-bar input,
+.filter-bar select {
+  color: #2f241f;
+}
+
+.hero-search input::placeholder,
+.filter-bar input::placeholder {
+  color: #77695e;
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  body {
+    font-weight: 600;
+  }
+
+  p,
+  li,
+  input,
+  select,
+  button {
+    font-weight: 700;
+  }
+}
