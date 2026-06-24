@@ -17,10 +17,7 @@
 }
 
 body {
-  background:
-    radial-gradient(circle at 6% 10%, rgba(217, 166, 66, 0.15), transparent 280px),
-    radial-gradient(circle at 94% 18%, rgba(36, 74, 56, 0.1), transparent 260px),
-    linear-gradient(180deg, #fffdf8 0, var(--ivory) 460px, #fbf2e6 100%);
+  background: #fff;
 }
 
 .site-header {
@@ -106,9 +103,7 @@ main {
   padding: clamp(30px, 5vw, 62px);
   border: 1px solid var(--line);
   border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(255, 253, 248, 0.96), rgba(255, 248, 238, 0.98)),
-    var(--paper);
+  background: #fff;
   box-shadow: var(--soft-shadow);
 }
 
@@ -198,7 +193,7 @@ main {
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 24px;
-  background: var(--paper);
+  background: #fff;
   box-shadow: var(--soft-shadow);
 }
 
@@ -239,7 +234,7 @@ main {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: var(--paper);
+  background: #fff;
   box-shadow: var(--soft-shadow);
 }
 
@@ -300,7 +295,7 @@ main {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 24px;
-  background: var(--paper);
+  background: #fff;
   box-shadow: var(--soft-shadow);
 }
 
@@ -365,9 +360,7 @@ main {
   padding: clamp(30px, 5vw, 58px);
   border: 1px solid var(--line);
   border-radius: 30px;
-  background:
-    linear-gradient(135deg, rgba(248, 237, 221, 0.92), rgba(228, 236, 223, 0.72)),
-    var(--cream);
+  background: #fff;
   box-shadow: var(--soft-shadow);
   text-align: center;
 }
@@ -394,7 +387,7 @@ main {
 .collection-card {
   border: 1px solid var(--line);
   border-radius: 28px;
-  background: var(--paper);
+  background: #fff;
   box-shadow: var(--soft-shadow);
 }
 
