@@ -15,20 +15,23 @@
     />
     <meta property="og:type" content="website" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="recipe.css?v=20260624-premium-1" />
+    <link rel="stylesheet" href="recipe.css?v=20260624-premium-2" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
     <title>오늘의 레시피 키친 | 집밥 레시피 검색</title>
   </head>
   <body>
     <header class="site-header" id="top">
+      <div class="header-note">
+        <span>API 레시피 검색</span>
+        <a href="#search">오늘 저녁 메뉴 찾기</a>
+      </div>
+      <a class="masthead-brand" href="#top" aria-label="오늘의 레시피 키친 홈">
+        <span>오늘의</span>
+        <strong>레시피 키친</strong>
+        <small>따뜻한 집밥을 위한 요리 노트</small>
+      </a>
       <nav class="top-nav" aria-label="주요 메뉴">
-        <a class="brand" href="#top" aria-label="오늘의 레시피 키친 홈">
-          <span class="brand-mark" aria-hidden="true">R</span>
-          <span class="brand-copy">
-            <strong>오늘의 레시피 키친</strong>
-            <small>Home Cooking Journal</small>
-          </span>
-        </a>
+        <a class="compact-brand" href="#top" aria-label="오늘의 레시피 키친 홈">레시피 키친</a>
         <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="navLinks">
           <span></span>
           <span></span>
@@ -42,6 +45,7 @@
           <a href="#popular">인기요리</a>
           <a href="#collections">최신요리</a>
           <a href="about.html">소개</a>
+          <a class="nav-search" href="#search">검색</a>
         </div>
       </nav>
     </header>
@@ -49,7 +53,7 @@
     <main>
       <section class="hero-section" aria-labelledby="heroTitle">
         <div class="hero-copy">
-          <p class="eyebrow">Recipe Search & Home Cooking</p>
+          <p class="eyebrow">Home Cooking Journal</p>
           <h1 id="heroTitle">오늘 뭐 먹지 고민될 때,<br />집밥 레시피를 쉽게 찾아보세요</h1>
           <p>
             재료, 상황, 카테고리별로 간편하게 요리를 검색할 수 있습니다. 공공 레시피 API에서 받아온 조리법을
@@ -67,7 +71,7 @@
         </div>
         <aside class="hero-feature" aria-label="추천 레시피">
           <div class="feature-label">
-            <span>Today Picks</span>
+            <span>Fresh From API</span>
             <strong id="apiSummary">레시피 데이터를 불러오는 중</strong>
           </div>
           <div class="hero-picks" id="heroPicks" aria-live="polite"></div>
@@ -76,25 +80,27 @@
       </section>
 
       <section class="trust-strip" aria-label="사이트 특징">
-        <article><strong>API 기반</strong><span>받아온 레시피만 표시</span></article>
-        <article><strong>집밥 중심</strong><span>재료와 카테고리 탐색</span></article>
-        <article><strong>모바일 최적화</strong><span>손쉬운 검색과 저장</span></article>
-      </section>
-
-      <section class="category-section" id="categories" aria-labelledby="categoryTitle">
-        <div class="section-heading">
-          <p class="eyebrow">Browse By Mood</p>
-          <h2 id="categoryTitle">카테고리로 빠르게 찾기</h2>
-          <p>한식, 국과 찌개, 반찬, 간식처럼 자주 찾는 테마를 눌러 바로 검색해보세요.</p>
-        </div>
-        <div class="category-list" id="categoryList"></div>
+        <article>
+          <strong>API 기반</strong>
+          <span>받아온 레시피만 표시</span>
+        </article>
+        <article>
+          <strong>집밥 중심</strong>
+          <span>재료와 카테고리 탐색</span>
+        </article>
+        <article>
+          <strong>모바일 최적화</strong>
+          <span>손쉬운 검색과 저장</span>
+        </article>
       </section>
 
       <section class="latest-section" id="latest" aria-labelledby="latestTitle">
-        <div class="section-heading row">
-          <div><p class="eyebrow">Latest Recipes</p><h2 id="latestTitle">새로 불러온 레시피</h2></div>
-          <p class="result-count" id="resultCount" role="status">API 응답 대기 중</p>
+        <div class="section-heading">
+          <p class="eyebrow">New Recipes</p>
+          <h2 id="latestTitle">새로 불러온 레시피</h2>
+          <p>API에서 받아온 최신 레시피를 사진, 조리 정보, 재료 힌트와 함께 블로그 카드처럼 정리했습니다.</p>
         </div>
+        <p class="result-count" id="resultCount" role="status">API 응답 대기 중</p>
         <div class="recipe-grid" id="recipeGrid" aria-live="polite"></div>
       </section>
 
@@ -105,29 +111,69 @@
           <p>요리명과 재료를 함께 입력하면 더 가까운 결과를 찾을 수 있습니다.</p>
         </div>
         <form class="filter-bar" id="searchForm" role="search">
-          <label>검색어<input id="queryInput" type="search" placeholder="김치찌개, 감자, 두부" /></label>
-          <label>재료<input id="ingredientInput" type="text" placeholder="김치, 돼지고기, 닭가슴살" /></label>
-          <label>분류<select id="categoryFilter"><option value="">전체</option></select></label>
+          <label>
+            검색어
+            <input id="queryInput" type="search" placeholder="김치찌개, 감자, 두부" />
+          </label>
+          <label>
+            재료
+            <input id="ingredientInput" type="text" placeholder="김치, 돼지고기, 닭가슴살" />
+          </label>
+          <label>
+            분류
+            <select id="categoryFilter">
+              <option value="">전체</option>
+            </select>
+          </label>
           <button type="submit">레시피 찾기</button>
         </form>
       </section>
 
+      <section class="category-section" id="categories" aria-labelledby="categoryTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Recipe Index</p>
+          <h2 id="categoryTitle">카테고리로 빠르게 찾기</h2>
+          <p>한식, 국과 찌개, 반찬, 간식처럼 자주 찾는 테마를 눌러 바로 검색해보세요.</p>
+        </div>
+        <div class="category-list" id="categoryList"></div>
+      </section>
+
       <section class="content-layout">
         <section class="popular-section" id="popular" aria-labelledby="popularTitle">
-          <div class="section-heading row"><div><p class="eyebrow">Reader Favorites</p><h2 id="popularTitle">많이 찾는 레시피</h2></div></div>
+          <div class="section-heading row">
+            <div>
+              <p class="eyebrow">Reader Favorites</p>
+              <h2 id="popularTitle">많이 찾는 레시피</h2>
+            </div>
+          </div>
           <div class="popular-list" id="popularList"></div>
         </section>
 
         <aside class="side-rail" aria-label="저장과 장보기">
           <section class="utility-card" id="saved">
-            <div class="mini-head"><div><p class="eyebrow">Saved</p><h2>저장한 레시피</h2></div><button class="text-button" id="clearSaved" type="button">삭제</button></div>
+            <div class="mini-head">
+              <div>
+                <p class="eyebrow">Saved</p>
+                <h2>저장한 레시피</h2>
+              </div>
+              <button class="text-button" id="clearSaved" type="button">삭제</button>
+            </div>
             <div class="saved-list" id="savedList"></div>
           </section>
           <section class="utility-card">
-            <div class="mini-head"><div><p class="eyebrow">Shopping</p><h2>장보기 목록</h2></div><button class="text-button" id="clearShopping" type="button">비우기</button></div>
+            <div class="mini-head">
+              <div>
+                <p class="eyebrow">Shopping</p>
+                <h2>장보기 목록</h2>
+              </div>
+              <button class="text-button" id="clearShopping" type="button">비우기</button>
+            </div>
             <ul class="shopping-list" id="shoppingList"></ul>
           </section>
-          <section class="sponsor-slot" aria-label="광고 또는 제휴 영역"><span>추천 공간</span><p>광고나 제휴 콘텐츠가 들어가도 본문과 자연스럽게 구분되는 여백입니다.</p></section>
+          <section class="sponsor-slot" aria-label="광고 또는 제휴 영역">
+            <span>추천 공간</span>
+            <p>광고나 제휴 콘텐츠가 들어가도 본문과 자연스럽게 구분되는 여백입니다.</p>
+          </section>
         </aside>
       </section>
 
@@ -151,16 +197,23 @@
       <div>
         <a class="brand footer-brand" href="#top" aria-label="오늘의 레시피 키친 홈">
           <span class="brand-mark" aria-hidden="true">R</span>
-          <span class="brand-copy"><strong>오늘의 레시피 키친</strong><small>따뜻한 집밥 레시피 검색</small></span>
+          <span class="brand-copy">
+            <strong>오늘의 레시피 키친</strong>
+            <small>따뜻한 집밥 레시피 검색</small>
+          </span>
         </a>
         <p>공공 레시피 API 응답을 보기 좋은 블로그형 레이아웃으로 정리하는 레시피 전문 사이트입니다.</p>
       </div>
       <nav aria-label="하단 메뉴">
-        <a href="#latest">레시피</a><a href="#categories">카테고리</a><a href="contact.html">문의</a><a href="privacy.html">개인정보처리방침</a><a href="terms.html">이용약관</a>
+        <a href="#latest">레시피</a>
+        <a href="#categories">카테고리</a>
+        <a href="contact.html">문의</a>
+        <a href="privacy.html">개인정보처리방침</a>
+        <a href="terms.html">이용약관</a>
       </nav>
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="recipe.js?v=20260624-premium-1"></script>
+    <script src="recipe.js?v=20260624-premium-2"></script>
   </body>
 </html>
