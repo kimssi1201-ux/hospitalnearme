@@ -1,0 +1,210 @@
+.calorie-calculator {
+  width: min(1120px, calc(100% - 32px));
+  margin: 48px auto;
+  padding: clamp(28px, 5vw, 56px);
+  border: 1px solid #eadbc6;
+  border-radius: 28px;
+  background: #fffaf2;
+  box-shadow: 0 18px 44px rgba(75, 48, 28, 0.08);
+}
+
+.calorie-calculator .section-heading {
+  max-width: 720px;
+  margin: 0 auto 28px;
+  text-align: center;
+}
+
+.calorie-tool {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.calorie-form,
+.custom-calorie,
+.calorie-results {
+  border: 1px solid #eadbc6;
+  border-radius: 22px;
+  background: #fff;
+}
+
+.calorie-form {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+}
+
+.calorie-form label,
+.custom-calorie-grid label {
+  display: grid;
+  gap: 8px;
+  color: #3b3029;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.calorie-form select,
+.calorie-form input,
+.custom-calorie-grid input {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid #dfd0bd;
+  border-radius: 16px;
+  background: #fffaf2;
+  color: #18110d;
+  font: inherit;
+  font-weight: 800;
+  padding: 0 15px;
+}
+
+.calorie-form button {
+  min-height: 54px;
+  border: 0;
+  border-radius: 999px;
+  background: #174d39;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.calorie-form button:hover,
+.calorie-form button:focus-visible {
+  background: #be5b3b;
+  outline: none;
+}
+
+.custom-calorie {
+  grid-column: 1;
+  padding: 0;
+  overflow: hidden;
+}
+
+.custom-calorie summary {
+  min-height: 54px;
+  padding: 16px 20px;
+  color: #174d39;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.custom-calorie-grid {
+  display: grid;
+  gap: 12px;
+  padding: 0 20px 20px;
+}
+
+.calorie-results {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+}
+
+.calorie-total {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.calorie-total span {
+  min-height: 82px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #fff7ed;
+  color: #59483d;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.calorie-total strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #174d39;
+  font-size: clamp(23px, 3vw, 32px);
+  line-height: 1;
+}
+
+.calorie-list {
+  display: grid;
+  gap: 10px;
+  min-height: 92px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.calorie-list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid #eadbc6;
+  border-radius: 16px;
+  background: #fffdf8;
+}
+
+.calorie-list strong {
+  display: block;
+  color: #18110d;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.calorie-list span {
+  color: #6d5a4d;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.calorie-list button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #eadbc6;
+  border-radius: 50%;
+  background: #fffaf2;
+  color: #934027;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.calorie-results .text-button {
+  justify-self: end;
+  color: #174d39;
+}
+
+.calorie-note {
+  max-width: 760px;
+  margin: 18px auto 0;
+  color: #6d5a4d;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.75;
+  text-align: center;
+}
+
+@media (max-width: 780px) {
+  .calorie-calculator {
+    width: min(100% - 24px, 560px);
+    margin: 34px auto;
+    padding: 24px 16px;
+    border-radius: 24px;
+  }
+
+  .calorie-tool {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-calorie,
+  .calorie-results {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .calorie-total {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
