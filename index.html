@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="재료와 카테고리로 집밥 레시피를 검색하고, 공공 레시피 API에서 불러온 조리법과 영양 정보를 보기 좋게 확인하는 레시피 전문 사이트입니다."
+      content="재료와 카테고리로 집밥 레시피를 검색하고, 다양한 조리법과 영양 정보를 보기 좋게 확인하는 레시피 전문 사이트입니다."
     />
     <meta name="theme-color" content="#fbf4e8" />
     <meta property="og:title" content="오늘의 레시피 키친 | 집밥 레시피 검색" />
     <meta
       property="og:description"
-      content="김치찌개, 닭가슴살, 반찬, 국과 찌개까지 API 레시피를 따뜻한 요리 매거진 스타일로 탐색하세요."
+      content="김치찌개, 닭가슴살, 반찬, 국과 찌개까지 집밥 레시피를 따뜻한 요리 매거진 스타일로 탐색하세요."
     />
     <meta property="og:type" content="website" />
     <link rel="manifest" href="manifest.webmanifest" />
@@ -23,7 +23,7 @@
   <body>
     <header class="site-header" id="top">
       <div class="header-note">
-        <span>API 레시피 검색</span>
+        <span>집밥 레시피 검색</span>
         <a href="#search">오늘 저녁 메뉴 찾기</a>
       </div>
       <a class="masthead-brand" href="#top" aria-label="오늘의 레시피 키친 홈">
@@ -57,7 +57,7 @@
           <p class="eyebrow">Editor's Note</p>
           <h1 id="heroTitle">오늘 뭐 먹지 고민될 때,<br />집밥 레시피를 쉽게 찾아보세요</h1>
           <p>
-            재료, 상황, 카테고리별로 간편하게 요리를 검색할 수 있습니다. 공공 레시피 API에서 받아온 조리법을
+            재료, 상황, 카테고리별로 간편하게 요리를 검색할 수 있습니다. 다양한 조리법을
             읽기 쉬운 카드와 상세 보기로 정리해 드려요.
           </p>
           <form class="hero-search" id="heroSearchForm" role="search">
@@ -73,17 +73,17 @@
         <aside class="hero-feature" aria-label="추천 레시피">
           <div class="feature-label">
             <span>Cover Recipes</span>
-            <strong id="apiSummary">레시피 데이터를 불러오는 중</strong>
+            <strong id="apiSummary">오늘의 추천을 준비하는 중</strong>
           </div>
           <div class="hero-picks" id="heroPicks" aria-live="polite"></div>
-          <p id="apiSummaryText">API 연결 상태를 확인하고 있습니다.</p>
+          <p id="apiSummaryText">잘 어울리는 레시피를 고르고 있습니다.</p>
         </aside>
       </section>
 
       <section class="trust-strip" aria-label="사이트 특징">
         <article>
-          <strong>API 기반</strong>
-          <span>받아온 레시피만 표시</span>
+          <strong>엄선한 레시피</strong>
+          <span>필요한 정보만 보기 좋게</span>
         </article>
         <article>
           <strong>집밥 중심</strong>
@@ -99,9 +99,9 @@
         <div class="section-heading">
           <p class="eyebrow">New Recipes</p>
           <h2 id="latestTitle">새로 불러온 레시피</h2>
-          <p>API에서 받아온 최신 레시피를 사진, 조리 정보, 재료 힌트와 함께 블로그 카드처럼 정리했습니다.</p>
+          <p>새로 찾은 레시피를 사진, 조리 정보, 재료 힌트와 함께 블로그 카드처럼 정리했습니다.</p>
         </div>
-        <p class="result-count" id="resultCount" role="status">API 응답 대기 중</p>
+        <p class="result-count" id="resultCount" role="status">레시피 준비 중</p>
         <div class="recipe-grid" id="recipeGrid" aria-live="polite"></div>
       </section>
 
@@ -203,7 +203,7 @@
             <small>따뜻한 집밥 레시피 검색</small>
           </span>
         </a>
-        <p>공공 레시피 API 응답을 보기 좋은 블로그형 레이아웃으로 정리하는 레시피 전문 사이트입니다.</p>
+        <p>집밥 레시피를 보기 좋은 블로그형 레이아웃으로 정리하는 레시피 전문 사이트입니다.</p>
       </div>
       <nav aria-label="하단 메뉴">
         <a href="#latest">레시피</a>
@@ -215,6 +215,6 @@
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="recipe.js?v=20260624-magazine-1"></script>
+    <script src="recipe.js?v=20260624-copy-1"></script>
   </body>
 </html>
