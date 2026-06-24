@@ -1,0 +1,72 @@
+.site-header .top-nav {
+  min-height: 66px;
+}
+
+.site-header .nav-links {
+  gap: 8px;
+}
+
+.site-header .nav-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 58px;
+  padding: 0 22px;
+  border-radius: 0;
+  color: #2f241f;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.site-header .nav-links a:hover,
+.site-header .nav-links a:focus-visible {
+  background: #f3e6d6;
+  color: #123f2f;
+  outline: none;
+}
+
+.site-header .nav-links .nav-search {
+  min-width: 72px;
+  background: #eadbc6;
+  color: #18110d;
+}
+
+.site-header .nav-links .nav-search:hover,
+.site-header .nav-links .nav-search:focus-visible {
+  background: #dcc7aa;
+  color: #123f2f;
+}
+
+@media (min-width: 920px) {
+  .site-header .top-nav {
+    width: min(1180px, calc(100% - 32px));
+  }
+}
+
+@media (max-width: 919px) {
+  .site-header .top-nav {
+    min-height: 64px;
+  }
+
+  .site-header .compact-brand {
+    font-size: 19px;
+  }
+
+  .site-header .menu-toggle {
+    width: 48px;
+    height: 48px;
+  }
+
+  .site-header .nav-links {
+    inset: 76px 12px auto;
+  }
+
+  .site-header .nav-links a {
+    min-height: 50px;
+    padding: 0 16px;
+    border-radius: 14px;
+    font-size: 16px;
+  }
+}
