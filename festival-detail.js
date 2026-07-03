@@ -209,7 +209,7 @@ function renderRelated(currentId) {
 
   $("#relatedGrid").innerHTML = related.map((article) => `
     <article class="related-card">
-      <a href="festival-detail.html?id=${encodeURIComponent(article.id)}">
+      <a href="festival-detail?id=${encodeURIComponent(article.id)}">
         <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" />
         <span>
           <em>${escapeHtml(article.category)}</em>

@@ -29,10 +29,10 @@ function articleMeta(item) {
 
 function detailUrl(item) {
   if (item.source === "tour" && item.contentId) {
-    return `festival-detail.html?source=tour&id=${encodeURIComponent(item.contentId)}`;
+    return `festival-detail?source=tour&id=${encodeURIComponent(item.contentId)}`;
   }
 
-  return `festival-detail.html?id=${encodeURIComponent(item.id)}`;
+  return `festival-detail?id=${encodeURIComponent(item.id)}`;
 }
 
 function articleCard(item, variant = "") {
