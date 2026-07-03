@@ -1,12 +1,12 @@
 {
-  "name": "틴클라임 액션",
-  "short_name": "TeenClimate",
-  "description": "청소년 기후 행동 챌린지, 학교 프로젝트, 실천 기록 플랫폼",
+  "name": "트래블 노트 허브",
+  "short_name": "트래블노트",
+  "description": "여행지, 예약 전 체크, 시즌별 큐레이션을 모아보는 여행 정보 포털입니다.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#edf4ee",
-  "theme_color": "#123d2f",
+  "background_color": "#ffffff",
+  "theme_color": "#0f5138",
   "orientation": "portrait",
   "lang": "ko-KR",
-  "categories": ["education", "lifestyle", "productivity"]
+  "categories": ["travel", "lifestyle", "magazines"]
 }
