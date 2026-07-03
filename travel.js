@@ -100,7 +100,7 @@ function normalizeTourItems(items) {
         title: item.title,
         summary: address
           ? `${address}에서 열리는 축제 정보입니다. 방문 전 행사 시간, 교통 통제, 주차와 우천 운영 여부를 함께 확인하세요.`
-          : "공공데이터에서 불러온 전국 축제 정보입니다. 방문 전 행사 시간, 교통과 우천 운영 여부를 확인하세요.",
+          : "방문 전 행사 시간, 장소, 교통과 우천 운영 여부를 확인하면 더 편하게 즐길 수 있는 전국 축제 정보입니다.",
         date: period,
         readTime: "축제 정보",
         image: String(image).replace(/^http:/, "https:"),

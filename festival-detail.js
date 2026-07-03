@@ -91,7 +91,7 @@ async function fetchTourDetail(contentId) {
     id: `tour-${contentId}`,
     category: "전국 축제",
     title: commonItem.title,
-    summary: stripHtml(commonItem.overview) || "공공데이터에서 불러온 전국 축제 상세 정보입니다.",
+    summary: stripHtml(commonItem.overview) || "방문 전 확인하면 좋은 전국 축제 상세 정보입니다.",
     date: period,
     readTime: "축제 상세",
     image: firstImage,
@@ -219,7 +219,7 @@ function renderImageGallery(article) {
       <div class="gallery-heading">
         <p class="eyebrow">Festival Photos</p>
         <h2 id="apiImageGalleryTitle">축제 사진</h2>
-        <p>공식 축제 정보에 포함된 추가 이미지를 함께 모았습니다.</p>
+        <p>현장 분위기를 미리 볼 수 있도록 관련 사진을 함께 모았습니다.</p>
       </div>
       <div class="api-image-grid">
         ${images.map((image, index) => `
@@ -305,6 +305,43 @@ function factValue(article, keyword, fallback = "") {
   const facts = article.facts || localFacts(article);
   const match = facts.find(([label]) => String(label).includes(keyword));
   return match ? stripHtml(match[1]) : fallback;
+}
+
+function renderReaderQuestionSection(article) {
+  const period = factValue(article, "일정", article.date || "공식 안내 확인 필요");
+  const place = factValue(article, "장소", article.address || "공식 안내 확인 필요");
+  const time = factValue(article, "운영", "공식 안내 확인 필요");
+  const fee = factValue(article, "요금", "공식 안내 확인 필요");
+  const parkingNote = article.address
+    ? "행사장 주변은 당일 혼잡할 수 있으므로 임시 주차장, 셔틀, 대중교통 막차 시간을 함께 확인하세요."
+    : "상세 위치가 확정되지 않은 경우 공식 안내의 주차장·셔틀 공지를 먼저 확인하세요.";
+
+  const items = [
+    ["언제 가면 좋을까?", `${period} 일정 안에서도 공연과 체험 시간이 다를 수 있습니다. 핵심 프로그램 시간을 먼저 확인하고 그 시간보다 30분 정도 여유 있게 도착하는 편이 좋습니다.`],
+    ["어디로 가야 할까?", `${place} 기준으로 이동 계획을 잡되, 축제장이 여러 구역이면 메인 입구와 안내 부스 위치를 먼저 확인하세요.`],
+    ["입장료가 있을까?", `${fee}로 안내됩니다. 무료 축제라도 체험, 좌석, 굿즈, 주차는 별도 비용이 생길 수 있습니다.`],
+    ["몇 시까지 운영할까?", `${time} 기준으로 확인됩니다. 부스와 공연은 마감 시간이 다를 수 있어 늦게 방문한다면 개별 프로그램 시간을 확인하세요.`],
+    ["차를 가져가도 될까?", parkingNote],
+    ["아이와 가도 괜찮을까?", "가족 방문이라면 화장실, 수유실, 그늘, 휴식 공간, 유모차 이동 가능 구간을 먼저 확인하는 것이 좋습니다."],
+    ["비가 오면 어떻게 될까?", "야외 축제는 우천 시 일부 프로그램이 취소되거나 장소가 바뀔 수 있습니다. 우천 공지와 실내 대체 코스를 함께 준비하세요."],
+    ["무엇을 챙기면 좋을까?", "보조배터리, 생수, 얇은 겉옷, 우비 또는 접이식 우산, 물티슈, 작은 돗자리처럼 오래 머무를 때 필요한 물품을 챙기면 편합니다."]
+  ];
+
+  return `
+    <section class="reader-question-section">
+      <p class="eyebrow">Reader Questions</p>
+      <h2>방문자가 가장 궁금해하는 정보</h2>
+      <p>축제를 고를 때 많이 확인하는 질문을 기준으로 핵심 내용을 정리했습니다.</p>
+      <div class="reader-question-grid">
+        ${items.map(([question, answer]) => `
+          <article>
+            <h3>${escapeHtml(question)}</h3>
+            <p>${escapeHtml(answer)}</p>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
 }
 
 function renderRichInfoSection(article) {
@@ -452,7 +489,7 @@ function renderArticle(article) {
           title: "축제 소개",
           body: [
             article.overview,
-            "공공데이터에서 제공되는 기본 소개 외에도 방문 전에는 행사 시간, 장소 이동, 현장 혼잡, 우천 운영 여부를 함께 확인해야 실제 일정 관리가 쉽습니다."
+            "기본 소개 외에도 방문 전에는 행사 시간, 장소 이동, 현장 혼잡, 우천 운영 여부를 함께 확인해야 실제 일정 관리가 쉽습니다."
           ]
         },
         ...detailSections(article).slice(1)
@@ -482,6 +519,7 @@ function renderArticle(article) {
       ${sections.map((section) => renderSection(section)).join("")}
       ${renderVisitPlan(article)}
       ${renderPracticalCards(article)}
+      ${renderReaderQuestionSection(article)}
       ${renderRichInfoSection(article)}
       <section class="checklist-section">
         <h2>방문 전 체크리스트</h2>
@@ -489,8 +527,8 @@ function renderArticle(article) {
       </section>
       <section class="ai-guide-section" id="aiGuideSection" hidden>
         <div>
-          <p class="eyebrow">AI Visit Guide</p>
-          <h2>AI가 정리한 방문 포인트</h2>
+          <p class="eyebrow">Visit Guide</p>
+          <h2>방문 전 참고 포인트</h2>
           <p>축제 기본 정보를 바탕으로 방문 전 확인할 내용을 짧게 보강합니다.</p>
         </div>
         <div class="ai-guide-content" id="aiGuideContent"></div>
