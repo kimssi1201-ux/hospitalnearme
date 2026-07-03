@@ -301,6 +301,95 @@ function renderPracticalCards(article) {
   `;
 }
 
+function factValue(article, keyword, fallback = "") {
+  const facts = article.facts || localFacts(article);
+  const match = facts.find(([label]) => String(label).includes(keyword));
+  return match ? stripHtml(match[1]) : fallback;
+}
+
+function renderRichInfoSection(article) {
+  const period = factValue(article, "일정", article.date);
+  const place = factValue(article, "장소", article.address || "공식 안내 확인 필요");
+  const time = factValue(article, "운영", "공식 안내 확인 필요");
+  const fee = factValue(article, "요금", "공식 안내 확인 필요");
+  const title = article.title;
+
+  const guideRows = [
+    ["일정 확인", period, "시작일과 종료일이 여러 날인 축제는 날짜별 프로그램이 다를 수 있습니다. 방문하려는 날짜의 공연·체험 운영 여부를 따로 확인하세요."],
+    ["장소 확인", place, "행사장이 넓거나 여러 구역으로 나뉘는 경우가 있습니다. 내비게이션 목적지는 메인 입구나 임시 주차장 기준으로 다시 확인하는 것이 좋습니다."],
+    ["운영 시간", time, "축제 전체 운영 시간과 개별 프로그램 시간이 다를 수 있습니다. 인기 공연, 퍼레이드, 체험 부스는 마감 시간이 빠를 수 있습니다."],
+    ["요금 정보", fee, "무료 행사라도 일부 체험, 좌석, 주차, 먹거리 이용은 별도 비용이 있을 수 있습니다. 현장 결제 수단도 함께 확인하세요."]
+  ];
+
+  const companionTips = [
+    ["가족 방문", "화장실, 수유실, 그늘, 휴식 공간 위치를 먼저 확인하고 오래 걷는 동선을 줄이는 편이 좋습니다."],
+    ["커플·친구", "사진을 남기기 좋은 시간대와 먹거리 부스 위치를 먼저 잡으면 짧은 시간에도 만족도가 높습니다."],
+    ["혼자 방문", "혼잡도가 낮은 시간에 전시·체험형 콘텐츠부터 보고, 귀가 교통을 먼저 확보하는 방식이 안정적입니다."],
+    ["당일치기", "핵심 프로그램 1~2개만 정하고 이동 시간을 줄이세요. 축제장 밖 식사·카페 대체 코스도 함께 준비하면 좋습니다."]
+  ];
+
+  const faqs = [
+    ["이 축제는 언제 가는 것이 좋나요?", `${title}은 공식 일정 기준으로 ${period}에 맞춰 방문 계획을 잡는 것이 좋습니다. 다만 프로그램별 시간표가 다를 수 있으므로 방문 전 최신 공지를 확인하세요.`],
+    ["입장권이나 예약이 필요한가요?", `요금 정보는 "${fee}"로 확인됩니다. 사전 예매, 현장 발권, 무료 입장 여부는 축제별로 다르므로 공식 안내에서 최종 확인하는 것이 안전합니다.`],
+    ["비가 오면 어떻게 해야 하나요?", "야외 축제는 우천 시 일부 프로그램이 변경될 수 있습니다. 우산보다 우비가 이동에 편하고, 실내 대체 코스나 근처 휴식 공간을 미리 정해두면 일정 변경이 쉽습니다."],
+    ["차를 가져가도 괜찮나요?", "축제 당일에는 임시 주차장과 교통 통제가 생길 수 있습니다. 가능하면 대중교통과 셔틀 정보를 함께 확인하고, 자가용 이용 시 출차 동선까지 고려하세요."]
+  ];
+
+  return `
+    <section class="rich-info-section">
+      <p class="eyebrow">Planning Notes</p>
+      <h2>방문 전 핵심 정보 자세히 보기</h2>
+      <p>${escapeHtml(title)}을 방문하기 전에는 사진이나 분위기만 보기보다 일정, 장소, 운영 시간, 요금 정보를 함께 확인해야 합니다. 아래 표는 실제 방문 계획을 세울 때 우선적으로 확인할 항목을 정리한 내용입니다.</p>
+      <div class="info-table">
+        ${guideRows.map(([label, value, note]) => `
+          <article>
+            <strong>${escapeHtml(label)}</strong>
+            <span>${escapeHtml(value)}</span>
+            <p>${escapeHtml(note)}</p>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+
+    <section class="rich-info-section">
+      <p class="eyebrow">By Traveler</p>
+      <h2>동행자별 추천 방문 팁</h2>
+      <p>같은 축제라도 누구와 방문하느냐에 따라 좋은 동선이 달라집니다. 가족, 친구, 커플, 혼자 방문하는 경우를 나눠 준비하면 현장 체류 시간이 더 편해집니다.</p>
+      <div class="companion-grid">
+        ${companionTips.map(([label, text]) => `
+          <article>
+            <h3>${escapeHtml(label)}</h3>
+            <p>${escapeHtml(text)}</p>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+
+    <section class="rich-info-section">
+      <p class="eyebrow">Cost & Booking</p>
+      <h2>예산과 예약 체크</h2>
+      <p>축제 방문 비용은 입장권만으로 끝나지 않는 경우가 많습니다. 교통비, 주차비, 식사비, 체험비, 숙박비가 함께 발생할 수 있으므로 당일치기와 1박 일정의 예산을 나눠 보는 것이 좋습니다.</p>
+      <ul class="article-note-list">
+        <li>무료 축제라도 인기 체험, 좌석, 굿즈, 먹거리 구매는 별도 비용이 들 수 있습니다.</li>
+        <li>숙박이 필요하다면 행사장과 가까운 숙소보다 귀가 교통이 편한 위치를 함께 비교하세요.</li>
+        <li>입장권 예매가 필요한 축제는 취소 마감 시간, 부분 환불, 우천 변경 기준을 먼저 확인하세요.</li>
+        <li>현장 결제가 많은 축제는 카드 결제 가능 여부와 모바일 결제 가능 여부를 미리 확인하면 좋습니다.</li>
+      </ul>
+    </section>
+
+    <section class="rich-info-section faq-block">
+      <p class="eyebrow">FAQ</p>
+      <h2>자주 묻는 질문</h2>
+      ${faqs.map(([question, answer]) => `
+        <details>
+          <summary>${escapeHtml(question)}</summary>
+          <p>${escapeHtml(answer)}</p>
+        </details>
+      `).join("")}
+    </section>
+  `;
+}
+
 function updateDocumentMeta(article) {
   document.title = `${article.title} | 페스티벌 노트`;
   const description = document.querySelector('meta[name="description"]');
@@ -393,6 +482,7 @@ function renderArticle(article) {
       ${sections.map((section) => renderSection(section)).join("")}
       ${renderVisitPlan(article)}
       ${renderPracticalCards(article)}
+      ${renderRichInfoSection(article)}
       <section class="checklist-section">
         <h2>방문 전 체크리스트</h2>
         <ul>${renderChecklist()}</ul>
