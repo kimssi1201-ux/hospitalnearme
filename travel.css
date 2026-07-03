@@ -197,10 +197,7 @@ main {
   align-content: center;
   gap: 18px;
   order: 2;
-  padding: clamp(28px, 3.4vw, 46px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
+  padding: clamp(10px, 2vw, 22px) 0;
 }
 
 .hero-copy h1 {
@@ -716,7 +713,7 @@ main {
   }
 
   .hero-copy {
-    padding: 28px 22px;
+    padding: 18px 0;
   }
 
   .hero-copy h1 {
