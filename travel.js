@@ -27,10 +27,18 @@ function articleMeta(item) {
   return `<span>${escapeHtml(item.date)}</span><span>${escapeHtml(item.readTime)}</span>`;
 }
 
+function detailUrl(item) {
+  if (item.source === "tour" && item.contentId) {
+    return `festival-detail.html?source=tour&id=${encodeURIComponent(item.contentId)}`;
+  }
+
+  return `festival-detail.html?id=${encodeURIComponent(item.id)}`;
+}
+
 function articleCard(item, variant = "") {
   return `
     <article class="article-card ${variant}">
-      <a href="${escapeHtml(item.href)}" aria-label="${escapeHtml(item.title)} 자세히 보기">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(item.title)} 자세히 보기">
         ${imageMarkup(item)}
         <span class="category-label">${escapeHtml(item.category)}</span>
         <h3>${escapeHtml(item.title)}</h3>
@@ -85,6 +93,9 @@ function normalizeTourItems(items) {
 
       return {
         id: `tour-api-${item.contentid || index}`,
+        source: "tour",
+        contentId: item.contentid,
+        contentTypeId: item.contenttypeid || 15,
         category,
         title: item.title,
         summary: address
@@ -160,7 +171,7 @@ function renderHero() {
 
   $("#heroGrid").innerHTML = `
     <article class="hero-featured">
-      <a href="${escapeHtml(featured.href)}" aria-label="${escapeHtml(featured.title)} 자세히 보기">
+      <a href="${escapeHtml(detailUrl(featured))}" aria-label="${escapeHtml(featured.title)} 자세히 보기">
         ${imageMarkup(featured, "hero")}
         <div class="hero-featured__body">
           <span class="category-label">${escapeHtml(featured.category)}</span>
@@ -173,7 +184,7 @@ function renderHero() {
     <div class="hero-side">
       ${sideItems.map((item) => `
         <article class="side-card">
-          <a href="${escapeHtml(item.href)}">
+          <a href="${escapeHtml(detailUrl(item))}">
             ${imageMarkup(item, "thumb")}
             <span>
               <em>${escapeHtml(item.category)}</em>
@@ -212,7 +223,7 @@ function renderCuration() {
   $("#curationList").innerHTML = items
     .map((item) => `
       <article class="curation-card">
-        <a href="${escapeHtml(item.href)}">
+        <a href="${escapeHtml(detailUrl(item))}">
           ${imageMarkup(item, "thumb")}
           <span>
             <em>${escapeHtml(item.category)}</em>
