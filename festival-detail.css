@@ -99,14 +99,14 @@
 
 .blog-body {
   display: grid;
-  gap: 30px;
-  max-width: 820px;
+  gap: 34px;
+  max-width: 860px;
   margin: 0 auto;
 }
 
 .blog-body section {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .blog-body h2 {
@@ -121,6 +121,72 @@
   color: #3f3a35;
   font-size: 18px;
   line-height: 1.95;
+}
+
+.timeline-section {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.timeline-section ol {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline-section li {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.timeline-section li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.timeline-section span {
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.timeline-section p {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.practical-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px !important;
+}
+
+.practical-grid article {
+  display: grid;
+  gap: 8px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+.practical-grid h3 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.practical-grid p {
+  font-size: 16px;
+  line-height: 1.75;
 }
 
 .checklist-section {
@@ -223,7 +289,17 @@
   }
 
   .fact-grid,
-  .related-grid {
+  .related-grid,
+  .practical-grid {
     grid-template-columns: 1fr;
+  }
+
+  .timeline-section {
+    padding: 22px;
+  }
+
+  .timeline-section li {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 }

@@ -186,17 +186,18 @@ main {
 
 .hero-section {
   display: grid;
-  grid-template-columns: minmax(320px, 0.78fr) minmax(0, 1.22fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.75fr);
   gap: 28px;
   align-items: stretch;
-  padding: 46px 0 58px;
+  padding: 34px 0 58px;
 }
 
 .hero-copy {
   display: grid;
   align-content: center;
   gap: 18px;
-  padding: clamp(30px, 4vw, 52px);
+  order: 2;
+  padding: clamp(28px, 3.4vw, 46px);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
@@ -204,8 +205,8 @@ main {
 
 .hero-copy h1 {
   margin: 0;
-  font-size: clamp(38px, 5vw, 64px);
-  line-height: 1.05;
+  font-size: clamp(34px, 4vw, 54px);
+  line-height: 1.08;
   letter-spacing: -0.055em;
 }
 
@@ -250,8 +251,9 @@ main {
 }
 
 .hero-grid {
+  order: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
+  grid-template-columns: minmax(0, 1.5fr) minmax(220px, 0.72fr);
   gap: 18px;
   min-width: 0;
 }
@@ -280,7 +282,7 @@ main {
 .hero-featured__body {
   display: grid;
   gap: 10px;
-  padding: 24px;
+  padding: 22px 24px 26px;
 }
 
 .hero-featured h2,
@@ -369,11 +371,11 @@ main {
 }
 
 .image-frame--hero {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 11;
 }
 
 .image-frame--card {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   border-radius: 18px 18px 0 0;
 }
 
@@ -454,9 +456,13 @@ main {
 .article-card p {
   display: -webkit-box;
   overflow: hidden;
-  min-height: 52px;
+  min-height: 48px;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+}
+
+.article-card .category-label {
+  margin-top: 4px;
 }
 
 .article-card .article-meta {
@@ -641,6 +647,11 @@ main {
     grid-template-columns: 1fr;
   }
 
+  .hero-copy,
+  .hero-grid {
+    order: initial;
+  }
+
   .card-grid,
   .category-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -700,12 +711,16 @@ main {
     padding: 28px 0 44px;
   }
 
+  .hero-grid {
+    gap: 14px;
+  }
+
   .hero-copy {
     padding: 28px 22px;
   }
 
   .hero-copy h1 {
-    font-size: 36px;
+    font-size: 34px;
   }
 
   .hero-copy p {
