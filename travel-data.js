@@ -1,4 +1,13 @@
 window.TRAVEL_PORTAL_DATA = {
+  tourApi: {
+    serviceKey: "f1ff302f1ae1553621d3c4208ee420449f700dbbaffef44a6bef09502ce92f59",
+    endpoint: "https://apis.data.go.kr/B551011/KorService2/areaBasedList2",
+    mobileOS: "ETC",
+    mobileApp: "TravelNoteHub",
+    numOfRows: 8,
+    pageNo: 1,
+    contentTypeId: "12"
+  },
   todayKeywords: [
     "제주 가볼만한 곳",
     "서울 숲길",

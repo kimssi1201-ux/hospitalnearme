@@ -1,4 +1,8 @@
 const data = window.TRAVEL_PORTAL_DATA;
+const state = {
+  apiArticles: [],
+  apiLoaded: false
+};
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -35,6 +39,92 @@ function articleCard(item, variant = "") {
       </a>
     </article>
   `;
+}
+
+function contentTypeName(contentTypeId) {
+  const map = {
+    12: "관광지",
+    14: "문화시설",
+    15: "축제",
+    25: "여행코스",
+    28: "레포츠",
+    32: "숙소",
+    38: "쇼핑",
+    39: "음식점"
+  };
+  return map[Number(contentTypeId)] || "여행 정보";
+}
+
+function normalizeTourItems(items) {
+  const list = Array.isArray(items) ? items : items ? [items] : [];
+  const fallbackImage = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80";
+
+  return list
+    .filter((item) => item && item.title)
+    .map((item, index) => {
+      const image = item.firstimage || item.firstimage2 || fallbackImage;
+      const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
+      const category = contentTypeName(item.contenttypeid);
+
+      return {
+        id: `tour-api-${item.contentid || index}`,
+        category,
+        title: item.title,
+        summary: address
+          ? `${address} 기준으로 확인한 공공 여행 정보입니다. 방문 전 운영 시간과 이동 동선을 함께 점검하세요.`
+          : "공공 여행 정보에서 불러온 추천 여행지입니다. 방문 전 운영 시간과 이동 동선을 함께 점검하세요.",
+        date: "TourAPI",
+        readTime: "공공데이터",
+        image: String(image).replace(/^http:/, "https:"),
+        href: "#places"
+      };
+    });
+}
+
+function buildTourApiUrl() {
+  const config = data.tourApi;
+  const params = new URLSearchParams({
+    serviceKey: config.serviceKey,
+    numOfRows: String(config.numOfRows || 8),
+    pageNo: String(config.pageNo || 1),
+    MobileOS: config.mobileOS || "ETC",
+    MobileApp: config.mobileApp || "TravelNoteHub",
+    _type: "json",
+    arrange: "O"
+  });
+
+  if (config.contentTypeId) {
+    params.set("contentTypeId", config.contentTypeId);
+  }
+
+  return `${config.endpoint}?${params.toString()}`;
+}
+
+async function loadTourApiPlaces() {
+  if (!data.tourApi?.serviceKey || !data.tourApi?.endpoint) return;
+
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 6500);
+
+  try {
+    const response = await fetch(buildTourApiUrl(), { signal: controller.signal });
+    if (!response.ok) throw new Error(`TourAPI HTTP ${response.status}`);
+
+    const payload = await response.json();
+    const items = payload?.response?.body?.items?.item;
+    const apiArticles = normalizeTourItems(items);
+
+    if (apiArticles.length) {
+      state.apiArticles = apiArticles;
+      state.apiLoaded = true;
+      renderPlaces();
+      renderCuration();
+    }
+  } catch (error) {
+    console.warn("TourAPI request failed. Fallback content is displayed.", error);
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 }
 
 function renderTodayKeywords() {
@@ -77,8 +167,9 @@ function renderHero() {
 }
 
 function renderPlaces() {
-  $("#placesGrid").innerHTML = data.articles
-    .slice(1)
+  const items = [...state.apiArticles, ...data.articles.slice(1)].slice(0, 12);
+
+  $("#placesGrid").innerHTML = items
     .map((item) => articleCard(item))
     .join("");
 }
@@ -95,8 +186,9 @@ function renderBooking() {
 }
 
 function renderCuration() {
-  $("#curationList").innerHTML = data.articles
-    .slice(2, 8)
+  const items = [...state.apiArticles.slice(0, 2), ...data.articles.slice(2, 8)].slice(0, 6);
+
+  $("#curationList").innerHTML = items
     .map((item) => `
       <article class="curation-card">
         <a href="${escapeHtml(item.href)}">
@@ -163,6 +255,7 @@ function init() {
   renderFaq();
   renderFooter();
   bindMenu();
+  loadTourApiPlaces();
 }
 
 document.addEventListener("DOMContentLoaded", init);
