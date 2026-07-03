@@ -9,15 +9,35 @@ window.TRAVEL_PORTAL_DATA = {
     arrange: "O",
     mode: "festival"
   },
+  regions: [
+    { id: "all", label: "전국", areaCode: "" },
+    { id: "seoul", label: "서울", areaCode: "1" },
+    { id: "gyeonggi", label: "경기", areaCode: "31" },
+    { id: "incheon", label: "인천", areaCode: "2" },
+    { id: "busan", label: "부산", areaCode: "6" },
+    { id: "daegu", label: "대구", areaCode: "4" },
+    { id: "daejeon", label: "대전", areaCode: "3" },
+    { id: "gwangju", label: "광주", areaCode: "5" },
+    { id: "ulsan", label: "울산", areaCode: "7" },
+    { id: "sejong", label: "세종", areaCode: "8" },
+    { id: "gangwon", label: "강원", areaCode: "32" },
+    { id: "chungbuk", label: "충북", areaCode: "33" },
+    { id: "chungnam", label: "충남", areaCode: "34" },
+    { id: "jeonbuk", label: "전북", areaCode: "37" },
+    { id: "jeonnam", label: "전남", areaCode: "38" },
+    { id: "gyeongbuk", label: "경북", areaCode: "35" },
+    { id: "gyeongnam", label: "경남", areaCode: "36" },
+    { id: "jeju", label: "제주", areaCode: "39" }
+  ],
   todayKeywords: [
-    "이번 주 축제",
-    "진행 중인 축제",
-    "예정 축제",
-    "야간 축제",
-    "가족 축제",
-    "무료 축제",
-    "축제 준비물",
-    "축제 숙소"
+    "서울 축제",
+    "경기 축제",
+    "인천 축제",
+    "부산 축제",
+    "제주 축제",
+    "강원 축제",
+    "전남 축제",
+    "이번 주 축제"
   ],
   articles: [
     {
@@ -129,19 +149,19 @@ window.TRAVEL_PORTAL_DATA = {
   ],
   categoryGroups: [
     {
-      title: "축제 일정",
-      summary: "지금 볼 수 있는 축제와 곧 시작되는 축제를 한눈에 확인합니다.",
-      links: ["이번 주 축제", "진행 중인 축제", "예정 축제", "무료 축제"]
+      title: "수도권 축제",
+      summary: "서울, 경기, 인천에서 열리는 축제를 빠르게 확인합니다.",
+      links: ["서울 축제", "경기 축제", "인천 축제", "주말 축제"]
     },
     {
-      title: "축제 준비",
-      summary: "교통, 준비물, 현장 동선, 우천 대응 정보를 정리합니다.",
-      links: ["준비물", "교통 체크", "우천 대응", "가족 나들이"]
+      title: "광역시 축제",
+      summary: "부산, 대구, 대전, 광주, 울산, 세종 축제를 묶어 봅니다.",
+      links: ["부산 축제", "대구 축제", "대전 축제", "광주 축제"]
     },
     {
-      title: "예약 전 체크",
-      summary: "숙소, 입장권, 셔틀, 할인 조건을 방문 전에 확인합니다.",
-      links: ["숙소 위치", "입장권 예매", "셔틀버스", "할인코드"]
+      title: "전국 여행 축제",
+      summary: "강원, 충청, 전라, 경상, 제주 축제를 여행 일정과 함께 확인합니다.",
+      links: ["강원 축제", "충청 축제", "전라 축제", "제주 축제"]
     }
   ],
   faq: [
@@ -161,7 +181,7 @@ window.TRAVEL_PORTAL_DATA = {
   footerGroups: [
     {
       title: "축제 정보",
-      links: ["이번 주 축제", "진행 중인 축제", "예정 축제", "무료 축제"]
+      links: ["서울 축제", "경기 축제", "인천 축제", "부산 축제"]
     },
     {
       title: "축제 준비",

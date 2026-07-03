@@ -1,7 +1,8 @@
 const data = window.TRAVEL_PORTAL_DATA;
 const state = {
   apiArticles: [],
-  apiLoaded: false
+  apiLoaded: false,
+  activeRegionId: "all"
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -77,6 +78,11 @@ function todayCompact() {
   return `${yyyy}${mm}${dd}`;
 }
 
+function activeRegion() {
+  const regions = data.regions || [];
+  return regions.find((region) => region.id === state.activeRegionId) || regions[0] || { id: "all", label: "전국", areaCode: "" };
+}
+
 function normalizeTourItems(items) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
   const fallbackImage = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80";
@@ -86,7 +92,8 @@ function normalizeTourItems(items) {
     .map((item, index) => {
       const image = item.firstimage || item.firstimage2 || fallbackImage;
       const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
-      const category = data.tourApi?.mode === "festival" ? "전국 축제" : contentTypeName(item.contenttypeid);
+      const region = activeRegion();
+      const category = data.tourApi?.mode === "festival" ? `${region.label} 축제` : contentTypeName(item.contenttypeid);
       const startDate = compactDate(item.eventstartdate);
       const endDate = compactDate(item.eventenddate);
       const period = startDate && endDate ? `${startDate} - ${endDate}` : startDate || "축제 일정";
@@ -111,6 +118,7 @@ function normalizeTourItems(items) {
 
 function buildTourApiUrl() {
   const config = data.tourApi;
+  const region = activeRegion();
   const params = new URLSearchParams({
     serviceKey: config.serviceKey,
     numOfRows: String(config.numOfRows || 8),
@@ -129,12 +137,17 @@ function buildTourApiUrl() {
     params.set("contentTypeId", config.contentTypeId);
   }
 
+  if (region.areaCode) {
+    params.set("areaCode", region.areaCode);
+  }
+
   return `${config.endpoint}?${params.toString()}`;
 }
 
 async function loadTourApiPlaces() {
   if (!data.tourApi?.serviceKey || !data.tourApi?.endpoint) return;
 
+  const requestRegionId = state.activeRegionId;
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), 6500);
 
@@ -145,6 +158,8 @@ async function loadTourApiPlaces() {
     const payload = await response.json();
     const items = payload?.response?.body?.items?.item;
     const apiArticles = normalizeTourItems(items);
+
+    if (requestRegionId !== state.activeRegionId) return;
 
     if (apiArticles.length) {
       state.apiArticles = apiArticles;
@@ -163,6 +178,54 @@ function renderTodayKeywords() {
   $("#todayKeywords").innerHTML = data.todayKeywords
     .map((keyword) => `<a href="#" aria-label="${escapeHtml(keyword)} 키워드 보기">${escapeHtml(keyword)}</a>`)
     .join("");
+}
+
+function updateRegionHeading() {
+  const region = activeRegion();
+  const title = $("#placesTitle");
+  if (title) {
+    title.textContent = region.id === "all" ? "전국 축제 정보" : `${region.label} 축제 정보`;
+  }
+}
+
+function renderRegionModal() {
+  const target = $("#regionList");
+  if (!target) return;
+
+  target.innerHTML = (data.regions || [])
+    .map((region) => `
+      <button
+        class="region-button ${region.id === state.activeRegionId ? "is-active" : ""}"
+        type="button"
+        data-region-id="${escapeHtml(region.id)}"
+        aria-pressed="${region.id === state.activeRegionId ? "true" : "false"}"
+      >
+        ${escapeHtml(region.label)}
+      </button>
+    `)
+    .join("");
+}
+
+function bindRegionModal() {
+  const target = $("#regionList");
+  if (!target) return;
+
+  target.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-region-id]");
+    if (!button) return;
+
+    const regionId = button.getAttribute("data-region-id");
+    if (!regionId || regionId === state.activeRegionId) return;
+
+    state.activeRegionId = regionId;
+    state.apiArticles = [];
+    state.apiLoaded = false;
+    renderRegionModal();
+    updateRegionHeading();
+    renderPlaces();
+    renderCuration();
+    loadTourApiPlaces();
+  });
 }
 
 function renderHero() {
@@ -279,6 +342,8 @@ function bindMenu() {
 
 function init() {
   renderTodayKeywords();
+  renderRegionModal();
+  updateRegionHeading();
   renderHero();
   renderPlaces();
   renderBooking();
@@ -287,6 +352,7 @@ function init() {
   renderFaq();
   renderFooter();
   bindMenu();
+  bindRegionModal();
   loadTourApiPlaces();
 }
 
