@@ -55,6 +55,20 @@ function contentTypeName(contentTypeId) {
   return map[Number(contentTypeId)] || "여행 정보";
 }
 
+function compactDate(value) {
+  if (!value || String(value).length !== 8) return "";
+  const text = String(value);
+  return `${text.slice(0, 4)}.${text.slice(4, 6)}.${text.slice(6, 8)}`;
+}
+
+function todayCompact() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}${mm}${dd}`;
+}
+
 function normalizeTourItems(items) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
   const fallbackImage = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80";
@@ -64,17 +78,20 @@ function normalizeTourItems(items) {
     .map((item, index) => {
       const image = item.firstimage || item.firstimage2 || fallbackImage;
       const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
-      const category = contentTypeName(item.contenttypeid);
+      const category = data.tourApi?.mode === "festival" ? "전국 축제" : contentTypeName(item.contenttypeid);
+      const startDate = compactDate(item.eventstartdate);
+      const endDate = compactDate(item.eventenddate);
+      const period = startDate && endDate ? `${startDate} - ${endDate}` : startDate || "축제 일정";
 
       return {
         id: `tour-api-${item.contentid || index}`,
         category,
         title: item.title,
         summary: address
-          ? `${address} 기준으로 확인한 공공 여행 정보입니다. 방문 전 운영 시간과 이동 동선을 함께 점검하세요.`
-          : "공공 여행 정보에서 불러온 추천 여행지입니다. 방문 전 운영 시간과 이동 동선을 함께 점검하세요.",
-        date: "TourAPI",
-        readTime: "공공데이터",
+          ? `${address}에서 열리는 축제 정보입니다. 방문 전 행사 시간, 교통 통제, 주차와 우천 운영 여부를 함께 확인하세요.`
+          : "공공데이터에서 불러온 전국 축제 정보입니다. 방문 전 행사 시간, 교통과 우천 운영 여부를 확인하세요.",
+        date: period,
+        readTime: "축제 정보",
         image: String(image).replace(/^http:/, "https:"),
         href: "#places"
       };
@@ -90,8 +107,12 @@ function buildTourApiUrl() {
     MobileOS: config.mobileOS || "ETC",
     MobileApp: config.mobileApp || "TravelNoteHub",
     _type: "json",
-    arrange: "O"
+    arrange: config.arrange || "O"
   });
+
+  if (config.mode === "festival") {
+    params.set("eventStartDate", config.eventStartDate || todayCompact());
+  }
 
   if (config.contentTypeId) {
     params.set("contentTypeId", config.contentTypeId);

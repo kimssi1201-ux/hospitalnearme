@@ -1,7 +1,7 @@
 {
-  "name": "트래블 노트 허브",
-  "short_name": "트래블노트",
-  "description": "여행지, 예약 전 체크, 시즌별 큐레이션을 모아보는 여행 정보 포털입니다.",
+  "name": "페스티벌 노트",
+  "short_name": "페스티벌노트",
+  "description": "전국 축제 일정과 축제 여행 체크 정보를 모아보는 매거진형 정보 포털입니다.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",

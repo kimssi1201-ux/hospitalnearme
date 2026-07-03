@@ -1,178 +1,179 @@
 window.TRAVEL_PORTAL_DATA = {
   tourApi: {
     serviceKey: "f1ff302f1ae1553621d3c4208ee420449f700dbbaffef44a6bef09502ce92f59",
-    endpoint: "https://apis.data.go.kr/B551011/KorService2/areaBasedList2",
+    endpoint: "https://apis.data.go.kr/B551011/KorService2/searchFestival2",
     mobileOS: "ETC",
-    mobileApp: "TravelNoteHub",
-    numOfRows: 8,
+    mobileApp: "FestivalNoteHub",
+    numOfRows: 12,
     pageNo: 1,
-    contentTypeId: "12"
+    arrange: "O",
+    mode: "festival"
   },
   todayKeywords: [
-    "제주 가볼만한 곳",
-    "서울 숲길",
-    "부산 숙소",
-    "도쿄 항공권",
-    "여름 축제",
-    "방콕 투어",
-    "강릉 여행",
-    "할인코드"
+    "이번 주 축제",
+    "서울 축제",
+    "부산 축제",
+    "제주 축제",
+    "야간 축제",
+    "가족 나들이",
+    "여름 페스티벌",
+    "지역 행사"
   ],
   articles: [
     {
-      id: "jeju-summer-route",
-      category: "국내여행",
-      title: "제주 서쪽 하루 코스, 바다와 숲길을 함께 보는 동선",
-      summary: "애월 해안도로, 협재 바다, 한림 숲길을 하루 안에 묶어 이동 부담을 줄이는 여름 제주 코스입니다.",
+      id: "summer-night-festival",
+      category: "축제 매거진",
+      title: "여름밤에 보기 좋은 전국 야간 축제 큐레이션",
+      summary: "해가 진 뒤 더 즐기기 좋은 야시장, 빛 축제, 해변 공연 중심으로 일정과 이동 체크포인트를 정리했습니다.",
       date: "2026.07.03",
       readTime: "7분 읽기",
-      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+      image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
       href: "#"
     },
     {
-      id: "seoul-forest-walk",
-      category: "도시여행",
-      title: "서울 숲길 산책, 반나절로 정리하는 카페와 전시 동선",
-      summary: "성수, 서울숲, 뚝섬 한강공원을 이어 걷기 좋은 반나절 산책 루트입니다.",
+      id: "seoul-weekend-festival",
+      category: "서울·수도권",
+      title: "주말에 가기 좋은 서울·수도권 축제 동선",
+      summary: "대중교통 접근성, 행사 시간, 주변 산책 코스를 기준으로 반나절 축제 일정을 묶었습니다.",
       date: "2026.07.03",
       readTime: "5분 읽기",
       image: "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80",
       href: "#"
     },
     {
-      id: "busan-stay-check",
-      category: "숙소",
-      title: "부산 숙소 고르기, 해운대와 광안리 위치 차이",
-      summary: "바다 전망, 이동 동선, 저녁 일정 기준으로 부산 숙소 지역을 비교합니다.",
+      id: "busan-sea-festival",
+      category: "부산·해변",
+      title: "부산 해변 축제 전 숙소 위치를 먼저 고르는 법",
+      summary: "행사장 접근성, 막차 시간, 해변 혼잡도를 기준으로 숙소 권역을 비교합니다.",
       date: "2026.07.03",
       readTime: "6분 읽기",
-      image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
       href: "#"
     },
     {
-      id: "tokyo-flight-check",
-      category: "항공권",
-      title: "도쿄 항공권 예약 전 확인할 시간대와 공항 선택",
-      summary: "나리타와 하네다 도착 시간, 숙소 이동, 귀국편 시간을 기준으로 항공권을 점검합니다.",
-      date: "2026.07.03",
-      readTime: "4분 읽기",
-      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=80",
-      href: "#"
-    },
-    {
-      id: "gangneung-weekend",
-      category: "국내여행",
-      title: "강릉 주말 여행, 해변 산책과 커피 거리 연결하기",
-      summary: "경포, 강문, 안목을 무리 없이 보는 주말 여행 루트와 시간대별 체크포인트입니다.",
+      id: "jeju-local-festival",
+      category: "제주",
+      title: "제주 지역 축제는 렌터카 동선과 주차장을 먼저 확인하세요",
+      summary: "해안 마을 행사, 야외 공연, 플리마켓을 볼 때 확인해야 할 이동 기준을 정리했습니다.",
       date: "2026.07.02",
-      readTime: "6분 읽기",
+      readTime: "5분 읽기",
       image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
       href: "#"
     },
     {
-      id: "summer-festival",
-      category: "축제",
-      title: "여름 축제 일정 보기 전 확인할 교통과 숙소 기준",
-      summary: "축제장 접근성, 막차 시간, 주변 숙소 가격 변동을 먼저 확인하는 체크리스트입니다.",
+      id: "family-festival-check",
+      category: "가족 나들이",
+      title: "아이와 함께 가는 축제에서 먼저 볼 편의시설 체크리스트",
+      summary: "그늘, 화장실, 유모차 이동, 실내 대피 공간 여부를 기준으로 가족 축제를 고르는 방법입니다.",
       date: "2026.07.02",
-      readTime: "5분 읽기",
-      image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80",
+      readTime: "4분 읽기",
+      image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
       href: "#"
     },
     {
-      id: "bangkok-tour",
-      category: "해외여행",
-      title: "방콕 투어 예약 전, 반일 투어와 단독 이동 비교",
-      summary: "왕궁, 수상시장, 야시장 일정을 기준으로 투어 유형별 장단점을 정리했습니다.",
-      date: "2026.07.01",
-      readTime: "6분 읽기",
-      image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=900&q=80",
-      href: "#"
-    },
-    {
-      id: "hotel-cancel-policy",
+      id: "festival-ticket-check",
       category: "예약 전 체크",
-      title: "호텔 무료 취소 조건, 가격보다 먼저 봐야 하는 이유",
-      summary: "여행 일정이 바뀔 가능성이 있다면 요금제와 취소 마감 시간을 먼저 확인해야 합니다.",
+      title: "축제 입장권 예약 전 취소 규정과 현장 수령 여부 확인하기",
+      summary: "무료 행사와 유료 행사 모두 예약 방식, 입장 시간, 우천 시 운영 기준을 먼저 확인해야 합니다.",
       date: "2026.07.01",
       readTime: "4분 읽기",
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=900&q=80",
+      image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=900&q=80",
+      href: "#"
+    },
+    {
+      id: "regional-food-festival",
+      category: "지역 축제",
+      title: "지역 먹거리 축제에서 실패를 줄이는 방문 시간대",
+      summary: "인기 부스 대기, 주차장 진입, 품절 시간을 고려해 방문 시간대를 정하는 기준입니다.",
+      date: "2026.07.01",
+      readTime: "5분 읽기",
+      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=80",
+      href: "#"
+    },
+    {
+      id: "rainy-day-festival",
+      category: "여행 정보",
+      title: "비 오는 날 축제 방문 전 확인할 실내 대체 코스",
+      summary: "야외 행사가 취소될 가능성에 대비해 주변 실내 관광지와 카페 동선을 함께 준비합니다.",
+      date: "2026.07.01",
+      readTime: "4분 읽기",
+      image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
       href: "#"
     }
   ],
   bookingChecks: [
     {
-      title: "호텔",
-      label: "위치·취소 조건",
-      summary: "후기 점수보다 이동 동선, 무료 취소 마감, 체크인 시간을 먼저 확인합니다.",
+      title: "숙소",
+      label: "행사장 접근성",
+      summary: "축제장까지 도보 이동이 가능한지, 막차 이후 이동 수단이 있는지 확인합니다.",
       href: "#"
     },
     {
-      title: "항공권",
-      label: "시간대·공항",
-      summary: "출발 공항, 도착 시간, 수하물 포함 여부를 비교한 뒤 예약 페이지로 이동합니다.",
+      title: "교통",
+      label: "주차·셔틀",
+      summary: "임시 주차장, 셔틀버스, 교통 통제 구간을 방문 전에 확인합니다.",
       href: "#"
     },
     {
-      title: "투어·입장권",
-      label: "운영 시간",
-      summary: "포함 사항, 집합 장소, 취소 규정, 이용 가능 날짜를 예약 전에 확인합니다.",
+      title: "입장권",
+      label: "예매·현장 발권",
+      summary: "예매 마감, 현장 수령, 취소 규정, 우천 운영 기준을 비교합니다.",
       href: "#"
     },
     {
       title: "할인코드",
-      label: "적용 조건",
-      summary: "최소 결제 금액, 제외 상품, 중복 할인 가능 여부를 체크합니다.",
+      label: "지역 혜택",
+      summary: "숙박, 교통, 입장권에 적용 가능한 지역 할인 조건을 확인합니다.",
       href: "#"
     }
   ],
   categoryGroups: [
     {
-      title: "가볼 만한 곳",
-      summary: "국내외 여행지, 계절 코스, 주말 일정",
-      links: ["국내 여행지", "해외 여행지", "전국 관광지", "도시별 가이드"]
+      title: "전국 축제",
+      summary: "진행 중인 축제, 예정 행사, 지역별 축제",
+      links: ["이번 주 축제", "서울 축제", "부산 축제", "제주 축제"]
     },
     {
-      title: "여행 정보",
-      summary: "준비물, 교통, 일정, 현장 체크",
-      links: ["여행 가이드", "최신 글", "검색하기", "태그 모아보기"]
+      title: "축제 여행 정보",
+      summary: "교통, 준비물, 현장 동선, 우천 대체 코스",
+      links: ["교통 체크", "주차 정보", "아이와 축제", "비 오는 날"]
     },
     {
       title: "예약 전 체크",
-      summary: "호텔, 항공권, 투어, 할인 조건",
-      links: ["호텔 비교", "항공권 검색", "투어·티켓", "할인코드"]
+      summary: "숙소, 입장권, 교통, 지역 할인",
+      links: ["숙소 위치", "입장권 예매", "셔틀버스", "할인코드"]
     }
   ],
   faq: [
     {
       question: "메인에서는 무엇을 먼저 보면 좋나요?",
-      answer: "목적지가 정해지지 않았다면 가볼 만한 곳과 큐레이션을 먼저 보고, 목적지가 정해졌다면 예약 전 체크 섹션에서 숙소와 항공권 기준을 확인하는 흐름이 좋습니다."
+      answer: "지금 갈 축제를 찾는다면 전국 축제 정보 섹션을 먼저 보고, 일정이 정해졌다면 예약 전 체크에서 숙소와 교통 기준을 확인하는 흐름이 좋습니다."
     },
     {
-      question: "예약 페이지와 매거진 글은 어떻게 연결되나요?",
-      answer: "매거진 글은 여행지 선택 기준을 제공하고, 예약 전 체크 카드는 가격·후기·위치·취소 조건을 비교하는 페이지로 이어질 수 있도록 설계했습니다."
+      question: "축제 정보와 예약 전 체크는 어떻게 연결되나요?",
+      answer: "축제 카드는 행사 선택을 돕고, 예약 전 체크 카드는 숙소 위치, 셔틀버스, 입장권, 할인 조건을 확인하는 페이지로 이어질 수 있도록 구성했습니다."
     },
     {
       question: "검색엔진이 이해하기 쉬운 구조인가요?",
-      answer: "섹션 제목, 카테고리 라벨, 날짜, 읽는 시간, 내부 링크 묶음을 명확히 배치해 여행지·예약·정보 탐색 의도를 구분하도록 구성했습니다."
+      answer: "전국 축제, 지역 축제, 예약 전 체크, 이용 가이드 섹션을 분리하고 카드마다 카테고리와 요약을 제공해 검색 의도를 명확히 했습니다."
     }
   ],
   footerGroups: [
     {
       title: "예약",
-      links: ["호텔 최저가", "항공권 검색", "투어·액티비티", "여행 할인코드"]
+      links: ["축제 근처 숙소", "교통 체크", "입장권 예매", "할인코드"]
     },
     {
-      title: "여행 허브",
-      links: ["여행지 가이드", "테마별 가이드", "전국 관광지", "축제·행사"]
+      title: "축제 허브",
+      links: ["전국 축제", "지역 행사", "야간 축제", "가족 축제"]
     },
     {
       title: "카테고리",
-      links: ["가볼 만한 곳", "여행 정보", "예약 전 체크", "큐레이션"]
+      links: ["축제 매거진", "여행 정보", "예약 전 체크", "큐레이션"]
     },
     {
-      title: "인기 여행지",
-      links: ["도쿄 호텔", "방콕 투어", "제주 숙소", "부산 여행"]
+      title: "인기 지역",
+      links: ["서울 축제", "부산 축제", "제주 축제", "강릉 축제"]
     },
     {
       title: "Language",
