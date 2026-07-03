@@ -184,69 +184,6 @@ main {
   color: var(--accent);
 }
 
-.region-modal {
-  display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
-  gap: 12px;
-  align-items: start;
-  margin: 18px 0 26px;
-  padding: 18px 20px;
-  border: 1px solid var(--line);
-  border-radius: 24px;
-  background: #fff;
-  box-shadow: var(--shadow);
-}
-
-.region-modal__head {
-  display: grid;
-  gap: 3px;
-}
-
-.region-modal__head span {
-  color: var(--gold);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-}
-
-.region-modal__head strong {
-  color: var(--ink);
-  font-size: 20px;
-  line-height: 1.2;
-}
-
-.region-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.region-button {
-  min-height: 40px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface);
-  color: #3b3732;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
-}
-
-.region-button:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-1px);
-}
-
-.region-button.is-active {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: #fff;
-}
-
 .hero-section {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.75fr);
@@ -763,38 +700,6 @@ main {
   main {
     width: min(100% - 24px, var(--max));
     padding-top: 18px;
-  }
-
-  .region-modal {
-    grid-template-columns: 1fr;
-    margin: 14px 0 20px;
-    padding: 14px;
-    border-radius: 20px;
-  }
-
-  .region-modal__head {
-    grid-template-columns: auto 1fr;
-    align-items: baseline;
-    gap: 8px;
-  }
-
-  .region-modal__head strong {
-    font-size: 16px;
-  }
-
-  .region-list {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 0 0 2px;
-  }
-
-  .region-button {
-    flex: 0 0 auto;
-    min-width: 68px;
-    min-height: 38px;
-    padding: 0 12px;
   }
 
   .today-bar {
