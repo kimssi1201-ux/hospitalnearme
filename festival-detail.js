@@ -247,6 +247,53 @@ function updateDocumentMeta(article) {
   if (description) description.setAttribute("content", article.summary.slice(0, 150));
 }
 
+async function hydrateAiGuide(article) {
+  const section = $("#aiGuideSection");
+  const content = $("#aiGuideContent");
+  if (!section || !content) return;
+
+  try {
+    const response = await fetch("/api/festival-ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        title: article.title,
+        category: article.category,
+        summary: article.summary,
+        date: article.date,
+        address: article.address || "",
+        facts: (article.facts || localFacts(article)).map(([label, value]) => `${label}: ${stripHtml(value)}`)
+      })
+    });
+
+    if (!response.ok) throw new Error(`AI guide ${response.status}`);
+
+    const payload = await response.json();
+    const sections = Array.isArray(payload.sections) ? payload.sections : [];
+    const tips = Array.isArray(payload.tips) ? payload.tips : [];
+    if (!sections.length && !tips.length) return;
+
+    content.innerHTML = `
+      ${sections.map((item) => `
+        <article>
+          <h3>${escapeHtml(item.title || "방문 포인트")}</h3>
+          <p>${escapeHtml(item.body || "")}</p>
+        </article>
+      `).join("")}
+      ${tips.length ? `
+        <ul>
+          ${tips.map((tip) => `<li>${escapeHtml(tip)}</li>`).join("")}
+        </ul>
+      ` : ""}
+    `;
+    section.hidden = false;
+  } catch (error) {
+    console.info("AI guide is not available.", error);
+  }
+}
+
 function renderArticle(article) {
   updateDocumentMeta(article);
   const facts = article.facts || localFacts(article);
@@ -289,9 +336,18 @@ function renderArticle(article) {
         <h2>방문 전 체크리스트</h2>
         <ul>${renderChecklist()}</ul>
       </section>
+      <section class="ai-guide-section" id="aiGuideSection" hidden>
+        <div>
+          <p class="eyebrow">AI Visit Guide</p>
+          <h2>AI가 정리한 방문 포인트</h2>
+          <p>축제 기본 정보를 바탕으로 방문 전 확인할 내용을 짧게 보강합니다.</p>
+        </div>
+        <div class="ai-guide-content" id="aiGuideContent"></div>
+      </section>
       ${article.homepage ? `<a class="primary-button official-link" href="${article.homepage}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}
     </div>
   `;
+  hydrateAiGuide(article);
 }
 
 function renderRelated(currentId) {

@@ -209,6 +209,63 @@
   line-height: 1.7;
 }
 
+.ai-guide-section {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.ai-guide-section > div:first-child {
+  display: grid;
+  gap: 8px;
+}
+
+.ai-guide-section > div:first-child p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.ai-guide-content {
+  display: grid;
+  gap: 14px;
+}
+
+.ai-guide-content article {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.ai-guide-content h3 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.ai-guide-content p {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.ai-guide-content ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.ai-guide-content li {
+  color: #3f3a35;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
 .official-link {
   justify-self: start;
 }
