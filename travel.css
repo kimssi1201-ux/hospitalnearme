@@ -185,20 +185,16 @@ main {
 }
 
 .region-modal {
-  position: fixed;
-  z-index: 30;
-  right: 18px;
-  bottom: 22px;
   display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
   gap: 12px;
-  width: min(260px, calc(100vw - 32px));
-  max-height: min(540px, calc(100vh - 120px));
-  padding: 18px;
+  align-items: start;
+  margin: 18px 0 26px;
+  padding: 18px 20px;
   border: 1px solid var(--line);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 24px 70px rgba(30, 25, 20, 0.18);
-  backdrop-filter: blur(14px);
+  background: #fff;
+  box-shadow: var(--shadow);
 }
 
 .region-modal__head {
@@ -220,15 +216,14 @@ main {
 }
 
 .region-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  overflow-y: auto;
-  padding-right: 2px;
 }
 
 .region-button {
   min-height: 40px;
+  padding: 0 14px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--surface);
@@ -768,16 +763,12 @@ main {
   main {
     width: min(100% - 24px, var(--max));
     padding-top: 18px;
-    padding-bottom: 138px;
   }
 
   .region-modal {
-    right: 10px;
-    bottom: 10px;
-    left: 10px;
-    width: auto;
-    max-height: 124px;
-    padding: 12px;
+    grid-template-columns: 1fr;
+    margin: 14px 0 20px;
+    padding: 14px;
     border-radius: 20px;
   }
 
