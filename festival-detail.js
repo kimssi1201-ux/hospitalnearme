@@ -36,6 +36,10 @@ function commonParams(extra = {}) {
   });
 }
 
+function normalizeImageUrl(value) {
+  return String(value || "").trim().replace(/^http:/, "https:");
+}
+
 async function fetchTourDetail(contentId) {
   const base = "https://apis.data.go.kr/B551011/KorService2";
   const commonUrl = `${base}/detailCommon2?${commonParams({
@@ -53,16 +57,25 @@ async function fetchTourDetail(contentId) {
     contentId,
     contentTypeId: "15"
   })}`;
+  const imageUrl = `${base}/detailImage2?${commonParams({
+    contentId,
+    imageYN: "Y",
+    subImageYN: "Y",
+    numOfRows: "50",
+    pageNo: "1"
+  })}`;
 
-  const [commonResponse, introResponse] = await Promise.all([
+  const [commonResponse, introResponse, imageResponse] = await Promise.all([
     fetch(commonUrl),
-    fetch(introUrl)
+    fetch(introUrl),
+    fetch(imageUrl)
   ]);
 
   if (!commonResponse.ok) throw new Error(`detailCommon2 ${commonResponse.status}`);
 
   const commonPayload = await commonResponse.json();
   const introPayload = introResponse.ok ? await introResponse.json() : {};
+  const imagePayload = imageResponse.ok ? await imageResponse.json() : {};
   const commonItem = normalizeApiItem(commonPayload?.response?.body?.items?.item);
   const introItem = normalizeApiItem(introPayload?.response?.body?.items?.item);
 
@@ -71,6 +84,8 @@ async function fetchTourDetail(contentId) {
   const start = compactDate(introItem?.eventstartdate);
   const end = compactDate(introItem?.eventenddate);
   const period = start && end ? `${start} - ${end}` : start || "일정 확인 필요";
+  const galleryImages = collectGalleryImages(commonItem, imagePayload);
+  const firstImage = galleryImages[0] || normalizeImageUrl(commonItem.firstimage || commonItem.firstimage2 || data.articles[0].image);
 
   return {
     id: `tour-${contentId}`,
@@ -79,7 +94,8 @@ async function fetchTourDetail(contentId) {
     summary: stripHtml(commonItem.overview) || "공공데이터에서 불러온 전국 축제 상세 정보입니다.",
     date: period,
     readTime: "축제 상세",
-    image: (commonItem.firstimage || commonItem.firstimage2 || data.articles[0].image).replace(/^http:/, "https:"),
+    image: firstImage,
+    galleryImages,
     address: [commonItem.addr1, commonItem.addr2].filter(Boolean).join(" "),
     tel: commonItem.tel || "",
     homepage: commonItem.homepage || "",
@@ -95,6 +111,25 @@ async function fetchTourDetail(contentId) {
 
 function normalizeApiItem(item) {
   return Array.isArray(item) ? item[0] : item || {};
+}
+
+function normalizeApiItems(item) {
+  if (Array.isArray(item)) return item;
+  return item ? [item] : [];
+}
+
+function collectGalleryImages(commonItem, imagePayload) {
+  const detailImages = normalizeApiItems(imagePayload?.response?.body?.items?.item)
+    .flatMap((item) => [item.originimgurl, item.smallimageurl]);
+  const urls = [
+    commonItem.firstimage,
+    commonItem.firstimage2,
+    ...detailImages
+  ]
+    .map(normalizeImageUrl)
+    .filter(Boolean);
+
+  return [...new Set(urls)];
 }
 
 function findLocalArticle() {
@@ -170,6 +205,31 @@ function renderFactGrid(facts) {
       </div>
     `)
     .join("");
+}
+
+function renderImageGallery(article) {
+  const images = (article.galleryImages || [])
+    .filter((image) => image && image !== article.image)
+    .slice(0, 24);
+
+  if (!images.length) return "";
+
+  return `
+    <section class="api-image-gallery" aria-labelledby="apiImageGalleryTitle">
+      <div class="gallery-heading">
+        <p class="eyebrow">Festival Photos</p>
+        <h2 id="apiImageGalleryTitle">축제 사진</h2>
+        <p>공식 축제 정보에 포함된 추가 이미지를 함께 모았습니다.</p>
+      </div>
+      <div class="api-image-grid">
+        ${images.map((image, index) => `
+          <figure>
+            <img src="${escapeHtml(image)}" alt="${escapeHtml(`${article.title} 추가 사진 ${index + 1}`)}" loading="lazy" />
+          </figure>
+        `).join("")}
+      </div>
+    </section>
+  `;
 }
 
 function renderChecklist() {
@@ -323,6 +383,7 @@ function renderArticle(article) {
     <div class="detail-hero-image">
       <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" />
     </div>
+    ${renderImageGallery(article)}
     <section class="fact-grid" aria-label="축제 기본 정보">
       ${renderFactGrid(facts)}
     </section>
