@@ -252,7 +252,16 @@ function articleMeta(item) {
 
 function detailUrl(item) {
   if (item.source === "tour" && item.contentId) {
-    return `festival-detail?source=tour&id=${encodeURIComponent(item.contentId)}`;
+    const params = new URLSearchParams({
+      source: "tour",
+      id: item.contentId,
+      title: item.title || "",
+      category: item.category || "",
+      date: item.date || "",
+      image: item.image || "",
+      summary: displaySummary(item) || ""
+    });
+    return `festival-detail?${params.toString()}`;
   }
 
   return `festival-detail?id=${encodeURIComponent(item.id)}`;

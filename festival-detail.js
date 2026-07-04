@@ -2,6 +2,11 @@ const data = window.TRAVEL_PORTAL_DATA;
 const params = new URLSearchParams(window.location.search);
 const source = params.get("source");
 const id = params.get("id");
+const fallbackTitle = params.get("title");
+const fallbackCategory = params.get("category");
+const fallbackDate = params.get("date");
+const fallbackImage = params.get("image");
+const fallbackSummary = params.get("summary");
 const supportedLanguages = ["ko", "en", "ja", "zh"];
 const state = {
   language: getStoredLanguage(),
@@ -294,6 +299,8 @@ function normalizeExternalUrl(value) {
 
 async function fetchTourDetail(contentId) {
   const base = "https://apis.data.go.kr/B551011/KorService2";
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 6500);
   const commonUrl = `${base}/detailCommon2?${commonParams({
     contentId,
     contentTypeId: "15",
@@ -317,11 +324,19 @@ async function fetchTourDetail(contentId) {
     pageNo: "1"
   })}`;
 
-  const [commonResponse, introResponse, imageResponse] = await Promise.all([
-    fetch(commonUrl),
-    fetch(introUrl),
-    fetch(imageUrl)
-  ]);
+  let commonResponse;
+  let introResponse;
+  let imageResponse;
+
+  try {
+    [commonResponse, introResponse, imageResponse] = await Promise.all([
+      fetch(commonUrl, { signal: controller.signal }),
+      fetch(introUrl, { signal: controller.signal }),
+      fetch(imageUrl, { signal: controller.signal })
+    ]);
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 
   if (!commonResponse.ok) throw new Error(`detailCommon2 ${commonResponse.status}`);
 
@@ -386,6 +401,35 @@ function collectGalleryImages(commonItem, imagePayload) {
 
 function findLocalArticle() {
   return data.articles.find((article) => article.id === id) || data.articles[0];
+}
+
+function fallbackArticleFromParams() {
+  const title = fallbackTitle || "축제 상세 정보";
+  const image = fallbackImage || data.articles[0].image;
+  const summary = fallbackSummary || `${title} 방문 전 확인하면 좋은 일정, 장소, 교통, 준비 정보를 정리했습니다.`;
+
+  return {
+    id: id ? `tour-fallback-${id}` : "tour-fallback",
+    source: "tour",
+    contentId: id || "",
+    category: fallbackCategory || textFor("category.festival"),
+    title,
+    summary,
+    date: fallbackDate || textFor("date.needCheck"),
+    readTime: textFor("read.detail"),
+    image,
+    galleryImages: image ? [image] : [],
+    address: "",
+    tel: "",
+    homepage: "",
+    overview: summary,
+    facts: [
+      ["일정", fallbackDate || textFor("date.needCheck")],
+      ["장소", textFor("place.needCheck")],
+      ["운영 시간", textFor("official.check")],
+      ["이용 요금", textFor("official.check")]
+    ]
+  };
 }
 
 function detailPostCopy(article) {
@@ -985,18 +1029,24 @@ function renderRelated(currentId) {
 async function init() {
   applyStaticLanguage();
   bindLanguageSwitch();
+  renderRelated();
 
   try {
-    const article = source === "tour" && id
-      ? await fetchTourDetail(id)
-      : findLocalArticle();
+    if (source === "tour" && id) {
+      const fallbackArticle = fallbackArticleFromParams();
+      state.article = fallbackArticle;
+      renderArticle(fallbackArticle);
+      renderRelated(fallbackArticle.id);
+    }
+
+    const article = source === "tour" && id ? await fetchTourDetail(id) : findLocalArticle();
 
     state.article = article;
     renderArticle(article);
     renderRelated(article.id);
   } catch (error) {
-    console.warn("Detail load failed. Local article is displayed.", error);
-    const article = findLocalArticle();
+    console.warn("Detail load failed. Fallback article is displayed.", error);
+    const article = source === "tour" && id ? fallbackArticleFromParams() : findLocalArticle();
     state.article = article;
     renderArticle(article);
     renderRelated(article.id);
