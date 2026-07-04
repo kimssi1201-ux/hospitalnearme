@@ -683,8 +683,7 @@ function bindRegionChips() {
 }
 
 function renderHero() {
-  const [featured, ...latest] = data.articles;
-  const sideItems = latest.slice(0, 4);
+  const [featured] = data.articles;
 
   $("#heroGrid").innerHTML = `
     <article class="hero-featured">
@@ -698,20 +697,6 @@ function renderHero() {
         </div>
       </a>
     </article>
-    <div class="hero-side">
-      ${sideItems.map((item) => `
-        <article class="side-card">
-          <a href="${escapeHtml(detailUrl(item))}">
-            ${imageMarkup(item, "thumb")}
-            <span>
-              <em>${escapeHtml(item.category)}</em>
-              <strong>${escapeHtml(item.title)}</strong>
-              <small>${escapeHtml(item.date)} · ${escapeHtml(item.readTime)}</small>
-            </span>
-          </a>
-        </article>
-      `).join("")}
-    </div>
   `;
 }
 
