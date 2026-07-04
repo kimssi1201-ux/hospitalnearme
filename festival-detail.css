@@ -588,3 +588,127 @@
     gap: 4px;
   }
 }
+
+/* Article-style detail page: remove boxed body blocks. */
+.blog-article {
+  gap: 24px;
+}
+
+.detail-loading,
+.blog-header {
+  padding: 8px 0 28px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.blog-lede {
+  max-width: 760px;
+}
+
+.detail-hero-image {
+  border-radius: 0;
+  background: transparent;
+}
+
+.api-image-gallery {
+  padding: 0 0 28px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.api-image-grid figure {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.fact-grid {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.fact-card {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.fact-card span {
+  letter-spacing: 0;
+}
+
+.blog-body section {
+  padding: 0 0 30px;
+  border-bottom: 1px solid var(--line);
+}
+
+.blog-body section:last-child {
+  border-bottom: 0;
+}
+
+.timeline-section,
+.reader-question-section,
+.rich-info-section,
+.checklist-section,
+.ai-guide-section {
+  padding: 0 0 30px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.practical-grid article,
+.reader-question-grid article,
+.companion-grid article,
+.info-table article,
+.ai-guide-content article {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.practical-grid article,
+.reader-question-grid article,
+.companion-grid article {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.info-table {
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.info-table article {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.faq-block details {
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.ai-guide-section {
+  display: grid;
+  gap: 20px;
+}
+
+.ai-guide-content article {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
