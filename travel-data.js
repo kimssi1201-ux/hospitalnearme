@@ -24,6 +24,7 @@ window.TRAVEL_PORTAL_DATA = {
     { id: "chungcheong", label: "충청도", areaCodes: ["33", "34"] },
     { id: "chungbuk", label: "충북", areaCode: "33" },
     { id: "chungnam", label: "충남", areaCode: "34" },
+    { id: "jeolla", label: "전라도", areaCodes: ["37", "38"] },
     { id: "jeonbuk", label: "전북", areaCode: "37" },
     { id: "jeonnam", label: "전남", areaCode: "38" },
     { id: "gyeongsang", label: "경상도", areaCodes: ["35", "36"] },
@@ -158,12 +159,12 @@ window.TRAVEL_PORTAL_DATA = {
     {
       title: "광역시 축제",
       summary: "부산, 대구, 대전, 광주, 울산, 세종 축제를 묶어 봅니다.",
-      links: ["부산 축제", "대구 축제", "대전 축제", "광주 축제"]
+      links: ["부산 축제", "대구 축제", "대전 축제", "광주 축제", "울산 축제", "세종 축제"]
     },
     {
       title: "전국 여행 축제",
       summary: "강원, 충청, 전라, 경상, 제주 축제를 여행 일정과 함께 확인합니다.",
-      links: ["강원 축제", "충청 축제", "전라 축제", "제주 축제"]
+      links: ["강원 축제", "충청 축제", "전라 축제", "경상 축제", "제주 축제"]
     }
   ],
   faq: [

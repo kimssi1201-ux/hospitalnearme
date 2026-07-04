@@ -305,6 +305,64 @@ function activeRegion() {
   return regions.find((region) => region.id === state.activeRegionId) || regions[0] || { id: "all", label: "전국", areaCode: "" };
 }
 
+function regionIdFromText(value) {
+  const text = String(value || "").replace(/\s+/g, "").replace(/축제|여행|주말|이번주/g, "");
+  const aliases = {
+    전국: "all",
+    서울: "seoul",
+    경기: "gyeonggi",
+    경기도: "gyeonggi",
+    인천: "incheon",
+    부산: "busan",
+    대구: "daegu",
+    대전: "daejeon",
+    광주: "gwangju",
+    울산: "ulsan",
+    세종: "sejong",
+    강원: "gangwon",
+    강원도: "gangwon",
+    충청: "chungcheong",
+    충청도: "chungcheong",
+    충북: "chungbuk",
+    충남: "chungnam",
+    전라: "jeolla",
+    전라도: "jeolla",
+    전북: "jeonbuk",
+    전남: "jeonnam",
+    경상: "gyeongsang",
+    경상도: "gyeongsang",
+    경북: "gyeongbuk",
+    경남: "gyeongnam",
+    제주: "jeju",
+    제주도: "jeju"
+  };
+
+  return aliases[text] || "";
+}
+
+function regionLinkMarkup(label) {
+  const regionId = regionIdFromText(label);
+  const dataAttr = regionId ? ` data-region-id="${escapeHtml(regionId)}"` : "";
+  return `<a href="${regionId ? "#places" : "#"}"${dataAttr}>${escapeHtml(label)}</a>`;
+}
+
+function selectRegion(regionId) {
+  if (!regionId || regionId === state.activeRegionId) return;
+
+  const regionExists = (data.regions || []).some((region) => region.id === regionId);
+  if (!regionExists) return;
+
+  state.activeRegionId = regionId;
+  state.apiArticles = [];
+  state.apiLoaded = false;
+  renderRegionChips();
+  updateRegionHeading();
+  updatePlacesStatus(`${activeRegion().label} 축제 정보를 불러오는 중입니다.`);
+  renderPlaces();
+  renderCuration();
+  loadTourApiPlaces();
+}
+
 function normalizeTourItems(items, regionOverride = activeRegion()) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
   const fallbackImage = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80";
@@ -464,11 +522,15 @@ async function loadTourApiPlaces() {
     if (apiArticles.length) {
       state.apiArticles = apiArticles;
       state.apiLoaded = true;
+      updatePlacesStatus(`${region.label} 축제 ${apiArticles.length}개를 불러왔습니다.`);
       renderPlaces();
       renderCuration();
+    } else {
+      updatePlacesStatus(`${region.label}에서 현재 표시할 축제 정보를 찾지 못했습니다.`);
     }
   } catch (error) {
     console.warn("TourAPI request failed. Fallback content is displayed.", error);
+    updatePlacesStatus("축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
   } finally {
     window.clearTimeout(timeoutId);
   }
@@ -561,7 +623,7 @@ async function loadJulyFestivalPosts() {
 
 function renderTodayKeywords() {
   $("#todayKeywords").innerHTML = data.todayKeywords
-    .map((keyword) => `<a href="#" aria-label="${escapeHtml(keyword)} 키워드 보기">${escapeHtml(keyword)}</a>`)
+    .map((keyword) => regionLinkMarkup(keyword))
     .join("");
 }
 
@@ -602,16 +664,7 @@ function bindRegionChips() {
     if (!button) return;
 
     const regionId = button.getAttribute("data-region-id");
-    if (!regionId || regionId === state.activeRegionId) return;
-
-    state.activeRegionId = regionId;
-    state.apiArticles = [];
-    state.apiLoaded = false;
-    renderRegionChips();
-    updateRegionHeading();
-    renderPlaces();
-    renderCuration();
-    loadTourApiPlaces();
+    selectRegion(regionId);
   });
 }
 
@@ -656,6 +709,12 @@ function renderPlaces() {
     .join("");
 }
 
+function updatePlacesStatus(message = "") {
+  const target = $("#placesStatus");
+  if (!target) return;
+  target.textContent = message;
+}
+
 function renderBooking() {
   $("#bookingGrid").innerHTML = data.bookingChecks.map((item) => `
     <article class="booking-card">
@@ -692,7 +751,7 @@ function renderCategoryGroups() {
       <h3>${escapeHtml(group.title)}</h3>
       <p>${escapeHtml(group.summary)}</p>
       <div>
-        ${group.links.map((link) => `<a href="#">${escapeHtml(link)}</a>`).join("")}
+        ${group.links.map((link) => regionLinkMarkup(link)).join("")}
       </div>
     </article>
   `).join("");
@@ -711,9 +770,23 @@ function renderFooter() {
   $("#footerLinks").innerHTML = data.footerGroups.map((group) => `
     <nav aria-label="${escapeHtml(group.title)}">
       <h2>${escapeHtml(group.title)}</h2>
-      ${group.links.map((link) => `<a href="#">${escapeHtml(link)}</a>`).join("")}
+      ${group.links.map((link) => regionLinkMarkup(link)).join("")}
     </nav>
   `).join("");
+}
+
+function bindRegionLinks() {
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[data-region-id]");
+    if (!link) return;
+
+    const regionId = link.getAttribute("data-region-id");
+    if (!regionId) return;
+
+    event.preventDefault();
+    selectRegion(regionId);
+    $("#places")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 function bindMenu() {
@@ -741,6 +814,7 @@ function init() {
   renderFooter();
   bindMenu();
   bindRegionChips();
+  bindRegionLinks();
   bindLanguageSwitch();
   applyLanguage();
   loadTourApiPlaces();
