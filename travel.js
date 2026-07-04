@@ -477,8 +477,41 @@ function renderJulyFestivals() {
     .join("");
 }
 
+function readJulyFestivalCache() {
+  try {
+    const cached = window.sessionStorage.getItem("festivalNote.julyArticles.v1");
+    if (!cached) return [];
+
+    const parsed = JSON.parse(cached);
+    if (!Array.isArray(parsed.items)) return [];
+    if (Date.now() - Number(parsed.savedAt || 0) > 6 * 60 * 60 * 1000) return [];
+
+    return parsed.items;
+  } catch {
+    return [];
+  }
+}
+
+function writeJulyFestivalCache(items) {
+  try {
+    window.sessionStorage.setItem(
+      "festivalNote.julyArticles.v1",
+      JSON.stringify({ savedAt: Date.now(), items })
+    );
+  } catch {
+    // Cache failures should not block rendering.
+  }
+}
+
 async function loadJulyFestivalPosts() {
   if (!data.tourApi?.serviceKey || !data.tourApi?.endpoint) return;
+
+  const cached = readJulyFestivalCache();
+  if (cached.length) {
+    state.julyArticles = cached;
+    renderJulyFestivals();
+    return;
+  }
 
   const numOfRows = 100;
   const collected = [];
@@ -503,6 +536,7 @@ async function loadJulyFestivalPosts() {
     ).values()];
 
     state.julyArticles = deduped;
+    writeJulyFestivalCache(deduped);
     renderJulyFestivals();
   } catch (error) {
     console.warn("July festival posts could not be loaded.", error);
@@ -525,46 +559,6 @@ function updateRegionHeading() {
       ? textFor("places.title.all")
       : textFor("places.title.region", { region: region.label });
   }
-}
-
-function renderRegionModal() {
-  const target = $("#regionList");
-  if (!target) return;
-
-  target.innerHTML = (data.regions || [])
-    .map((region) => `
-      <button
-        class="region-button ${region.id === state.activeRegionId ? "is-active" : ""}"
-        type="button"
-        data-region-id="${escapeHtml(region.id)}"
-        aria-pressed="${region.id === state.activeRegionId ? "true" : "false"}"
-      >
-        ${escapeHtml(region.label)}
-      </button>
-    `)
-    .join("");
-}
-
-function bindRegionModal() {
-  const target = $("#regionList");
-  if (!target) return;
-
-  target.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-region-id]");
-    if (!button) return;
-
-    const regionId = button.getAttribute("data-region-id");
-    if (!regionId || regionId === state.activeRegionId) return;
-
-    state.activeRegionId = regionId;
-    state.apiArticles = [];
-    state.apiLoaded = false;
-    renderRegionModal();
-    updateRegionHeading();
-    renderPlaces();
-    renderCuration();
-    loadTourApiPlaces();
-  });
 }
 
 function renderHero() {
@@ -681,7 +675,6 @@ function bindMenu() {
 
 function init() {
   renderTodayKeywords();
-  renderRegionModal();
   updateRegionHeading();
   renderHero();
   renderJulyFestivals();
@@ -692,7 +685,6 @@ function init() {
   renderFaq();
   renderFooter();
   bindMenu();
-  bindRegionModal();
   bindLanguageSwitch();
   applyLanguage();
   loadTourApiPlaces();

@@ -40,6 +40,27 @@ function normalizeImageUrl(value) {
   return String(value || "").trim().replace(/^http:/, "https:");
 }
 
+function normalizeExternalUrl(value) {
+  const html = String(value || "").trim();
+  if (!html) return "";
+
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  const href = div.querySelector("a[href]")?.getAttribute("href") || stripHtml(html);
+  const candidate = String(href || "").trim();
+  const normalized = candidate.startsWith("//") ? `https:${candidate}` : candidate;
+
+  if (!/^https?:\/\//i.test(normalized)) return "";
+
+  try {
+    const url = new URL(normalized);
+    if (!["http:", "https:"].includes(url.protocol)) return "";
+    return url.href.replace(/^http:/, "https:");
+  } catch {
+    return "";
+  }
+}
+
 async function fetchTourDetail(contentId) {
   const base = "https://apis.data.go.kr/B551011/KorService2";
   const commonUrl = `${base}/detailCommon2?${commonParams({
@@ -98,7 +119,7 @@ async function fetchTourDetail(contentId) {
     galleryImages,
     address: [commonItem.addr1, commonItem.addr2].filter(Boolean).join(" "),
     tel: commonItem.tel || "",
-    homepage: commonItem.homepage || "",
+    homepage: normalizeExternalUrl(commonItem.homepage),
     overview: stripHtml(commonItem.overview),
     facts: [
       ["일정", period],
@@ -436,7 +457,7 @@ function updateDocumentMeta(article) {
 async function hydrateAiGuide(article) {
   const section = $("#aiGuideSection");
   const content = $("#aiGuideContent");
-  if (!section || !content) return;
+  if (!section || !content) return false;
 
   try {
     const response = await fetch("/api/festival-ai", {
@@ -445,6 +466,7 @@ async function hydrateAiGuide(article) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        contentId: article.contentId || article.id,
         title: article.title,
         category: article.category,
         summary: article.summary,
@@ -459,7 +481,7 @@ async function hydrateAiGuide(article) {
     const payload = await response.json();
     const sections = Array.isArray(payload.sections) ? payload.sections : [];
     const tips = Array.isArray(payload.tips) ? payload.tips : [];
-    if (!sections.length && !tips.length) return;
+    if (!sections.length && !tips.length) return false;
 
     content.innerHTML = `
       ${sections.map((item) => `
@@ -475,9 +497,32 @@ async function hydrateAiGuide(article) {
       ` : ""}
     `;
     section.hidden = false;
+    return true;
   } catch (error) {
     console.info("AI guide is not available.", error);
+    return false;
   }
+}
+
+function bindAiGuide(article) {
+  const button = $("#aiGuideButton");
+  const content = $("#aiGuideContent");
+  if (!button || !content) return;
+
+  button.addEventListener("click", async () => {
+    if (button.dataset.loading === "true") return;
+
+    button.dataset.loading = "true";
+    button.disabled = true;
+    button.textContent = "방문 팁을 불러오는 중";
+    content.textContent = "";
+
+    const loaded = await hydrateAiGuide(article);
+
+    button.dataset.loading = "false";
+    button.disabled = false;
+    button.textContent = loaded ? "방문 팁 다시 불러오기" : "잠시 후 다시 시도하기";
+  });
 }
 
 function renderArticle(article) {
@@ -525,18 +570,19 @@ function renderArticle(article) {
         <h2>방문 전 체크리스트</h2>
         <ul>${renderChecklist()}</ul>
       </section>
-      <section class="ai-guide-section" id="aiGuideSection" hidden>
+      <section class="ai-guide-section" id="aiGuideSection">
         <div>
           <p class="eyebrow">Visit Guide</p>
           <h2>방문 전 참고 포인트</h2>
           <p>축제 기본 정보를 바탕으로 방문 전 확인할 내용을 짧게 보강합니다.</p>
+          <button class="guide-load-button" id="aiGuideButton" type="button">방문 팁 더 보기</button>
         </div>
         <div class="ai-guide-content" id="aiGuideContent"></div>
       </section>
-      ${article.homepage ? `<a class="primary-button official-link" href="${article.homepage}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}
+      ${article.homepage ? `<a class="primary-button official-link" href="${escapeHtml(article.homepage)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}
     </div>
   `;
-  hydrateAiGuide(article);
+  bindAiGuide(article);
 }
 
 function renderRelated(currentId) {

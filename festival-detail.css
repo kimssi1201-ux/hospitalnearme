@@ -424,6 +424,24 @@
   line-height: 1.7;
 }
 
+.guide-load-button {
+  width: fit-content;
+  margin-top: 6px;
+  padding: 12px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.guide-load-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .ai-guide-content {
   display: grid;
   gap: 14px;
