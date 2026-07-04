@@ -373,7 +373,7 @@ async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId 
   const overview = stripHtml(commonItem.overview);
   const address = [commonItem.addr1, commonItem.addr2].filter(Boolean).join(" ") || fallbackAddress || extractAddressFromOverview(overview);
   const place = introItem?.eventplace || address || "장소 확인 필요";
-  const playTime = stripHtml(introItem?.playtime) || stripHtml(introItem?.eventstartdate) || "공식 안내 확인";
+  const playTime = stripHtml(introItem?.playtime) || "공식 안내 확인";
   const fee = stripHtml(introItem?.usetimefestival) || "공식 안내 확인";
 
   return {
