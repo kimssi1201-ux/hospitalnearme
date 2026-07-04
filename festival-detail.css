@@ -717,6 +717,7 @@
 .course-timeline,
 .spot-detail-section,
 .spot-info-card,
+.official-detail-list,
 .detail-ad-box,
 .nearby-spot-section,
 .travel-tip-box,
@@ -728,6 +729,7 @@
 .blog-body .travel-summary-box,
 .blog-body .course-timeline,
 .blog-body .spot-info-card,
+.blog-body .official-detail-list,
 .blog-body .travel-tip-box,
 .blog-body .closing-note {
   padding: clamp(22px, 5vw, 34px);
@@ -745,6 +747,7 @@
 .course-timeline h2,
 .spot-detail-section h2,
 .spot-info-card h2,
+.official-detail-list h2,
 .nearby-spot-section h2,
 .travel-tip-box h2,
 .closing-note h2 {
@@ -781,6 +784,7 @@
 
 .summary-point-grid span,
 .spot-info-card dt,
+.official-detail-grid span,
 .nearby-spot-grid span {
   color: var(--gold);
   font-size: 12px;
@@ -907,6 +911,27 @@
   font-weight: 700;
 }
 
+.official-detail-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.official-detail-grid article {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.official-detail-grid p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.75;
+}
+
 .official-link-inline {
   justify-self: start;
   padding: 12px 18px;
@@ -983,6 +1008,7 @@
   .blog-body .travel-summary-box,
   .blog-body .course-timeline,
   .blog-body .spot-info-card,
+  .blog-body .official-detail-list,
   .blog-body .travel-tip-box,
   .blog-body .closing-note {
     border-radius: 22px;

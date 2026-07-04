@@ -340,16 +340,24 @@ async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId 
     numOfRows: "50",
     pageNo: "1"
   })}`;
+  const infoUrl = `${base}/detailInfo2?${commonParams({
+    contentId,
+    contentTypeId,
+    numOfRows: "30",
+    pageNo: "1"
+  })}`;
 
   let commonResponse;
   let introResponse;
   let imageResponse;
+  let infoResponse;
 
   try {
-    [commonResponse, introResponse, imageResponse] = await Promise.all([
+    [commonResponse, introResponse, imageResponse, infoResponse] = await Promise.all([
       fetch(commonUrl, { signal: controller.signal }),
       fetch(introUrl, { signal: controller.signal }),
-      fetch(imageUrl, { signal: controller.signal })
+      fetch(imageUrl, { signal: controller.signal }),
+      fetch(infoUrl, { signal: controller.signal })
     ]);
   } finally {
     window.clearTimeout(timeoutId);
@@ -360,8 +368,10 @@ async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId 
   const commonPayload = await commonResponse.json();
   const introPayload = introResponse.ok ? await introResponse.json() : {};
   const imagePayload = imageResponse.ok ? await imageResponse.json() : {};
+  const infoPayload = infoResponse.ok ? await infoResponse.json() : {};
   const commonItem = normalizeApiItem(commonPayload?.response?.body?.items?.item);
   const introItem = normalizeApiItem(introPayload?.response?.body?.items?.item);
+  const detailInfoItems = normalizeApiItems(infoPayload?.response?.body?.items?.item);
 
   if (!commonItem?.title) throw new Error("Tour detail item missing");
 
@@ -375,6 +385,7 @@ async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId 
   const place = introItem?.eventplace || address || "장소 확인 필요";
   const playTime = stripHtml(introItem?.playtime) || "공식 안내 확인";
   const fee = stripHtml(introItem?.usetimefestival) || "공식 안내 확인";
+  const detailInfo = collectOfficialDetails(commonItem, introItem, detailInfoItems);
 
   return {
     id: `tour-${contentId}`,
@@ -394,11 +405,18 @@ async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId 
     tel: commonItem.tel || "",
     homepage: normalizeExternalUrl(commonItem.homepage),
     overview,
+    detailInfo,
     facts: [
       ["일정", period],
       ["장소", place],
       ["운영 시간", playTime],
-      ["이용 요금", fee]
+      ["이용 요금", fee],
+      ["주최", stripHtml(introItem?.sponsor1)],
+      ["문의", stripHtml(introItem?.sponsor1tel || commonItem.tel)],
+      ["행사 프로그램", stripHtml(introItem?.program)],
+      ["부대 행사", stripHtml(introItem?.subevent)],
+      ["관람 소요시간", stripHtml(introItem?.spendtimefestival)],
+      ["참가 연령", stripHtml(introItem?.agelimit)]
     ]
   };
 }
@@ -424,6 +442,37 @@ function collectGalleryImages(commonItem, imagePayload) {
     .filter(Boolean);
 
   return [...new Set(urls)];
+}
+
+function collectOfficialDetails(commonItem, introItem, detailInfoItems) {
+  const details = [];
+  const add = (label, value) => {
+    const clean = stripHtml(value);
+    if (!clean || clean === "0") return;
+    if (details.some((item) => item.label === label && item.value === clean)) return;
+    details.push({ label, value: clean });
+  };
+
+  add("행사 장소", introItem?.eventplace);
+  add("행사 시간", introItem?.playtime);
+  add("이용 요금", introItem?.usetimefestival);
+  add("주최 기관", introItem?.sponsor1);
+  add("주관 기관", introItem?.sponsor2);
+  add("문의 전화", introItem?.sponsor1tel || commonItem?.tel);
+  add("행사 프로그램", introItem?.program);
+  add("부대 행사", introItem?.subevent);
+  add("관람 소요시간", introItem?.spendtimefestival);
+  add("참가 연령", introItem?.agelimit);
+  add("예매처", introItem?.bookingplace);
+  add("행사장 위치 안내", introItem?.placeinfo);
+  add("할인 정보", introItem?.discountinfofestival);
+  add("축제 등급", introItem?.festivalgrade);
+
+  detailInfoItems.forEach((item) => {
+    add(item.infoname || item.serialnum || "상세 정보", item.infotext);
+  });
+
+  return details;
 }
 
 function extractAddressFromOverview(value) {
@@ -1058,6 +1107,26 @@ function SpotInfoCard(article) {
   `;
 }
 
+function OfficialDetailList(article) {
+  const details = Array.isArray(article.detailInfo) ? article.detailInfo : [];
+  if (!details.length) return "";
+
+  return `
+    <section class="official-detail-list" aria-labelledby="officialDetailTitle">
+      <p class="eyebrow">Official Info</p>
+      <h2 id="officialDetailTitle">공식 제공 상세 정보</h2>
+      <div class="official-detail-grid">
+        ${details.map((item) => `
+          <article>
+            <span>${escapeHtml(item.label)}</span>
+            <p>${escapeHtml(item.value)}</p>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function AdBox(position = "본문 중간") {
   return `
     <aside class="detail-ad-box" aria-label="${escapeHtml(position)} 광고 영역">
@@ -1152,6 +1221,7 @@ function renderTravelDetailBody(article, sections) {
     ${CourseTimeline(article)}
     ${renderSpotDetailSections(article, sections)}
     ${SpotInfoCard(article)}
+    ${OfficialDetailList(article)}
     ${AdBox("본문 중간")}
     ${NearbySpotCard(article)}
     ${TravelTipBox(article)}
