@@ -20,6 +20,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -28,6 +29,7 @@ body {
   color: var(--ink);
   font-family: var(--sans, "Pretendard Variable", Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 a {
@@ -1030,6 +1032,9 @@ main {
 
 @media (max-width: 720px) {
   .site-header {
+    width: 100%;
+    max-width: 100vw;
+    overflow: hidden;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 44px;
     grid-template-areas:
@@ -1066,6 +1071,7 @@ main {
   .language-switch {
     grid-area: language;
     width: 100%;
+    max-width: 100%;
     gap: 2px;
     padding: 3px;
   }
@@ -1105,6 +1111,25 @@ main {
   main {
     width: min(100% - 28px, var(--max));
     padding-top: 16px;
+    overflow-x: hidden;
+  }
+
+  .mobile-news-feed,
+  .category-news-wrapper,
+  #categoryNewsSections,
+  .news-feature-card,
+  .news-recommend-card,
+  .news-list-card,
+  .category-news-block {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .news-feature-body *,
+  .news-list-card *,
+  .news-recommend-card *,
+  .category-news-block * {
+    overflow-wrap: anywhere;
   }
 
   .hero-section {

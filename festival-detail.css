@@ -1,6 +1,7 @@
 .detail-main {
   width: min(1040px, calc(100% - 32px));
   padding-top: 30px;
+  overflow-x: hidden;
 }
 
 .back-link {
@@ -153,6 +154,7 @@
   gap: 34px;
   max-width: 860px;
   margin: 0 auto;
+  min-width: 0;
 }
 
 .blog-body section {
@@ -1060,13 +1062,23 @@
 }
 
 @media (max-width: 760px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
   .detail-main {
-    width: min(100% - 28px, 1040px);
+    width: 100%;
+    max-width: 100%;
+    padding-right: 18px;
+    padding-left: 18px;
     padding-top: 18px;
+    overflow-x: hidden;
   }
 
   .blog-article {
     gap: 22px;
+    min-width: 0;
   }
 
   .detail-loading,
@@ -1097,6 +1109,45 @@
   .blog-body {
     gap: 24px;
     max-width: none;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .blog-header,
+  .blog-body,
+  .blog-body section,
+  .travel-summary-box,
+  .course-timeline,
+  .spot-detail-section,
+  .spot-info-card,
+  .official-detail-list,
+  .nearby-parking-section,
+  .travel-tip-box,
+  .closing-note,
+  .summary-point-grid,
+  .summary-point-grid article,
+  .spot-info-card dl,
+  .spot-info-card dl div,
+  .official-detail-grid,
+  .official-detail-grid article,
+  .parking-list,
+  .parking-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .blog-header *,
+  .blog-body *,
+  .summary-point-grid strong,
+  .spot-info-card dd,
+  .official-detail-grid p,
+  .parking-card h3,
+  .parking-card p,
+  .parking-card dd {
+    max-width: 100%;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   .summary-point-grid,
