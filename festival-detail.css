@@ -1146,8 +1146,10 @@
   .parking-card p,
   .parking-card dd {
     max-width: 100%;
-    word-break: keep-all;
+    word-break: break-word;
     overflow-wrap: anywhere;
+    line-break: anywhere;
+    white-space: normal;
   }
 
   .summary-point-grid,
