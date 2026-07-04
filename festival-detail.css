@@ -45,13 +45,12 @@
   overflow: hidden;
   border-radius: 28px;
   background: var(--surface);
-  aspect-ratio: 16 / 8;
 }
 
 .detail-hero-image img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
 }
 
 .api-image-gallery {
@@ -93,13 +92,12 @@
   margin: 0;
   border-radius: 18px;
   background: var(--surface);
-  aspect-ratio: 4 / 3;
 }
 
 .api-image-grid img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
   transition: transform 180ms ease;
 }
 
@@ -1100,5 +1098,124 @@
 
   .parking-card dl {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Clean article body: keep information readable without boxed containers. */
+.blog-body .travel-summary-box,
+.blog-body .course-timeline,
+.blog-body .spot-detail-section,
+.blog-body .spot-info-card,
+.blog-body .official-detail-list,
+.blog-body .nearby-parking-section,
+.blog-body .travel-tip-box,
+.blog-body .closing-note,
+.blog-body .detail-ad-box {
+  padding: 0 0 34px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.blog-body .closing-note {
+  border-bottom: 0;
+}
+
+.blog-body .travel-summary-box {
+  background: transparent;
+}
+
+.summary-point-grid {
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.summary-point-grid article,
+.spot-info-card dl div,
+.official-detail-grid article,
+.parking-card,
+.parking-card dl div,
+.nearby-spot-grid article,
+.timeline-note {
+  min-height: 0;
+  padding: 16px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.summary-point-grid article:last-child,
+.official-detail-grid article:last-child,
+.parking-card:last-child,
+.nearby-spot-grid article:last-child {
+  border-bottom: 0;
+}
+
+.spot-info-card dl,
+.official-detail-grid,
+.nearby-spot-grid,
+.parking-list {
+  gap: 0;
+}
+
+.spot-info-card dl {
+  border-top: 1px solid var(--line);
+}
+
+.spot-info-card dl div {
+  padding: 16px 0;
+}
+
+.course-timeline li > span {
+  background: #111;
+}
+
+.blog-body .detail-ad-box {
+  display: none;
+}
+
+.detail-hero-image,
+.api-image-gallery {
+  overflow: visible;
+}
+
+.detail-hero-image img,
+.api-image-grid img {
+  object-fit: contain;
+}
+
+.api-image-grid {
+  align-items: start;
+}
+
+.api-image-grid figure {
+  border-radius: 14px;
+  background: transparent;
+}
+
+@media (max-width: 760px) {
+  .detail-hero-image {
+    margin-left: -18px;
+    margin-right: -18px;
+  }
+
+  .api-image-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-body .travel-summary-box,
+  .blog-body .course-timeline,
+  .blog-body .spot-detail-section,
+  .blog-body .spot-info-card,
+  .blog-body .official-detail-list,
+  .blog-body .nearby-parking-section,
+  .blog-body .travel-tip-box,
+  .blog-body .closing-note {
+    padding: 0 0 28px;
+    border-radius: 0;
   }
 }
