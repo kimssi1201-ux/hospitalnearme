@@ -423,6 +423,7 @@ function selectRegion(regionId) {
   renderRegionChips();
   updateRegionHeading();
   updatePlacesStatus(`${activeRegion().label} 축제 정보를 불러오는 중입니다.`);
+  renderJulyFestivals();
   renderPlaces();
   renderCuration();
   loadTourApiPlaces();
@@ -603,6 +604,7 @@ async function loadTourApiPlaces() {
 
     renderPlaces();
     renderCuration();
+    renderJulyFestivals();
   } catch (error) {
     console.warn("TourAPI request failed. Fallback content is displayed.", error);
     state.apiArticles = [];
@@ -611,6 +613,7 @@ async function loadTourApiPlaces() {
     updatePlacesStatus("축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
     renderPlaces();
     renderCuration();
+    renderJulyFestivals();
   } finally {
     window.clearTimeout(timeoutId);
   }
@@ -623,8 +626,18 @@ function renderJulyFestivals() {
   const feed = $("#newsFeedList");
   if (!status || !featured || !recommended || !feed) return;
 
+  const region = activeRegion();
+  const isRegional = region.id !== "all";
+  const regionalJulyItems = isRegional
+    ? state.julyArticles.filter((item) => {
+        const haystack = `${item.category || ""} ${item.address || ""} ${item.summaryParams?.address || ""}`;
+        return haystack.includes(region.label.replace("도", "")) || haystack.includes(region.label);
+      })
+    : [];
   const fallbackItems = data.articles || [];
-  const items = state.julyArticles.length ? state.julyArticles : fallbackItems;
+  const items = isRegional
+    ? (state.apiArticles.length ? state.apiArticles : regionalJulyItems)
+    : (state.julyArticles.length ? state.julyArticles : fallbackItems);
 
   if (!items.length) {
     status.textContent = textFor("july.loading");
@@ -634,8 +647,8 @@ function renderJulyFestivals() {
     return;
   }
 
-  status.textContent = state.julyArticles.length
-    ? textFor("july.count", { count: state.julyArticles.length })
+  status.textContent = items.length && (state.julyArticles.length || state.apiArticles.length)
+    ? `${region.label} 기준 ${items.length}개의 축제 기사를 보여드립니다.`
     : "추천 축제 기사를 준비했습니다. 실제 축제 정보가 불러와지면 자동으로 교체됩니다.";
 
   const [main, ...rest] = items;
