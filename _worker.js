@@ -12,6 +12,10 @@ export default {
       return handleSeoulEventsApi(request, env);
     }
 
+    if (url.pathname === "/api/seoul-parking") {
+      return handleSeoulParkingApi(request, env);
+    }
+
     return env.ASSETS.fetch(request);
   }
 };
@@ -149,6 +153,156 @@ function buildSeoulSummary({ title, place, date, fee, category }) {
     fee ? `이용요금은 ${fee} 기준으로 확인됩니다` : "요금 정보는 공식 안내를 확인해 주세요"
   ].filter(Boolean);
   return `${chunks.join(". ")}.`;
+}
+
+async function handleSeoulParkingApi(request, env) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: apiHeaders(request)
+    });
+  }
+
+  if (request.method !== "GET") {
+    return jsonResponse({ ok: false, message: "GET method required." }, 405, request);
+  }
+
+  if (!isSameOriginRequest(request)) {
+    return jsonResponse({ ok: false, message: "Forbidden origin." }, 403, request);
+  }
+
+  try {
+    const apiKey = String(env.SEOUL_PARKING_API_KEY || "").trim();
+    if (!apiKey) {
+      return jsonResponse(
+        {
+          ok: false,
+          code: "missing_parking_key",
+          message: "SEOUL_PARKING_API_KEY 환경변수가 설정되지 않았습니다."
+        },
+        500,
+        request
+      );
+    }
+
+    const url = new URL(request.url);
+    const limit = clampNumber(url.searchParams.get("limit"), 20, 1000, 300);
+    const lat = Number(url.searchParams.get("lat"));
+    const lng = Number(url.searchParams.get("lng"));
+    const endpoint = `https://openapi.seoul.go.kr:8088/${encodeURIComponent(apiKey)}/json/GetParkInfo/1/${limit}/`;
+    const cacheRequest = new Request(`${url.origin}/api/seoul-parking/cache?limit=${limit}`, { method: "GET" });
+    const cached = await readCache(cacheRequest);
+    let rows;
+
+    if (cached) {
+      const payload = await cached.clone().json();
+      rows = Array.isArray(payload.items) ? payload.items : [];
+    } else {
+      const response = await fetch(endpoint, {
+        headers: { Accept: "application/json" }
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        return jsonResponse(
+          {
+            ok: false,
+            code: "parking_request_failed",
+            message: payload?.RESULT?.MESSAGE || "서울 공영주차장 API 요청에 실패했습니다."
+          },
+          response.status,
+          request
+        );
+      }
+
+      rows = normalizeParkingRows(payload?.GetParkInfo?.row);
+      const cacheResponse = jsonResponse(
+        {
+          ok: true,
+          source: "서울 열린데이터광장 공영주차장 안내 정보",
+          count: rows.length,
+          items: rows
+        },
+        200,
+        request,
+        { "cache-control": "public, max-age=3600" }
+      );
+      await writeCache(cacheRequest, cacheResponse.clone());
+    }
+
+    const items = rankParkingRows(rows, lat, lng).slice(0, 8);
+    return jsonResponse(
+      {
+        ok: true,
+        source: "서울 열린데이터광장 공영주차장 안내 정보",
+        count: items.length,
+        items
+      },
+      200,
+      request,
+      { "cache-control": "public, max-age=1800" }
+    );
+  } catch (error) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "seoul_parking_error",
+        message: error && error.message ? error.message : String(error)
+      },
+      500,
+      request
+    );
+  }
+}
+
+function normalizeParkingRows(row) {
+  const rows = Array.isArray(row) ? row : row ? [row] : [];
+  return rows
+    .map(normalizeParkingLot)
+    .filter((item) => item.name);
+}
+
+function normalizeParkingLot(item) {
+  const lat = toNumber(item.LAT || item.LATITUDE || item.Y_CODE);
+  const lng = toNumber(item.LNG || item.LONGITUDE || item.LOT || item.X_CODE);
+  const weekday = formatParkingHours(item.WEEKDAY_BEGIN_TIME, item.WEEKDAY_END_TIME);
+  const weekend = formatParkingHours(item.WEEKEND_BEGIN_TIME, item.WEEKEND_END_TIME);
+  const holiday = formatParkingHours(item.HOLIDAY_BEGIN_TIME, item.HOLIDAY_END_TIME);
+
+  return {
+    name: cleanText(item.PARKING_NAME || item.PKLT_NM || item.NAME),
+    address: cleanText(item.ADDR || item.ADDRESS || item.ROAD_ADDR),
+    tel: cleanText(item.TEL || item.PHONE),
+    type: cleanText(item.PARKING_TYPE_NM || item.PARKING_TYPE),
+    operationRule: cleanText(item.OPERATION_RULE_NM || item.OPERATION_RULE),
+    payType: cleanText(item.PAY_NM || item.PAY_YN),
+    capacity: cleanText(item.CAPACITY),
+    currentParking: cleanText(item.CUR_PARKING),
+    baseRate: formatParkingRate(item.RATES, item.TIME_RATE),
+    addRate: formatParkingRate(item.ADD_RATES, item.ADD_TIME_RATE),
+    dayMaximum: cleanText(item.DAY_MAXIMUM),
+    weekday,
+    weekend,
+    holiday,
+    lat,
+    lng
+  };
+}
+
+function rankParkingRows(rows, lat, lng) {
+  const hasPoint = Number.isFinite(lat) && Number.isFinite(lng);
+  return rows
+    .map((item) => ({
+      ...item,
+      distanceM: hasPoint && Number.isFinite(item.lat) && Number.isFinite(item.lng)
+        ? Math.round(distanceMeters(lat, lng, item.lat, item.lng))
+        : null
+    }))
+    .sort((a, b) => {
+      if (a.distanceM == null && b.distanceM == null) return 0;
+      if (a.distanceM == null) return 1;
+      if (b.distanceM == null) return -1;
+      return a.distanceM - b.distanceM;
+    });
 }
 
 async function handleFestivalAiApi(request, env) {
@@ -395,6 +549,43 @@ function hashString(value) {
     hash = ((hash << 5) - hash + text.charCodeAt(index)) | 0;
   }
   return Math.abs(hash).toString(36);
+}
+
+function toNumber(value) {
+  const number = Number(cleanText(value));
+  return Number.isFinite(number) ? number : null;
+}
+
+function formatParkingHours(start, end) {
+  const begin = formatHour(start);
+  const finish = formatHour(end);
+  if (!begin && !finish) return "";
+  return `${begin || "시작 확인"} - ${finish || "종료 확인"}`;
+}
+
+function formatHour(value) {
+  const text = cleanText(value).replace(/[^\d]/g, "");
+  if (!text) return "";
+  const padded = text.padStart(4, "0").slice(0, 4);
+  return `${padded.slice(0, 2)}:${padded.slice(2, 4)}`;
+}
+
+function formatParkingRate(rate, minutes) {
+  const rateText = cleanText(rate);
+  const minuteText = cleanText(minutes);
+  if (!rateText && !minuteText) return "";
+  if (rateText && minuteText) return `${minuteText}분 ${rateText}원`;
+  return rateText ? `${rateText}원` : `${minuteText}분 기준`;
+}
+
+function distanceMeters(lat1, lng1, lat2, lng2) {
+  const radius = 6371000;
+  const toRad = (degree) => degree * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2
+    + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return radius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function extractOutputText(payload) {

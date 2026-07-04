@@ -23,6 +23,8 @@ const fallbackImage = params.get("image");
 const fallbackAddress = params.get("address");
 const fallbackMapx = params.get("mapx");
 const fallbackMapy = params.get("mapy");
+const fallbackLat = params.get("lat");
+const fallbackLng = params.get("lng");
 const fallbackSummary = params.get("summary");
 const fallbackTel = params.get("tel");
 const fallbackHomepage = params.get("homepage");
@@ -516,6 +518,8 @@ function fallbackArticleFromParams() {
     address,
     mapx: fallbackMapx || "",
     mapy: fallbackMapy || "",
+    lat: fallbackLat || fallbackMapy || "",
+    lng: fallbackLng || fallbackMapx || "",
     tel: fallbackTel || "",
     homepage: normalizeExternalUrl(fallbackHomepage),
     overview: summary,
@@ -1144,6 +1148,78 @@ function OfficialDetailList(article) {
   `;
 }
 
+function NearbyParkingSection(article) {
+  const lat = article.lat || article.mapy;
+  const lng = article.lng || article.mapx;
+  const hasPoint = lat && lng;
+
+  return `
+    <section class="nearby-parking-section" id="nearbyParkingSection" aria-labelledby="nearbyParkingTitle" ${hasPoint ? "" : "hidden"}>
+      <p class="eyebrow">Parking</p>
+      <h2 id="nearbyParkingTitle">주변 공영주차장</h2>
+      <p class="parking-notice">서울시 공영주차장 안내 정보를 기준으로 가까운 주차장을 확인합니다. 실제 요금과 운영시간은 현장 또는 공식 안내와 다를 수 있습니다.</p>
+      <div class="parking-list" id="nearbyParkingList">
+        <p class="parking-loading">주변 주차장 정보를 불러오는 중입니다.</p>
+      </div>
+    </section>
+  `;
+}
+
+async function hydrateNearbyParking(article) {
+  const section = $("#nearbyParkingSection");
+  const target = $("#nearbyParkingList");
+  if (!section || !target) return;
+
+  const lat = article.lat || article.mapy;
+  const lng = article.lng || article.mapx;
+  if (!lat || !lng) {
+    section.hidden = true;
+    return;
+  }
+
+  try {
+    const query = new URLSearchParams({ lat, lng, limit: "300" });
+    const response = await fetch(`/api/seoul-parking?${query.toString()}`, {
+      headers: { Accept: "application/json" }
+    });
+    const payload = await response.json();
+    if (!response.ok || payload?.ok === false) {
+      throw new Error(payload?.message || `Parking API ${response.status}`);
+    }
+
+    const items = Array.isArray(payload.items) ? payload.items.slice(0, 5) : [];
+    if (!items.length) {
+      target.innerHTML = `<p class="parking-loading">표시할 주변 공영주차장 정보를 찾지 못했습니다.</p>`;
+      return;
+    }
+
+    target.innerHTML = items.map((item) => `
+      <article class="parking-card">
+        <h3>${escapeHtml(item.name)}</h3>
+        <p>${escapeHtml(item.address || "주소 확인 필요")}</p>
+        <dl>
+          ${item.distanceM != null ? `<div><dt>거리</dt><dd>${escapeHtml(formatDistance(item.distanceM))}</dd></div>` : ""}
+          ${item.baseRate ? `<div><dt>기본요금</dt><dd>${escapeHtml(item.baseRate)}</dd></div>` : ""}
+          ${item.addRate ? `<div><dt>추가요금</dt><dd>${escapeHtml(item.addRate)}</dd></div>` : ""}
+          ${item.weekday ? `<div><dt>평일</dt><dd>${escapeHtml(item.weekday)}</dd></div>` : ""}
+          ${item.weekend ? `<div><dt>주말</dt><dd>${escapeHtml(item.weekend)}</dd></div>` : ""}
+          ${item.payType ? `<div><dt>요금구분</dt><dd>${escapeHtml(item.payType)}</dd></div>` : ""}
+          ${item.tel ? `<div><dt>문의</dt><dd>${escapeHtml(item.tel)}</dd></div>` : ""}
+        </dl>
+      </article>
+    `).join("");
+  } catch (error) {
+    console.info("Nearby parking is not available.", error);
+    target.innerHTML = `<p class="parking-loading">주변 공영주차장 정보를 불러오지 못했습니다. 서울시 주차 안내 또는 현장 공지를 확인해 주세요.</p>`;
+  }
+}
+
+function formatDistance(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return "";
+  return number >= 1000 ? `${(number / 1000).toFixed(1)}km` : `${number}m`;
+}
+
 function AdBox(position = "본문 중간") {
   return `
     <aside class="detail-ad-box" aria-label="${escapeHtml(position)} 광고 영역">
@@ -1239,6 +1315,7 @@ function renderTravelDetailBody(article, sections) {
     ${renderSpotDetailSections(article, sections)}
     ${SpotInfoCard(article)}
     ${OfficialDetailList(article)}
+    ${NearbyParkingSection(article)}
     ${AdBox("본문 중간")}
     ${NearbySpotCard(article)}
     ${TravelTipBox(article)}
@@ -1278,6 +1355,7 @@ function renderArticle(article) {
       ${renderTravelDetailBody(article, sections)}
     </div>
   `;
+  hydrateNearbyParking(article);
 }
 
 function applyStaticLanguage() {

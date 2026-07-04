@@ -269,7 +269,9 @@ function detailUrl(item) {
       org: item.org || "",
       target: item.target || "",
       isFree: item.isFree || "",
-      updatedAt: item.updatedAt || ""
+      updatedAt: item.updatedAt || "",
+      lat: item.lat || "",
+      lng: item.lng || ""
     });
     return `festival-detail?${params.toString()}`;
   }
