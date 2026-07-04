@@ -4,6 +4,18 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (url.pathname === "/travel") {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = "/travel-list.html";
+      return env.ASSETS.fetch(new Request(assetUrl, request));
+    }
+
+    if (/^\/travel\/[^/]+\/?$/.test(url.pathname)) {
+      const assetUrl = new URL(request.url);
+      assetUrl.pathname = "/travel-detail.html";
+      return env.ASSETS.fetch(new Request(assetUrl, request));
+    }
+
     if (url.pathname === "/api/festival-ai") {
       return handleFestivalAiApi(request, env);
     }

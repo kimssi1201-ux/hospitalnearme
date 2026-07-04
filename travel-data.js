@@ -1,206 +1,301 @@
-window.TRAVEL_PORTAL_DATA = {
-  tourApi: {
-    serviceKey: "f1ff302f1ae1553621d3c4208ee420449f700dbbaffef44a6bef09502ce92f59",
-    endpoint: "https://apis.data.go.kr/B551011/KorService2/searchFestival2",
-    mobileOS: "ETC",
-    mobileApp: "FestivalNoteHub",
-    numOfRows: 30,
-    pageNo: 1,
-    arrange: "O",
-    mode: "festival"
+window.TRAVEL_BLOG_DATA = {
+  site: {
+    name: "트립노트",
+    tagline: "국내 여행 코스와 여행 정보를 한눈에",
+    description:
+      "국내 여행지, 계절별 여행 코스, 당일치기 코스, 맛집·카페·숙소 정보를 보기 좋게 정리하는 여행 정보형 블로그입니다.",
+    nameIdeas: ["트립노트", "하루여행 지도", "코스앤스테이"],
+    heroCopies: [
+      "국내 여행 코스와 여행 정보를 한눈에",
+      "이번 주말 떠나기 좋은 여행지를 쉽게 찾아보세요",
+      "지역, 계절, 일정별 여행 코스를 정리해 드립니다"
+    ]
   },
-  regions: [
-    { id: "all", label: "전국", areaCode: "" },
-    { id: "seoul", label: "서울", areaCode: "1" },
-    { id: "gyeonggi", label: "경기", areaCode: "31" },
-    { id: "incheon", label: "인천", areaCode: "2" },
-    { id: "busan", label: "부산", areaCode: "6" },
-    { id: "daegu", label: "대구", areaCode: "4" },
-    { id: "daejeon", label: "대전", areaCode: "3" },
-    { id: "gwangju", label: "광주", areaCode: "5" },
-    { id: "ulsan", label: "울산", areaCode: "7" },
-    { id: "sejong", label: "세종", areaCode: "8" },
-    { id: "gangwon", label: "강원", areaCode: "32" },
-    { id: "chungcheong", label: "충청도", areaCodes: ["33", "34"] },
-    { id: "chungbuk", label: "충북", areaCode: "33" },
-    { id: "chungnam", label: "충남", areaCode: "34" },
-    { id: "jeolla", label: "전라도", areaCodes: ["37", "38"] },
-    { id: "jeonbuk", label: "전북", areaCode: "37" },
-    { id: "jeonnam", label: "전남", areaCode: "38" },
-    { id: "gyeongsang", label: "경상도", areaCodes: ["35", "36"] },
-    { id: "gyeongbuk", label: "경북", areaCode: "35" },
-    { id: "gyeongnam", label: "경남", areaCode: "36" },
-    { id: "jeju", label: "제주도", areaCode: "39" }
-  ],
-  todayKeywords: [
-    "서울 축제",
-    "경기 축제",
-    "인천 축제",
-    "부산 축제",
-    "제주 축제",
-    "강원 축제",
-    "전남 축제",
-    "이번 주 축제"
-  ],
-  articles: [
+  regions: ["서울", "경기", "강원", "충청", "전라", "경상", "제주"],
+  seasons: ["봄", "여름", "가을", "겨울"],
+  categories: ["당일치기", "도보여행", "계절여행", "맛집·카페", "숙소", "가족여행", "드라이브"],
+  // 공공데이터 여행 API를 연결할 때는 아래 posts 배열을 API 응답 매핑 결과로 교체하면 됩니다.
+  // 권장 매핑: title, slug, region, category, season, thumbnail, summary, course, address, parking, fee, operatingHours, content, nearbySpots.
+  posts: [
     {
-      id: "weekly-festival-guide",
-      category: "축제 일정",
-      title: "이번 주 축제 고르는 법, 일정과 동선을 먼저 확인하세요",
-      summary: "축제는 날짜만 보고 고르면 이동 시간이 길어지거나 현장 대기에서 지치기 쉽습니다. 운영 시간, 주요 프로그램, 이동 수단, 비 예보를 함께 확인하면 하루 일정이 훨씬 안정적으로 잡힙니다.",
-      date: "2026.07.04",
-      readTime: "7분 읽기",
-      image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
-      href: "#"
+      title: "태안 신두리 해안사구와 만리포를 잇는 7월 당일치기 코스",
+      slug: "taean-sinduri-manripo-july-course",
+      region: "충청",
+      category: "당일치기",
+      season: "여름",
+      thumbnail:
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=85",
+      summary:
+        "모래언덕 산책, 해변 카페, 만리포 노을을 하루 일정으로 묶은 태안 여름 여행 코스입니다.",
+      date: "2026.07.05",
+      readingTime: "6분 읽기",
+      course: ["신두리 해안사구", "태안 해변길", "만리포 해수욕장", "노을 카페"],
+      address: "충남 태안군 원북면 신두리 일대",
+      parking: "신두리 해안사구 방문자 주차장과 만리포 공영주차장 이용 가능",
+      fee: "해안사구 관람 무료, 일부 체험·카페 비용 별도",
+      operatingHours: "해안 산책은 상시 가능하나 탐방 안내소 운영 시간은 방문 전 확인 권장",
+      content: [
+        {
+          heading: "코스 한눈에 보기",
+          body:
+            "태안은 여름에 바다만 보고 돌아오기보다 해안사구와 노을 포인트를 함께 묶으면 만족도가 높습니다. 오전에는 신두리 해안사구에서 가볍게 걷고, 오후에는 만리포 해변으로 이동해 카페와 해수욕장 산책을 이어가면 동선이 단순합니다."
+        },
+        {
+          heading: "신두리 해안사구 산책",
+          body:
+            "신두리 해안사구는 국내에서 보기 드문 해안 사구 지형을 가까이서 볼 수 있는 곳입니다. 한낮에는 그늘이 적으므로 모자와 물을 준비하고, 사진을 남기려면 오전이나 늦은 오후가 좋습니다."
+        },
+        {
+          heading: "만리포 노을 코스",
+          body:
+            "만리포는 넓은 백사장과 카페가 가까워 당일치기 마무리 장소로 좋습니다. 해가 지기 전 주차를 마치고 해변을 걷다가, 노을 시간에 맞춰 전망 좋은 카페나 방파제 쪽으로 이동해 보세요."
+        }
+      ],
+      nearbySpots: [
+        { name: "만리포 해변 카페 거리", type: "카페", note: "해변 전망 카페가 많아 쉬어가기 좋습니다." },
+        { name: "천리포수목원", type: "여행지", note: "식물원 산책을 추가하고 싶을 때 추천합니다." },
+        { name: "태안 로컬 해산물 식당", type: "맛집", note: "꽃게, 해물칼국수 메뉴를 찾기 쉽습니다." }
+      ]
     },
     {
-      id: "active-festival-check",
-      category: "진행 중인 축제",
-      title: "진행 중인 축제 정보를 볼 때 놓치기 쉬운 기준",
-      summary: "현재 운영 중인 축제라도 프로그램 시간이 매일 같지는 않습니다. 공연 시작 시간, 체험 부스 마감 시간, 임시 휴무와 우천 변경 공지를 방문 전 한 번 더 확인하는 것이 좋습니다.",
-      date: "2026.07.04",
-      readTime: "6분 읽기",
-      image: "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80",
-      href: "#"
+      title: "서울 북촌과 서촌을 천천히 걷는 감성 골목 여행",
+      slug: "seoul-bukchon-seochon-walking-course",
+      region: "서울",
+      category: "도보여행",
+      season: "봄",
+      thumbnail:
+        "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=1200&q=85",
+      summary:
+        "한옥 골목, 작은 서점, 카페를 묶어 반나절 동안 걷기 좋은 서울 도심 여행 코스입니다.",
+      date: "2026.06.28",
+      readingTime: "5분 읽기",
+      course: ["안국역", "북촌 한옥길", "삼청동 카페", "서촌 골목", "경복궁역"],
+      address: "서울 종로구 북촌·서촌 일대",
+      parking: "대중교통 추천, 차량 이용 시 공영주차장 사전 확인 필요",
+      fee: "골목 산책 무료, 전시·카페 비용 별도",
+      operatingHours: "상점별 운영 시간이 다르므로 방문 전 확인 권장",
+      content: [
+        {
+          heading: "도심 속 느린 여행",
+          body:
+            "북촌과 서촌은 짧은 이동 안에 한옥, 전시, 카페, 식당이 모여 있어 여행 초보자도 동선을 짜기 쉽습니다. 오전에 북촌을 먼저 걷고 오후에 서촌으로 넘어가면 사람 많은 시간을 조금 피할 수 있습니다."
+        },
+        {
+          heading: "사진보다 생활 동네로 보기",
+          body:
+            "북촌은 실제 거주 공간이 많아 조용히 걷는 태도가 중요합니다. 큰 길보다 골목 사이 작은 표지판을 따라 움직이면 과하게 붐비지 않는 포인트를 찾기 좋습니다."
+        },
+        {
+          heading: "서촌에서 마무리",
+          body:
+            "서촌은 작은 식당과 카페가 많아 여행의 마지막을 보내기 좋습니다. 통인시장, 독립서점, 골목 카페를 취향에 맞게 골라 여유 있게 머무르세요."
+        }
+      ],
+      nearbySpots: [
+        { name: "삼청동 카페거리", type: "카페", note: "걷다가 쉬어가기 좋은 카페가 많습니다." },
+        { name: "통인시장", type: "맛집", note: "간단한 점심 코스로 좋습니다." },
+        { name: "국립현대미술관 서울", type: "전시", note: "비 오는 날 대체 코스로 좋습니다." }
+      ]
     },
     {
-      id: "summer-festival-pack",
-      category: "축제 준비",
-      title: "여름 축제 준비물과 현장 체류 팁",
-      summary: "낮 기온이 높은 축제장은 물, 모자, 보조배터리, 얇은 겉옷의 차이가 큽니다. 오래 걷는 일정이라면 휴식 지점과 그늘 구역을 미리 정해두는 것이 좋습니다.",
-      date: "2026.07.03",
-      readTime: "5분 읽기",
-      image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
-      href: "#"
+      title: "강릉 안목해변 카페거리와 주문진 바다 드라이브",
+      slug: "gangneung-anmok-jumunjin-drive",
+      region: "강원",
+      category: "드라이브",
+      season: "여름",
+      thumbnail:
+        "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=85",
+      summary:
+        "강릉 바다를 처음 여행하는 사람에게 좋은 해변 카페, 항구, 드라이브 코스입니다.",
+      date: "2026.06.22",
+      readingTime: "6분 읽기",
+      course: ["강릉역", "안목해변", "사천진해변", "주문진항", "도깨비 촬영지"],
+      address: "강원 강릉시 안목해변·주문진 일대",
+      parking: "해변 공영주차장 이용 가능, 성수기 조기 만차 주의",
+      fee: "해변 방문 무료, 카페·식사 비용 별도",
+      operatingHours: "해변 상시 개방, 카페와 식당은 매장별 상이",
+      content: [
+        {
+          heading: "초보자도 쉬운 강릉 바다 코스",
+          body:
+            "강릉은 해변 간 거리가 비교적 가까워 하루 일정으로 여러 바다를 보기 좋습니다. 안목해변에서 커피와 산책을 시작하고, 북쪽으로 이동하며 사천진과 주문진을 들르는 흐름이 편합니다."
+        },
+        {
+          heading: "안목해변에서 시작하기",
+          body:
+            "안목해변은 카페 선택지가 많고 바다 접근성이 좋아 첫 방문지로 적합합니다. 오전 시간에 도착하면 주차와 좌석 선택이 한결 수월합니다."
+        },
+        {
+          heading: "주문진에서 마무리",
+          body:
+            "주문진은 항구 분위기와 바다 풍경을 함께 볼 수 있습니다. 해산물 식사 후 해안도로를 따라 이동하면 짧은 여행이라도 강릉 바다의 분위기를 충분히 느낄 수 있습니다."
+        }
+      ],
+      nearbySpots: [
+        { name: "안목 커피거리", type: "카페", note: "바다 전망 카페가 모여 있습니다." },
+        { name: "주문진 수산시장", type: "맛집", note: "해산물 식사를 계획하기 좋습니다." },
+        { name: "사천진해변", type: "여행지", note: "조용한 바다 산책 코스로 좋습니다." }
+      ]
     },
     {
-      id: "night-festival-safe-route",
-      category: "야간 축제",
-      title: "야간 축제 방문 전 확인할 안전과 귀가 동선",
-      summary: "야간 축제는 분위기가 좋지만 귀가 교통과 조명 구간을 먼저 확인해야 합니다. 막차 시간, 택시 승차 위치, 동행자 만남 지점을 미리 정하면 현장 혼잡을 줄일 수 있습니다.",
-      date: "2026.07.03",
-      readTime: "5분 읽기",
-      image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=900&q=80",
-      href: "#"
+      title: "전주 한옥마을 1박 2일 먹거리와 야경 코스",
+      slug: "jeonju-hanok-village-food-night-course",
+      region: "전라",
+      category: "맛집·카페",
+      season: "가을",
+      thumbnail:
+        "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=85",
+      summary:
+        "한옥마을 산책, 전주비빔밥, 남부시장, 야경을 묶은 전주 대표 여행 일정입니다.",
+      date: "2026.06.18",
+      readingTime: "7분 읽기",
+      course: ["전주역", "한옥마을", "경기전", "남부시장", "전동성당 야경"],
+      address: "전북 전주시 완산구 한옥마을 일대",
+      parking: "한옥마을 공영주차장 이용 가능, 주말 혼잡 주의",
+      fee: "거리 산책 무료, 경기전 등 일부 관람료 별도",
+      operatingHours: "상점별 운영 시간 상이, 야시장 운영일 확인 필요",
+      content: [
+        {
+          heading: "전주는 천천히 먹고 걷는 도시",
+          body:
+            "전주는 이동 거리를 늘리기보다 한옥마을 주변을 깊게 보는 일정이 잘 맞습니다. 낮에는 경기전과 골목을 걷고, 저녁에는 남부시장이나 전동성당 주변 야경을 보는 구성이 좋습니다."
+        },
+        {
+          heading: "먹거리 동선 잡기",
+          body:
+            "전주비빔밥, 콩나물국밥, 길거리 간식은 모두 한 끼에 몰아넣기보다 점심과 저녁으로 나누는 편이 좋습니다. 인기 식당은 대기 시간이 있어 식사 시간을 조금 앞당기면 편합니다."
+        },
+        {
+          heading: "숙소는 도보권 추천",
+          body:
+            "한옥마을 안팎의 숙소를 선택하면 밤 산책과 아침 골목 산책을 모두 누리기 쉽습니다. 주차가 포함되는지, 객실 방음과 조식 여부도 함께 확인하세요."
+        }
+      ],
+      nearbySpots: [
+        { name: "남부시장", type: "맛집", note: "간단한 먹거리와 야시장 코스로 좋습니다." },
+        { name: "전동성당", type: "여행지", note: "야경 사진 포인트로 많이 찾습니다." },
+        { name: "한옥 스테이", type: "숙소", note: "도보 여행 중심 일정에 잘 맞습니다." }
+      ]
     },
     {
-      id: "family-festival-check",
-      category: "가족 축제",
-      title: "아이와 함께 가는 가족 축제 체크리스트",
-      summary: "가족 방문은 공연보다 동선과 휴식 시설이 더 중요할 때가 많습니다. 유모차 이동 가능 여부, 화장실 위치, 수유실, 의무실, 그늘 구역을 먼저 확인하세요.",
-      date: "2026.07.02",
-      readTime: "4분 읽기",
-      image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
-      href: "#"
+      title: "경주 황리단길과 대릉원 야경까지 이어지는 역사 산책",
+      slug: "gyeongju-hwangnidan-daereungwon-night",
+      region: "경상",
+      category: "가족여행",
+      season: "가을",
+      thumbnail:
+        "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=85",
+      summary:
+        "황리단길 카페, 대릉원 산책, 첨성대 야경을 하루에 묶은 경주 도보 여행입니다.",
+      date: "2026.06.12",
+      readingTime: "6분 읽기",
+      course: ["황리단길", "대릉원", "첨성대", "월정교", "교촌마을"],
+      address: "경북 경주시 황남동·인왕동 일대",
+      parking: "대릉원 주변 공영주차장 이용 가능, 주말 혼잡",
+      fee: "일부 유적지 관람료 별도",
+      operatingHours: "유적지별 운영 시간이 다르므로 야간 개방 여부 확인 필요",
+      content: [
+        {
+          heading: "걷기 좋은 경주 핵심 코스",
+          body:
+            "경주는 한 지역 안에 볼거리가 밀집해 있어 차를 자주 옮기기보다 한 번 주차 후 걸어 다니는 일정이 편합니다. 황리단길에서 시작해 대릉원, 첨성대, 월정교로 이어가면 동선이 자연스럽습니다."
+        },
+        {
+          heading: "낮과 밤을 나눠 보기",
+          body:
+            "낮에는 대릉원과 교촌마을을 여유 있게 걷고, 해가 진 뒤 첨성대와 월정교 조명을 보는 방식이 좋습니다. 가족 여행이라면 중간에 카페 휴식 시간을 넣어 체력 부담을 줄이세요."
+        },
+        {
+          heading: "사진 포인트",
+          body:
+            "대릉원 돌담길과 첨성대 주변은 사진을 남기기 좋은 곳입니다. 사람이 많은 시간에는 한 블록 뒤 골목으로 이동하면 조금 더 조용한 분위기를 만날 수 있습니다."
+        }
+      ],
+      nearbySpots: [
+        { name: "황리단길 카페", type: "카페", note: "디저트와 쉬어가기 좋은 매장이 많습니다." },
+        { name: "교촌마을", type: "여행지", note: "한옥 분위기 산책 코스로 좋습니다." },
+        { name: "경주 한옥 숙소", type: "숙소", note: "야경 코스 후 이동 부담을 줄일 수 있습니다." }
+      ]
     },
     {
-      id: "festival-ticket-check",
-      category: "예약 전 체크",
-      title: "축제 입장권 예약 전 취소 규정과 현장 수령 확인하기",
-      summary: "유료 축제와 체험 프로그램은 예매 마감, 현장 발권, 환불 가능 시간, 신분 확인 기준이 다를 수 있습니다. 예약 전 작은 조건을 확인해야 현장 문제가 줄어듭니다.",
-      date: "2026.07.02",
-      readTime: "4분 읽기",
-      image: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=900&q=80",
-      href: "#"
+      title: "제주 서쪽 협재와 금오름을 잇는 감성 드라이브",
+      slug: "jeju-hyeopjae-geumoreum-drive",
+      region: "제주",
+      category: "드라이브",
+      season: "봄",
+      thumbnail:
+        "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=85",
+      summary:
+        "협재 바다, 오름 산책, 노을 포인트를 하루에 담는 제주 서쪽 여행 코스입니다.",
+      date: "2026.06.05",
+      readingTime: "6분 읽기",
+      course: ["협재해수욕장", "금오름", "한림 카페", "애월 해안도로"],
+      address: "제주 제주시 한림읍·애월읍 일대",
+      parking: "해변과 오름 주변 주차장 이용, 성수기 혼잡 주의",
+      fee: "대부분 무료, 카페·체험 비용 별도",
+      operatingHours: "야외 여행지는 날씨와 일몰 시간을 기준으로 일정 조정 권장",
+      content: [
+        {
+          heading: "제주 서쪽의 핵심은 시간대",
+          body:
+            "제주 서쪽은 바다와 오름, 노을을 한 번에 보기 좋아 일정 만족도가 높습니다. 오전에는 협재 바다를 보고, 오후에는 금오름을 오른 뒤 애월 해안도로에서 노을을 기다리는 흐름이 좋습니다."
+        },
+        {
+          heading: "협재에서 여유 있게 시작",
+          body:
+            "협재해수욕장은 물빛이 밝고 주변 카페가 많아 여행 첫 코스로 좋습니다. 바람이 강한 날에는 해변 체류 시간을 줄이고 실내 카페나 한림공원 쪽으로 대체해도 좋습니다."
+        },
+        {
+          heading: "금오름 산책 팁",
+          body:
+            "금오름은 비교적 짧게 오를 수 있지만 경사가 있어 편한 신발이 필요합니다. 일몰 시간대에는 사람이 몰릴 수 있으니 이동과 주차 시간을 넉넉하게 잡으세요."
+        }
+      ],
+      nearbySpots: [
+        { name: "한림 카페", type: "카페", note: "바다와 오름 사이 쉬어가기 좋습니다." },
+        { name: "애월 해안도로", type: "여행지", note: "드라이브와 노을 코스로 인기입니다." },
+        { name: "제주 서쪽 감성 숙소", type: "숙소", note: "협재·애월 사이 숙소가 동선상 편합니다." }
+      ]
     },
     {
-      id: "food-festival-route",
-      category: "먹거리 축제",
-      title: "먹거리 축제에서 대기 시간을 줄이는 방문 요령",
-      summary: "먹거리 축제는 인기 부스에 대기가 집중됩니다. 식사 시간을 조금 피하고, 현장 지도에서 결제 방식과 대기 줄 위치를 먼저 확인하면 체류 시간이 효율적입니다.",
-      date: "2026.07.01",
-      readTime: "5분 읽기",
-      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=900&q=80",
-      href: "#"
-    },
-    {
-      id: "rainy-day-festival",
-      category: "우천 대응",
-      title: "비 오는 날 축제 방문 전 확인할 실내 대체 코스",
-      summary: "야외 축제는 비 예보에 따라 공연 위치나 운영 시간이 바뀔 수 있습니다. 우천 공지, 실내 체험, 근처 휴식 공간을 함께 준비하면 일정 변경이 쉬워집니다.",
-      date: "2026.07.01",
-      readTime: "4분 읽기",
-      image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=900&q=80",
-      href: "#"
-    }
-  ],
-  bookingChecks: [
-    {
-      title: "숙소",
-      label: "축제장 접근성",
-      summary: "축제장까지 도보 이동이 가능한지, 막차 이후 이동 수단이 있는지 확인합니다.",
-      href: "#"
-    },
-    {
-      title: "교통",
-      label: "주차와 셔틀",
-      summary: "임시 주차장, 셔틀버스, 교통 통제 구간을 방문 전에 확인합니다.",
-      href: "#"
-    },
-    {
-      title: "입장권",
-      label: "예매와 현장 발권",
-      summary: "예매 마감, 현장 수령, 취소 규정, 우천 운영 기준을 비교합니다.",
-      href: "#"
-    },
-    {
-      title: "할인코드",
-      label: "지원 혜택",
-      summary: "숙박, 교통, 입장권에 적용 가능한 할인 조건을 확인합니다.",
-      href: "#"
-    }
-  ],
-  categoryGroups: [
-    {
-      title: "수도권 축제",
-      summary: "서울, 경기, 인천에서 열리는 축제를 빠르게 확인합니다.",
-      links: ["서울 축제", "경기 축제", "인천 축제", "주말 축제"]
-    },
-    {
-      title: "광역시 축제",
-      summary: "부산, 대구, 대전, 광주, 울산, 세종 축제를 묶어 봅니다.",
-      links: ["부산 축제", "대구 축제", "대전 축제", "광주 축제", "울산 축제", "세종 축제"]
-    },
-    {
-      title: "전국 여행 축제",
-      summary: "강원, 충청, 전라, 경상, 제주 축제를 여행 일정과 함께 확인합니다.",
-      links: ["강원 축제", "충청 축제", "전라 축제", "경상 축제", "제주 축제"]
-    }
-  ],
-  faq: [
-    {
-      question: "메인에서는 무엇을 먼저 보면 좋나요?",
-      answer: "가까운 날짜의 축제를 찾는다면 축제 일정 섹션을 먼저 보고, 마음에 드는 축제를 고른 뒤 예약 전 체크에서 교통과 숙소 기준을 확인하는 흐름이 좋습니다."
-    },
-    {
-      question: "축제 상세 글에서는 어떤 정보를 확인할 수 있나요?",
-      answer: "축제 소개, 일정, 장소, 문의처, 요금 정보에 더해 방문자 유형, 교통 동선, 준비물, 우천 대응 같은 실전 정보를 함께 볼 수 있습니다."
-    },
-    {
-      question: "검색엔진이 이해하기 쉬운 구조인가요?",
-      answer: "축제 일정, 방문 준비, 예약 전 체크, 이용 가이드를 분리하고 카드마다 카테고리와 요약을 제공해 정보성 콘텐츠로 읽히기 쉽게 구성했습니다."
-    }
-  ],
-  footerGroups: [
-    {
-      title: "축제 정보",
-      links: ["서울 축제", "경기 축제", "인천 축제", "부산 축제"]
-    },
-    {
-      title: "축제 준비",
-      links: ["준비물", "교통 체크", "우천 대응", "가족 축제"]
-    },
-    {
-      title: "예약",
-      links: ["축제 근처 숙소", "입장권 예매", "교통 체크", "할인코드"]
-    },
-    {
-      title: "매거진",
-      links: ["축제 정보", "예약 전 체크", "방문 가이드", "큐레이션"]
-    },
-    {
-      title: "Language",
-      links: ["한국어", "English", "日本語", "中文"]
+      title: "가평 남이섬과 자라섬을 묶은 수도권 당일치기",
+      slug: "gapyeong-namiseom-jaraseom-day-trip",
+      region: "경기",
+      category: "당일치기",
+      season: "겨울",
+      thumbnail:
+        "https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?auto=format&fit=crop&w=1200&q=85",
+      summary:
+        "서울 근교에서 부담 없이 다녀오기 좋은 남이섬, 자라섬, 북한강 카페 코스입니다.",
+      date: "2026.05.30",
+      readingTime: "5분 읽기",
+      course: ["가평역", "남이섬", "자라섬", "북한강 카페"],
+      address: "경기 가평군 가평읍 일대",
+      parking: "남이섬 선착장 및 자라섬 주변 주차장 이용 가능",
+      fee: "남이섬 입장권 및 선박 이용료 별도",
+      operatingHours: "남이섬 운영 시간과 배 운항 시간 사전 확인 필요",
+      content: [
+        {
+          heading: "수도권에서 가까운 하루 여행",
+          body:
+            "가평은 대중교통과 자가용 모두 접근성이 좋아 당일치기 여행지로 자주 선택됩니다. 남이섬을 중심으로 자라섬과 북한강 카페를 묶으면 짧은 일정에도 여행 느낌이 분명합니다."
+        },
+        {
+          heading: "남이섬 먼저 보기",
+          body:
+            "남이섬은 입장과 이동에 시간이 걸리므로 오전 일정으로 배치하는 편이 좋습니다. 겨울에는 방한 준비를 하고, 봄·가을에는 산책 시간을 넉넉하게 잡으세요."
+        },
+        {
+          heading: "자라섬과 카페 마무리",
+          body:
+            "자라섬은 행사 일정에 따라 분위기가 크게 달라집니다. 특별 행사가 없을 때는 강변 산책 후 북한강 전망 카페에서 쉬는 방식이 무난합니다."
+        }
+      ],
+      nearbySpots: [
+        { name: "북한강 전망 카페", type: "카페", note: "당일치기 마무리 장소로 좋습니다." },
+        { name: "자라섬", type: "여행지", note: "축제와 산책 코스로 자주 찾습니다." },
+        { name: "가평 닭갈비 식당", type: "맛집", note: "가평 여행에서 찾기 쉬운 식사 메뉴입니다." }
+      ]
     }
   ]
 };
