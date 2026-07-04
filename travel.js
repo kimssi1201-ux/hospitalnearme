@@ -17,14 +17,14 @@ const I18N = {
     "footer.tagline": "축제 선택을 돕는 정보 포털",
     "footer.description": "전국 축제 일정, 방문 준비, 교통과 숙소 체크 정보를 한 흐름으로 연결하는 축제 매거진입니다.",
     "nav.menu": "메뉴 열기",
-    "nav.july": "7월 축제",
+    "nav.july": "축제 뉴스",
     "nav.places": "지역별 축제",
     "nav.booking": "방문 전 체크",
     "nav.guide": "방문 가이드",
-    "july.title": "2026년 7월 축제 모아보기",
-    "july.description": "7월에 열리거나 7월 일정이 포함된 축제를 한곳에 모았습니다. 마음에 드는 축제를 누르면 일정, 장소, 사진, 방문 전 체크사항을 자세히 볼 수 있습니다.",
+    "july.title": "오늘 볼 만한 축제 뉴스",
+    "july.description": "상단 메인 기사, 추천 카드, 최신 축제 피드 순서로 전국 축제 정보를 빠르게 확인할 수 있습니다.",
     "july.loading": "7월 축제 목록을 불러오는 중입니다.",
-    "july.count": "총 {count}개의 7월 축제를 모았습니다.",
+    "july.count": "총 {count}개의 축제 기사를 불러왔습니다.",
     "july.error": "7월 축제 목록을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
     "places.title": "지역별 축제 찾기",
     "places.title.all": "지역별 축제 찾기",
@@ -54,14 +54,14 @@ const I18N = {
     "footer.tagline": "A guide for choosing festivals",
     "footer.description": "A festival magazine that connects schedules, travel preparation, transport, and lodging checks in one flow.",
     "nav.menu": "Open menu",
-    "nav.july": "July Festivals",
+    "nav.july": "Festival News",
     "nav.places": "By Region",
     "nav.booking": "Before You Go",
     "nav.guide": "Visit Guide",
-    "july.title": "July 2026 Festivals",
-    "july.description": "Browse festivals taking place in July or including July dates. Open a card to see schedule, location, photos, and visit checks.",
+    "july.title": "Festival News to Read Today",
+    "july.description": "Browse Korea festival information in a mobile news feed with one featured story, recommended cards, and the latest list.",
     "july.loading": "Loading July festivals.",
-    "july.count": "{count} July festivals collected.",
+    "july.count": "{count} festival stories loaded.",
     "july.error": "Could not load July festivals. Please try again later.",
     "places.title": "Find Festivals by Region",
     "places.title.all": "Find Festivals by Region",
@@ -91,14 +91,14 @@ const I18N = {
     "footer.tagline": "フェス選びを助ける情報ポータル",
     "footer.description": "全国のフェス日程、訪問準備、交通、宿泊チェックをひとつの流れで確認できるマガジンです。",
     "nav.menu": "メニューを開く",
-    "nav.july": "7月のフェス",
+    "nav.july": "フェスニュース",
     "nav.places": "地域別",
     "nav.booking": "訪問前チェック",
     "nav.guide": "訪問ガイド",
-    "july.title": "2026年7月のフェス一覧",
-    "july.description": "7月に開催される、または7月の日程を含むフェスをまとめました。カードを開くと日程、場所、写真、訪問前チェックを確認できます。",
+    "july.title": "今日読みたいフェスニュース",
+    "july.description": "注目記事、推薦カード、最新リストの順に韓国フェス情報を確認できます。",
     "july.loading": "7月のフェス一覧を読み込んでいます。",
-    "july.count": "7月のフェスを{count}件まとめました。",
+    "july.count": "{count}件のフェス記事を読み込みました。",
     "july.error": "7月のフェス一覧を読み込めませんでした。時間をおいてもう一度確認してください。",
     "places.title": "地域別フェスを探す",
     "places.title.all": "地域別フェスを探す",
@@ -128,14 +128,14 @@ const I18N = {
     "footer.tagline": "帮助选择庆典的信息门户",
     "footer.description": "这里把全国庆典日程、出行准备、交通和住宿确认事项整理成一个清晰的浏览流程。",
     "nav.menu": "打开菜单",
-    "nav.july": "7月庆典",
+    "nav.july": "庆典新闻",
     "nav.places": "按地区查找",
     "nav.booking": "出发前确认",
     "nav.guide": "参观指南",
-    "july.title": "2026年7月庆典汇总",
-    "july.description": "这里汇总了7月举办或日程包含7月的庆典。点击卡片可查看日程、地点、照片和出发前确认事项。",
+    "july.title": "今日值得关注的庆典新闻",
+    "july.description": "按重点报道、推荐卡片和最新列表的顺序浏览韩国庆典信息。",
     "july.loading": "正在加载7月庆典列表。",
-    "july.count": "已汇总{count}个7月庆典。",
+    "july.count": "已加载{count}篇庆典文章。",
     "july.error": "无法加载7月庆典列表，请稍后再试。",
     "places.title": "按地区查找庆典",
     "places.title.all": "按地区查找庆典",
@@ -280,6 +280,48 @@ function articleCard(item, variant = "") {
         <h3>${escapeHtml(item.title)}</h3>
         <p>${escapeHtml(displaySummary(item))}</p>
         <div class="article-meta">${articleMeta(item)}</div>
+      </a>
+    </article>
+  `;
+}
+
+function newsFeaturedCard(item) {
+  return `
+    <article class="news-feature-card">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+        ${imageMarkup(item, "hero")}
+        <div class="news-feature-body">
+          <span class="category-label">${escapeHtml(item.category)}</span>
+          <h2>${escapeHtml(item.title)}</h2>
+          <p>${escapeHtml(displaySummary(item))}</p>
+          <div class="article-meta">${articleMeta(item)}</div>
+        </div>
+      </a>
+    </article>
+  `;
+}
+
+function newsRecommendCard(item) {
+  return `
+    <article class="news-recommend-card">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+        ${imageMarkup(item, "recommend")}
+        <strong>${escapeHtml(item.title)}</strong>
+      </a>
+    </article>
+  `;
+}
+
+function newsListCard(item) {
+  return `
+    <article class="news-list-card">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+        ${imageMarkup(item, "feed")}
+        <span>
+          <em>${escapeHtml(item.category)}</em>
+          <strong>${escapeHtml(item.title)}</strong>
+          <small>${escapeHtml(item.date)} · ${escapeHtml(displayReadTime(item))}</small>
+        </span>
       </a>
     </article>
   `;
@@ -576,19 +618,30 @@ async function loadTourApiPlaces() {
 
 function renderJulyFestivals() {
   const status = $("#julyStatus");
-  const grid = $("#julyGrid");
-  if (!status || !grid) return;
+  const featured = $("#featuredArticle");
+  const recommended = $("#recommendedArticles");
+  const feed = $("#newsFeedList");
+  if (!status || !featured || !recommended || !feed) return;
 
-  if (!state.julyArticles.length) {
+  const fallbackItems = data.articles || [];
+  const items = state.julyArticles.length ? state.julyArticles : fallbackItems;
+
+  if (!items.length) {
     status.textContent = textFor("july.loading");
-    grid.innerHTML = "";
+    featured.innerHTML = "";
+    recommended.innerHTML = "";
+    feed.innerHTML = "";
     return;
   }
 
-  status.textContent = textFor("july.count", { count: state.julyArticles.length });
-  grid.innerHTML = state.julyArticles
-    .map((item) => articleCard(item))
-    .join("");
+  status.textContent = state.julyArticles.length
+    ? textFor("july.count", { count: state.julyArticles.length })
+    : "추천 축제 기사를 준비했습니다. 실제 축제 정보가 불러와지면 자동으로 교체됩니다.";
+
+  const [main, ...rest] = items;
+  featured.innerHTML = newsFeaturedCard(main);
+  recommended.innerHTML = rest.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
+  feed.innerHTML = rest.slice(3, 15).map((item) => newsListCard(item)).join("");
 }
 
 function readJulyFestivalCache() {
