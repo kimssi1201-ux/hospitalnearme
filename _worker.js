@@ -8,9 +8,148 @@ export default {
       return handleFestivalAiApi(request, env);
     }
 
+    if (url.pathname === "/api/seoul-events") {
+      return handleSeoulEventsApi(request, env);
+    }
+
     return env.ASSETS.fetch(request);
   }
 };
+
+async function handleSeoulEventsApi(request, env) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: apiHeaders(request)
+    });
+  }
+
+  if (request.method !== "GET") {
+    return jsonResponse({ ok: false, message: "GET method required." }, 405, request);
+  }
+
+  if (!isSameOriginRequest(request)) {
+    return jsonResponse({ ok: false, message: "Forbidden origin." }, 403, request);
+  }
+
+  try {
+    const apiKey = String(env.SEOUL_OPEN_API_KEY || "").trim();
+    if (!apiKey) {
+      return jsonResponse(
+        {
+          ok: false,
+          code: "missing_seoul_key",
+          message: "SEOUL_OPEN_API_KEY 환경변수가 설정되지 않았습니다."
+        },
+        500,
+        request
+      );
+    }
+
+    const url = new URL(request.url);
+    const limit = clampNumber(url.searchParams.get("limit"), 20, 300, 120);
+    const endpoint = `https://openapi.seoul.go.kr:8088/${encodeURIComponent(apiKey)}/json/culturalEventInfo/1/${limit}/`;
+    const cacheRequest = new Request(`${url.origin}/api/seoul-events/cache?limit=${limit}`, { method: "GET" });
+    const cached = await readCache(cacheRequest);
+    if (cached) return cached;
+
+    const response = await fetch(endpoint, {
+      headers: { Accept: "application/json" }
+    });
+
+    const payload = await response.json();
+    if (!response.ok) {
+      return jsonResponse(
+        {
+          ok: false,
+          code: "seoul_request_failed",
+          message: payload?.RESULT?.MESSAGE || "서울 문화행사 API 요청에 실패했습니다."
+        },
+        response.status,
+        request
+      );
+    }
+
+    const rows = normalizeSeoulRows(payload?.culturalEventInfo?.row);
+    const finalResponse = jsonResponse(
+      {
+        ok: true,
+        source: "서울 열린데이터광장 문화행사 정보",
+        count: rows.length,
+        items: rows
+      },
+      200,
+      request,
+      { "cache-control": "public, max-age=1800" }
+    );
+    await writeCache(cacheRequest, finalResponse.clone());
+    return finalResponse;
+  } catch (error) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "seoul_events_error",
+        message: error && error.message ? error.message : String(error)
+      },
+      500,
+      request
+    );
+  }
+}
+
+function normalizeSeoulRows(row) {
+  const rows = Array.isArray(row) ? row : row ? [row] : [];
+  return rows
+    .filter((item) => item?.TITLE)
+    .map((item, index) => normalizeSeoulEvent(item, index));
+}
+
+function normalizeSeoulEvent(item, index) {
+  const title = cleanText(item.TITLE);
+  const place = cleanText(item.PLACE);
+  const gu = cleanText(item.GUNAME);
+  const date = cleanText(item.DATE) || formatSeoulPeriod(item.STRTDATE, item.END_DATE);
+  const fee = cleanText(item.USE_FEE);
+  const time = cleanText(item.TIME || item.EVENT_TIME || item.PLAYTIME);
+  const category = cleanText(item.CODENAME) || "서울 문화행사";
+  const image = normalizeUrl(item.MAIN_IMG) || "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80";
+  const homepage = normalizeUrl(item.ORG_LINK || item.HMPG_ADDR);
+  const tel = cleanText(item.INQUIRY || item.TEL || item.PHONE);
+  const address = [gu, place].filter(Boolean).join(" ");
+
+  return {
+    id: `seoul-event-${hashString(`${title}-${date}-${place}`) || index}`,
+    source: "seoul",
+    category,
+    title,
+    summary: buildSeoulSummary({ title, place, date, fee, category }),
+    date: date || "일정 확인 필요",
+    readTime: "서울 행사 정보",
+    image,
+    address,
+    place,
+    gu,
+    tel,
+    homepage,
+    fee,
+    time,
+    org: cleanText(item.ORG_NAME),
+    target: cleanText(item.USE_TRGT),
+    isFree: cleanText(item.IS_FREE),
+    lat: cleanText(item.LAT),
+    lng: cleanText(item.LOT),
+    updatedAt: cleanText(item.RGSTDATE)
+  };
+}
+
+function buildSeoulSummary({ title, place, date, fee, category }) {
+  const chunks = [
+    place ? `${place}에서 진행되는 ${category}입니다` : `${title} 관련 서울 문화행사입니다`,
+    date ? `일정은 ${date}입니다` : "",
+    fee ? `이용요금은 ${fee} 기준으로 확인됩니다` : "요금 정보는 공식 안내를 확인해 주세요"
+  ].filter(Boolean);
+  return `${chunks.join(". ")}.`;
+}
 
 async function handleFestivalAiApi(request, env) {
   if (request.method === "OPTIONS") {
@@ -213,6 +352,51 @@ function targetLanguageName(language) {
   }[language] || "Korean";
 }
 
+function cleanText(value) {
+  return String(value || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeUrl(value) {
+  const text = cleanText(value);
+  if (!text) return "";
+  const url = text.startsWith("//") ? `https:${text}` : text;
+  if (!/^https?:\/\//i.test(url)) return "";
+  return url.replace(/^http:/i, "https:");
+}
+
+function formatSeoulPeriod(start, end) {
+  const startText = formatSeoulDate(start);
+  const endText = formatSeoulDate(end);
+  if (startText && endText && startText !== endText) return `${startText} - ${endText}`;
+  return startText || endText || "";
+}
+
+function formatSeoulDate(value) {
+  const text = cleanText(value);
+  if (!text) return "";
+  const compact = text.replace(/[^\d]/g, "");
+  if (compact.length < 8) return text;
+  return `${compact.slice(0, 4)}.${compact.slice(4, 6)}.${compact.slice(6, 8)}`;
+}
+
+function clampNumber(value, min, max, fallback) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.min(max, Math.max(min, Math.floor(number)));
+}
+
+function hashString(value) {
+  let hash = 0;
+  const text = String(value || "");
+  for (let index = 0; index < text.length; index += 1) {
+    hash = ((hash << 5) - hash + text.charCodeAt(index)) | 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
 function extractOutputText(payload) {
   if (payload?.output_text) return payload.output_text;
 
@@ -260,7 +444,7 @@ function apiHeaders(request, extra = {}) {
   return {
     "content-type": "application/json; charset=utf-8",
     "access-control-allow-origin": allowOrigin,
-    "access-control-allow-methods": "POST, OPTIONS",
+    "access-control-allow-methods": "GET, POST, OPTIONS",
     "access-control-allow-headers": "content-type",
     "x-content-type-options": "nosniff",
     ...extra

@@ -252,6 +252,28 @@ function articleMeta(item) {
 }
 
 function detailUrl(item) {
+  if (item.source === "seoul") {
+    const params = new URLSearchParams({
+      source: "seoul",
+      id: item.id || "",
+      title: item.title || "",
+      category: item.category || "",
+      date: item.date || "",
+      image: item.image || "",
+      address: item.address || item.place || "",
+      summary: displaySummary(item) || "",
+      tel: item.tel || "",
+      homepage: item.homepage || "",
+      fee: item.fee || "",
+      time: item.time || "",
+      org: item.org || "",
+      target: item.target || "",
+      isFree: item.isFree || "",
+      updatedAt: item.updatedAt || ""
+    });
+    return `festival-detail?${params.toString()}`;
+  }
+
   if (item.source === "tour" && item.contentId) {
     const params = new URLSearchParams({
       source: "tour",
@@ -284,6 +306,34 @@ function articleCard(item, variant = "") {
       </a>
     </article>
   `;
+}
+
+function normalizeSeoulCultureItems(items) {
+  const list = Array.isArray(items) ? items : items ? [items] : [];
+  return list
+    .filter((item) => item && item.title)
+    .map((item, index) => ({
+      id: item.id || `seoul-culture-${index}`,
+      source: "seoul",
+      category: item.category || "서울 문화행사",
+      title: item.title,
+      summary: item.summary || `${item.address || "서울"}에서 진행되는 문화행사입니다.`,
+      date: item.date || "일정 확인 필요",
+      readTime: item.readTime || "서울 행사 정보",
+      image: String(item.image || "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80").replace(/^http:/, "https:"),
+      address: item.address || item.place || "",
+      place: item.place || "",
+      tel: item.tel || "",
+      homepage: item.homepage || "",
+      fee: item.fee || "",
+      time: item.time || "",
+      org: item.org || "",
+      target: item.target || "",
+      isFree: item.isFree || "",
+      updatedAt: item.updatedAt || "",
+      lat: item.lat || "",
+      lng: item.lng || ""
+    }));
 }
 
 function newsFeaturedCard(item) {
@@ -622,6 +672,14 @@ function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
   return `${config.endpoint}?${params.toString()}`;
 }
 
+function buildSeoulCultureUrl() {
+  const config = data.seoulCultureApi || {};
+  const params = new URLSearchParams({
+    limit: String(config.limit || 120)
+  });
+  return `${config.endpoint || "/api/seoul-events"}?${params.toString()}`;
+}
+
 function overlapsJulyFestival(item) {
   const start = String(item.eventstartdate || "");
   const end = String(item.eventenddate || start);
@@ -758,6 +816,49 @@ function renderJulyFestivals() {
   featured.innerHTML = newsFeaturedCard(main);
   recommended.innerHTML = rest.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
   feed.innerHTML = rest.slice(3, 15).map((item) => newsListCard(item)).join("");
+}
+
+async function loadSeoulCultureEvents() {
+  if (!data.seoulCultureApi?.endpoint) {
+    loadTourApiPlaces();
+    return;
+  }
+
+  state.apiError = false;
+  updatePlacesStatus("서울 문화행사 정보를 불러오는 중입니다.");
+
+  try {
+    const response = await fetch(buildSeoulCultureUrl(), {
+      headers: { Accept: "application/json" }
+    });
+    const payload = await response.json();
+    if (!response.ok || payload?.ok === false) {
+      throw new Error(payload?.message || `Seoul events HTTP ${response.status}`);
+    }
+
+    const seoulArticles = normalizeSeoulCultureItems(payload.items);
+    state.apiArticles = seoulArticles;
+    state.apiLoaded = true;
+    state.apiError = false;
+
+    if (seoulArticles.length) {
+      updatePlacesStatus(`서울 문화행사 ${seoulArticles.length}개를 불러왔습니다.`);
+    } else {
+      updatePlacesStatus("서울 문화행사 정보가 아직 등록되어 있지 않습니다.");
+    }
+
+    renderPlaces();
+    renderCuration();
+    renderJulyFestivals();
+    renderCategoryNewsSections();
+  } catch (error) {
+    console.warn("Seoul cultural events could not be loaded. TourAPI fallback is requested.", error);
+    state.apiArticles = [];
+    state.apiLoaded = false;
+    state.apiError = true;
+    updatePlacesStatus("서울 문화행사 정보를 불러오지 못했습니다. 관광공사 축제 정보로 다시 확인합니다.");
+    loadTourApiPlaces();
+  }
 }
 
 function readJulyFestivalCache() {
@@ -1035,7 +1136,7 @@ function init() {
   bindRegionLinks();
   bindLanguageSwitch();
   applyLanguage();
-  loadTourApiPlaces();
+  loadSeoulCultureEvents();
   loadJulyFestivalPosts();
 }
 

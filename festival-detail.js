@@ -24,6 +24,14 @@ const fallbackAddress = params.get("address");
 const fallbackMapx = params.get("mapx");
 const fallbackMapy = params.get("mapy");
 const fallbackSummary = params.get("summary");
+const fallbackTel = params.get("tel");
+const fallbackHomepage = params.get("homepage");
+const fallbackFee = params.get("fee");
+const fallbackTime = params.get("time");
+const fallbackOrg = params.get("org");
+const fallbackTarget = params.get("target");
+const fallbackIsFree = params.get("isFree");
+const fallbackUpdatedAt = params.get("updatedAt");
 const supportedLanguages = ["ko", "en", "ja", "zh"];
 const state = {
   language: getStoredLanguage(),
@@ -508,14 +516,23 @@ function fallbackArticleFromParams() {
     address,
     mapx: fallbackMapx || "",
     mapy: fallbackMapy || "",
-    tel: "",
-    homepage: "",
+    tel: fallbackTel || "",
+    homepage: normalizeExternalUrl(fallbackHomepage),
     overview: summary,
+    detailInfo: [
+      { label: "운영 시간", value: fallbackTime },
+      { label: "이용 요금", value: fallbackFee },
+      { label: "주최 기관", value: fallbackOrg },
+      { label: "이용 대상", value: fallbackTarget },
+      { label: "유무료", value: fallbackIsFree },
+      { label: "정보 기준일", value: fallbackUpdatedAt }
+    ].filter((item) => item.value),
     facts: [
       ["일정", fallbackDate || textFor("date.needCheck")],
       ["장소", address || textFor("place.needCheck")],
-      ["운영 시간", textFor("official.check")],
-      ["이용 요금", textFor("official.check")]
+      ["운영 시간", fallbackTime || textFor("official.check")],
+      ["이용 요금", fallbackFee || textFor("official.check")],
+      ["문의", fallbackTel || ""]
     ]
   };
 }
