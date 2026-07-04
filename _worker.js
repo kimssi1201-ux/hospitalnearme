@@ -61,29 +61,29 @@ async function handleFestivalAiApi(request, env) {
           {
             role: "system",
             content:
-              "너는 한국어 여행·축제 정보 에디터다. 제공된 축제 정보만 바탕으로 방문 전 도움이 되는 짧은 가이드를 만든다. 확인되지 않은 가격, 날짜, 장소, 교통편은 단정하지 않는다. JSON만 출력한다."
+              `You are a travel and festival information editor. Write in ${targetLanguageName(article.language)}. Use only the provided festival information and create a short pre-visit guide. Do not invent unverified prices, dates, places, or transport details. Output JSON only.`
           },
           {
             role: "user",
-            content: `다음 축제 상세 페이지에 넣을 보강 콘텐츠를 JSON으로 작성해줘.
+            content: `Create supplemental content for this festival detail page in ${targetLanguageName(article.language)}.
 
-반환 형식:
+Return format:
 {
   "sections": [
-    {"title": "방문 포인트", "body": "2~3문장"},
-    {"title": "예약 전 체크", "body": "2~3문장"},
-    {"title": "현장 준비", "body": "2~3문장"}
+    {"title": "short section title", "body": "2-3 sentences"},
+    {"title": "short section title", "body": "2-3 sentences"},
+    {"title": "short section title", "body": "2-3 sentences"}
   ],
-  "tips": ["짧은 체크 문장 1", "짧은 체크 문장 2", "짧은 체크 문장 3"]
+  "tips": ["short checklist sentence 1", "short checklist sentence 2", "short checklist sentence 3"]
 }
 
-축제 정보:
-제목: ${article.title}
-분류: ${article.category}
-요약: ${article.summary}
-일정: ${article.date}
-장소: ${article.address}
-기본 정보: ${article.facts.join(" / ")}`
+Festival information:
+Title: ${article.title}
+Category: ${article.category}
+Summary: ${article.summary}
+Schedule: ${article.date}
+Place: ${article.address}
+Facts: ${article.facts.join(" / ")}`
           }
         ],
         max_output_tokens: 700
@@ -148,6 +148,7 @@ async function buildCacheRequest(request, article) {
   const url = new URL(request.url);
   const hashSource = JSON.stringify({
     id: article.contentId,
+    language: article.language,
     title: article.title,
     date: article.date,
     address: article.address
@@ -188,6 +189,7 @@ function normalizeFestivalArticle(input) {
 
   return {
     contentId: String(input?.contentId || input?.id || "").slice(0, 80),
+    language: normalizeLanguage(input?.language),
     title: String(input?.title || "축제").slice(0, 120),
     category: String(input?.category || "축제 정보").slice(0, 80),
     summary: String(input?.summary || "").slice(0, 700),
@@ -195,6 +197,20 @@ function normalizeFestivalArticle(input) {
     address: String(input?.address || "").slice(0, 180),
     facts
   };
+}
+
+function normalizeLanguage(value) {
+  const language = String(value || "ko").toLowerCase();
+  return ["ko", "en", "ja", "zh"].includes(language) ? language : "ko";
+}
+
+function targetLanguageName(language) {
+  return {
+    ko: "Korean",
+    en: "English",
+    ja: "Japanese",
+    zh: "Simplified Chinese"
+  }[language] || "Korean";
 }
 
 function extractOutputText(payload) {
