@@ -52,7 +52,7 @@ async function handleSeoulEventsApi(request, env) {
 
     const url = new URL(request.url);
     const limit = clampNumber(url.searchParams.get("limit"), 20, 300, 120);
-    const endpoint = `https://openapi.seoul.go.kr:8088/${encodeURIComponent(apiKey)}/json/culturalEventInfo/1/${limit}/`;
+    const endpoint = `http://openapi.seoul.go.kr:8088/${encodeURIComponent(apiKey)}/json/culturalEventInfo/1/${limit}/`;
     const cacheRequest = new Request(`${url.origin}/api/seoul-events/cache?limit=${limit}`, { method: "GET" });
     const cached = await readCache(cacheRequest);
     if (cached) return cached;
@@ -189,7 +189,7 @@ async function handleSeoulParkingApi(request, env) {
     const limit = clampNumber(url.searchParams.get("limit"), 20, 1000, 300);
     const lat = Number(url.searchParams.get("lat"));
     const lng = Number(url.searchParams.get("lng"));
-    const endpoint = `https://openapi.seoul.go.kr:8088/${encodeURIComponent(apiKey)}/json/GetParkInfo/1/${limit}/`;
+    const endpoint = `http://openapi.seoul.go.kr:8088/${encodeURIComponent(apiKey)}/json/GetParkInfo/1/${limit}/`;
     const cacheRequest = new Request(`${url.origin}/api/seoul-parking/cache?limit=${limit}`, { method: "GET" });
     const cached = await readCache(cacheRequest);
     let rows;
