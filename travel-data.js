@@ -27,7 +27,7 @@ window.TRAVEL_PORTAL_DATA = {
     { id: "jeonnam", label: "전남", areaCode: "38" },
     { id: "gyeongbuk", label: "경북", areaCode: "35" },
     { id: "gyeongnam", label: "경남", areaCode: "36" },
-    { id: "jeju", label: "제주", areaCode: "39" }
+    { id: "jeju", label: "제주도", areaCode: "39" }
   ],
   todayKeywords: [
     "서울 축제",

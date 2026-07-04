@@ -561,6 +561,46 @@ function updateRegionHeading() {
   }
 }
 
+function renderRegionChips() {
+  const target = $("#regionList");
+  if (!target) return;
+
+  target.innerHTML = (data.regions || [])
+    .map((region) => `
+      <button
+        class="region-button ${region.id === state.activeRegionId ? "is-active" : ""}"
+        type="button"
+        data-region-id="${escapeHtml(region.id)}"
+        aria-pressed="${region.id === state.activeRegionId ? "true" : "false"}"
+      >
+        ${escapeHtml(region.label)}
+      </button>
+    `)
+    .join("");
+}
+
+function bindRegionChips() {
+  const target = $("#regionList");
+  if (!target) return;
+
+  target.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-region-id]");
+    if (!button) return;
+
+    const regionId = button.getAttribute("data-region-id");
+    if (!regionId || regionId === state.activeRegionId) return;
+
+    state.activeRegionId = regionId;
+    state.apiArticles = [];
+    state.apiLoaded = false;
+    renderRegionChips();
+    updateRegionHeading();
+    renderPlaces();
+    renderCuration();
+    loadTourApiPlaces();
+  });
+}
+
 function renderHero() {
   const [featured, ...latest] = data.articles;
   const sideItems = latest.slice(0, 4);
@@ -675,6 +715,7 @@ function bindMenu() {
 
 function init() {
   renderTodayKeywords();
+  renderRegionChips();
   updateRegionHeading();
   renderHero();
   renderJulyFestivals();
@@ -685,6 +726,7 @@ function init() {
   renderFaq();
   renderFooter();
   bindMenu();
+  bindRegionChips();
   bindLanguageSwitch();
   applyLanguage();
   loadTourApiPlaces();
