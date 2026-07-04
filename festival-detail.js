@@ -1409,6 +1409,14 @@ async function init() {
   renderRelated();
 
   try {
+    if (source === "seoul" && id) {
+      const article = fallbackArticleFromParams();
+      state.article = article;
+      renderArticle(article);
+      renderRelated(article.id);
+      return;
+    }
+
     if (source === "tour" && id) {
       const fallbackArticle = fallbackArticleFromParams();
       state.article = fallbackArticle;
