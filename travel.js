@@ -1,6 +1,7 @@
 const data = window.TRAVEL_PORTAL_DATA;
 const state = {
   apiArticles: [],
+  julyArticles: [],
   apiLoaded: false,
   activeRegionId: "all"
 };
@@ -144,6 +145,72 @@ function buildTourApiUrl() {
   return `${config.endpoint}?${params.toString()}`;
 }
 
+function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
+  const config = data.tourApi;
+  const params = new URLSearchParams({
+    serviceKey: config.serviceKey,
+    numOfRows: String(numOfRows),
+    pageNo: String(pageNo),
+    MobileOS: config.mobileOS || "ETC",
+    MobileApp: config.mobileApp || "FestivalNoteHub",
+    _type: "json",
+    arrange: config.arrange || "O",
+    eventStartDate: "20260701"
+  });
+
+  return `${config.endpoint}?${params.toString()}`;
+}
+
+function overlapsJulyFestival(item) {
+  const start = String(item.eventstartdate || "");
+  const end = String(item.eventenddate || start);
+  return start <= "20260731" && end >= "20260701";
+}
+
+function regionLabelFromAddress(address) {
+  const first = String(address || "").split(" ")[0] || "전국";
+  return first
+    .replace("특별시", "")
+    .replace("광역시", "")
+    .replace("특별자치시", "")
+    .replace("특별자치도", "")
+    .replace("도", "")
+    .replace("북", "북")
+    .replace("남", "남");
+}
+
+function normalizeJulyFestivalItems(items) {
+  const list = Array.isArray(items) ? items : items ? [items] : [];
+  const fallbackImage = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80";
+
+  return list
+    .filter((item) => item && item.title && overlapsJulyFestival(item))
+    .sort((a, b) => String(a.eventstartdate || "").localeCompare(String(b.eventstartdate || "")))
+    .map((item, index) => {
+      const image = item.firstimage || item.firstimage2 || fallbackImage;
+      const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
+      const startDate = compactDate(item.eventstartdate);
+      const endDate = compactDate(item.eventenddate);
+      const period = startDate && endDate ? `${startDate} - ${endDate}` : startDate || "7월 진행";
+      const region = regionLabelFromAddress(item.addr1);
+
+      return {
+        id: `july-festival-${item.contentid || index}`,
+        source: "tour",
+        contentId: item.contentid,
+        contentTypeId: item.contenttypeid || 15,
+        category: `${region} 7월 축제`,
+        title: item.title,
+        summary: address
+          ? `${address}에서 열리는 7월 축제입니다. 방문 전 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인하세요.`
+          : "7월 일정이 포함된 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인하세요.",
+        date: period,
+        readTime: "상세 포스팅",
+        image: String(image).replace(/^http:/, "https:")
+      };
+    });
+}
+
 async function loadTourApiPlaces() {
   if (!data.tourApi?.serviceKey || !data.tourApi?.endpoint) return;
 
@@ -171,6 +238,57 @@ async function loadTourApiPlaces() {
     console.warn("TourAPI request failed. Fallback content is displayed.", error);
   } finally {
     window.clearTimeout(timeoutId);
+  }
+}
+
+function renderJulyFestivals() {
+  const status = $("#julyStatus");
+  const grid = $("#julyGrid");
+  if (!status || !grid) return;
+
+  if (!state.julyArticles.length) {
+    status.textContent = "7월 축제 목록을 불러오는 중입니다.";
+    grid.innerHTML = "";
+    return;
+  }
+
+  status.textContent = `총 ${state.julyArticles.length}개의 7월 축제를 포스팅했습니다.`;
+  grid.innerHTML = state.julyArticles
+    .map((item) => articleCard(item))
+    .join("");
+}
+
+async function loadJulyFestivalPosts() {
+  if (!data.tourApi?.serviceKey || !data.tourApi?.endpoint) return;
+
+  const numOfRows = 100;
+  const collected = [];
+
+  try {
+    for (let pageNo = 1; pageNo <= 6; pageNo += 1) {
+      const response = await fetch(buildJulyFestivalUrl(pageNo, numOfRows));
+      if (!response.ok) throw new Error(`July festival HTTP ${response.status}`);
+
+      const payload = await response.json();
+      const body = payload?.response?.body || {};
+      const items = body?.items?.item;
+      const totalCount = Number(body.totalCount || body.total_count || 0);
+      const list = Array.isArray(items) ? items : items ? [items] : [];
+      collected.push(...list);
+
+      if (!list.length || pageNo * numOfRows >= totalCount) break;
+    }
+
+    const deduped = [...new Map(
+      normalizeJulyFestivalItems(collected).map((item) => [item.contentId || item.id, item])
+    ).values()];
+
+    state.julyArticles = deduped;
+    renderJulyFestivals();
+  } catch (error) {
+    console.warn("July festival posts could not be loaded.", error);
+    const status = $("#julyStatus");
+    if (status) status.textContent = "7월 축제 목록을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.";
   }
 }
 
@@ -345,6 +463,7 @@ function init() {
   renderRegionModal();
   updateRegionHeading();
   renderHero();
+  renderJulyFestivals();
   renderPlaces();
   renderBooking();
   renderCuration();
@@ -354,6 +473,7 @@ function init() {
   bindMenu();
   bindRegionModal();
   loadTourApiPlaces();
+  loadJulyFestivalPosts();
 }
 
 document.addEventListener("DOMContentLoaded", init);

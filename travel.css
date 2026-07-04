@@ -393,6 +393,17 @@ main {
   color: var(--muted);
 }
 
+.section-status {
+  margin: -8px 0 20px;
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.july-grid {
+  align-items: stretch;
+}
+
 .card-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
