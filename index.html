@@ -16,10 +16,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="travel.css?v=20260705-top-region-1" />
+    <link rel="stylesheet" href="travel.css?v=20260705-category-news-1" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
     <script src="travel-data.js?v=20260704-festival-api-fix-1" defer></script>
-    <script src="travel.js?v=20260705-top-region-1" defer></script>
+    <script src="travel.js?v=20260705-category-news-1" defer></script>
     <title>페스티벌 노트 | 전국 축제 정보 매거진</title>
   </head>
   <body>
@@ -66,44 +66,8 @@
         <div class="news-list-feed" id="newsFeedList"></div>
       </section>
 
-      <section class="content-section" id="places" aria-labelledby="placesTitle">
-        <div class="section-heading">
-          <p class="eyebrow">Festival Guide</p>
-          <h2 id="placesTitle" data-i18n="places.title">지역별 축제 찾기</h2>
-          <p data-i18n="places.description">서울, 경기, 인천부터 제주까지 지역별 축제 정보를 확인하고, 일정·장소·요금·교통 정보를 함께 살펴보세요.</p>
-          <a class="text-link" href="#curation" data-i18n="common.more">더보기</a>
-        </div>
-        <div class="section-status" id="placesStatus"></div>
-        <div class="card-grid" id="placesGrid"></div>
-      </section>
-
-      <section class="booking-section" id="booking" aria-labelledby="bookingTitle">
-        <div class="section-heading">
-          <p class="eyebrow">Before You Go</p>
-          <h2 id="bookingTitle" data-i18n="booking.title">가기 전에 확인하면 좋은 것들</h2>
-          <p data-i18n="booking.description">축제장은 날짜와 시간에 따라 혼잡도와 이동 동선이 달라집니다. 숙소, 교통, 입장권, 우천 운영 기준을 미리 확인해 두세요.</p>
-        </div>
-        <div class="booking-grid" id="bookingGrid"></div>
-      </section>
-
-      <section class="content-section" id="curation" aria-labelledby="curationTitle">
-        <div class="section-heading row">
-          <div>
-            <p class="eyebrow">Editor's Pick</p>
-            <h2 id="curationTitle" data-i18n="curation.title">함께 보면 좋은 축제 글</h2>
-          </div>
-          <a class="text-link" href="#info" data-i18n="common.all">전체 보기</a>
-        </div>
-        <div class="curation-list" id="curationList"></div>
-      </section>
-
-      <section class="category-hub" id="info" aria-labelledby="infoTitle">
-        <div class="section-heading">
-          <p class="eyebrow">Festival Hub</p>
-          <h2 id="infoTitle" data-i18n="info.title">축제 방문 준비</h2>
-          <p data-i18n="info.description">축제 일정, 준비물, 교통, 예약 전 체크 정보를 목적별로 나누어 정리했습니다.</p>
-        </div>
-        <div class="category-grid" id="categoryGroups"></div>
+      <section class="category-news-wrapper" id="categoryNews" aria-label="카테고리별 축제 뉴스">
+        <div id="categoryNewsSections"></div>
       </section>
 
       <section class="faq-section" aria-labelledby="faqTitle">

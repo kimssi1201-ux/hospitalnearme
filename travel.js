@@ -196,6 +196,7 @@ function applyLanguage() {
   renderBooking();
   renderCuration();
   renderJulyFestivals();
+  renderCategoryNewsSections();
 }
 
 function bindLanguageSwitch() {
@@ -327,6 +328,113 @@ function newsListCard(item) {
   `;
 }
 
+function categoryFeaturedCard(item) {
+  return `
+    <article class="category-feature-card">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+        ${imageMarkup(item, "categoryHero")}
+        <strong>${escapeHtml(item.title)}</strong>
+      </a>
+    </article>
+  `;
+}
+
+function categoryMiniCard(item) {
+  return `
+    <article class="category-mini-card">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+        ${imageMarkup(item, "mini")}
+        <strong>${escapeHtml(item.title)}</strong>
+      </a>
+    </article>
+  `;
+}
+
+function categoryListCard(item) {
+  return `
+    <article class="category-list-card">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+        ${imageMarkup(item, "feed")}
+        <strong>${escapeHtml(item.title)}</strong>
+      </a>
+    </article>
+  `;
+}
+
+function uniqueArticles(items) {
+  return [...new Map(
+    items
+      .filter(Boolean)
+      .map((item, index) => [item.contentId || item.id || `${item.title}-${index}`, item])
+  ).values()];
+}
+
+function categoryItems(seedItems, fallbackItems, offset = 0, limit = 8) {
+  const source = uniqueArticles([...seedItems, ...fallbackItems]);
+  if (!source.length) return [];
+  const rotated = [...source.slice(offset), ...source.slice(0, offset)];
+  return rotated.slice(0, limit);
+}
+
+function buildCategoryNewsGroups() {
+  const apiItems = state.apiArticles || [];
+  const julyItems = state.julyArticles || [];
+  const localItems = data.articles || [];
+  const allItems = uniqueArticles([...apiItems, ...julyItems, ...localItems]);
+  const guideItems = localItems.filter((item) => /준비|체크|방문|야간|가족|입장권|우천|요령/.test(`${item.category} ${item.title}`));
+  const summerItems = uniqueArticles([
+    ...julyItems,
+    ...localItems.filter((item) => /여름|7월|야간|먹거리|비 오는/.test(`${item.category} ${item.title}`))
+  ]);
+  const regionItems = uniqueArticles([
+    ...apiItems,
+    ...julyItems.filter((item) => /서울|경기|인천|부산|제주|강원|전남|경북|경남/.test(`${item.category} ${item.address || ""}`))
+  ]);
+
+  return [
+    { id: "festival", title: "Festival", subtitle: "지금 확인할 전국 축제", items: categoryItems(allItems, localItems, 0) },
+    { id: "places", title: "Local", subtitle: "지역별로 보는 축제 뉴스", items: categoryItems(regionItems, allItems, 1) },
+    { id: "collection", title: "Collection", subtitle: "사진으로 먼저 보는 추천 축제", items: categoryItems(julyItems, allItems, 2) },
+    { id: "travel", title: "Travel", subtitle: "축제와 함께 잡는 여행 동선", items: categoryItems(summerItems, allItems, 3) },
+    { id: "booking", title: "Check", subtitle: "방문 전 확인할 준비 정보", items: categoryItems(guideItems, allItems, 4) },
+    { id: "info", title: "Guide", subtitle: "현장에서 도움이 되는 이용 가이드", items: categoryItems(guideItems, allItems, 5) }
+  ].filter((group) => group.items.length);
+}
+
+function renderCategoryNewsBlock(group) {
+  const [featured, ...rest] = group.items;
+  const recommended = rest.slice(0, 3);
+  const list = rest.slice(3, 8);
+
+  return `
+    <section class="category-news-block" id="${escapeHtml(group.id)}" aria-labelledby="${escapeHtml(group.id)}Title">
+      <div class="category-news-heading">
+        <h2 id="${escapeHtml(group.id)}Title">${escapeHtml(group.title)}</h2>
+        <p>${escapeHtml(group.subtitle)}</p>
+      </div>
+      ${featured ? categoryFeaturedCard(featured) : ""}
+      ${recommended.length ? `
+        <div class="category-mini-row">
+          ${recommended.map((item) => categoryMiniCard(item)).join("")}
+        </div>
+      ` : ""}
+      ${list.length ? `
+        <div class="category-list-feed">
+          ${list.map((item) => categoryListCard(item)).join("")}
+        </div>
+      ` : ""}
+    </section>
+  `;
+}
+
+function renderCategoryNewsSections() {
+  const target = $("#categoryNewsSections");
+  if (!target) return;
+
+  const groups = buildCategoryNewsGroups();
+  target.innerHTML = groups.map((group) => renderCategoryNewsBlock(group)).join("");
+}
+
 function contentTypeName(contentTypeId) {
   const map = {
     12: "관광지",
@@ -424,6 +532,7 @@ function selectRegion(regionId) {
   updateRegionHeading();
   updatePlacesStatus(`${activeRegion().label} 축제 정보를 불러오는 중입니다.`);
   renderJulyFestivals();
+  renderCategoryNewsSections();
   renderPlaces();
   renderCuration();
   loadTourApiPlaces();
@@ -605,6 +714,7 @@ async function loadTourApiPlaces() {
     renderPlaces();
     renderCuration();
     renderJulyFestivals();
+    renderCategoryNewsSections();
   } catch (error) {
     console.warn("TourAPI request failed. Fallback content is displayed.", error);
     state.apiArticles = [];
@@ -614,6 +724,7 @@ async function loadTourApiPlaces() {
     renderPlaces();
     renderCuration();
     renderJulyFestivals();
+    renderCategoryNewsSections();
   } finally {
     window.clearTimeout(timeoutId);
   }
@@ -691,6 +802,7 @@ async function loadJulyFestivalPosts() {
     state.julyArticles = cached;
     renderJulyFestivals();
     renderCuration();
+    renderCategoryNewsSections();
     return;
   }
 
@@ -720,6 +832,7 @@ async function loadJulyFestivalPosts() {
     writeJulyFestivalCache(deduped);
     renderJulyFestivals();
     renderCuration();
+    renderCategoryNewsSections();
   } catch (error) {
     console.warn("July festival posts could not be loaded.", error);
     const status = $("#julyStatus");
@@ -769,6 +882,8 @@ function bindRegionChips() {
 }
 
 function renderPlaces() {
+  const grid = $("#placesGrid");
+  if (!grid) return;
   const region = activeRegion();
   const items = state.apiArticles.length
     ? state.apiArticles.slice(0, 12)
@@ -786,7 +901,7 @@ function renderPlaces() {
         ? "공공 관광 데이터에 지역 축제가 등록되면 이곳에 표시됩니다."
         : "잠시만 기다려 주세요. 등록된 지역 축제를 확인하고 있습니다.";
 
-    $("#placesGrid").innerHTML = `
+    grid.innerHTML = `
       <div class="empty-state">
         <h3>${escapeHtml(title)}</h3>
         <p>${escapeHtml(description)}</p>
@@ -795,7 +910,7 @@ function renderPlaces() {
     return;
   }
 
-  $("#placesGrid").innerHTML = items
+  grid.innerHTML = items
     .map((item) => articleCard(item))
     .join("");
 }
@@ -807,7 +922,10 @@ function updatePlacesStatus(message = "") {
 }
 
 function renderBooking() {
-  $("#bookingGrid").innerHTML = data.bookingChecks.map((item) => `
+  const target = $("#bookingGrid");
+  if (!target) return;
+
+  target.innerHTML = data.bookingChecks.map((item) => `
     <article class="booking-card">
       <span>${escapeHtml(item.label)}</span>
       <h3>${escapeHtml(item.title)}</h3>
@@ -818,12 +936,15 @@ function renderBooking() {
 }
 
 function renderCuration() {
+  const target = $("#curationList");
+  if (!target) return;
+
   const items = [...state.apiArticles.slice(0, 2), ...state.julyArticles.slice(0, 4)]
     .filter((item, index, list) => list.findIndex((target) => target.contentId === item.contentId) === index)
     .slice(0, 6);
 
   if (!items.length) {
-    $("#curationList").innerHTML = `
+    target.innerHTML = `
       <div class="empty-state">
         <h3>추천 축제를 불러오는 중입니다</h3>
         <p>축제 목록이 준비되면 실제 상세 정보로 연결되는 추천 카드가 표시됩니다.</p>
@@ -832,7 +953,7 @@ function renderCuration() {
     return;
   }
 
-  $("#curationList").innerHTML = items
+  target.innerHTML = items
     .map((item) => `
       <article class="curation-card">
         <a href="${escapeHtml(detailUrl(item))}">
@@ -849,7 +970,10 @@ function renderCuration() {
 }
 
 function renderCategoryGroups() {
-  $("#categoryGroups").innerHTML = data.categoryGroups.map((group) => `
+  const target = $("#categoryGroups");
+  if (!target) return;
+
+  target.innerHTML = data.categoryGroups.map((group) => `
     <article class="category-group">
       <h3>${escapeHtml(group.title)}</h3>
       <p>${escapeHtml(group.summary)}</p>
@@ -910,6 +1034,7 @@ function init() {
   renderPlaces();
   renderBooking();
   renderCuration();
+  renderCategoryNewsSections();
   renderCategoryGroups();
   renderFaq();
   renderFooter();
