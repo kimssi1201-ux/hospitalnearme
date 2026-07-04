@@ -605,6 +605,7 @@ async function loadJulyFestivalPosts() {
   if (cached.length) {
     state.julyArticles = cached;
     renderJulyFestivals();
+    renderCuration();
     return;
   }
 
@@ -633,6 +634,7 @@ async function loadJulyFestivalPosts() {
     state.julyArticles = deduped;
     writeJulyFestivalCache(deduped);
     renderJulyFestivals();
+    renderCuration();
   } catch (error) {
     console.warn("July festival posts could not be loaded.", error);
     const status = $("#julyStatus");
@@ -683,12 +685,9 @@ function bindRegionChips() {
 
 function renderPlaces() {
   const region = activeRegion();
-  const isRegionFiltered = region.id !== "all";
   const items = state.apiArticles.length
     ? state.apiArticles.slice(0, 12)
-    : isRegionFiltered
-      ? []
-      : data.articles.slice(1, 13);
+    : [];
 
   if (!items.length) {
     const title = state.apiError
@@ -734,7 +733,19 @@ function renderBooking() {
 }
 
 function renderCuration() {
-  const items = [...state.apiArticles.slice(0, 2), ...data.articles.slice(2, 8)].slice(0, 6);
+  const items = [...state.apiArticles.slice(0, 2), ...state.julyArticles.slice(0, 4)]
+    .filter((item, index, list) => list.findIndex((target) => target.contentId === item.contentId) === index)
+    .slice(0, 6);
+
+  if (!items.length) {
+    $("#curationList").innerHTML = `
+      <div class="empty-state">
+        <h3>추천 축제를 불러오는 중입니다</h3>
+        <p>축제 목록이 준비되면 실제 상세 정보로 연결되는 추천 카드가 표시됩니다.</p>
+      </div>
+    `;
+    return;
+  }
 
   $("#curationList").innerHTML = items
     .map((item) => `

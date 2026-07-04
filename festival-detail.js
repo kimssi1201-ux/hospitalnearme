@@ -978,21 +978,8 @@ function bindLanguageSwitch() {
 }
 
 function renderRelated(currentId) {
-  const related = data.articles
-    .filter((article) => article.id !== currentId)
-    .slice(0, 3);
-
-  $("#relatedGrid").innerHTML = related.map((article) => `
-    <article class="related-card">
-      <a href="festival-detail?id=${encodeURIComponent(article.id)}" aria-label="${escapeHtml(textFor("related.aria", { title: article.title }))}">
-        <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" />
-        <span>
-          <em>${escapeHtml(article.category)}</em>
-          <strong>${escapeHtml(article.title)}</strong>
-        </span>
-      </a>
-    </article>
-  `).join("");
+  const section = document.querySelector(".related-section");
+  if (section) section.hidden = true;
 }
 
 async function init() {
