@@ -119,6 +119,33 @@ input {
   background: var(--surface);
 }
 
+.language-switch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.language-switch button {
+  min-width: 38px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #4d4741;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.language-switch button.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
 .menu-toggle {
   display: none;
   width: 42px;
@@ -659,6 +686,18 @@ main {
 
   .brand small {
     display: none;
+  }
+
+  .language-switch {
+    order: 3;
+    gap: 2px;
+    padding: 3px;
+  }
+
+  .language-switch button {
+    min-width: 32px;
+    height: 28px;
+    font-size: 11px;
   }
 
   .menu-toggle {

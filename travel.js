@@ -1,12 +1,223 @@
 const data = window.TRAVEL_PORTAL_DATA;
+const supportedLanguages = ["ko", "en", "ja", "zh"];
 const state = {
   apiArticles: [],
   julyArticles: [],
   apiLoaded: false,
-  activeRegionId: "all"
+  activeRegionId: "all",
+  language: getStoredLanguage()
+};
+
+const I18N = {
+  ko: {
+    "meta.title": "페스티벌 노트 | 전국 축제 정보 매거진",
+    "brand.name": "페스티벌 노트",
+    "brand.tagline": "전국 축제 정보 매거진",
+    "footer.tagline": "축제 선택을 돕는 정보 포털",
+    "footer.description": "전국 축제 일정, 방문 준비, 교통과 숙소 체크 정보를 한 흐름으로 연결하는 축제 매거진입니다.",
+    "nav.menu": "메뉴 열기",
+    "nav.july": "7월 축제",
+    "nav.places": "지역별 축제",
+    "nav.booking": "방문 전 체크",
+    "nav.guide": "방문 가이드",
+    "july.title": "2026년 7월 축제 모아보기",
+    "july.description": "7월에 열리거나 7월 일정이 포함된 축제를 한곳에 모았습니다. 마음에 드는 축제를 누르면 일정, 장소, 사진, 방문 전 체크사항을 자세히 볼 수 있습니다.",
+    "july.loading": "7월 축제 목록을 불러오는 중입니다.",
+    "july.count": "총 {count}개의 7월 축제를 모았습니다.",
+    "july.error": "7월 축제 목록을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
+    "places.title": "지역별 축제 찾기",
+    "places.title.all": "지역별 축제 찾기",
+    "places.title.region": "{region} 축제 정보",
+    "places.description": "서울, 경기, 인천부터 제주까지 지역별 축제 정보를 확인하고, 일정·장소·요금·교통 정보를 함께 살펴보세요.",
+    "booking.title": "가기 전에 확인하면 좋은 것들",
+    "booking.description": "축제장은 날짜와 시간에 따라 혼잡도와 이동 동선이 달라집니다. 숙소, 교통, 입장권, 우천 운영 기준을 미리 확인해 두세요.",
+    "booking.link": "체크하기",
+    "curation.title": "함께 보면 좋은 축제 글",
+    "info.title": "축제 방문 준비",
+    "info.description": "축제 일정, 준비물, 교통, 예약 전 체크 정보를 목적별로 나누어 정리했습니다.",
+    "faq.title": "이용 가이드",
+    "common.more": "더보기",
+    "common.all": "전체 보기",
+    "card.detail": "자세히 보기",
+    "read.festival": "축제 정보",
+    "read.detail": "상세 보기",
+    "summary.festival": "{address}에서 열리는 축제입니다. 방문 전 운영 시간, 교통 통제, 주차와 우천 운영 여부를 확인해 보세요.",
+    "summary.festivalFallback": "방문 전 행사 시간, 장소, 교통과 우천 운영 여부를 확인하면 더 편하게 즐길 수 있는 축제 정보입니다.",
+    "summary.july": "{address}에서 열리는 7월 축제입니다. 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인해 보세요.",
+    "summary.julyFallback": "7월 일정이 포함된 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요."
+  },
+  en: {
+    "meta.title": "Festival Note | Korea Festival Magazine",
+    "brand.name": "Festival Note",
+    "brand.tagline": "Korea festival magazine",
+    "footer.tagline": "A guide for choosing festivals",
+    "footer.description": "A festival magazine that connects schedules, travel preparation, transport, and lodging checks in one flow.",
+    "nav.menu": "Open menu",
+    "nav.july": "July Festivals",
+    "nav.places": "By Region",
+    "nav.booking": "Before You Go",
+    "nav.guide": "Visit Guide",
+    "july.title": "July 2026 Festivals",
+    "july.description": "Browse festivals taking place in July or including July dates. Open a card to see schedule, location, photos, and visit checks.",
+    "july.loading": "Loading July festivals.",
+    "july.count": "{count} July festivals collected.",
+    "july.error": "Could not load July festivals. Please try again later.",
+    "places.title": "Find Festivals by Region",
+    "places.title.all": "Find Festivals by Region",
+    "places.title.region": "{region} Festival Guide",
+    "places.description": "Check festivals by region, from Seoul and Gyeonggi to Jeju, with schedule, place, fee, and transport notes.",
+    "booking.title": "What to Check Before You Go",
+    "booking.description": "Festival crowd levels and routes vary by date and time. Check lodging, transport, tickets, and rain policy before visiting.",
+    "booking.link": "Check",
+    "curation.title": "Festival Articles to Read Next",
+    "info.title": "Festival Visit Prep",
+    "info.description": "Festival schedules, packing tips, transport, and booking checks are grouped by visitor intent.",
+    "faq.title": "User Guide",
+    "common.more": "More",
+    "common.all": "View all",
+    "card.detail": "View details",
+    "read.festival": "Festival info",
+    "read.detail": "Details",
+    "summary.festival": "A festival held at {address}. Before visiting, check operating hours, transport restrictions, parking, and rain policy.",
+    "summary.festivalFallback": "Festival information to review before visiting, including time, location, transport, and rain policy.",
+    "summary.july": "A July festival held at {address}. Check operating hours, entry method, transport, and rain policy before visiting.",
+    "summary.julyFallback": "A festival that includes July dates. Check schedule, location, fees, and transport before visiting."
+  },
+  ja: {
+    "meta.title": "フェスティバルノート | 韓国フェスティバルマガジン",
+    "brand.name": "フェスティバルノート",
+    "brand.tagline": "韓国フェスティバル情報マガジン",
+    "footer.tagline": "フェス選びを助ける情報ポータル",
+    "footer.description": "全国のフェス日程、訪問準備、交通、宿泊チェックをひとつの流れで確認できるマガジンです。",
+    "nav.menu": "メニューを開く",
+    "nav.july": "7月のフェス",
+    "nav.places": "地域別",
+    "nav.booking": "訪問前チェック",
+    "nav.guide": "訪問ガイド",
+    "july.title": "2026年7月のフェス一覧",
+    "july.description": "7月に開催される、または7月の日程を含むフェスをまとめました。カードを開くと日程、場所、写真、訪問前チェックを確認できます。",
+    "july.loading": "7月のフェス一覧を読み込んでいます。",
+    "july.count": "7月のフェスを{count}件まとめました。",
+    "july.error": "7月のフェス一覧を読み込めませんでした。時間をおいてもう一度確認してください。",
+    "places.title": "地域別フェスを探す",
+    "places.title.all": "地域別フェスを探す",
+    "places.title.region": "{region}のフェス情報",
+    "places.description": "ソウル、京畿、仁川から済州まで、地域別フェスの日程・場所・料金・交通情報を確認できます。",
+    "booking.title": "訪問前に確認したいこと",
+    "booking.description": "フェス会場は日時によって混雑や動線が変わります。宿泊、交通、チケット、雨天時の運営基準を事前に確認しましょう。",
+    "booking.link": "確認する",
+    "curation.title": "あわせて読みたいフェス記事",
+    "info.title": "フェス訪問準備",
+    "info.description": "日程、持ち物、交通、予約前チェックを目的別に整理しました。",
+    "faq.title": "利用ガイド",
+    "common.more": "もっと見る",
+    "common.all": "すべて見る",
+    "card.detail": "詳しく見る",
+    "read.festival": "フェス情報",
+    "read.detail": "詳細",
+    "summary.festival": "{address}で開催されるフェスです。訪問前に運営時間、交通規制、駐車、雨天時の案内を確認しましょう。",
+    "summary.festivalFallback": "訪問前に時間、場所、交通、雨天時の案内を確認したいフェス情報です。",
+    "summary.july": "{address}で開催される7月のフェスです。運営時間、入場方法、交通、雨天時の案内を確認しましょう。",
+    "summary.julyFallback": "7月の日程を含むフェスです。訪問前に日程、場所、料金、交通情報を確認しましょう。"
+  },
+  zh: {
+    "meta.title": "Festival Note | 韩国庆典信息杂志",
+    "brand.name": "Festival Note",
+    "brand.tagline": "韩国庆典信息杂志",
+    "footer.tagline": "帮助选择庆典的信息门户",
+    "footer.description": "这里把全国庆典日程、出行准备、交通和住宿确认事项整理成一个清晰的浏览流程。",
+    "nav.menu": "打开菜单",
+    "nav.july": "7月庆典",
+    "nav.places": "按地区查找",
+    "nav.booking": "出发前确认",
+    "nav.guide": "参观指南",
+    "july.title": "2026年7月庆典汇总",
+    "july.description": "这里汇总了7月举办或日程包含7月的庆典。点击卡片可查看日程、地点、照片和出发前确认事项。",
+    "july.loading": "正在加载7月庆典列表。",
+    "july.count": "已汇总{count}个7月庆典。",
+    "july.error": "无法加载7月庆典列表，请稍后再试。",
+    "places.title": "按地区查找庆典",
+    "places.title.all": "按地区查找庆典",
+    "places.title.region": "{region}庆典信息",
+    "places.description": "从首尔、京畿、仁川到济州，按地区查看庆典日程、地点、费用和交通信息。",
+    "booking.title": "出发前建议确认",
+    "booking.description": "庆典现场会因日期和时间而有不同的人流和动线。请提前确认住宿、交通、门票和雨天安排。",
+    "booking.link": "查看",
+    "curation.title": "推荐一起阅读的庆典文章",
+    "info.title": "庆典出行准备",
+    "info.description": "按目的整理庆典日程、携带物品、交通和预约前确认事项。",
+    "faq.title": "使用指南",
+    "common.more": "查看更多",
+    "common.all": "查看全部",
+    "card.detail": "查看详情",
+    "read.festival": "庆典信息",
+    "read.detail": "详情",
+    "summary.festival": "这是在{address}举行的庆典。出发前请确认开放时间、交通管制、停车和雨天安排。",
+    "summary.festivalFallback": "出发前建议确认时间、地点、交通和雨天安排的庆典信息。",
+    "summary.july": "这是在{address}举行的7月庆典。请提前确认开放时间、入场方式、交通和雨天安排。",
+    "summary.julyFallback": "这是日程包含7月的庆典。出发前请确认日程、地点、费用和交通信息。"
+  }
 };
 
 const $ = (selector) => document.querySelector(selector);
+
+function getStoredLanguage() {
+  try {
+    const stored = window.localStorage.getItem("festivalNote.language");
+    return supportedLanguages.includes(stored) ? stored : "ko";
+  } catch {
+    return "ko";
+  }
+}
+
+function textFor(key, params = {}) {
+  const table = I18N[state.language] || I18N.ko;
+  const template = table[key] || I18N.ko[key] || key;
+  return template.replace(/\{(\w+)\}/g, (_, name) => params[name] ?? "");
+}
+
+function applyLanguage() {
+  document.documentElement.lang = state.language === "zh" ? "zh-Hans" : state.language;
+  document.title = textFor("meta.title");
+
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = textFor(element.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-lang]").forEach((button) => {
+    const isActive = button.dataset.lang === state.language;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+
+  updateRegionHeading();
+  renderHero();
+  renderPlaces();
+  renderBooking();
+  renderCuration();
+  renderJulyFestivals();
+}
+
+function bindLanguageSwitch() {
+  const switcher = $("#languageSwitch");
+  if (!switcher) return;
+
+  switcher.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-lang]");
+    if (!button) return;
+
+    const lang = button.getAttribute("data-lang");
+    if (!supportedLanguages.includes(lang) || lang === state.language) return;
+
+    state.language = lang;
+    try {
+      window.localStorage.setItem("festivalNote.language", lang);
+    } catch {
+      // Ignore storage failures; the language still changes for this session.
+    }
+    applyLanguage();
+  });
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -25,8 +236,18 @@ function imageMarkup(item, size = "card") {
   `;
 }
 
+function displaySummary(item) {
+  if (item.summaryKey) return textFor(item.summaryKey, item.summaryParams || {});
+  return item.summary || "";
+}
+
+function displayReadTime(item) {
+  if (item.readTimeKey) return textFor(item.readTimeKey);
+  return item.readTime || "";
+}
+
 function articleMeta(item) {
-  return `<span>${escapeHtml(item.date)}</span><span>${escapeHtml(item.readTime)}</span>`;
+  return `<span>${escapeHtml(item.date)}</span><span>${escapeHtml(displayReadTime(item))}</span>`;
 }
 
 function detailUrl(item) {
@@ -40,11 +261,11 @@ function detailUrl(item) {
 function articleCard(item, variant = "") {
   return `
     <article class="article-card ${variant}">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(item.title)} 자세히 보기">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item)}
         <span class="category-label">${escapeHtml(item.category)}</span>
         <h3>${escapeHtml(item.title)}</h3>
-        <p>${escapeHtml(item.summary)}</p>
+        <p>${escapeHtml(displaySummary(item))}</p>
         <div class="article-meta">${articleMeta(item)}</div>
       </a>
     </article>
@@ -106,11 +327,10 @@ function normalizeTourItems(items) {
         contentTypeId: item.contenttypeid || 15,
         category,
         title: item.title,
-        summary: address
-          ? `${address}에서 열리는 축제 정보입니다. 방문 전 행사 시간, 교통 통제, 주차와 우천 운영 여부를 함께 확인하세요.`
-          : "방문 전 행사 시간, 장소, 교통과 우천 운영 여부를 확인하면 더 편하게 즐길 수 있는 전국 축제 정보입니다.",
+        summaryKey: address ? "summary.festival" : "summary.festivalFallback",
+        summaryParams: { address },
         date: period,
-        readTime: "축제 정보",
+        readTimeKey: "read.festival",
         image: String(image).replace(/^http:/, "https:"),
         href: "#places"
       };
@@ -201,11 +421,10 @@ function normalizeJulyFestivalItems(items) {
         contentTypeId: item.contenttypeid || 15,
         category: `${region} 7월 축제`,
         title: item.title,
-        summary: address
-          ? `${address}에서 열리는 7월 축제입니다. 방문 전 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인하세요.`
-          : "7월 일정이 포함된 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인하세요.",
+        summaryKey: address ? "summary.july" : "summary.julyFallback",
+        summaryParams: { address },
         date: period,
-        readTime: "상세 포스팅",
+        readTimeKey: "read.detail",
         image: String(image).replace(/^http:/, "https:")
       };
     });
@@ -247,12 +466,12 @@ function renderJulyFestivals() {
   if (!status || !grid) return;
 
   if (!state.julyArticles.length) {
-    status.textContent = "7월 축제 목록을 불러오는 중입니다.";
+    status.textContent = textFor("july.loading");
     grid.innerHTML = "";
     return;
   }
 
-  status.textContent = `총 ${state.julyArticles.length}개의 7월 축제를 포스팅했습니다.`;
+  status.textContent = textFor("july.count", { count: state.julyArticles.length });
   grid.innerHTML = state.julyArticles
     .map((item) => articleCard(item))
     .join("");
@@ -288,7 +507,7 @@ async function loadJulyFestivalPosts() {
   } catch (error) {
     console.warn("July festival posts could not be loaded.", error);
     const status = $("#julyStatus");
-    if (status) status.textContent = "7월 축제 목록을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.";
+    if (status) status.textContent = textFor("july.error");
   }
 }
 
@@ -302,7 +521,9 @@ function updateRegionHeading() {
   const region = activeRegion();
   const title = $("#placesTitle");
   if (title) {
-    title.textContent = region.id === "all" ? "전국 축제 정보" : `${region.label} 축제 정보`;
+    title.textContent = region.id === "all"
+      ? textFor("places.title.all")
+      : textFor("places.title.region", { region: region.label });
   }
 }
 
@@ -352,7 +573,7 @@ function renderHero() {
 
   $("#heroGrid").innerHTML = `
     <article class="hero-featured">
-      <a href="${escapeHtml(detailUrl(featured))}" aria-label="${escapeHtml(featured.title)} 자세히 보기">
+      <a href="${escapeHtml(detailUrl(featured))}" aria-label="${escapeHtml(`${featured.title} ${textFor("card.detail")}`)}">
         ${imageMarkup(featured, "hero")}
         <div class="hero-featured__body">
           <span class="category-label">${escapeHtml(featured.category)}</span>
@@ -393,7 +614,7 @@ function renderBooking() {
       <span>${escapeHtml(item.label)}</span>
       <h3>${escapeHtml(item.title)}</h3>
       <p>${escapeHtml(item.summary)}</p>
-      <a href="${escapeHtml(item.href)}">체크 페이지로 이동</a>
+      <a href="${escapeHtml(item.href)}">${escapeHtml(textFor("booking.link"))}</a>
     </article>
   `).join("");
 }
@@ -409,7 +630,7 @@ function renderCuration() {
           <span>
             <em>${escapeHtml(item.category)}</em>
             <strong>${escapeHtml(item.title)}</strong>
-            <small>${escapeHtml(item.summary)}</small>
+            <small>${escapeHtml(displaySummary(item))}</small>
           </span>
         </a>
       </article>
@@ -472,6 +693,8 @@ function init() {
   renderFooter();
   bindMenu();
   bindRegionModal();
+  bindLanguageSwitch();
+  applyLanguage();
   loadTourApiPlaces();
   loadJulyFestivalPosts();
 }
