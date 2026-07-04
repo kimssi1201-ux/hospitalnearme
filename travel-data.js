@@ -4,7 +4,7 @@ window.TRAVEL_PORTAL_DATA = {
     endpoint: "https://apis.data.go.kr/B551011/KorService2/searchFestival2",
     mobileOS: "ETC",
     mobileApp: "FestivalNoteHub",
-    numOfRows: 12,
+    numOfRows: 30,
     pageNo: 1,
     arrange: "O",
     mode: "festival"

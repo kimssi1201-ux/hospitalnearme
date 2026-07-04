@@ -4,6 +4,7 @@ const state = {
   apiArticles: [],
   julyArticles: [],
   apiLoaded: false,
+  apiError: false,
   activeRegionId: "all",
   language: getStoredLanguage()
 };
@@ -300,6 +301,15 @@ function todayCompact() {
   return `${yyyy}${mm}${dd}`;
 }
 
+function festivalSearchStartCompact() {
+  const date = new Date();
+  date.setMonth(date.getMonth() - 18);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return `${yyyy}${mm}${dd}`;
+}
+
 function activeRegion() {
   const regions = data.regions || [];
   return regions.find((region) => region.id === state.activeRegionId) || regions[0] || { id: "all", label: "전국", areaCode: "" };
@@ -355,6 +365,7 @@ function selectRegion(regionId) {
   state.activeRegionId = regionId;
   state.apiArticles = [];
   state.apiLoaded = false;
+  state.apiError = false;
   renderRegionChips();
   updateRegionHeading();
   updatePlacesStatus(`${activeRegion().label} 축제 정보를 불러오는 중입니다.`);
@@ -408,7 +419,7 @@ function buildTourApiUrl(areaCode = activeRegion().areaCode) {
   });
 
   if (config.mode === "festival") {
-    params.set("eventStartDate", config.eventStartDate || todayCompact());
+    params.set("eventStartDate", config.eventStartDate || festivalSearchStartCompact());
   }
 
   if (config.contentTypeId) {
@@ -500,6 +511,7 @@ async function loadTourApiPlaces() {
   const areaCodes = regionAreaCodes(region);
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), 6500);
+  state.apiError = false;
 
   try {
     const responses = await Promise.all(
@@ -519,18 +531,26 @@ async function loadTourApiPlaces() {
 
     if (requestRegionId !== state.activeRegionId) return;
 
+    state.apiArticles = apiArticles;
+    state.apiLoaded = true;
+    state.apiError = false;
+
     if (apiArticles.length) {
-      state.apiArticles = apiArticles;
-      state.apiLoaded = true;
       updatePlacesStatus(`${region.label} 축제 ${apiArticles.length}개를 불러왔습니다.`);
-      renderPlaces();
-      renderCuration();
     } else {
-      updatePlacesStatus(`${region.label}에서 현재 표시할 축제 정보를 찾지 못했습니다.`);
+      updatePlacesStatus(`${region.label} 지역에 표시할 축제 정보가 아직 등록되어 있지 않습니다.`);
     }
+
+    renderPlaces();
+    renderCuration();
   } catch (error) {
     console.warn("TourAPI request failed. Fallback content is displayed.", error);
+    state.apiArticles = [];
+    state.apiLoaded = true;
+    state.apiError = true;
     updatePlacesStatus("축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    renderPlaces();
+    renderCuration();
   } finally {
     window.clearTimeout(timeoutId);
   }
@@ -696,7 +716,34 @@ function renderHero() {
 }
 
 function renderPlaces() {
-  const items = [...state.apiArticles, ...data.articles.slice(1)].slice(0, 12);
+  const region = activeRegion();
+  const isRegionFiltered = region.id !== "all";
+  const items = state.apiArticles.length
+    ? state.apiArticles.slice(0, 12)
+    : isRegionFiltered
+      ? []
+      : data.articles.slice(1, 13);
+
+  if (!items.length) {
+    const title = state.apiError
+      ? "축제 정보를 불러오지 못했습니다"
+      : state.apiLoaded
+        ? `${region.label} 축제 정보가 아직 없습니다`
+        : "축제 정보를 불러오는 중입니다";
+    const description = state.apiError
+      ? "네트워크 상태를 확인한 뒤 다시 시도해 주세요. 다른 지역을 선택하면 등록된 축제를 확인할 수 있습니다."
+      : state.apiLoaded
+        ? "공공 관광 데이터에 지역 축제가 등록되면 이곳에 표시됩니다."
+        : "잠시만 기다려 주세요. 등록된 지역 축제를 확인하고 있습니다.";
+
+    $("#placesGrid").innerHTML = `
+      <div class="empty-state">
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(description)}</p>
+      </div>
+    `;
+    return;
+  }
 
   $("#placesGrid").innerHTML = items
     .map((item) => articleCard(item))
