@@ -192,7 +192,6 @@ function applyLanguage() {
   });
 
   updateRegionHeading();
-  renderHero();
   renderPlaces();
   renderBooking();
   renderCuration();
@@ -682,24 +681,6 @@ function bindRegionChips() {
   });
 }
 
-function renderHero() {
-  const [featured] = data.articles;
-
-  $("#heroGrid").innerHTML = `
-    <article class="hero-featured">
-      <a href="${escapeHtml(detailUrl(featured))}" aria-label="${escapeHtml(`${featured.title} ${textFor("card.detail")}`)}">
-        ${imageMarkup(featured, "hero")}
-        <div class="hero-featured__body">
-          <span class="category-label">${escapeHtml(featured.category)}</span>
-          <h2>${escapeHtml(featured.title)}</h2>
-          <p>${escapeHtml(featured.summary)}</p>
-          <div class="article-meta">${articleMeta(featured)}</div>
-        </div>
-      </a>
-    </article>
-  `;
-}
-
 function renderPlaces() {
   const region = activeRegion();
   const isRegionFiltered = region.id !== "all";
@@ -829,7 +810,6 @@ function bindMenu() {
 function init() {
   renderRegionChips();
   updateRegionHeading();
-  renderHero();
   renderJulyFestivals();
   renderPlaces();
   renderBooking();
