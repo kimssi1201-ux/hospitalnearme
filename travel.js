@@ -314,6 +314,7 @@ function normalizeSeoulCultureItems(items) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
   return list
     .filter((item) => item && item.title)
+    .filter((item) => overlapsCurrentMonthByDateText(item.date))
     .map((item, index) => ({
       id: item.id || `seoul-culture-${index}`,
       source: "seoul",
@@ -431,7 +432,7 @@ function categoryItems(seedItems, fallbackItems, offset = 0, limit = 8) {
 function buildCategoryNewsGroups() {
   const apiItems = state.apiArticles || [];
   const julyItems = state.julyArticles || [];
-  const localItems = data.articles || [];
+  const localItems = [];
   const allItems = uniqueArticles([...apiItems, ...julyItems, ...localItems]);
   const guideItems = localItems.filter((item) => /준비|체크|방문|야간|가족|입장권|우천|요령/.test(`${item.category} ${item.title}`));
   const summerItems = uniqueArticles([
@@ -508,20 +509,55 @@ function compactDate(value) {
 }
 
 function todayCompact() {
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, "0");
-  const dd = String(now.getDate()).padStart(2, "0");
-  return `${yyyy}${mm}${dd}`;
+  const month = currentSeoulMonth();
+  const day = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    day: "2-digit"
+  }).formatToParts(new Date()).find((part) => part.type === "day")?.value || "01";
+  return `${month.year}${month.month}${day}`;
+}
+
+function currentSeoulMonth() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit"
+  }).formatToParts(new Date());
+  const year = parts.find((part) => part.type === "year")?.value || String(new Date().getFullYear());
+  const month = parts.find((part) => part.type === "month")?.value || String(new Date().getMonth() + 1).padStart(2, "0");
+  const lastDay = String(new Date(Number(year), Number(month), 0).getDate()).padStart(2, "0");
+  return {
+    year,
+    month,
+    key: `${year}${month}`,
+    start: `${year}${month}01`,
+    end: `${year}${month}${lastDay}`,
+    label: `${Number(month)}월`
+  };
 }
 
 function festivalSearchStartCompact() {
-  const date = new Date();
-  date.setMonth(date.getMonth() - 18);
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const dd = String(date.getDate()).padStart(2, "0");
-  return `${yyyy}${mm}${dd}`;
+  return currentSeoulMonth().start;
+}
+
+function monthFromDateRange(value) {
+  const text = String(value || "");
+  const compactDates = text.match(/\d{8}/g) || [];
+  const dashedDates = text.match(/\d{4}[.-]\d{2}[.-]\d{2}/g) || [];
+  const normalized = [
+    ...compactDates,
+    ...dashedDates.map((date) => date.replace(/\D/g, ""))
+  ].filter((date) => date.length === 8);
+  return normalized;
+}
+
+function overlapsCurrentMonthByDateText(value) {
+  const dates = monthFromDateRange(value);
+  if (!dates.length) return true;
+  const month = currentSeoulMonth();
+  const start = dates[0];
+  const end = dates[1] || start;
+  return start <= month.end && end >= month.start;
 }
 
 function activeRegion() {
@@ -659,6 +695,7 @@ function regionAreaCodes(region) {
 
 function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
   const config = data.tourApi;
+  const month = currentSeoulMonth();
   const params = new URLSearchParams({
     serviceKey: config.serviceKey,
     numOfRows: String(numOfRows),
@@ -667,7 +704,7 @@ function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
     MobileApp: config.mobileApp || "SeoulTravelNote",
     _type: "json",
     arrange: config.arrange || "O",
-    eventStartDate: "20260701",
+    eventStartDate: month.start,
     areaCode: config.areaCode || "1"
   });
 
@@ -676,16 +713,19 @@ function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
 
 function buildSeoulCultureUrl() {
   const config = data.seoulCultureApi || {};
+  const month = currentSeoulMonth();
   const params = new URLSearchParams({
-    limit: String(config.limit || 120)
+    limit: String(config.limit || 300),
+    month: month.key
   });
   return `${config.endpoint || "/api/seoul-events"}?${params.toString()}`;
 }
 
 function overlapsJulyFestival(item) {
+  const month = currentSeoulMonth();
   const start = String(item.eventstartdate || "");
   const end = String(item.eventenddate || start);
-  return start <= "20260731" && end >= "20260701";
+  return start <= month.end && end >= month.start;
 }
 
 function regionLabelFromAddress(address) {
@@ -798,12 +838,11 @@ function renderJulyFestivals() {
   const feed = $("#newsFeedList");
   if (!status || !featured || !recommended || !feed) return;
 
-  const region = activeRegion();
-  const fallbackItems = data.articles || [];
-  const items = state.apiArticles.length ? state.apiArticles : (state.julyArticles.length ? state.julyArticles : fallbackItems);
+  const month = currentSeoulMonth();
+  const items = state.apiArticles.length ? state.apiArticles : state.julyArticles;
 
   if (!items.length) {
-    status.textContent = textFor("july.loading");
+    status.textContent = `${month.label}에 표시할 서울 축제 정보를 불러오는 중입니다.`;
     featured.innerHTML = "";
     recommended.innerHTML = "";
     feed.innerHTML = "";
@@ -865,7 +904,7 @@ async function loadSeoulCultureEvents() {
 
 function readJulyFestivalCache() {
   try {
-    const cached = window.sessionStorage.getItem("festivalNote.julyArticles.v1");
+    const cached = window.sessionStorage.getItem(`festivalNote.monthArticles.${currentSeoulMonth().key}.v1`);
     if (!cached) return [];
 
     const parsed = JSON.parse(cached);
@@ -881,7 +920,7 @@ function readJulyFestivalCache() {
 function writeJulyFestivalCache(items) {
   try {
     window.sessionStorage.setItem(
-      "festivalNote.julyArticles.v1",
+      `festivalNote.monthArticles.${currentSeoulMonth().key}.v1`,
       JSON.stringify({ savedAt: Date.now(), items })
     );
   } catch {

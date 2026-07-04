@@ -51,9 +51,10 @@ async function handleSeoulEventsApi(request, env) {
     }
 
     const url = new URL(request.url);
-    const limit = clampNumber(url.searchParams.get("limit"), 20, 300, 120);
+    const limit = clampNumber(url.searchParams.get("limit"), 100, 1000, 300);
+    const month = normalizeYearMonth(url.searchParams.get("month"));
     const endpoint = `http://openapi.seoul.go.kr:8088/${encodeURIComponent(apiKey)}/json/culturalEventInfo/1/${limit}/`;
-    const cacheRequest = new Request(`${url.origin}/api/seoul-events/cache?limit=${limit}`, { method: "GET" });
+    const cacheRequest = new Request(`${url.origin}/api/seoul-events/cache?limit=${limit}&month=${month}`, { method: "GET" });
     const cached = await readCache(cacheRequest);
     if (cached) return cached;
 
@@ -74,7 +75,7 @@ async function handleSeoulEventsApi(request, env) {
       );
     }
 
-    const rows = normalizeSeoulRows(payload?.culturalEventInfo?.row);
+    const rows = normalizeSeoulRows(payload?.culturalEventInfo?.row, month);
     const finalResponse = jsonResponse(
       {
         ok: true,
@@ -101,10 +102,64 @@ async function handleSeoulEventsApi(request, env) {
   }
 }
 
-function normalizeSeoulRows(row) {
+function normalizeYearMonth(value) {
+  const text = String(value || "").trim();
+  if (/^\d{6}$/.test(text)) return text;
+
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit"
+    }).formatToParts(new Date());
+    const year = parts.find((part) => part.type === "year")?.value || String(new Date().getFullYear());
+    const month = parts.find((part) => part.type === "month")?.value || String(new Date().getMonth() + 1).padStart(2, "0");
+    return `${year}${month}`;
+  } catch {
+    const now = new Date(Date.now() + 9 * 60 * 60 * 1000);
+    return `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+  }
+}
+
+function monthRange(month) {
+  const year = Number(month.slice(0, 4));
+  const monthNumber = Number(month.slice(4, 6));
+  const lastDay = String(new Date(year, monthNumber, 0).getDate()).padStart(2, "0");
+  return {
+    start: `${month}01`,
+    end: `${month}${lastDay}`
+  };
+}
+
+function dateTokens(value) {
+  const text = String(value || "");
+  const compact = text.match(/\d{8}/g) || [];
+  const dashed = text.match(/\d{4}[.-]\d{2}[.-]\d{2}/g) || [];
+  return [
+    ...compact,
+    ...dashed.map((date) => date.replace(/\D/g, ""))
+  ].filter((date) => date.length === 8);
+}
+
+function seoulEventOverlapsMonth(item, month) {
+  const range = monthRange(month);
+  const tokens = [
+    ...dateTokens(item.STRTDATE),
+    ...dateTokens(item.DATE),
+    ...dateTokens(item.END_DATE)
+  ];
+  if (!tokens.length) return true;
+
+  const start = tokens[0];
+  const end = tokens[tokens.length - 1] || start;
+  return start <= range.end && end >= range.start;
+}
+
+function normalizeSeoulRows(row, month) {
   const rows = Array.isArray(row) ? row : row ? [row] : [];
   return rows
     .filter((item) => item?.TITLE)
+    .filter((item) => seoulEventOverlapsMonth(item, month))
     .map((item, index) => normalizeSeoulEvent(item, index));
 }
 

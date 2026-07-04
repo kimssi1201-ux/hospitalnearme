@@ -12,7 +12,7 @@ window.TRAVEL_PORTAL_DATA = {
   },
   seoulCultureApi: {
     endpoint: "/api/seoul-events",
-    limit: 120
+    limit: 300
   },
   regions: [
     { id: "seoul", label: "서울", areaCode: "1" }
