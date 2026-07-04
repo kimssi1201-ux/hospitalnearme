@@ -3,44 +3,25 @@ window.TRAVEL_PORTAL_DATA = {
     serviceKey: "f1ff302f1ae1553621d3c4208ee420449f700dbbaffef44a6bef09502ce92f59",
     endpoint: "https://apis.data.go.kr/B551011/KorService2/searchFestival2",
     mobileOS: "ETC",
-    mobileApp: "FestivalNoteHub",
+    mobileApp: "SeoulTravelNote",
     numOfRows: 30,
     pageNo: 1,
     arrange: "O",
-    mode: "festival"
+    mode: "festival",
+    areaCode: "1"
   },
   regions: [
-    { id: "all", label: "전국", areaCode: "" },
-    { id: "seoul", label: "서울", areaCode: "1" },
-    { id: "gyeonggi", label: "경기", areaCode: "31" },
-    { id: "incheon", label: "인천", areaCode: "2" },
-    { id: "busan", label: "부산", areaCode: "6" },
-    { id: "daegu", label: "대구", areaCode: "4" },
-    { id: "daejeon", label: "대전", areaCode: "3" },
-    { id: "gwangju", label: "광주", areaCode: "5" },
-    { id: "ulsan", label: "울산", areaCode: "7" },
-    { id: "sejong", label: "세종", areaCode: "8" },
-    { id: "gangwon", label: "강원", areaCode: "32" },
-    { id: "chungcheong", label: "충청도", areaCodes: ["33", "34"] },
-    { id: "chungbuk", label: "충북", areaCode: "33" },
-    { id: "chungnam", label: "충남", areaCode: "34" },
-    { id: "jeolla", label: "전라도", areaCodes: ["37", "38"] },
-    { id: "jeonbuk", label: "전북", areaCode: "37" },
-    { id: "jeonnam", label: "전남", areaCode: "38" },
-    { id: "gyeongsang", label: "경상도", areaCodes: ["35", "36"] },
-    { id: "gyeongbuk", label: "경북", areaCode: "35" },
-    { id: "gyeongnam", label: "경남", areaCode: "36" },
-    { id: "jeju", label: "제주도", areaCode: "39" }
+    { id: "seoul", label: "서울", areaCode: "1" }
   ],
   todayKeywords: [
     "서울 축제",
-    "경기 축제",
-    "인천 축제",
-    "부산 축제",
-    "제주 축제",
-    "강원 축제",
-    "전남 축제",
-    "이번 주 축제"
+    "서울 여행",
+    "서울 가볼만한 곳",
+    "서울 산책",
+    "서울 전시",
+    "서울 야간 축제",
+    "서울 주말 나들이",
+    "서울 실내 여행"
   ],
   articles: [
     {
@@ -152,39 +133,39 @@ window.TRAVEL_PORTAL_DATA = {
   ],
   categoryGroups: [
     {
-      title: "수도권 축제",
-      summary: "서울, 경기, 인천에서 열리는 축제를 빠르게 확인합니다.",
-      links: ["서울 축제", "경기 축제", "인천 축제", "주말 축제"]
+      title: "서울 축제",
+      summary: "서울에서 열리는 축제와 행사를 빠르게 확인합니다.",
+      links: ["서울 축제", "서울 전시", "서울 공연", "주말 축제"]
     },
     {
-      title: "광역시 축제",
-      summary: "부산, 대구, 대전, 광주, 울산, 세종 축제를 묶어 봅니다.",
-      links: ["부산 축제", "대구 축제", "대전 축제", "광주 축제", "울산 축제", "세종 축제"]
+      title: "서울 여행",
+      summary: "축제와 함께 둘러보기 좋은 서울 여행 동선을 정리합니다.",
+      links: ["서울 산책", "서울 야경", "서울 박물관", "서울 데이트"]
     },
     {
-      title: "전국 여행 축제",
-      summary: "강원, 충청, 전라, 경상, 제주 축제를 여행 일정과 함께 확인합니다.",
-      links: ["강원 축제", "충청 축제", "전라 축제", "경상 축제", "제주 축제"]
+      title: "방문 전 체크",
+      summary: "교통, 주차, 입장권, 운영시간을 방문 전에 확인합니다.",
+      links: ["교통 체크", "주차 정보", "우천 대응", "가족 여행"]
     }
   ],
   faq: [
     {
       question: "메인에서는 무엇을 먼저 보면 좋나요?",
-      answer: "가까운 날짜의 축제를 찾는다면 축제 일정 섹션을 먼저 보고, 마음에 드는 축제를 고른 뒤 예약 전 체크에서 교통과 숙소 기준을 확인하는 흐름이 좋습니다."
+      answer: "서울에서 가까운 날짜의 축제를 찾는다면 상단 뉴스 피드를 먼저 보고, 마음에 드는 글에서 일정과 장소, 교통 정보를 확인하는 흐름이 좋습니다."
     },
     {
       question: "축제 상세 글에서는 어떤 정보를 확인할 수 있나요?",
-      answer: "축제 소개, 일정, 장소, 문의처, 요금 정보에 더해 방문자 유형, 교통 동선, 준비물, 우천 대응 같은 실전 정보를 함께 볼 수 있습니다."
+      answer: "서울 축제 소개, 일정, 장소, 문의처, 요금 정보에 더해 교통 동선, 준비물, 우천 대응 같은 실전 정보를 함께 볼 수 있습니다."
     },
     {
       question: "검색엔진이 이해하기 쉬운 구조인가요?",
-      answer: "축제 일정, 방문 준비, 예약 전 체크, 이용 가이드를 분리하고 카드마다 카테고리와 요약을 제공해 정보성 콘텐츠로 읽히기 쉽게 구성했습니다."
+      answer: "서울 축제, 서울 여행, 방문 준비, 이용 가이드를 분리하고 카드마다 카테고리와 요약을 제공해 정보성 콘텐츠로 읽히기 쉽게 구성했습니다."
     }
   ],
   footerGroups: [
     {
-      title: "축제 정보",
-      links: ["서울 축제", "경기 축제", "인천 축제", "부산 축제"]
+      title: "서울 정보",
+      links: ["서울 축제", "서울 여행", "서울 전시", "서울 산책"]
     },
     {
       title: "축제 준비",

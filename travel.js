@@ -5,31 +5,31 @@ const state = {
   julyArticles: [],
   apiLoaded: false,
   apiError: false,
-  activeRegionId: "all",
+  activeRegionId: "seoul",
   language: getStoredLanguage()
 };
 
 const I18N = {
   ko: {
-    "meta.title": "페스티벌 노트 | 전국 축제 정보 매거진",
-    "brand.name": "페스티벌 노트",
-    "brand.tagline": "전국 축제 정보 매거진",
-    "footer.tagline": "축제 선택을 돕는 정보 포털",
-    "footer.description": "전국 축제 일정, 방문 준비, 교통과 숙소 체크 정보를 한 흐름으로 연결하는 축제 매거진입니다.",
+    "meta.title": "서울여행노트 | 서울 여행 정보 매거진",
+    "brand.name": "서울여행노트",
+    "brand.tagline": "서울 여행 정보 매거진",
+    "footer.tagline": "서울 여행 선택을 돕는 정보 포털",
+    "footer.description": "서울 축제 일정, 방문 준비, 교통과 주변 여행 정보를 한 흐름으로 연결하는 서울 여행 매거진입니다.",
     "nav.menu": "메뉴 열기",
-    "nav.july": "축제 뉴스",
-    "nav.places": "지역별 축제",
+    "nav.july": "서울 여행 뉴스",
+    "nav.places": "서울 축제",
     "nav.booking": "방문 전 체크",
     "nav.guide": "방문 가이드",
-    "july.title": "오늘 볼 만한 축제 뉴스",
-    "july.description": "상단 메인 기사, 추천 카드, 최신 축제 피드 순서로 전국 축제 정보를 빠르게 확인할 수 있습니다.",
-    "july.loading": "7월 축제 목록을 불러오는 중입니다.",
-    "july.count": "총 {count}개의 축제 기사를 불러왔습니다.",
-    "july.error": "7월 축제 목록을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
-    "places.title": "지역별 축제 찾기",
-    "places.title.all": "지역별 축제 찾기",
-    "places.title.region": "{region} 축제 정보",
-    "places.description": "서울, 경기, 인천부터 제주까지 지역별 축제 정보를 확인하고, 일정·장소·요금·교통 정보를 함께 살펴보세요.",
+    "july.title": "오늘 볼 만한 서울 여행 뉴스",
+    "july.description": "서울 축제, 계절 행사, 산책 코스와 방문 전 체크 정보를 뉴스 피드 형식으로 정리했습니다.",
+    "july.loading": "서울 축제 정보를 불러오는 중입니다.",
+    "july.count": "총 {count}개의 서울 여행 기사를 불러왔습니다.",
+    "july.error": "서울 축제 정보를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
+    "places.title": "서울 축제 찾기",
+    "places.title.all": "서울 축제 찾기",
+    "places.title.region": "서울 축제 정보",
+    "places.description": "서울에서 열리는 축제와 여행 정보를 일정·장소·요금·교통 정보와 함께 살펴보세요.",
     "booking.title": "가기 전에 확인하면 좋은 것들",
     "booking.description": "축제장은 날짜와 시간에 따라 혼잡도와 이동 동선이 달라집니다. 숙소, 교통, 입장권, 우천 운영 기준을 미리 확인해 두세요.",
     "booking.link": "체크하기",
@@ -42,15 +42,15 @@ const I18N = {
     "card.detail": "자세히 보기",
     "read.festival": "축제 정보",
     "read.detail": "상세 보기",
-    "summary.festival": "{address}에서 열리는 축제입니다. 방문 전 운영 시간, 교통 통제, 주차와 우천 운영 여부를 확인해 보세요.",
-    "summary.festivalFallback": "방문 전 행사 시간, 장소, 교통과 우천 운영 여부를 확인하면 더 편하게 즐길 수 있는 축제 정보입니다.",
-    "summary.july": "{address}에서 열리는 7월 축제입니다. 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인해 보세요.",
-    "summary.julyFallback": "7월 일정이 포함된 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요."
+    "summary.festival": "{address}에서 열리는 서울 축제입니다. 방문 전 운영 시간, 교통 통제, 주차와 우천 운영 여부를 확인해 보세요.",
+    "summary.festivalFallback": "방문 전 행사 시간, 장소, 교통과 우천 운영 여부를 확인하면 더 편하게 즐길 수 있는 서울 축제 정보입니다.",
+    "summary.july": "{address}에서 열리는 서울 7월 축제입니다. 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인해 보세요.",
+    "summary.julyFallback": "7월 일정이 포함된 서울 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요."
   },
   en: {
-    "meta.title": "Festival Note | Korea Festival Magazine",
-    "brand.name": "Festival Note",
-    "brand.tagline": "Korea festival magazine",
+    "meta.title": "Seoul Travel Note | Seoul Travel Magazine",
+    "brand.name": "Seoul Travel Note",
+    "brand.tagline": "Seoul travel magazine",
     "footer.tagline": "A guide for choosing festivals",
     "footer.description": "A festival magazine that connects schedules, travel preparation, transport, and lodging checks in one flow.",
     "nav.menu": "Open menu",
@@ -59,7 +59,7 @@ const I18N = {
     "nav.booking": "Before You Go",
     "nav.guide": "Visit Guide",
     "july.title": "Festival News to Read Today",
-    "july.description": "Browse Korea festival information in a mobile news feed with one featured story, recommended cards, and the latest list.",
+    "july.description": "Browse Seoul festival and travel information in a mobile news feed with one featured story, recommended cards, and the latest list.",
     "july.loading": "Loading July festivals.",
     "july.count": "{count} festival stories loaded.",
     "july.error": "Could not load July festivals. Please try again later.",
@@ -122,8 +122,8 @@ const I18N = {
     "summary.julyFallback": "7月の日程を含むフェスです。訪問前に日程、場所、料金、交通情報を確認しましょう。"
   },
   zh: {
-    "meta.title": "Festival Note | 韩国庆典信息杂志",
-    "brand.name": "Festival Note",
+    "meta.title": "Seoul Travel Note | 首尔旅行信息杂志",
+    "brand.name": "Seoul Travel Note",
     "brand.tagline": "韩国庆典信息杂志",
     "footer.tagline": "帮助选择庆典的信息门户",
     "footer.description": "这里把全国庆典日程、出行准备、交通和住宿确认事项整理成一个清晰的浏览流程。",
@@ -388,14 +388,14 @@ function buildCategoryNewsGroups() {
   ]);
   const regionItems = uniqueArticles([
     ...apiItems,
-    ...julyItems.filter((item) => /서울|경기|인천|부산|제주|강원|전남|경북|경남/.test(`${item.category} ${item.address || ""}`))
+    ...julyItems.filter((item) => /서울/.test(`${item.category} ${item.address || ""}`))
   ]);
 
   return [
-    { id: "festival", title: "Festival", subtitle: "지금 확인할 전국 축제", items: categoryItems(allItems, localItems, 0) },
-    { id: "places", title: "Local", subtitle: "지역별로 보는 축제 뉴스", items: categoryItems(regionItems, allItems, 1) },
-    { id: "collection", title: "Collection", subtitle: "사진으로 먼저 보는 추천 축제", items: categoryItems(julyItems, allItems, 2) },
-    { id: "travel", title: "Travel", subtitle: "축제와 함께 잡는 여행 동선", items: categoryItems(summerItems, allItems, 3) },
+    { id: "festival", title: "Festival", subtitle: "지금 확인할 서울 축제", items: categoryItems(allItems, localItems, 0) },
+    { id: "places", title: "Seoul", subtitle: "서울에서 열리는 축제 뉴스", items: categoryItems(regionItems, allItems, 1) },
+    { id: "collection", title: "Collection", subtitle: "사진으로 먼저 보는 서울 추천 행사", items: categoryItems(julyItems, allItems, 2) },
+    { id: "travel", title: "Travel", subtitle: "축제와 함께 잡는 서울 여행 동선", items: categoryItems(summerItems, allItems, 3) },
     { id: "booking", title: "Check", subtitle: "방문 전 확인할 준비 정보", items: categoryItems(guideItems, allItems, 4) },
     { id: "info", title: "Guide", subtitle: "현장에서 도움이 되는 이용 가이드", items: categoryItems(guideItems, allItems, 5) }
   ].filter((group) => group.items.length);
@@ -474,7 +474,7 @@ function festivalSearchStartCompact() {
 
 function activeRegion() {
   const regions = data.regions || [];
-  return regions.find((region) => region.id === state.activeRegionId) || regions[0] || { id: "all", label: "전국", areaCode: "" };
+  return regions.find((region) => region.id === state.activeRegionId) || regions[0] || { id: "seoul", label: "서울", areaCode: "1" };
 }
 
 function regionIdFromText(value) {
@@ -580,7 +580,7 @@ function buildTourApiUrl(areaCode = activeRegion().areaCode) {
     numOfRows: String(config.numOfRows || 8),
     pageNo: String(config.pageNo || 1),
     MobileOS: config.mobileOS || "ETC",
-    MobileApp: config.mobileApp || "TravelNoteHub",
+    MobileApp: config.mobileApp || "SeoulTravelNote",
     _type: "json",
     arrange: config.arrange || "O"
   });
@@ -612,10 +612,11 @@ function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
     numOfRows: String(numOfRows),
     pageNo: String(pageNo),
     MobileOS: config.mobileOS || "ETC",
-    MobileApp: config.mobileApp || "FestivalNoteHub",
+    MobileApp: config.mobileApp || "SeoulTravelNote",
     _type: "json",
     arrange: config.arrange || "O",
-    eventStartDate: "20260701"
+    eventStartDate: "20260701",
+    areaCode: config.areaCode || "1"
   });
 
   return `${config.endpoint}?${params.toString()}`;
@@ -628,7 +629,7 @@ function overlapsJulyFestival(item) {
 }
 
 function regionLabelFromAddress(address) {
-  const first = String(address || "").split(" ")[0] || "전국";
+  const first = String(address || "").split(" ")[0] || "서울";
   return first
     .replace("특별시", "")
     .replace("광역시", "")
@@ -706,9 +707,9 @@ async function loadTourApiPlaces() {
     state.apiError = false;
 
     if (apiArticles.length) {
-      updatePlacesStatus(`${region.label} 축제 ${apiArticles.length}개를 불러왔습니다.`);
+      updatePlacesStatus(`서울 축제 ${apiArticles.length}개를 불러왔습니다.`);
     } else {
-      updatePlacesStatus(`${region.label} 지역에 표시할 축제 정보가 아직 등록되어 있지 않습니다.`);
+      updatePlacesStatus("서울에 표시할 축제 정보가 아직 등록되어 있지 않습니다.");
     }
 
     renderPlaces();
@@ -720,7 +721,7 @@ async function loadTourApiPlaces() {
     state.apiArticles = [];
     state.apiLoaded = true;
     state.apiError = true;
-    updatePlacesStatus("축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    updatePlacesStatus("서울 축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
     renderPlaces();
     renderCuration();
     renderJulyFestivals();
@@ -738,17 +739,8 @@ function renderJulyFestivals() {
   if (!status || !featured || !recommended || !feed) return;
 
   const region = activeRegion();
-  const isRegional = region.id !== "all";
-  const regionalJulyItems = isRegional
-    ? state.julyArticles.filter((item) => {
-        const haystack = `${item.category || ""} ${item.address || ""} ${item.summaryParams?.address || ""}`;
-        return haystack.includes(region.label.replace("도", "")) || haystack.includes(region.label);
-      })
-    : [];
   const fallbackItems = data.articles || [];
-  const items = isRegional
-    ? (state.apiArticles.length ? state.apiArticles : regionalJulyItems)
-    : (state.julyArticles.length ? state.julyArticles : fallbackItems);
+  const items = state.apiArticles.length ? state.apiArticles : (state.julyArticles.length ? state.julyArticles : fallbackItems);
 
   if (!items.length) {
     status.textContent = textFor("july.loading");
@@ -759,8 +751,8 @@ function renderJulyFestivals() {
   }
 
   status.textContent = items.length && (state.julyArticles.length || state.apiArticles.length)
-    ? `${region.label} 기준 ${items.length}개의 축제 기사를 보여드립니다.`
-    : "추천 축제 기사를 준비했습니다. 실제 축제 정보가 불러와지면 자동으로 교체됩니다.";
+    ? `서울 기준 ${items.length}개의 여행 기사를 보여드립니다.`
+    : "서울 추천 여행 기사를 준비했습니다. 실제 서울 축제 정보가 불러와지면 자동으로 교체됩니다.";
 
   const [main, ...rest] = items;
   featured.innerHTML = newsFeaturedCard(main);
