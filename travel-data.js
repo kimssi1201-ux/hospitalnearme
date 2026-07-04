@@ -21,10 +21,12 @@ window.TRAVEL_PORTAL_DATA = {
     { id: "ulsan", label: "울산", areaCode: "7" },
     { id: "sejong", label: "세종", areaCode: "8" },
     { id: "gangwon", label: "강원", areaCode: "32" },
+    { id: "chungcheong", label: "충청도", areaCodes: ["33", "34"] },
     { id: "chungbuk", label: "충북", areaCode: "33" },
     { id: "chungnam", label: "충남", areaCode: "34" },
     { id: "jeonbuk", label: "전북", areaCode: "37" },
     { id: "jeonnam", label: "전남", areaCode: "38" },
+    { id: "gyeongsang", label: "경상도", areaCodes: ["35", "36"] },
     { id: "gyeongbuk", label: "경북", areaCode: "35" },
     { id: "gyeongnam", label: "경남", areaCode: "36" },
     { id: "jeju", label: "제주도", areaCode: "39" }

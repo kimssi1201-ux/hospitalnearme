@@ -305,7 +305,7 @@ function activeRegion() {
   return regions.find((region) => region.id === state.activeRegionId) || regions[0] || { id: "all", label: "전국", areaCode: "" };
 }
 
-function normalizeTourItems(items) {
+function normalizeTourItems(items, regionOverride = activeRegion()) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
   const fallbackImage = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80";
 
@@ -314,7 +314,7 @@ function normalizeTourItems(items) {
     .map((item, index) => {
       const image = item.firstimage || item.firstimage2 || fallbackImage;
       const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
-      const region = activeRegion();
+      const region = regionOverride || activeRegion();
       const category = data.tourApi?.mode === "festival" ? `${region.label} 축제` : contentTypeName(item.contenttypeid);
       const startDate = compactDate(item.eventstartdate);
       const endDate = compactDate(item.eventenddate);
@@ -337,9 +337,8 @@ function normalizeTourItems(items) {
     });
 }
 
-function buildTourApiUrl() {
+function buildTourApiUrl(areaCode = activeRegion().areaCode) {
   const config = data.tourApi;
-  const region = activeRegion();
   const params = new URLSearchParams({
     serviceKey: config.serviceKey,
     numOfRows: String(config.numOfRows || 8),
@@ -358,11 +357,16 @@ function buildTourApiUrl() {
     params.set("contentTypeId", config.contentTypeId);
   }
 
-  if (region.areaCode) {
-    params.set("areaCode", region.areaCode);
+  if (areaCode) {
+    params.set("areaCode", areaCode);
   }
 
   return `${config.endpoint}?${params.toString()}`;
+}
+
+function regionAreaCodes(region) {
+  if (Array.isArray(region.areaCodes)) return region.areaCodes.filter(Boolean);
+  return region.areaCode ? [region.areaCode] : [""];
 }
 
 function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
@@ -434,16 +438,26 @@ async function loadTourApiPlaces() {
   if (!data.tourApi?.serviceKey || !data.tourApi?.endpoint) return;
 
   const requestRegionId = state.activeRegionId;
+  const region = activeRegion();
+  const areaCodes = regionAreaCodes(region);
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), 6500);
 
   try {
-    const response = await fetch(buildTourApiUrl(), { signal: controller.signal });
-    if (!response.ok) throw new Error(`TourAPI HTTP ${response.status}`);
+    const responses = await Promise.all(
+      areaCodes.map(async (areaCode) => {
+        const response = await fetch(buildTourApiUrl(areaCode), { signal: controller.signal });
+        if (!response.ok) throw new Error(`TourAPI HTTP ${response.status}`);
+        return response.json();
+      })
+    );
 
-    const payload = await response.json();
-    const items = payload?.response?.body?.items?.item;
-    const apiArticles = normalizeTourItems(items);
+    const items = responses.flatMap((payload) => {
+      const rawItems = payload?.response?.body?.items?.item;
+      return Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
+    });
+    const dedupedItems = [...new Map(items.map((item, index) => [item.contentid || `${item.title}-${index}`, item])).values()];
+    const apiArticles = normalizeTourItems(dedupedItems, region);
 
     if (requestRegionId !== state.activeRegionId) return;
 
