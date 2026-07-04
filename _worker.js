@@ -7,15 +7,13 @@ export default {
     if (url.pathname === "/travel") {
       const assetUrl = new URL(request.url);
       assetUrl.pathname = "/travel-list.html";
-      const response = await env.ASSETS.fetch(new Request(assetUrl, request));
-      return normalizeAssetResponse(response, request, env);
+      return env.ASSETS.fetch(new Request(assetUrl, request));
     }
 
     if (/^\/travel\/[^/]+\/?$/.test(url.pathname)) {
       const assetUrl = new URL(request.url);
       assetUrl.pathname = "/travel-detail.html";
-      const response = await env.ASSETS.fetch(new Request(assetUrl, request));
-      return normalizeAssetResponse(response, request, env);
+      return env.ASSETS.fetch(new Request(assetUrl, request));
     }
 
     if (url.pathname === "/api/festival-ai") {
@@ -25,26 +23,6 @@ export default {
     return env.ASSETS.fetch(request);
   }
 };
-
-async function normalizeAssetResponse(response, request, env) {
-  if (![301, 302, 307, 308].includes(response.status)) return response;
-
-  const location = response.headers.get("location") || "";
-  if (!location) return response;
-
-  const nextUrl = new URL(location, request.url);
-  const fallbackUrl = new URL(request.url);
-
-  if (nextUrl.pathname === "/travel-detail") {
-    fallbackUrl.pathname = "/travel-detail";
-  } else if (nextUrl.pathname === "/travel-list") {
-    fallbackUrl.pathname = "/travel-list";
-  } else {
-    return response;
-  }
-
-  return env.ASSETS.fetch(new Request(fallbackUrl, request));
-}
 
 async function handleFestivalAiApi(request, env) {
   if (request.method === "OPTIONS") {
