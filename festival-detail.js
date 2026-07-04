@@ -1,4 +1,17 @@
-const data = window.TRAVEL_PORTAL_DATA;
+const fallbackData = {
+  articles: [
+    {
+      id: "festival-detail-fallback",
+      category: "축제 정보",
+      title: "축제 상세 정보를 확인해 주세요",
+      summary: "목록에서 축제를 선택하면 일정, 장소, 사진, 방문 전 체크사항을 자세히 볼 수 있습니다.",
+      date: "일정 확인 필요",
+      readTime: "축제 상세",
+      image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80"
+    }
+  ]
+};
+const data = window.TRAVEL_PORTAL_DATA || fallbackData;
 const params = new URLSearchParams(window.location.search);
 const source = params.get("source");
 const id = params.get("id");
