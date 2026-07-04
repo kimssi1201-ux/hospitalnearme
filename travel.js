@@ -621,12 +621,6 @@ async function loadJulyFestivalPosts() {
   }
 }
 
-function renderTodayKeywords() {
-  $("#todayKeywords").innerHTML = data.todayKeywords
-    .map((keyword) => regionLinkMarkup(keyword))
-    .join("");
-}
-
 function updateRegionHeading() {
   const region = activeRegion();
   const title = $("#placesTitle");
@@ -801,7 +795,6 @@ function bindMenu() {
 }
 
 function init() {
-  renderTodayKeywords();
   renderRegionChips();
   updateRegionHeading();
   renderHero();
