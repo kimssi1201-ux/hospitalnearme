@@ -16,9 +16,13 @@ const params = new URLSearchParams(window.location.search);
 const source = params.get("source");
 const id = params.get("id");
 const fallbackTitle = params.get("title");
+const fallbackContentTypeId = params.get("contentTypeId") || "15";
 const fallbackCategory = params.get("category");
 const fallbackDate = params.get("date");
 const fallbackImage = params.get("image");
+const fallbackAddress = params.get("address");
+const fallbackMapx = params.get("mapx");
+const fallbackMapy = params.get("mapy");
 const fallbackSummary = params.get("summary");
 const supportedLanguages = ["ko", "en", "ja", "zh"];
 const state = {
@@ -310,13 +314,13 @@ function normalizeExternalUrl(value) {
   }
 }
 
-async function fetchTourDetail(contentId) {
+async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId || "15") {
   const base = "https://apis.data.go.kr/B551011/KorService2";
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), 6500);
   const commonUrl = `${base}/detailCommon2?${commonParams({
     contentId,
-    contentTypeId: "15",
+    contentTypeId,
     defaultYN: "Y",
     firstImageYN: "Y",
     areacodeYN: "Y",
@@ -327,7 +331,7 @@ async function fetchTourDetail(contentId) {
   })}`;
   const introUrl = `${base}/detailIntro2?${commonParams({
     contentId,
-    contentTypeId: "15"
+    contentTypeId
   })}`;
   const imageUrl = `${base}/detailImage2?${commonParams({
     contentId,
@@ -366,25 +370,35 @@ async function fetchTourDetail(contentId) {
   const period = start && end ? `${start} - ${end}` : start || "일정 확인 필요";
   const galleryImages = collectGalleryImages(commonItem, imagePayload);
   const firstImage = galleryImages[0] || normalizeImageUrl(commonItem.firstimage || commonItem.firstimage2 || data.articles[0].image);
+  const overview = stripHtml(commonItem.overview);
+  const address = [commonItem.addr1, commonItem.addr2].filter(Boolean).join(" ") || fallbackAddress || extractAddressFromOverview(overview);
+  const place = introItem?.eventplace || address || "장소 확인 필요";
+  const playTime = stripHtml(introItem?.playtime) || stripHtml(introItem?.eventstartdate) || "공식 안내 확인";
+  const fee = stripHtml(introItem?.usetimefestival) || "공식 안내 확인";
 
   return {
     id: `tour-${contentId}`,
+    source: "tour",
+    contentId,
+    contentTypeId,
     category: "전국 축제",
     title: commonItem.title,
-    summary: stripHtml(commonItem.overview) || "방문 전 확인하면 좋은 전국 축제 상세 정보입니다.",
+    summary: overview || "방문 전 확인하면 좋은 전국 축제 상세 정보입니다.",
     date: period,
     readTime: "축제 상세",
     image: firstImage,
     galleryImages,
-    address: [commonItem.addr1, commonItem.addr2].filter(Boolean).join(" "),
+    address,
+    mapx: commonItem.mapx || fallbackMapx || "",
+    mapy: commonItem.mapy || fallbackMapy || "",
     tel: commonItem.tel || "",
     homepage: normalizeExternalUrl(commonItem.homepage),
-    overview: stripHtml(commonItem.overview),
+    overview,
     facts: [
       ["일정", period],
-      ["장소", introItem?.eventplace || commonItem.addr1 || "장소 확인 필요"],
-      ["운영 시간", introItem?.playtime || "공식 안내 확인"],
-      ["이용 요금", stripHtml(introItem?.usetimefestival) || "공식 안내 확인"]
+      ["장소", place],
+      ["운영 시간", playTime],
+      ["이용 요금", fee]
     ]
   };
 }
@@ -412,6 +426,14 @@ function collectGalleryImages(commonItem, imagePayload) {
   return [...new Set(urls)];
 }
 
+function extractAddressFromOverview(value) {
+  const text = stripHtml(value).replace(/\s+/g, " ").trim();
+  if (!text) return "";
+
+  const match = text.match(/((?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주)[^,.。]*?(?:로|길|번길)\s?\d+(?:\s?\([^)]*\))?)/);
+  return match ? match[1].trim() : "";
+}
+
 function findLocalArticle() {
   return data.articles.find((article) => article.id === id) || data.articles[0];
 }
@@ -419,12 +441,14 @@ function findLocalArticle() {
 function fallbackArticleFromParams() {
   const title = fallbackTitle || "축제 상세 정보";
   const image = fallbackImage || data.articles[0].image;
+  const address = fallbackAddress || "";
   const summary = fallbackSummary || `${title} 방문 전 확인하면 좋은 일정, 장소, 교통, 준비 정보를 정리했습니다.`;
 
   return {
     id: id ? `tour-fallback-${id}` : "tour-fallback",
     source: "tour",
     contentId: id || "",
+    contentTypeId: fallbackContentTypeId,
     category: fallbackCategory || textFor("category.festival"),
     title,
     summary,
@@ -432,13 +456,15 @@ function fallbackArticleFromParams() {
     readTime: textFor("read.detail"),
     image,
     galleryImages: image ? [image] : [],
-    address: "",
+    address,
+    mapx: fallbackMapx || "",
+    mapy: fallbackMapy || "",
     tel: "",
     homepage: "",
     overview: summary,
     facts: [
       ["일정", fallbackDate || textFor("date.needCheck")],
-      ["장소", textFor("place.needCheck")],
+      ["장소", address || textFor("place.needCheck")],
       ["운영 시간", textFor("official.check")],
       ["이용 요금", textFor("official.check")]
     ]

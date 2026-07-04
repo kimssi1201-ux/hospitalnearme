@@ -255,10 +255,14 @@ function detailUrl(item) {
     const params = new URLSearchParams({
       source: "tour",
       id: item.contentId,
+      contentTypeId: item.contentTypeId || "",
       title: item.title || "",
       category: item.category || "",
       date: item.date || "",
       image: item.image || "",
+      address: item.address || item.summaryParams?.address || "",
+      mapx: item.mapx || "",
+      mapy: item.mapy || "",
       summary: displaySummary(item) || ""
     });
     return `festival-detail?${params.toString()}`;
@@ -409,6 +413,9 @@ function normalizeTourItems(items, regionOverride = activeRegion()) {
         date: period,
         readTimeKey: "read.festival",
         image: String(image).replace(/^http:/, "https:"),
+        address,
+        mapx: item.mapx || "",
+        mapy: item.mapy || "",
         href: "#places"
       };
     });
@@ -506,7 +513,10 @@ function normalizeJulyFestivalItems(items) {
         summaryParams: { address },
         date: period,
         readTimeKey: "read.detail",
-        image: String(image).replace(/^http:/, "https:")
+        image: String(image).replace(/^http:/, "https:"),
+        address,
+        mapx: item.mapx || "",
+        mapy: item.mapy || ""
       };
     });
 }
