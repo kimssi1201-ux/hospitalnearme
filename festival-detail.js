@@ -934,9 +934,207 @@ function bindAiGuide(article) {
   });
 }
 
+function travelRegionName(article) {
+  const address = String(article.address || "");
+  const first = address.split(" ")[0];
+  if (first) {
+    return first
+      .replace("특별시", "")
+      .replace("광역시", "")
+      .replace("특별자치시", "")
+      .replace("특별자치도", "")
+      .replace("도", "");
+  }
+
+  const category = String(article.category || "");
+  return category.replace("축제", "").trim() || "국내";
+}
+
+function factValueByLabels(article, labels, fallback = "") {
+  const facts = article.facts || localFacts(article);
+  const list = Array.isArray(labels) ? labels : [labels];
+  const match = facts.find(([label]) => list.some((item) => String(label).includes(item)));
+  return match ? stripHtml(match[1]) : fallback;
+}
+
+function TravelSummaryBox(article) {
+  const region = travelRegionName(article);
+  const schedule = factValueByLabels(article, "일정", article.date || textFor("date.needCheck"));
+  const place = factValueByLabels(article, "장소", article.address || textFor("place.needCheck"));
+
+  return `
+    <section class="travel-summary-box" aria-labelledby="travelSummaryTitle">
+      <p class="eyebrow">Travel Summary</p>
+      <h2 id="travelSummaryTitle">${escapeHtml(region)} 여행 요약</h2>
+      <p>${escapeHtml(article.title)}은 ${escapeHtml(region)}에서 일정과 동선을 함께 확인하고 방문하면 좋은 여행 콘텐츠입니다. 사진만 보고 고르기보다 일정, 장소, 이동 방법, 현장 운영 정보를 함께 확인하면 당일 계획이 더 안정적입니다.</p>
+      <div class="summary-point-grid">
+        <article><span>지역</span><strong>${escapeHtml(region)}</strong></article>
+        <article><span>일정</span><strong>${escapeHtml(schedule)}</strong></article>
+        <article><span>장소</span><strong>${escapeHtml(place)}</strong></article>
+      </div>
+    </section>
+  `;
+}
+
+function CourseTimeline(article) {
+  const place = factValueByLabels(article, "장소", article.address || textFor("place.needCheck"));
+  const schedule = factValueByLabels(article, "일정", article.date || textFor("date.needCheck"));
+  const time = factValueByLabels(article, "운영", textFor("official.check"));
+  const region = travelRegionName(article);
+  const steps = [
+    ["방문 전", `${schedule} 기준으로 날짜와 운영 여부를 먼저 확인합니다.`],
+    ["도착", `${place} 주변 교통과 주차 가능 여부를 확인한 뒤 이동합니다.`],
+    ["현장 관람", `${article.title}의 주요 프로그램과 사진 포인트를 먼저 둘러봅니다.`],
+    ["마무리", `${region} 주변 맛집·카페나 가까운 산책 코스로 일정을 정리합니다.`]
+  ];
+
+  return `
+    <section class="course-timeline" aria-labelledby="courseTimelineTitle">
+      <p class="eyebrow">Course</p>
+      <h2 id="courseTimelineTitle">코스 한눈에 보기</h2>
+      <ol>
+        ${steps.map(([label, text], index) => `
+          <li>
+            <span>${String(index + 1).padStart(2, "0")}</span>
+            <div>
+              <h3>${escapeHtml(label)}</h3>
+              <p>${escapeHtml(text)}</p>
+            </div>
+          </li>
+        `).join("")}
+      </ol>
+      <p class="timeline-note">운영 시간은 ${escapeHtml(time)} 기준으로 확인되며, 현장 상황에 따라 달라질 수 있습니다.</p>
+    </section>
+  `;
+}
+
+function SpotInfoCard(article) {
+  const schedule = factValueByLabels(article, "일정", article.date || textFor("date.needCheck"));
+  const place = factValueByLabels(article, "장소", article.address || textFor("place.needCheck"));
+  const time = factValueByLabels(article, "운영", textFor("official.check"));
+  const fee = factValueByLabels(article, "요금", textFor("official.check"));
+  const parking = article.address ? "행사장 주변 공영주차장, 임시 주차장, 대중교통 공지를 함께 확인하세요." : textFor("official.check");
+
+  return `
+    <section class="spot-info-card" aria-labelledby="spotInfoTitle">
+      <p class="eyebrow">Basic Info</p>
+      <h2 id="spotInfoTitle">주소·주차·운영시간·입장료</h2>
+      <dl>
+        <div><dt>주소</dt><dd>${escapeHtml(place)}</dd></div>
+        <div><dt>주차</dt><dd>${escapeHtml(parking)}</dd></div>
+        <div><dt>운영시간</dt><dd>${escapeHtml(time)}</dd></div>
+        <div><dt>입장료</dt><dd>${escapeHtml(fee)}</dd></div>
+        <div><dt>일정</dt><dd>${escapeHtml(schedule)}</dd></div>
+        ${article.tel ? `<div><dt>문의</dt><dd>${escapeHtml(article.tel)}</dd></div>` : ""}
+      </dl>
+      ${article.homepage ? `<a class="official-link-inline" href="${escapeHtml(article.homepage)}" target="_blank" rel="noopener noreferrer">${escapeHtml(textFor("official.link"))}</a>` : ""}
+    </section>
+  `;
+}
+
+function AdBox(position = "본문 중간") {
+  return `
+    <aside class="detail-ad-box" aria-label="${escapeHtml(position)} 광고 영역">
+      <span>Advertisement</span>
+      <p>${escapeHtml(position)} 광고가 들어갈 수 있는 자리입니다.</p>
+    </aside>
+  `;
+}
+
+function NearbySpotCard(article) {
+  const region = travelRegionName(article);
+  const cards = [
+    ["맛집", `${region} 로컬 식당`, "현장 방문 전후로 식사 시간을 넉넉히 잡고, 주말에는 대기 가능성을 고려하세요."],
+    ["카페", `${region} 전망 카페`, "사진을 정리하거나 다음 동선을 확인하기 좋은 휴식 지점으로 활용할 수 있습니다."],
+    ["숙소", `${region} 숙소 체크`, "늦은 시간까지 머문다면 행사장과 대중교통 접근성을 함께 비교하세요."]
+  ];
+
+  return `
+    <section class="nearby-spot-section" aria-labelledby="nearbySpotTitle">
+      <p class="eyebrow">Nearby</p>
+      <h2 id="nearbySpotTitle">주변 맛집·카페 추천</h2>
+      <div class="nearby-spot-grid">
+        ${cards.map(([type, title, body]) => `
+          <article>
+            <span>${escapeHtml(type)}</span>
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(body)}</p>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function TravelTipBox(article) {
+  const schedule = factValueByLabels(article, "일정", article.date || textFor("date.needCheck"));
+  const place = factValueByLabels(article, "장소", article.address || textFor("place.needCheck"));
+  const tips = [
+    `${schedule} 안에서도 프로그램별 시간이 다를 수 있으니 방문 당일 공지를 확인하세요.`,
+    `${place} 주변은 주말과 성수기에 혼잡할 수 있어 이동 시간을 여유 있게 잡으세요.`,
+    "야외 일정이라면 우산보다 이동이 편한 우비, 생수, 보조배터리를 준비하는 것이 좋습니다.",
+    "아이와 함께 방문한다면 화장실, 휴식 공간, 유모차 이동 가능 구간을 먼저 확인하세요."
+  ];
+
+  return `
+    <section class="travel-tip-box" aria-labelledby="travelTipTitle">
+      <p class="eyebrow">Check Point</p>
+      <h2 id="travelTipTitle">여행 전 체크 포인트</h2>
+      <ul>
+        ${tips.map((tip) => `<li>${escapeHtml(tip)}</li>`).join("")}
+      </ul>
+    </section>
+  `;
+}
+
+function renderSpotDetailSections(article, sections) {
+  const region = travelRegionName(article);
+  const detailSections = sections.slice(0, 3);
+
+  return `
+    <section class="spot-detail-section" aria-labelledby="spotDetailTitle">
+      <p class="eyebrow">Travel Notes</p>
+      <h2 id="spotDetailTitle">여행지별 상세 설명</h2>
+      ${detailSections.map((section, index) => `
+        <article>
+          <h3>${escapeHtml(section.title || `${region} 여행 포인트 ${index + 1}`)}</h3>
+          ${(Array.isArray(section.body) ? section.body : [section.body])
+            .slice(0, 2)
+            .map((paragraph) => `<p>${escapeHtml(stripHtml(paragraph))}</p>`)
+            .join("")}
+        </article>
+      `).join("")}
+      ${renderImageGallery(article)}
+    </section>
+  `;
+}
+
+function renderClosingNote(article) {
+  const region = travelRegionName(article);
+
+  return `
+    <section class="closing-note">
+      <h2>${escapeHtml(region)} 여행을 마무리하며</h2>
+      <p>${escapeHtml(article.title)}은 일정과 현장 정보를 함께 확인할수록 만족도가 높아지는 여행지입니다. 방문 전 공식 안내를 한 번 더 확인하고, 이동 시간과 휴식 시간을 넉넉히 잡으면 더 편안한 하루를 만들 수 있습니다.</p>
+    </section>
+  `;
+}
+
+function renderTravelDetailBody(article, sections) {
+  return `
+    ${TravelSummaryBox(article)}
+    ${CourseTimeline(article)}
+    ${renderSpotDetailSections(article, sections)}
+    ${SpotInfoCard(article)}
+    ${AdBox("본문 중간")}
+    ${NearbySpotCard(article)}
+    ${TravelTipBox(article)}
+    ${renderClosingNote(article)}
+  `;
+}
+
 function renderArticle(article) {
   updateDocumentMeta(article);
-  const facts = article.facts || localFacts(article);
   const sections = article.overview && state.language === "ko"
     ? [
         {
@@ -963,35 +1161,10 @@ function renderArticle(article) {
     <div class="detail-hero-image">
       <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" />
     </div>
-    ${renderImageGallery(article)}
-    <section class="fact-grid" aria-label="${escapeHtml(textFor("basicInfo"))}">
-      ${renderFactGrid(facts)}
-    </section>
-    ${article.address ? `<p class="detail-address"><strong>${escapeHtml(textFor("address"))}</strong> ${escapeHtml(article.address)}</p>` : ""}
-    ${article.tel ? `<p class="detail-address"><strong>${escapeHtml(textFor("tel"))}</strong> ${escapeHtml(article.tel)}</p>` : ""}
     <div class="blog-body">
-      ${sections.map((section) => renderSection(section)).join("")}
-      ${renderVisitPlan(article)}
-      ${renderPracticalCards(article)}
-      ${renderReaderQuestionSection(article)}
-      ${renderRichInfoSection(article)}
-      <section class="checklist-section">
-        <h2>${escapeHtml(textFor("checklist.title"))}</h2>
-        <ul>${renderChecklist()}</ul>
-      </section>
-      <section class="ai-guide-section" id="aiGuideSection">
-        <div>
-          <p class="eyebrow">${escapeHtml(textFor("guide.eyebrow"))}</p>
-          <h2>${escapeHtml(textFor("guide.title"))}</h2>
-          <p>${escapeHtml(textFor("guide.desc"))}</p>
-          <button class="guide-load-button" id="aiGuideButton" type="button">${escapeHtml(textFor("guide.load"))}</button>
-        </div>
-        <div class="ai-guide-content" id="aiGuideContent"></div>
-      </section>
-      ${article.homepage ? `<a class="primary-button official-link" href="${escapeHtml(article.homepage)}" target="_blank" rel="noopener noreferrer">${escapeHtml(textFor("official.link"))}</a>` : ""}
+      ${renderTravelDetailBody(article, sections)}
     </div>
   `;
-  bindAiGuide(article);
 }
 
 function applyStaticLanguage() {

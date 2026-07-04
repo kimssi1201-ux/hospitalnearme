@@ -712,3 +712,294 @@
   padding-bottom: 14px;
   border-bottom: 1px solid var(--line);
 }
+
+.travel-summary-box,
+.course-timeline,
+.spot-detail-section,
+.spot-info-card,
+.detail-ad-box,
+.nearby-spot-section,
+.travel-tip-box,
+.closing-note {
+  display: grid;
+  gap: 16px;
+}
+
+.blog-body .travel-summary-box,
+.blog-body .course-timeline,
+.blog-body .spot-info-card,
+.blog-body .travel-tip-box,
+.blog-body .closing-note {
+  padding: clamp(22px, 5vw, 34px);
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(24, 22, 18, 0.06);
+}
+
+.blog-body .travel-summary-box {
+  background: linear-gradient(180deg, #fff 0%, var(--surface) 100%);
+}
+
+.travel-summary-box h2,
+.course-timeline h2,
+.spot-detail-section h2,
+.spot-info-card h2,
+.nearby-spot-section h2,
+.travel-tip-box h2,
+.closing-note h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(25px, 5vw, 36px);
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.travel-summary-box p,
+.closing-note p {
+  margin: 0;
+  color: #3f3a35;
+  font-size: 17px;
+  line-height: 1.85;
+}
+
+.summary-point-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summary-point-grid article {
+  display: grid;
+  gap: 6px;
+  min-height: 104px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+}
+
+.summary-point-grid span,
+.spot-info-card dt,
+.nearby-spot-grid span {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.summary-point-grid strong {
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.blog-body .course-timeline {
+  background: var(--surface);
+}
+
+.course-timeline ol {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.course-timeline li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 14px;
+  padding: 0 0 20px;
+}
+
+.course-timeline li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 46px;
+  bottom: 0;
+  left: 22px;
+  width: 1px;
+  background: var(--line);
+}
+
+.course-timeline li > span {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.course-timeline h3 {
+  margin: 2px 0 4px;
+  color: var(--ink);
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.course-timeline p,
+.spot-detail-section p,
+.nearby-spot-grid p,
+.travel-tip-box li,
+.timeline-note {
+  margin: 0;
+  color: #4f4942;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.timeline-note {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.blog-body .spot-detail-section {
+  padding-bottom: 34px;
+}
+
+.spot-detail-section article {
+  display: grid;
+  gap: 10px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.spot-detail-section article:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.spot-detail-section h3 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.spot-info-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.spot-info-card dl div {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.spot-info-card dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
+.official-link-inline {
+  justify-self: start;
+  padding: 12px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+}
+
+.blog-body .detail-ad-box {
+  padding: 18px 20px;
+  border: 1px dashed #d8cdbb;
+  border-radius: 22px;
+  background: #fbf7ef;
+}
+
+.detail-ad-box span {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.detail-ad-box p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.nearby-spot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nearby-spot-grid article {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+}
+
+.nearby-spot-grid h3 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.travel-tip-box ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+@media (max-width: 760px) {
+  .blog-body {
+    gap: 24px;
+    max-width: none;
+  }
+
+  .summary-point-grid,
+  .spot-info-card dl,
+  .nearby-spot-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-body .travel-summary-box,
+  .blog-body .course-timeline,
+  .blog-body .spot-info-card,
+  .blog-body .travel-tip-box,
+  .blog-body .closing-note {
+    border-radius: 22px;
+    padding: 22px;
+  }
+
+  .course-timeline li {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .course-timeline li > span {
+    width: 40px;
+    height: 40px;
+  }
+
+  .course-timeline li:not(:last-child)::after {
+    top: 40px;
+    left: 19px;
+  }
+}
