@@ -1104,6 +1104,54 @@ function CourseTimeline(article) {
   `;
 }
 
+function TravelSummaryBox(article) {
+  const region = travelRegionName(article);
+  const schedule = article.date || textFor("date.needCheck");
+  const place = article.address || textFor("place.needCheck");
+
+  return `
+    <section class="travel-summary-box" aria-labelledby="travelSummaryTitle">
+      <p class="eyebrow">Travel Summary</p>
+      <h2 id="travelSummaryTitle">${escapeHtml(region)} 여행 요약</h2>
+      <p>방문 전에는 일정, 장소, 이동 방법을 먼저 확인하는 것이 좋습니다. 현장 운영 정보와 주변 교통을 함께 보면 일정 관리가 더 편합니다.</p>
+      <div class="summary-point-grid">
+        <article><span>지역</span><strong>${escapeHtml(region)}</strong></article>
+        <article><span>일정</span><strong>${escapeHtml(schedule)}</strong></article>
+        <article><span>장소</span><strong>${escapeHtml(place)}</strong></article>
+      </div>
+    </section>
+  `;
+}
+
+function CourseTimeline(article) {
+  const time = factValueByLabels(article, "운영", textFor("official.check"));
+  const steps = [
+    ["방문 전", "날짜와 운영 여부를 먼저 확인합니다."],
+    ["이동", "대중교통과 주변 주차 정보를 확인합니다."],
+    ["현장 관람", "현장 안내와 주요 프로그램을 확인합니다."],
+    ["마무리", "주변 맛집이나 카페를 함께 둘러보면 좋습니다."]
+  ];
+
+  return `
+    <section class="course-timeline" aria-labelledby="courseTimelineTitle">
+      <p class="eyebrow">Course</p>
+      <h2 id="courseTimelineTitle">코스 한눈에 보기</h2>
+      <ol>
+        ${steps.map(([label, text], index) => `
+          <li>
+            <span>${String(index + 1).padStart(2, "0")}</span>
+            <div>
+              <h3>${escapeHtml(label)}</h3>
+              <p>${escapeHtml(text)}</p>
+            </div>
+          </li>
+        `).join("")}
+      </ol>
+      <p class="timeline-note">운영 시간은 ${escapeHtml(time)} 기준으로 확인되며, 현장 상황에 따라 달라질 수 있습니다.</p>
+    </section>
+  `;
+}
+
 function SpotInfoCard(article) {
   const schedule = factValueByLabels(article, "일정", article.date || textFor("date.needCheck"));
   const place = factValueByLabels(article, "장소", article.address || textFor("place.needCheck"));
@@ -1304,6 +1352,17 @@ function renderClosingNote(article) {
     <section class="closing-note">
       <h2>${escapeHtml(region)} 여행을 마무리하며</h2>
       <p>${escapeHtml(article.title)}은 일정과 현장 정보를 함께 확인할수록 만족도가 높아지는 여행지입니다. 방문 전 공식 안내를 한 번 더 확인하고, 이동 시간과 휴식 시간을 넉넉히 잡으면 더 편안한 하루를 만들 수 있습니다.</p>
+    </section>
+  `;
+}
+
+function renderClosingNote(article) {
+  const region = travelRegionName(article);
+
+  return `
+    <section class="closing-note">
+      <h2>${escapeHtml(region)} 여행을 마무리하며</h2>
+      <p>방문 전 공식 안내를 한 번 더 확인하고, 이동 시간과 휴식 시간을 넉넉히 잡으면 더 편안한 하루를 만들 수 있습니다.</p>
     </section>
   `;
 }
