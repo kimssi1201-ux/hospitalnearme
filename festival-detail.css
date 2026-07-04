@@ -1285,6 +1285,43 @@
 }
 
 @media (max-width: 760px) {
+  .blog-body h2 {
+    font-size: 23px;
+    line-height: 1.25;
+  }
+
+  .blog-body h3 {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .blog-body p,
+  .blog-body li,
+  .blog-body dd,
+  .blog-body strong,
+  .blog-body span {
+    font-size: 15px;
+    line-height: 1.62;
+  }
+
+  .spot-detail-section article {
+    padding: 16px 0;
+  }
+
+  .spot-detail-section p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5;
+  }
+
+  .blog-body .rich-info-section,
+  .blog-body .reader-question-section,
+  .blog-body .practical-grid,
+  .blog-body .timeline-section {
+    display: none !important;
+  }
+
   .detail-hero-image {
     margin-left: 0;
     margin-right: 0;

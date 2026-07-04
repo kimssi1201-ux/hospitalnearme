@@ -1371,7 +1371,6 @@ function renderTravelDetailBody(article, sections) {
   return `
     ${TravelSummaryBox(article)}
     ${CourseTimeline(article)}
-    ${renderSpotDetailSections(article, sections)}
     ${SpotInfoCard(article)}
     ${OfficialDetailList(article)}
     ${NearbyParkingSection(article)}
