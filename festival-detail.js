@@ -776,12 +776,67 @@ function translateFactValue(label, value) {
 function displayArticleCategory(article) {
   return article.source === "tour" || String(article.id || "").startsWith("tour-")
     ? textFor("category.festival")
-    : article.category;
+    : localizedCategoryLabel(article.category);
 }
 
 function localizedSummary(article) {
   if (state.language === "ko") return article.summary;
-  return textFor("summary.localized", { title: article.title });
+  return textFor("summary.localized", { title: localizedEventReference(article) });
+}
+
+function localizedEventReference(article) {
+  if (state.language === "ko") return article.title;
+  const table = {
+    en: "this Seoul event",
+    ja: "このソウルイベント",
+    zh: "这项首尔活动"
+  };
+  return table[state.language] || article.title;
+}
+
+function localizedCategoryLabel(category = "") {
+  const value = String(category || "").trim();
+  const key = value.includes("전시") ? "exhibition"
+    : value.includes("공연") || value.includes("클래식") || value.includes("연극") || value.includes("콘서트") || value.includes("무용") || value.includes("국악") || value.includes("뮤지컬") ? "performance"
+    : value.includes("교육") || value.includes("체험") ? "experience"
+    : value.includes("영화") ? "movie"
+    : value.includes("축제") ? "festival"
+    : "event";
+  const table = {
+    ko: {
+      exhibition: "전시/미술",
+      performance: "공연/무대",
+      experience: "교육/체험",
+      movie: "영화",
+      festival: "축제",
+      event: value || "서울 행사"
+    },
+    en: {
+      exhibition: "Exhibitions",
+      performance: "Performances",
+      experience: "Classes & Experiences",
+      movie: "Film",
+      festival: "Festivals",
+      event: "Seoul Events"
+    },
+    ja: {
+      exhibition: "展示・美術",
+      performance: "公演・舞台",
+      experience: "教育・体験",
+      movie: "映画",
+      festival: "祭り",
+      event: "ソウルイベント"
+    },
+    zh: {
+      exhibition: "展览/美术",
+      performance: "演出/舞台",
+      experience: "教育/体验",
+      movie: "电影",
+      festival: "庆典",
+      event: "首尔活动"
+    }
+  };
+  return (table[state.language] || table.ko)[key];
 }
 
 function detailSections(article) {
@@ -1206,46 +1261,49 @@ function NearbyParkingSection(article) {
   const lat = article.lat || article.mapy;
   const lng = article.lng || article.mapx;
   const hasPoint = lat && lng;
+  const copy = parkingCopy();
 
   return `
     <section class="nearby-parking-section" id="nearbyParkingSection" aria-labelledby="nearbyParkingTitle" ${hasPoint ? "" : "hidden"}>
       <p class="eyebrow">Parking</p>
-      <h2 id="nearbyParkingTitle">주변 공영주차장</h2>
-      <p class="parking-notice">서울시 공영주차장 안내 정보를 기준으로 가까운 주차장을 확인합니다. 실제 요금과 운영시간은 현장 또는 공식 안내와 다를 수 있습니다.</p>
+      <h2 id="nearbyParkingTitle">${escapeHtml(copy.title)}</h2>
+      <p class="parking-notice">${escapeHtml(copy.notice)}</p>
       <div class="parking-list" id="nearbyParkingList">
-        <p class="parking-loading">주변 주차장 정보를 불러오는 중입니다.</p>
+        <p class="parking-loading">${escapeHtml(copy.loading)}</p>
       </div>
     </section>
   `;
 }
 
 function parkingMapLinks(item) {
+  const copy = parkingCopy();
   const query = [item.name, item.address].filter(Boolean).join(" ").trim();
-  const encodedQuery = encodeURIComponent(query || item.name || "서울 공영주차장");
+  const encodedQuery = encodeURIComponent(query || item.name || copy.fallbackQuery);
   const hasPoint = Number.isFinite(Number(item.lat)) && Number.isFinite(Number(item.lng));
   const googleQuery = hasPoint
     ? `${Number(item.lat)},${Number(item.lng)}`
-    : (query || item.name || "서울 공영주차장");
+    : (query || item.name || copy.fallbackQuery);
 
   return [
     {
-      label: "네이버지도",
+      label: copy.maps[0],
       url: `https://map.naver.com/p/search/${encodedQuery}`
     },
     {
-      label: "카카오맵",
+      label: copy.maps[1],
       url: `https://map.kakao.com/link/search/${encodedQuery}`
     },
     {
-      label: "구글지도",
+      label: copy.maps[2],
       url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(googleQuery)}`
     }
   ];
 }
 
 function parkingMapLinkMarkup(item) {
+  const copy = parkingCopy();
   return `
-    <div class="parking-map-links" aria-label="${escapeHtml(`${item.name} 지도 링크`)}">
+    <div class="parking-map-links" aria-label="${escapeHtml(`${item.name} ${copy.mapAria}`)}">
       ${parkingMapLinks(item).map((link) => `
         <a class="parking-map-link" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
           ${escapeHtml(link.label)}
@@ -1258,6 +1316,7 @@ function parkingMapLinkMarkup(item) {
 async function hydrateNearbyParking(article) {
   const section = $("#nearbyParkingSection");
   const target = $("#nearbyParkingList");
+  const copy = parkingCopy();
   if (!section || !target) return;
 
   const lat = article.lat || article.mapy;
@@ -1279,29 +1338,29 @@ async function hydrateNearbyParking(article) {
 
     const items = Array.isArray(payload.items) ? payload.items.slice(0, 5) : [];
     if (!items.length) {
-      target.innerHTML = `<p class="parking-loading">표시할 주변 공영주차장 정보를 찾지 못했습니다.</p>`;
+      target.innerHTML = `<p class="parking-loading">${escapeHtml(copy.empty)}</p>`;
       return;
     }
 
     target.innerHTML = items.map((item) => `
       <article class="parking-card">
         <h3>${escapeHtml(item.name)}</h3>
-        <p>${escapeHtml(item.address || "주소 확인 필요")}</p>
+        <p>${escapeHtml(item.address || copy.addressFallback)}</p>
         <dl>
-          ${item.distanceM != null ? `<div><dt>거리</dt><dd>${escapeHtml(formatDistance(item.distanceM))}</dd></div>` : ""}
-          ${item.baseRate ? `<div><dt>기본요금</dt><dd>${escapeHtml(item.baseRate)}</dd></div>` : ""}
-          ${item.addRate ? `<div><dt>추가요금</dt><dd>${escapeHtml(item.addRate)}</dd></div>` : ""}
-          ${item.weekday ? `<div><dt>평일</dt><dd>${escapeHtml(item.weekday)}</dd></div>` : ""}
-          ${item.weekend ? `<div><dt>주말</dt><dd>${escapeHtml(item.weekend)}</dd></div>` : ""}
-          ${item.payType ? `<div><dt>요금구분</dt><dd>${escapeHtml(item.payType)}</dd></div>` : ""}
-          ${item.tel ? `<div><dt>문의</dt><dd>${escapeHtml(item.tel)}</dd></div>` : ""}
+          ${item.distanceM != null ? `<div><dt>${escapeHtml(copy.labels.distance)}</dt><dd>${escapeHtml(formatDistance(item.distanceM))}</dd></div>` : ""}
+          ${item.baseRate ? `<div><dt>${escapeHtml(copy.labels.baseRate)}</dt><dd>${escapeHtml(item.baseRate)}</dd></div>` : ""}
+          ${item.addRate ? `<div><dt>${escapeHtml(copy.labels.addRate)}</dt><dd>${escapeHtml(item.addRate)}</dd></div>` : ""}
+          ${item.weekday ? `<div><dt>${escapeHtml(copy.labels.weekday)}</dt><dd>${escapeHtml(item.weekday)}</dd></div>` : ""}
+          ${item.weekend ? `<div><dt>${escapeHtml(copy.labels.weekend)}</dt><dd>${escapeHtml(item.weekend)}</dd></div>` : ""}
+          ${item.payType ? `<div><dt>${escapeHtml(copy.labels.payType)}</dt><dd>${escapeHtml(item.payType)}</dd></div>` : ""}
+          ${item.tel ? `<div><dt>${escapeHtml(copy.labels.tel)}</dt><dd>${escapeHtml(item.tel)}</dd></div>` : ""}
         </dl>
         ${parkingMapLinkMarkup(item)}
       </article>
     `).join("");
   } catch (error) {
     console.info("Nearby parking is not available.", error);
-    target.innerHTML = `<p class="parking-loading">주변 공영주차장 정보를 불러오지 못했습니다. 서울시 주차 안내 또는 현장 공지를 확인해 주세요.</p>`;
+    target.innerHTML = `<p class="parking-loading">${escapeHtml(copy.error)}</p>`;
   }
 }
 
@@ -1728,17 +1787,283 @@ function cleanCopy() {
   return table[state.language] || table.ko;
 }
 
+function detailCopy() {
+  const table = {
+    ko: {
+      eventContent: "행사 내용",
+      basicInfo: "기본 정보",
+      highlightTitle: "관람 포인트",
+      officialTitle: "상세 안내",
+      officialNoticeTitle: "공식 안내 확인",
+      officialNoticeBody: "세부 프로그램, 예약 방식, 운영 변경 사항은 행사 주최 측 공지가 가장 정확합니다. 방문 전 공식 안내 페이지를 한 번 더 확인하세요.",
+      visitCheck: "방문 전 체크",
+      closingTitle: "마무리",
+      defaultTarget: "가족, 친구, 연인, 혼자 방문하는 여행자",
+      rowNotes: {
+        date: "시작일과 종료일을 함께 확인하세요.",
+        place: "지도 앱에서 정확한 입구와 이동 경로를 확인하세요.",
+        time: "프로그램별 시간이 다를 수 있습니다.",
+        fee: "무료 행사도 일부 체험은 유료일 수 있습니다.",
+        target: "동행자 연령 제한 여부를 확인하세요.",
+        subCategory: "서울 문화행사 분류 기준입니다.",
+        contact: "변경 사항은 공식 문의처가 가장 정확합니다."
+      },
+      labels: {
+        date: "일정",
+        place: "장소",
+        time: "운영시간",
+        fee: "입장료",
+        target: "이용대상",
+        subCategory: "분류",
+        contact: "문의"
+      },
+      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 서울 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
+      intro: (title, category, place) => `${title}은 ${category || "서울 행사"} 분야의 행사입니다. ${place ? `${place}에서 진행되며,` : "서울 지역에서 진행되며,"} 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
+      highlights: (article, context, feeText, targetText, scheduleText) => [
+        ["무엇을 볼 수 있나요?", `${context.eventName}은 ${context.category || "서울 행사"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
+        ["언제 방문하면 좋나요?", `${scheduleText} 일정에 맞춰 운영됩니다. 주말이나 저녁 시간대에는 방문객이 몰릴 수 있어, 사진 촬영이나 여유로운 관람을 원한다면 비교적 이른 시간에 도착하는 편이 좋습니다.`],
+        ["누구에게 잘 맞나요?", `${targetText}에게 참고하기 좋은 행사입니다. 입장료는 ${feeText} 기준으로 확인되며, 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`]
+      ],
+      tips: (place, time, fee) => [
+        time ? `방문 전 ${time} 기준 운영 여부를 한 번 더 확인하세요.` : "방문 전 공식 안내에서 당일 운영 여부를 확인하세요.",
+        place ? `${place} 주변은 행사 시간대에 혼잡할 수 있으므로 대중교통과 주차 동선을 함께 확인하세요.` : "행사장 위치와 이동 동선을 먼저 확인하세요.",
+        fee ? `요금은 ${fee} 기준으로 확인되지만, 체험·예약·좌석·주차 비용은 별도로 운영될 수 있습니다.` : "무료 여부와 사전 예약 필요 여부를 확인하세요.",
+        "야외 행사라면 날씨, 우산이나 우비, 보조배터리, 물을 준비하면 현장 체류가 더 편합니다."
+      ],
+      closing: (title) => `${title}은 일정, 장소, 요금, 이동 정보를 함께 확인하고 방문하면 더 안정적으로 즐길 수 있습니다. 특히 주말이나 방학 기간에는 혼잡도가 높아질 수 있으니 방문 시간을 여유 있게 잡는 것이 좋습니다.`
+    },
+    en: {
+      eventContent: "Event Overview",
+      basicInfo: "Basic Information",
+      highlightTitle: "Visitor Guide",
+      officialTitle: "Official Details",
+      officialNoticeTitle: "Check the latest notice",
+      officialNoticeBody: "Program details, booking rules, and operating changes are best confirmed through the organizer's official notice before you visit.",
+      visitCheck: "Before You Visit",
+      closingTitle: "Final Note",
+      defaultTarget: "families, friends, couples, and solo travelers",
+      rowNotes: {
+        date: "Check both the start and end date.",
+        place: "Confirm the exact entrance and route in a map app.",
+        time: "Program times may differ by session.",
+        fee: "Some free events may still charge for selected activities.",
+        target: "Check age limits or companion rules.",
+        subCategory: "Based on Seoul cultural event classification.",
+        contact: "Official contact channels are the safest source for updates."
+      },
+      labels: {
+        date: "Date",
+        place: "Place",
+        time: "Hours",
+        fee: "Fee",
+        target: "Audience",
+        subCategory: "Category",
+        contact: "Contact"
+      },
+      defaultOverview: (title) => `${title} is a Seoul travel event worth checking with its schedule, venue, and operating details before you go. Conditions may change by date and time, so review the official notice before leaving.`,
+      intro: (title, category, place) => `${title} is listed under ${category || "Seoul events"}. ${place ? `It takes place at ${place},` : "It takes place in Seoul,"} so plan your route, visit time, and nearby transport after checking the event type and operating information.`,
+      highlights: (article, context, feeText, targetText, scheduleText) => [
+        ["What can you expect?", `${context.eventName} is useful for visitors comparing Seoul events by date and location. Depending on the event type, exhibitions, performances, workshops, or outdoor programs may be available.`],
+        ["When is a good time to visit?", `The event is scheduled for ${scheduleText}. Weekends and evenings can be crowded, so arrive earlier if you want photos or a slower visit.`],
+        ["Who is it suitable for?", `This event can work well for ${targetText}. Fees are listed as ${feeText}, but some programs may require separate booking or on-site registration.`]
+      ],
+      tips: (place, time, fee) => [
+        time ? `Check same-day operation based on ${time}.` : "Check the official notice before visiting.",
+        place ? `Around ${place}, traffic may increase during event hours. Check public transport and parking routes together.` : "Confirm the venue and route before leaving.",
+        fee ? `The listed fee is ${fee}, but activities, seats, bookings, or parking may cost extra.` : "Check whether admission is free and whether booking is required.",
+        "For outdoor events, check the weather and bring rain gear, a battery pack, and water."
+      ],
+      closing: (title) => `${title} is easier to enjoy when schedule, place, fee, and transport are checked together. Allow extra time on weekends or during school holidays.`
+    },
+    ja: {
+      eventContent: "イベント概要",
+      basicInfo: "基本情報",
+      highlightTitle: "見どころ",
+      officialTitle: "公式詳細",
+      officialNoticeTitle: "最新案内の確認",
+      officialNoticeBody: "詳細プログラム、予約方法、運営変更は主催者の公式案内が最も正確です。訪問前に公式ページを確認してください。",
+      visitCheck: "訪問前チェック",
+      closingTitle: "まとめ",
+      defaultTarget: "家族、友人、カップル、一人旅の旅行者",
+      rowNotes: {
+        date: "開始日と終了日を確認してください。",
+        place: "地図アプリで入口と移動経路を確認してください。",
+        time: "プログラムごとに時間が異なる場合があります。",
+        fee: "無料イベントでも一部体験は有料の場合があります。",
+        target: "年齢制限や同伴条件を確認してください。",
+        subCategory: "ソウル文化イベント分類に基づきます。",
+        contact: "変更事項は公式問い合わせ先が最も正確です。"
+      },
+      labels: {
+        date: "日程",
+        place: "場所",
+        time: "時間",
+        fee: "料金",
+        target: "対象",
+        subCategory: "分類",
+        contact: "問い合わせ"
+      },
+      defaultOverview: (title) => `${title}は、訪問前に日程、会場、運営情報を確認しておきたいソウルの旅行イベントです。状況は日付や時間帯によって変わることがあるため、出発前に公式案内を確認してください。`,
+      intro: (title, category, place) => `${title}は${category || "ソウルイベント"}に分類されます。${place ? `${place}で開催され、` : "ソウル市内で開催され、"}イベントの性格と運営情報を確認したうえで、移動経路、観覧時間、周辺交通を計画すると便利です。`,
+      highlights: (article, context, feeText, targetText, scheduleText) => [
+        ["何が見られますか？", `${context.eventName}は、日程と場所を基準にソウルのイベントを比較したい人に役立つ情報です。分類によって展示、公演、体験、屋外プログラムなどが運営される場合があります。`],
+        ["いつ訪問するとよいですか？", `${scheduleText}の日程で運営されます。週末や夜の時間帯は混雑しやすいため、写真撮影やゆっくり観覧したい場合は早めの到着がおすすめです。`],
+        ["誰に向いていますか？", `${targetText}に参考になるイベントです。料金は${feeText}を基準に確認されますが、一部プログラムは別途予約や現地受付が必要な場合があります。`]
+      ],
+      tips: (place, time, fee) => [
+        time ? `訪問前に${time}基準の運営状況を確認してください。` : "訪問前に公式案内で当日の運営状況を確認してください。",
+        place ? `${place}周辺はイベント時間帯に混雑する場合があります。公共交通と駐車動線を一緒に確認してください。` : "会場の位置と移動経路を先に確認してください。",
+        fee ? `料金は${fee}を基準に確認されますが、体験、予約、座席、駐車料金は別途発生する場合があります。` : "無料かどうか、事前予約が必要かを確認してください。",
+        "屋外イベントの場合は天気、雨具、補助バッテリー、水を準備すると安心です。"
+      ],
+      closing: (title) => `${title}は、日程、場所、料金、移動情報を一緒に確認して訪問するとより安心して楽しめます。週末や休暇期間は混雑しやすいため、時間に余裕を持って訪問してください。`
+    },
+    zh: {
+      eventContent: "活动介绍",
+      basicInfo: "基本信息",
+      highlightTitle: "参观重点",
+      officialTitle: "官方详情",
+      officialNoticeTitle: "确认最新公告",
+      officialNoticeBody: "详细节目、预约方式和运营变更以主办方官方公告为准。出发前建议再次查看官方页面。",
+      visitCheck: "出发前确认",
+      closingTitle: "总结",
+      defaultTarget: "家庭、朋友、情侣和独自旅行者",
+      rowNotes: {
+        date: "请同时确认开始日期和结束日期。",
+        place: "请在地图应用中确认入口和路线。",
+        time: "不同节目时间可能不同。",
+        fee: "免费活动中部分体验也可能收费。",
+        target: "请确认年龄限制或同行条件。",
+        subCategory: "基于首尔文化活动分类。",
+        contact: "变更信息以官方咨询渠道为准。"
+      },
+      labels: {
+        date: "日期",
+        place: "地点",
+        time: "时间",
+        fee: "费用",
+        target: "对象",
+        subCategory: "分类",
+        contact: "咨询"
+      },
+      defaultOverview: (title) => `${title}是出发前值得确认日程、地点和运营信息的首尔旅行活动。现场情况可能因日期和时间而变化，建议出发前查看官方公告。`,
+      intro: (title, category, place) => `${title}属于${category || "首尔活动"}类别。${place ? `活动在${place}举行，` : "活动在首尔举行，"}建议先确认活动类型和运营信息，再规划路线、参观时间和周边交通。`,
+      highlights: (article, context, feeText, targetText, scheduleText) => [
+        ["可以看到什么？", `${context.eventName}适合想按日期和地点比较首尔活动的访客参考。根据活动类型，可能包含展览、演出、体验或户外项目。`],
+        ["什么时候去比较好？", `活动日程为${scheduleText}。周末和晚间可能较拥挤，如果想拍照或从容参观，建议较早到达。`],
+        ["适合谁？", `该活动适合${targetText}参考。费用显示为${feeText}，但部分项目可能需要另行预约或现场报名。`]
+      ],
+      tips: (place, time, fee) => [
+        time ? `出发前请按${time}确认当天运营情况。` : "出发前请查看官方公告确认当天运营情况。",
+        place ? `${place}周边在活动时段可能拥挤，请同时确认公共交通和停车路线。` : "请先确认场地位置和移动路线。",
+        fee ? `费用以${fee}为准，但体验、预约、座位或停车可能另行收费。` : "请确认是否免费以及是否需要提前预约。",
+        "如果是户外活动，请确认天气，并准备雨具、充电宝和饮用水。"
+      ],
+      closing: (title) => `${title}在确认日程、地点、费用和交通信息后再前往，会更容易安心游览。周末或假期可能较拥挤，建议预留充足时间。`
+    }
+  };
+
+  return table[state.language] || table.ko;
+}
+
+function parkingCopy() {
+  const table = {
+    ko: {
+      title: "주변 공영주차장",
+      notice: "서울시 공영주차장 안내 정보를 기준으로 가까운 주차장을 확인합니다. 실제 요금과 운영시간은 현장 또는 공식 안내와 다를 수 있습니다.",
+      loading: "주변 주차장 정보를 불러오는 중입니다.",
+      empty: "표시할 주변 공영주차장 정보를 찾지 못했습니다.",
+      error: "주변 공영주차장 정보를 불러오지 못했습니다. 서울시 주차 안내 또는 현장 공지를 확인해 주세요.",
+      fallbackQuery: "서울 공영주차장",
+      mapAria: "지도 링크",
+      addressFallback: "주소 확인 필요",
+      labels: {
+        distance: "거리",
+        baseRate: "기본요금",
+        addRate: "추가요금",
+        weekday: "평일",
+        weekend: "주말",
+        payType: "요금구분",
+        tel: "문의"
+      },
+      maps: ["네이버지도", "카카오맵", "구글지도"]
+    },
+    en: {
+      title: "Nearby Public Parking",
+      notice: "Nearby public parking is shown using Seoul parking information. Actual fees and hours may differ, so confirm before parking.",
+      loading: "Loading nearby parking information.",
+      empty: "No nearby public parking information was found.",
+      error: "Nearby parking information could not be loaded. Check Seoul parking notices or on-site guidance.",
+      fallbackQuery: "Seoul public parking",
+      mapAria: "map links",
+      addressFallback: "Address needs confirmation",
+      labels: {
+        distance: "Distance",
+        baseRate: "Base fee",
+        addRate: "Additional fee",
+        weekday: "Weekday",
+        weekend: "Weekend",
+        payType: "Fee type",
+        tel: "Contact"
+      },
+      maps: ["Naver Map", "Kakao Map", "Google Maps"]
+    },
+    ja: {
+      title: "周辺公営駐車場",
+      notice: "ソウル市の駐車場情報をもとに近くの公営駐車場を表示します。実際の料金や時間は現地案内と異なる場合があります。",
+      loading: "周辺駐車場情報を読み込んでいます。",
+      empty: "表示できる周辺公営駐車場情報が見つかりませんでした。",
+      error: "周辺公営駐車場情報を読み込めませんでした。ソウル市の駐車案内または現地案内を確認してください。",
+      fallbackQuery: "ソウル 公営駐車場",
+      mapAria: "地図リンク",
+      addressFallback: "住所確認が必要",
+      labels: {
+        distance: "距離",
+        baseRate: "基本料金",
+        addRate: "追加料金",
+        weekday: "平日",
+        weekend: "週末",
+        payType: "料金区分",
+        tel: "問い合わせ"
+      },
+      maps: ["Naver Map", "Kakao Map", "Google Maps"]
+    },
+    zh: {
+      title: "附近公共停车场",
+      notice: "根据首尔市停车信息显示附近公共停车场。实际费用和时间可能不同，请停车前确认。",
+      loading: "正在加载附近停车信息。",
+      empty: "未找到可显示的附近公共停车场信息。",
+      error: "无法加载附近公共停车场信息。请查看首尔市停车公告或现场指引。",
+      fallbackQuery: "首尔公共停车场",
+      mapAria: "地图链接",
+      addressFallback: "需要确认地址",
+      labels: {
+        distance: "距离",
+        baseRate: "基本费用",
+        addRate: "追加费用",
+        weekday: "平日",
+        weekend: "周末",
+        payType: "收费类型",
+        tel: "咨询"
+      },
+      maps: ["Naver Map", "Kakao Map", "Google Maps"]
+    }
+  };
+
+  return table[state.language] || table.ko;
+}
+
 function cleanBodyOverview(article) {
-  const copy = cleanCopy();
-  if (state.language !== "ko") return copy.defaultOverview(article.title);
+  const copy = detailCopy();
+  if (state.language !== "ko") return copy.defaultOverview(localizedEventReference(article));
   const overview = usefulValue(article.overview);
   const summary = usefulValue(article.summary);
   if (overview && overview !== summary) return overview;
-  return copy.defaultOverview(article.title);
+  return copy.defaultOverview(localizedEventReference(article));
 }
 
 function cleanEventContext(article) {
-  const category = usefulValue(article.category) || displayArticleCategory(article);
+  const category = localizedCategoryLabel(usefulValue(article.category) || displayArticleCategory(article));
   const subCategory = usefulValue(article.subCategory) || usefulValue(article.rawCategory);
   const place = getFactByLabels(article, "장소", article.address || "");
   const schedule = getFactByLabels(article, "일정", article.date || "");
@@ -1746,6 +2071,7 @@ function cleanEventContext(article) {
   const target = usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], "");
 
   return {
+    eventName: localizedEventReference(article),
     category,
     subCategory,
     place,
@@ -1756,27 +2082,27 @@ function cleanEventContext(article) {
 }
 
 function CleanIntroSection(article) {
-  const copy = cleanCopy();
+  const copy = detailCopy();
   const context = cleanEventContext(article);
 
   return `
     <section class="clean-article-section">
       <h2>${escapeHtml(copy.eventContent)}</h2>
       <p>${escapeHtml(cleanBodyOverview(article))}</p>
-      <p>${escapeHtml(copy.intro(article.title, context.category, context.place))}</p>
+      <p>${escapeHtml(copy.intro(context.eventName, context.category, context.place))}</p>
     </section>
   `;
 }
 
 function CleanInfoSection(article) {
-  const copy = cleanCopy();
+  const copy = detailCopy();
   const rows = [
     [copy.labels.date, getFactByLabels(article, "일정", article.date || textFor("date.needCheck")), copy.rowNotes.date],
     [copy.labels.place, getFactByLabels(article, "장소", article.address || textFor("place.needCheck")), copy.rowNotes.place],
     [copy.labels.time, getFactByLabels(article, ["운영", "행사 시간"], fallbackTime || textFor("official.check")), copy.rowNotes.time],
     [copy.labels.fee, getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || textFor("official.check")), copy.rowNotes.fee],
     [copy.labels.target, usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], textFor("official.check")), copy.rowNotes.target],
-    [copy.labels.subCategory, usefulValue(article.subCategory) || usefulValue(article.rawCategory) || "", copy.rowNotes.subCategory],
+    [copy.labels.subCategory, localizedCategoryLabel(usefulValue(article.subCategory) || usefulValue(article.rawCategory) || usefulValue(article.category)), copy.rowNotes.subCategory],
     [copy.labels.contact, usefulValue(article.tel) || getFactByLabels(article, "문의", ""), copy.rowNotes.contact]
   ].filter(([, value]) => usefulValue(value));
 
@@ -1785,7 +2111,7 @@ function CleanInfoSection(article) {
       <h2>${escapeHtml(copy.basicInfo)}</h2>
       <div class="clean-info-table-wrap">
         <table class="clean-info-table">
-          <caption>${escapeHtml(`${article.title} ${copy.basicInfo}`)}</caption>
+          <caption>${escapeHtml(`${localizedEventReference(article)} ${copy.basicInfo}`)}</caption>
           <tbody>
             ${rows.map(([label, value, note]) => `
               <tr>
@@ -1803,7 +2129,7 @@ function CleanInfoSection(article) {
 }
 
 function CleanHighlightSection(article) {
-  const copy = cleanCopy();
+  const copy = detailCopy();
   const context = cleanEventContext(article);
   const feeText = context.fee || textFor("official.check");
   const targetText = context.target || copy.defaultTarget;
@@ -1824,7 +2150,7 @@ function CleanHighlightSection(article) {
 }
 
 function CleanOfficialInfoSection(article) {
-  const copy = cleanCopy();
+  const copy = detailCopy();
   const hiddenLabels = ["행사 장소", "행사 시간", "운영 시간", "이용 요금", "문의 전화", "이용 대상", "참가 연령", "정보 기준일", "유무료"];
   const details = (Array.isArray(article.detailInfo) ? article.detailInfo : [])
     .map((item) => ({
@@ -1842,6 +2168,19 @@ function CleanOfficialInfoSection(article) {
     return true;
   }).slice(0, 6);
 
+  if (state.language !== "ko") {
+    return `
+      <section class="clean-article-section clean-official-section">
+        <h2>${escapeHtml(copy.officialTitle)}</h2>
+        <article>
+          <h3>${escapeHtml(copy.officialNoticeTitle)}</h3>
+          <p>${escapeHtml(copy.officialNoticeBody)}</p>
+        </article>
+        ${article.homepage ? `<a class="official-link-inline" href="${escapeHtml(article.homepage)}" target="_blank" rel="noopener noreferrer">${escapeHtml(textFor("official.link"))}</a>` : ""}
+      </section>
+    `;
+  }
+
   if (!unique.length) return "";
 
   return `
@@ -1858,7 +2197,7 @@ function CleanOfficialInfoSection(article) {
 }
 
 function CleanVisitTipSection(article) {
-  const copy = cleanCopy();
+  const copy = detailCopy();
   const place = getFactByLabels(article, "장소", article.address || "");
   const time = getFactByLabels(article, ["운영", "행사 시간"], "");
   const fee = getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || "");
@@ -1875,11 +2214,11 @@ function CleanVisitTipSection(article) {
 }
 
 function CleanClosingSection(article) {
-  const copy = cleanCopy();
+  const copy = detailCopy();
   return `
     <section class="clean-article-section clean-closing-section">
       <h2>${escapeHtml(copy.closingTitle)}</h2>
-      <p>${escapeHtml(copy.closing(article.title))}</p>
+      <p>${escapeHtml(copy.closing(localizedEventReference(article)))}</p>
     </section>
   `;
 }
