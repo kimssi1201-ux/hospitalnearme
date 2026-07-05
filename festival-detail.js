@@ -1494,6 +1494,140 @@ function renderRelated(currentId) {
   if (section) section.hidden = true;
 }
 
+function cleanValue(value) {
+  return stripHtml(value)
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function usefulValue(value) {
+  const clean = cleanValue(value);
+  if (!clean) return "";
+  if (["0", "-", "null", "undefined"].includes(clean.toLowerCase())) return "";
+  return clean;
+}
+
+function getFactByLabels(article, labels, fallback = "") {
+  const facts = article.facts || localFacts(article);
+  const list = Array.isArray(labels) ? labels : [labels];
+  const match = facts.find(([label]) => list.some((item) => String(label).includes(item)));
+  return usefulValue(match?.[1]) || usefulValue(fallback);
+}
+
+function cleanBodyOverview(article) {
+  const overview = usefulValue(article.overview);
+  const summary = usefulValue(article.summary);
+  if (overview && overview !== summary) return overview;
+  return `${article.title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 서울 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`;
+}
+
+function CleanIntroSection(article) {
+  return `
+    <section class="clean-article-section">
+      <h2>행사 소개</h2>
+      <p>${escapeHtml(cleanBodyOverview(article))}</p>
+    </section>
+  `;
+}
+
+function CleanInfoSection(article) {
+  const rows = [
+    ["일정", getFactByLabels(article, "일정", article.date || textFor("date.needCheck"))],
+    ["장소", getFactByLabels(article, "장소", article.address || textFor("place.needCheck"))],
+    ["운영시간", getFactByLabels(article, ["운영", "행사 시간"], fallbackTime || textFor("official.check"))],
+    ["입장료", getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || textFor("official.check"))],
+    ["문의", usefulValue(article.tel) || getFactByLabels(article, "문의", "")]
+  ].filter(([, value]) => usefulValue(value));
+
+  return `
+    <section class="clean-article-section clean-info-section">
+      <h2>기본 정보</h2>
+      <dl class="clean-info-list">
+        ${rows.map(([label, value]) => `
+          <div>
+            <dt>${escapeHtml(label)}</dt>
+            <dd>${escapeHtml(value)}</dd>
+          </div>
+        `).join("")}
+      </dl>
+      ${article.homepage ? `<a class="official-link-inline" href="${escapeHtml(article.homepage)}" target="_blank" rel="noopener noreferrer">${escapeHtml(textFor("official.link"))}</a>` : ""}
+    </section>
+  `;
+}
+
+function CleanOfficialInfoSection(article) {
+  const hiddenLabels = ["운영 시간", "이용 요금", "문의 전화", "정보 기준일"];
+  const details = (Array.isArray(article.detailInfo) ? article.detailInfo : [])
+    .map((item) => ({
+      label: usefulValue(item.label),
+      value: usefulValue(item.value)
+    }))
+    .filter((item) => item.label && item.value)
+    .filter((item) => !hiddenLabels.some((label) => item.label.includes(label)));
+
+  const seen = new Set();
+  const unique = details.filter((item) => {
+    const key = `${item.label}:${item.value}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, 6);
+
+  if (!unique.length) return "";
+
+  return `
+    <section class="clean-article-section clean-official-section">
+      <h2>상세 안내</h2>
+      ${unique.map((item) => `
+        <article>
+          <h3>${escapeHtml(item.label)}</h3>
+          <p>${escapeHtml(item.value)}</p>
+        </article>
+      `).join("")}
+    </section>
+  `;
+}
+
+function CleanVisitTipSection(article) {
+  const place = getFactByLabels(article, "장소", article.address || "");
+  const time = getFactByLabels(article, ["운영", "행사 시간"], "");
+  const tips = [
+    time ? `방문 전 ${time} 기준 운영 여부를 한 번 더 확인하세요.` : "방문 전 공식 안내에서 당일 운영 여부를 확인하세요.",
+    place ? `${place} 주변은 행사 시간대에 혼잡할 수 있으므로 대중교통과 주차 동선을 함께 확인하세요.` : "행사장 위치와 이동 동선을 먼저 확인하세요.",
+    "야외 행사라면 날씨, 우산이나 우비, 보조배터리, 물을 준비하면 현장 체류가 더 편합니다."
+  ];
+
+  return `
+    <section class="clean-article-section clean-tip-section">
+      <h2>방문 전 체크</h2>
+      <ul>
+        ${tips.map((tip) => `<li>${escapeHtml(tip)}</li>`).join("")}
+      </ul>
+    </section>
+  `;
+}
+
+function CleanClosingSection(article) {
+  return `
+    <section class="clean-article-section clean-closing-section">
+      <h2>마무리</h2>
+      <p>${escapeHtml(article.title)}은 일정, 장소, 요금, 이동 정보를 함께 확인하고 방문하면 더 안정적으로 즐길 수 있습니다. 특히 주말이나 방학 기간에는 혼잡도가 높아질 수 있으니 방문 시간을 여유 있게 잡는 것이 좋습니다.</p>
+    </section>
+  `;
+}
+
+function renderTravelDetailBody(article, sections) {
+  return `
+    ${CleanIntroSection(article)}
+    ${CleanInfoSection(article)}
+    ${renderImageGallery(article)}
+    ${CleanOfficialInfoSection(article)}
+    ${NearbyParkingSection(article)}
+    ${CleanVisitTipSection(article)}
+    ${CleanClosingSection(article)}
+  `;
+}
+
 async function init() {
   applyStaticLanguage();
   bindLanguageSwitch();

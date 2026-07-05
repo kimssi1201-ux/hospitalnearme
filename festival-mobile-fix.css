@@ -148,4 +148,87 @@
   .spot-detail-section p {
     display: block !important;
   }
+
+  .clean-article-section {
+    display: block !important;
+    padding: 0 0 28px !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .clean-article-section h2 {
+    margin: 0 0 14px !important;
+    color: var(--ink) !important;
+    font-size: 25px !important;
+    line-height: 1.32 !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .clean-article-section h3 {
+    margin: 0 0 8px !important;
+    color: var(--accent) !important;
+    font-size: 19px !important;
+    line-height: 1.35 !important;
+    font-weight: 800 !important;
+  }
+
+  .clean-article-section p,
+  .clean-article-section li,
+  .clean-article-section dd {
+    margin: 0 !important;
+    color: #4f4942 !important;
+    font-size: 18px !important;
+    line-height: 1.78 !important;
+    font-weight: 500 !important;
+  }
+
+  .clean-info-list {
+    display: block !important;
+    margin: 0 !important;
+    border-top: 1px solid var(--line) !important;
+  }
+
+  .clean-info-list div {
+    display: grid !important;
+    grid-template-columns: 76px minmax(0, 1fr) !important;
+    gap: 12px !important;
+    padding: 13px 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+  }
+
+  .clean-info-list dt {
+    color: var(--gold) !important;
+    font-size: 15px !important;
+    line-height: 1.45 !important;
+    font-weight: 800 !important;
+  }
+
+  .clean-info-list dd {
+    color: var(--ink) !important;
+    font-weight: 650 !important;
+  }
+
+  .clean-official-section article {
+    padding: 16px 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+  }
+
+  .clean-official-section article:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .clean-tip-section ul {
+    display: grid !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding-left: 20px !important;
+  }
+
+  .clean-closing-section {
+    border-bottom: 0 !important;
+  }
 }
