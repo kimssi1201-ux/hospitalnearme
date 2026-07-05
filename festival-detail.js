@@ -1367,6 +1367,39 @@ function renderClosingNote(article) {
   `;
 }
 
+function SpotInfoCard(article) {
+  const schedule = factValueByLabels(article, "일정", article.date || textFor("date.needCheck"));
+  const place = factValueByLabels(article, "장소", article.address || textFor("place.needCheck"));
+  const time = factValueByLabels(article, "운영", textFor("official.check"));
+  const fee = factValueByLabels(article, "요금", textFor("official.check"));
+  const parking = article.address
+    ? "방문 전 행사장 주변 공영주차장과 임시 주차장 운영 여부를 확인하세요."
+    : textFor("official.check");
+  const rows = [
+    ["주소", place],
+    ["일정", schedule],
+    ["운영시간", time],
+    ["입장료", fee],
+    ["주차", parking],
+    ...(article.tel ? [["문의", article.tel]] : [])
+  ].filter(([, value]) => value);
+
+  return `
+    <section class="spot-info-card compact-info-card" aria-labelledby="spotInfoTitle">
+      <h2 id="spotInfoTitle">기본 정보</h2>
+      <div class="compact-info-list">
+        ${rows.map(([label, value]) => `
+          <div class="compact-info-row">
+            <span>${escapeHtml(label)}</span>
+            <p>${escapeHtml(stripHtml(value))}</p>
+          </div>
+        `).join("")}
+      </div>
+      ${article.homepage ? `<a class="official-link-inline" href="${escapeHtml(article.homepage)}" target="_blank" rel="noopener noreferrer">${escapeHtml(textFor("official.link"))}</a>` : ""}
+    </section>
+  `;
+}
+
 function renderTravelDetailBody(article, sections) {
   return `
     ${TravelSummaryBox(article)}
