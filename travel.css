@@ -439,10 +439,14 @@ main {
 }
 
 .section-status {
-  margin: -8px 0 20px;
+  margin: 0 0 8px;
   color: var(--accent);
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.section-status[hidden] {
+  display: none !important;
 }
 
 .mobile-news-feed {

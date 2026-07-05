@@ -942,14 +942,14 @@ function renderJulyFestivals() {
 
   if (!items.length) {
     status.textContent = `${month.label}에 표시할 서울 축제 정보를 불러오는 중입니다.`;
+    status.hidden = false;
     recommended.innerHTML = "";
     feed.innerHTML = "";
     return;
   }
 
-  status.textContent = items.length && (state.julyArticles.length || state.apiArticles.length)
-    ? `서울 기준 ${items.length}개의 여행 기사를 보여드립니다.`
-    : "서울 추천 여행 기사를 준비했습니다. 실제 서울 축제 정보가 불러와지면 자동으로 교체됩니다.";
+  status.textContent = "";
+  status.hidden = true;
 
   recommended.innerHTML = items.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
   feed.innerHTML = items.slice(3, 18).map((item) => newsListCard(item)).join("");
@@ -1066,7 +1066,10 @@ async function loadJulyFestivalPosts() {
   } catch (error) {
     console.warn("July festival posts could not be loaded.", error);
     const status = $("#julyStatus");
-    if (status) status.textContent = textFor("july.error");
+    if (status) {
+      status.textContent = textFor("july.error");
+      status.hidden = false;
+    }
   }
 }
 
