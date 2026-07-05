@@ -230,15 +230,21 @@ function escapeHtml(value) {
 }
 
 function TenpingAdBox(label = "Advertisement", variant = "small") {
-  const config = variant === "large"
-    ? {
-        maxWidth: 768,
-        displayType: "1LawCE8FqKOhetXZhMopsQ%3d%3d"
-      }
-    : {
-        maxWidth: 580,
-        displayType: "UD8Mia8gyIoT5Z2MT6VB3Q%3d%3d"
-      };
+  const configs = {
+    large: {
+      maxWidth: 768,
+      displayType: "1LawCE8FqKOhetXZhMopsQ%3d%3d"
+    },
+    small: {
+      maxWidth: 580,
+      displayType: "UD8Mia8gyIoT5Z2MT6VB3Q%3d%3d"
+    },
+    list: {
+      maxWidth: 768,
+      displayType: "67%2be3LHzHbblsB9oLrOpWQ%3d%3d"
+    }
+  };
+  const config = configs[variant] || configs.small;
   return `
     <aside class="tenping-ad-slot tenping-ad-slot--${escapeHtml(variant)}" aria-label="${escapeHtml(label)}">
       <span>Advertisement</span>
@@ -1077,7 +1083,7 @@ function renderJulyFestivals() {
   const feedItems = items.slice(3, 18);
   feed.innerHTML = [
     ...feedItems.slice(0, 5).map((item) => newsListCard(item)),
-    TenpingAdBox("Tenping native advertisement"),
+    TenpingAdBox("Tenping list advertisement", "list"),
     ...feedItems.slice(5).map((item) => newsListCard(item))
   ].join("");
   refreshTenpingAds();

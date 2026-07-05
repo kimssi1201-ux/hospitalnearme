@@ -1395,6 +1395,11 @@ main {
   max-width: 768px;
 }
 
+.tenping-ad-slot--list {
+  max-width: 768px;
+  padding: 12px 14px;
+}
+
 .tenping-ad-slot > span {
   display: block;
   margin: 0 0 10px;

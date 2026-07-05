@@ -281,15 +281,21 @@ function escapeHtml(value) {
 }
 
 function TenpingAdBox(label = "Advertisement", variant = "large") {
-  const config = variant === "small"
-    ? {
-        maxWidth: 580,
-        displayType: "UD8Mia8gyIoT5Z2MT6VB3Q%3d%3d"
-      }
-    : {
-        maxWidth: 768,
-        displayType: "1LawCE8FqKOhetXZhMopsQ%3d%3d"
-      };
+  const configs = {
+    large: {
+      maxWidth: 768,
+      displayType: "1LawCE8FqKOhetXZhMopsQ%3d%3d"
+    },
+    small: {
+      maxWidth: 580,
+      displayType: "UD8Mia8gyIoT5Z2MT6VB3Q%3d%3d"
+    },
+    list: {
+      maxWidth: 768,
+      displayType: "67%2be3LHzHbblsB9oLrOpWQ%3d%3d"
+    }
+  };
+  const config = configs[variant] || configs.large;
   return `
     <aside class="tenping-ad-slot tenping-ad-slot--${escapeHtml(variant)}" aria-label="${escapeHtml(label)}">
       <span>Advertisement</span>
