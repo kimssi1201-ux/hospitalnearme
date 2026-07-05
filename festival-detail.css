@@ -1188,6 +1188,93 @@
   }
 }
 
+/* Final mobile compact override for iOS/Safari detail pages. */
+@media (max-width: 760px) {
+  html,
+  body {
+    -webkit-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+
+  .detail-main {
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+  }
+
+  .blog-header h1,
+  .detail-loading h1 {
+    font-size: 24px !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .blog-lede,
+  .detail-loading p:not(.eyebrow),
+  .blog-body p,
+  .blog-body li,
+  .blog-body dd,
+  .blog-body strong,
+  .blog-body span {
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+    font-weight: 500 !important;
+  }
+
+  .blog-body h2,
+  .travel-summary-box h2,
+  .course-timeline h2,
+  .spot-detail-section h2,
+  .spot-info-card h2,
+  .official-detail-list h2,
+  .nearby-parking-section h2,
+  .nearby-spot-section h2,
+  .travel-tip-box h2,
+  .closing-note h2 {
+    font-size: 20px !important;
+    line-height: 1.28 !important;
+    letter-spacing: -0.015em !important;
+  }
+
+  .blog-body h3,
+  .course-timeline h3,
+  .nearby-spot-grid h3,
+  .parking-card h3 {
+    font-size: 16px !important;
+    line-height: 1.35 !important;
+  }
+
+  .eyebrow,
+  .summary-point-grid span,
+  .spot-info-card dt,
+  .official-detail-grid span,
+  .nearby-spot-grid span,
+  .parking-card dt {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .summary-point-grid article,
+  .spot-info-card dl div,
+  .official-detail-grid article,
+  .parking-card,
+  .parking-card dl div,
+  .nearby-spot-grid article,
+  .timeline-note {
+    padding: 11px 0 !important;
+  }
+
+  .blog-body .travel-summary-box,
+  .blog-body .course-timeline,
+  .blog-body .spot-info-card,
+  .blog-body .official-detail-list,
+  .blog-body .nearby-parking-section,
+  .blog-body .travel-tip-box,
+  .blog-body .closing-note {
+    padding-bottom: 22px !important;
+  }
+}
+
 /* Clean article body: keep information readable without boxed containers. */
 .blog-body .travel-summary-box,
 .blog-body .course-timeline,
