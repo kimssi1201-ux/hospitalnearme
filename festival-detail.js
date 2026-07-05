@@ -305,12 +305,17 @@ function TenpingAdBox(label = "Advertisement", variant = "large") {
 }
 
 function refreshTenpingAds() {
-  document.getElementById("tenping-ad-script")?.remove();
-  const script = document.createElement("script");
-  script.id = "tenping-ad-script";
-  script.async = true;
-  script.src = "https://ads.tenping.kr/scripts/adsbytenping.min.js";
-  document.body.appendChild(script);
+  document.querySelectorAll(".tenping-ad-loader").forEach((script) => {
+    script.parentNode?.removeChild(script);
+  });
+  document.querySelectorAll("tenping.adsbytenping").forEach((slot, index) => {
+    const script = document.createElement("script");
+    script.className = "tenping-ad-loader";
+    script.dataset.tenpingSlot = String(index);
+    script.async = true;
+    script.src = "https://ads.tenping.kr/scripts/adsbytenping.min.js";
+    slot.insertAdjacentElement("afterend", script);
+  });
 }
 
 function stripHtml(value) {
