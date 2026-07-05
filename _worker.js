@@ -3,9 +3,15 @@ const MYREALTRIP_API_BASE = "https://partner-ext-api.myrealtrip.com";
 const MYREALTRIP_ENDPOINTS = {
   "tna-categories": "/v1/products/tna/categories",
   "airport-autocomplete": "/v1/products/flight/airport-autocomplete",
+  "accommodation-region": "/v1/products/accommodation/region-autocomplete",
+  "accommodation-region-autocomplete": "/v1/products/accommodation/region-autocomplete",
   "accommodation-search": "/v1/products/accommodation/search"
 };
 const MYREALTRIP_DEFAULT_ENDPOINT = `${MYREALTRIP_API_BASE}${MYREALTRIP_ENDPOINTS["tna-categories"]}`;
+const MYREALTRIP_POST_PATHS = new Set([
+  "/v1/products/accommodation/region-autocomplete",
+  "/v1/products/accommodation/search"
+]);
 
 export default {
   async fetch(request, env) {
@@ -39,8 +45,8 @@ async function handleMyRealTripApi(request, env) {
     });
   }
 
-  if (request.method !== "GET") {
-    return jsonResponse({ ok: false, message: "GET method required." }, 405, request);
+  if (request.method !== "GET" && request.method !== "POST") {
+    return jsonResponse({ ok: false, message: "GET or POST method required." }, 405, request);
   }
 
   if (!isSameOriginRequest(request)) {
@@ -79,18 +85,25 @@ async function handleMyRealTripApi(request, env) {
         request
       );
     }
-    requestUrl.searchParams.forEach((value, key) => {
-      if (key === "type" || key === "endpoint") return;
-      apiUrl.searchParams.set(key, value);
-    });
-
-    const response = await fetch(apiUrl.toString(), {
+    const shouldPost = request.method === "POST" || MYREALTRIP_POST_PATHS.has(apiUrl.pathname);
+    const proxyParams = collectProxyParams(requestUrl.searchParams);
+    const requestInit = {
+      method: shouldPost ? "POST" : "GET",
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${apiKey}`,
         "x-api-key": apiKey
       }
-    });
+    };
+
+    if (shouldPost) {
+      requestInit.headers["Content-Type"] = "application/json";
+      requestInit.body = JSON.stringify(await buildMyRealTripPostBody(request, apiUrl.pathname, proxyParams));
+    } else {
+      Object.entries(proxyParams).forEach(([key, value]) => apiUrl.searchParams.set(key, value));
+    }
+
+    const response = await fetch(apiUrl.toString(), requestInit);
     const contentType = response.headers.get("content-type") || "";
     const payload = contentType.includes("application/json")
       ? await response.json()
@@ -139,6 +152,70 @@ function normalizeMyRealTripEndpoint(value) {
   if (MYREALTRIP_ENDPOINTS[endpoint]) return `${MYREALTRIP_API_BASE}${MYREALTRIP_ENDPOINTS[endpoint]}`;
   if (endpoint.startsWith("/")) return `${MYREALTRIP_API_BASE}${endpoint}`;
   return endpoint;
+}
+
+function collectProxyParams(searchParams) {
+  const params = {};
+  searchParams.forEach((value, key) => {
+    if (key === "type" || key === "endpoint") return;
+    params[key] = value;
+  });
+  return params;
+}
+
+async function buildMyRealTripPostBody(request, pathname, queryParams) {
+  const postedBody = request.method === "POST" ? await readJsonBody(request) : {};
+  const body = { ...queryParams, ...postedBody };
+
+  if (pathname === "/v1/products/accommodation/region-autocomplete") {
+    return {
+      keyword: String(body.keyword || body.q || body.search || "서울").trim(),
+      isDomestic: parseBoolean(body.isDomestic, true)
+    };
+  }
+
+  if (pathname === "/v1/products/accommodation/search") {
+    const checkIn = body.checkIn || dateOffset(1);
+    const checkOut = body.checkOut || dateOffset(2);
+    const searchBody = {
+      regionId: parseInteger(body.regionId, 178308),
+      checkIn,
+      checkOut,
+      adultCount: parseInteger(body.adultCount, 2),
+      childCount: parseInteger(body.childCount, 0),
+      page: parseInteger(body.page, 0),
+      size: parseInteger(body.size, 10)
+    };
+    if (body.starRating) searchBody.starRating = String(body.starRating);
+    return searchBody;
+  }
+
+  return body;
+}
+
+async function readJsonBody(request) {
+  try {
+    return await request.json();
+  } catch (_) {
+    return {};
+  }
+}
+
+function parseBoolean(value, fallback) {
+  if (value === true || value === false) return value;
+  if (value == null || value === "") return fallback;
+  return String(value).toLowerCase() === "true";
+}
+
+function parseInteger(value, fallback) {
+  const number = Number.parseInt(value, 10);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+function dateOffset(days) {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
 }
 
 async function handleSeoulEventsApi(request, env) {
