@@ -649,6 +649,68 @@ function renderMrtFlightCard(item) {
   `;
 }
 
+function mrtFeedImage(url, title) {
+  return `
+    <div class="image-frame image-frame--feed mrt-feed-thumb">
+      ${url
+        ? `<img src="${escapeHtml(url)}" alt="${escapeHtml(title)}" loading="lazy" />`
+        : `<span aria-hidden="true">SN</span>`}
+    </div>
+  `;
+}
+
+function renderMrtFeedProduct(kind, item) {
+  if (!item) return "";
+  const isStay = kind === "stay";
+  const title = item.itemName || (isStay ? "서울 숙소" : "서울 투어·티켓");
+  const label = isStay ? "서울 숙소 추천" : "서울 투어·티켓";
+  const meta = isStay
+    ? `${formatWon(item.salePrice || item.originalPrice)} · 평점 ${item.reviewScore || "확인"}`
+    : `${item.priceDisplay || formatWon(item.salePrice)} · 평점 ${item.reviewScore || "확인"}`;
+  const url = item.productUrl || "#";
+  return `
+    <article class="news-list-card mrt-feed-card">
+      <a href="${escapeHtml(url)}" target="_blank" rel="sponsored noopener noreferrer" aria-label="${escapeHtml(`${title} 상품 보기`)}">
+        ${mrtFeedImage(item.imageUrl, title)}
+        <span>
+          <em>${escapeHtml(label)}</em>
+          <strong>${escapeHtml(title)}</strong>
+          <small>${escapeHtml(meta)} · 상품 보기</small>
+        </span>
+      </a>
+    </article>
+  `;
+}
+
+function renderMrtFeedFlight(item) {
+  if (!item) return "";
+  const title = `${item.fromCity || "ICN"} → ${item.toCity || "BKK"} 항공 최저가`;
+  const schedule = `${formatMrtDate(item.departureDate)} 출발${item.returnDate ? ` · ${formatMrtDate(item.returnDate)} 귀국` : ""}`;
+  return `
+    <article class="news-list-card mrt-feed-card mrt-feed-card--flight">
+      <a href="#july" aria-label="${escapeHtml(title)}">
+        <div class="image-frame image-frame--feed mrt-feed-thumb mrt-feed-thumb--flight" aria-hidden="true">
+          <span>AIR</span>
+        </div>
+        <span>
+          <em>항공 최저가</em>
+          <strong>${escapeHtml(title)}</strong>
+          <small>${escapeHtml(formatWon(item.totalPrice))} · ${escapeHtml(schedule)} · ${escapeHtml(item.airline || "항공사 확인")}</small>
+        </span>
+      </a>
+    </article>
+  `;
+}
+
+function myRealTripFeedCards() {
+  if (!state.myrealtrip.loaded) return [];
+  return [
+    renderMrtFeedProduct("tour", state.myrealtrip.tours[0]),
+    renderMrtFeedProduct("stay", state.myrealtrip.stays[0]),
+    renderMrtFeedFlight(state.myrealtrip.flights[0])
+  ].filter(Boolean);
+}
+
 function renderMrtPanel(title, subtitle, items, renderer, emptyText) {
   return `
     <section class="mrt-panel">
@@ -755,6 +817,7 @@ async function loadMyRealTripProducts() {
   }
 
   renderMyRealTripProducts();
+  renderJulyFestivals();
 }
 
 function categoryFeaturedCard(item) {
@@ -1306,11 +1369,17 @@ function renderJulyFestivals() {
 
   recommended.innerHTML = items.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
   const feedItems = items.slice(3, 18);
+  const mrtCards = myRealTripFeedCards();
   feed.innerHTML = [
-    ...feedItems.slice(0, 5).map((item) => newsListCard(item)),
+    ...feedItems.slice(0, 4).map((item) => newsListCard(item)),
+    mrtCards[0] || "",
+    ...feedItems.slice(4, 8).map((item) => newsListCard(item)),
     TenpingAdBox("Tenping list advertisement", "list"),
-    ...feedItems.slice(5).map((item) => newsListCard(item))
-  ].join("");
+    mrtCards[1] || "",
+    ...feedItems.slice(8, 12).map((item) => newsListCard(item)),
+    mrtCards[2] || "",
+    ...feedItems.slice(12).map((item) => newsListCard(item))
+  ].filter(Boolean).join("");
   refreshTenpingAds();
 }
 

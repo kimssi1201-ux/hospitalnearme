@@ -671,6 +671,48 @@ main {
   font-size: 13px;
 }
 
+.mrt-feed-card {
+  border-color: #d8e5dd;
+  background: linear-gradient(0deg, #f8fbf9, #fff);
+}
+
+.mrt-feed-card a {
+  min-height: 112px;
+}
+
+.mrt-feed-card em {
+  color: var(--accent);
+}
+
+.mrt-feed-card small {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.mrt-feed-thumb {
+  background: var(--accent-soft);
+}
+
+.mrt-feed-thumb span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.mrt-feed-card--flight {
+  border-color: #e0d4c4;
+  background: #fffaf2;
+}
+
+.mrt-feed-card--flight .mrt-feed-thumb {
+  background: #efe2cf;
+}
+
 .category-news-wrapper {
   padding: 18px 0 50px;
   border-top: 1px solid var(--line);
