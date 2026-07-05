@@ -2263,6 +2263,91 @@ function CleanClosingSection(article) {
   `;
 }
 
+function bookingSearchUrl(kind, article) {
+  const params = new URLSearchParams({ booking: kind });
+  const region = travelRegionName(article) || "서울";
+  const title = localizedEventReference(article);
+
+  if (kind === "stay") params.set("keyword", region);
+  if (kind === "tour") params.set("keyword", `${title} 서울`);
+  if (kind === "flight") {
+    params.set("depCityCd", "ICN");
+    params.set("arrCityCds", "CJU,BKK,NRT");
+  }
+
+  return `index.html?${params.toString()}#bookingSearch`;
+}
+
+function bookingCheckCopy(article) {
+  const eventName = localizedEventReference(article);
+  const region = travelRegionName(article) || "서울";
+  const table = {
+    ko: {
+      eyebrow: "Before You Go",
+      title: "방문 전 예약 체크",
+      desc: `${eventName} 방문 전에는 일정뿐 아니라 숙소, 입장권, 이동 계획까지 함께 확인하면 동선이 훨씬 안정적입니다.`,
+      cards: [
+        ["stay", "근처 숙소 찾기", `${region} 주변 숙소 위치와 가격을 비교해 보세요.`, "숙소 검색"],
+        ["tour", "관련 티켓 보기", "전시, 공연, 체험 상품을 함께 확인해 보세요.", "티켓 검색"],
+        ["flight", "항공권 확인", "서울 출발 항공권 흐름을 빠르게 비교해 보세요.", "항공권 검색"]
+      ]
+    },
+    en: {
+      eyebrow: "Before You Go",
+      title: "Check bookings before your visit",
+      desc: `Before visiting ${eventName}, compare nearby stays, tickets, and transport options so the day is easier to plan.`,
+      cards: [
+        ["stay", "Nearby stays", `Compare places to stay around ${region}.`, "Search stays"],
+        ["tour", "Tickets and activities", "Check related exhibitions, shows, and activities.", "Search tickets"],
+        ["flight", "Flights", "Compare flight price trends from Seoul.", "Search flights"]
+      ]
+    },
+    ja: {
+      eyebrow: "Before You Go",
+      title: "訪問前の予約チェック",
+      desc: `${eventName}へ行く前に、周辺宿泊、チケット、移動手段を一緒に確認すると計画しやすくなります。`,
+      cards: [
+        ["stay", "周辺宿泊を探す", `${region}周辺の宿泊先を比較できます。`, "宿泊検索"],
+        ["tour", "関連チケットを見る", "展示、公演、体験商品を確認できます。", "チケット検索"],
+        ["flight", "航空券を確認", "ソウル発の航空券の流れを比較できます。", "航空券検索"]
+      ]
+    },
+    zh: {
+      eyebrow: "Before You Go",
+      title: "出发前预约确认",
+      desc: `前往 ${eventName} 之前，建议同时查看附近住宿、门票和交通安排。`,
+      cards: [
+        ["stay", "查找附近住宿", `比较 ${region} 周边住宿。`, "搜索住宿"],
+        ["tour", "查看相关门票", "查看展览、演出和体验商品。", "搜索门票"],
+        ["flight", "查看机票", "比较首尔出发机票价格趋势。", "搜索机票"]
+      ]
+    }
+  };
+
+  return table[state.language] || table.ko;
+}
+
+function BookingCheckSection(article) {
+  const copy = bookingCheckCopy(article);
+  return `
+    <section class="booking-check-section" aria-labelledby="bookingCheckTitle">
+      <p class="eyebrow">${escapeHtml(copy.eyebrow)}</p>
+      <h2 id="bookingCheckTitle">${escapeHtml(copy.title)}</h2>
+      <p>${escapeHtml(copy.desc)}</p>
+      <div class="booking-check-grid">
+        ${copy.cards.map(([kind, title, body, cta]) => `
+          <a class="booking-check-card" href="${escapeHtml(bookingSearchUrl(kind, article))}">
+            <span>${escapeHtml(kind === "stay" ? "STAY" : kind === "tour" ? "TICKET" : "AIR")}</span>
+            <strong>${escapeHtml(title)}</strong>
+            <small>${escapeHtml(body)}</small>
+            <em>${escapeHtml(cta)}</em>
+          </a>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function renderTravelDetailBody(article, sections) {
   return `
     ${CleanIntroSection(article)}
@@ -2272,6 +2357,7 @@ function renderTravelDetailBody(article, sections) {
     ${CleanOfficialInfoSection(article)}
     ${NearbyParkingSection(article)}
     ${CleanVisitTipSection(article)}
+    ${BookingCheckSection(article)}
     ${CleanClosingSection(article)}
   `;
 }

@@ -728,20 +728,20 @@ function renderMrtFeedFlight(item) {
 function renderMrtSearchAdCard(kind) {
   const configs = {
     stay: {
-      label: "추천 광고 · 숙소",
-      title: "서울 숙소 조건별로 다시 찾기",
-      meta: "체크인, 지역, 인원 기준으로 숙소 검색",
+      label: "방문 전 체크 · 숙소",
+      title: "행사장 근처 숙소 다시 찾기",
+      meta: "체크인, 지역, 인원 기준으로 비교",
       thumb: "STAY"
     },
     tour: {
-      label: "추천 광고 · 투어·티켓",
-      title: "서울 입장권과 체험 상품 검색",
+      label: "방문 전 체크 · 티켓",
+      title: "관련 입장권과 체험 상품 보기",
       meta: "공연, 전시, 체험, 투어 상품 확인",
       thumb: "TICKET"
     },
     flight: {
-      label: "추천 광고 · 항공권",
-      title: "서울 출발 항공권 최저가 검색",
+      label: "방문 전 체크 · 항공권",
+      title: "서울 출발 항공권 흐름 확인",
       meta: "도착지와 여행 기간 기준으로 비교",
       thumb: "AIR"
     }
@@ -763,6 +763,8 @@ function renderMrtSearchAdCard(kind) {
     </article>
   `;
 }
+
+const MRT_FEED_INTERVAL = 6;
 
 function myRealTripFeedCards() {
   if (!state.myrealtrip.loaded) return [];
@@ -804,8 +806,8 @@ function buildNewsFeedMarkup(feedItems, seed = "main") {
     const articleNumber = index + 1;
     blocks.push(newsListCard(item));
 
-    if (articleNumber % 3 === 0 && mrtCards.length) {
-      const mrtIndex = (articleNumber / 3 - 1 + offset) % mrtCards.length;
+    if (articleNumber % MRT_FEED_INTERVAL === 0 && mrtCards.length) {
+      const mrtIndex = (articleNumber / MRT_FEED_INTERVAL - 1 + offset) % mrtCards.length;
       blocks.push(mrtCards[mrtIndex]);
     }
   });
@@ -822,8 +824,8 @@ function buildCategoryListMarkup(items, seed = "category") {
     const articleNumber = index + 1;
     blocks.push(categoryListCard(item));
 
-    if (articleNumber % 3 === 0 && mrtCards.length) {
-      const mrtIndex = (articleNumber / 3 - 1 + offset) % mrtCards.length;
+    if (articleNumber % MRT_FEED_INTERVAL === 0 && mrtCards.length) {
+      const mrtIndex = (articleNumber / MRT_FEED_INTERVAL - 1 + offset) % mrtCards.length;
       blocks.push(mrtCards[mrtIndex]);
     }
   });
@@ -2057,6 +2059,37 @@ function bindBookingSearchPanel() {
   });
 }
 
+function applyBookingSearchQuery() {
+  const params = new URLSearchParams(window.location.search);
+  const requestedTab = params.get("booking") || params.get("mrt");
+  const shouldOpen = window.location.hash === "#bookingSearch" || Boolean(requestedTab);
+  if (!shouldOpen) return;
+
+  const allowedTabs = ["stay", "tour", "flight"];
+  const tab = allowedTabs.includes(requestedTab) ? requestedTab : state.activeMrtTab || "stay";
+  const keyword = params.get("keyword");
+
+  if (keyword && tab === "stay") {
+    const input = $("#mrtStayForm")?.elements.keyword;
+    if (input) input.value = keyword;
+  }
+
+  if (keyword && tab === "tour") {
+    const input = $("#mrtTourForm")?.elements.keyword;
+    if (input) input.value = keyword;
+  }
+
+  if (tab === "flight") {
+    const flightForm = $("#mrtFlightForm");
+    const depCity = params.get("depCityCd");
+    const arrCities = params.get("arrCityCds");
+    if (flightForm?.elements.depCityCd && depCity) flightForm.elements.depCityCd.value = depCity;
+    if (flightForm?.elements.arrCityCds && arrCities) flightForm.elements.arrCityCds.value = arrCities;
+  }
+
+  window.setTimeout(() => openBookingSearch(tab), 120);
+}
+
 function bindRegionLinks() {
   document.addEventListener("click", (event) => {
     const link = event.target.closest("a[data-region-id]");
@@ -2103,6 +2136,7 @@ function init() {
   bindTopCategoryTabs();
   bindLanguageSwitch();
   applyLanguage();
+  applyBookingSearchQuery();
   loadSeoulCultureEvents();
   loadJulyFestivalPosts();
   loadMyRealTripProducts();
