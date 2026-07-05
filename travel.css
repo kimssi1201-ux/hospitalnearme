@@ -713,6 +713,15 @@ main {
   background: #efe2cf;
 }
 
+.mrt-feed-card--cta {
+  border-style: dashed;
+  background: #fbfaf6;
+}
+
+.mrt-feed-card--cta .mrt-feed-thumb {
+  background: #f0eadf;
+}
+
 .category-news-wrapper {
   padding: 18px 0 50px;
   border-top: 1px solid var(--line);

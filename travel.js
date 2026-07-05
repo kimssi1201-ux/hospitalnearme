@@ -725,6 +725,45 @@ function renderMrtFeedFlight(item) {
   `;
 }
 
+function renderMrtSearchAdCard(kind) {
+  const configs = {
+    stay: {
+      label: "추천 광고 · 숙소",
+      title: "서울 숙소 조건별로 다시 찾기",
+      meta: "체크인, 지역, 인원 기준으로 숙소 검색",
+      thumb: "STAY"
+    },
+    tour: {
+      label: "추천 광고 · 투어·티켓",
+      title: "서울 입장권과 체험 상품 검색",
+      meta: "공연, 전시, 체험, 투어 상품 확인",
+      thumb: "TICKET"
+    },
+    flight: {
+      label: "추천 광고 · 항공권",
+      title: "서울 출발 항공권 최저가 검색",
+      meta: "도착지와 여행 기간 기준으로 비교",
+      thumb: "AIR"
+    }
+  };
+  const config = configs[kind] || configs.tour;
+
+  return `
+    <article class="news-list-card mrt-feed-card mrt-feed-card--cta">
+      <a href="#bookingSearch" data-mrt-open="${escapeHtml(kind)}" aria-label="${escapeHtml(config.title)}">
+        <div class="image-frame image-frame--feed mrt-feed-thumb" aria-hidden="true">
+          <span>${escapeHtml(config.thumb)}</span>
+        </div>
+        <span>
+          <em>${escapeHtml(config.label)}</em>
+          <strong>${escapeHtml(config.title)}</strong>
+          <small>${escapeHtml(config.meta)}</small>
+        </span>
+      </a>
+    </article>
+  `;
+}
+
 function myRealTripFeedCards() {
   if (!state.myrealtrip.loaded) return [];
   const cards = [];
@@ -740,6 +779,12 @@ function myRealTripFeedCards() {
       renderMrtFeedFlight(flights[index])
     );
   }
+
+  cards.push(
+    renderMrtSearchAdCard("stay"),
+    renderMrtSearchAdCard("tour"),
+    renderMrtSearchAdCard("flight")
+  );
 
   return cards.filter(Boolean);
 }
