@@ -766,29 +766,110 @@ function renderMrtSearchAdCard(kind) {
 
 const MRT_FEED_INTERVAL = 6;
 
-function myRealTripFeedCards() {
+function mrtProductLinkAttrs(kind, item = {}) {
+  if (item.productUrl) {
+    return `href="${escapeHtml(item.productUrl)}" target="_blank" rel="sponsored noopener noreferrer"`;
+  }
+  const tab = kind === "stay" ? "stay" : "tour";
+  const keyword = kind === "stay" ? "서울" : "서울 입장권";
+  return `href="#bookingSearch" data-mrt-open="${tab}" data-mrt-keyword="${escapeHtml(keyword)}"`;
+}
+
+function renderMrtRailProduct(kind, item = {}) {
+  const isStay = kind === "stay";
+  const title = item.itemName || (isStay ? "서울 숙소 검색" : "서울 투어·티켓 검색");
+  const category = isStay ? "국내숙소" : item.category || "투어·티켓";
+  const price = item.priceDisplay || formatWon(item.salePrice || item.originalPrice);
+  const rating = item.reviewScore ? `★ ${item.reviewScore}` : "";
+  const meta = [rating, price].filter(Boolean).join(" · ");
+
+  return `
+    <article class="mrt-rail-card">
+      <a ${mrtProductLinkAttrs(kind, item)} aria-label="${escapeHtml(title)}">
+        <div class="mrt-rail-image">
+          ${item.imageUrl
+            ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(title)}" loading="lazy" />`
+            : `<span aria-hidden="true">${escapeHtml(isStay ? "STAY" : "TICKET")}</span>`}
+        </div>
+        <div class="mrt-rail-copy">
+          <em>${escapeHtml(category)}</em>
+          <strong>${escapeHtml(title)}</strong>
+          <small>${escapeHtml(meta || "조건별로 상품 보기")}</small>
+        </div>
+      </a>
+    </article>
+  `;
+}
+
+function renderMrtRailSearchCard(kind) {
+  const isStay = kind === "stay";
+  const title = isStay ? "서울 숙소 조건별 검색" : "서울 입장권·체험 검색";
+  const label = isStay ? "국내숙소" : "투어·티켓";
+  const body = isStay ? "지역, 체크인, 인원 기준으로 비교" : "전시, 공연, 체험 상품 한 번에 확인";
+
+  return `
+    <article class="mrt-rail-card mrt-rail-card--cta">
+      <a href="#bookingSearch" data-mrt-open="${isStay ? "stay" : "tour"}" data-mrt-keyword="${escapeHtml(isStay ? "서울" : "서울 입장권")}" aria-label="${escapeHtml(title)}">
+        <div class="mrt-rail-image" aria-hidden="true">
+          <span>${escapeHtml(isStay ? "STAY" : "TICKET")}</span>
+        </div>
+        <div class="mrt-rail-copy">
+          <em>${escapeHtml(label)}</em>
+          <strong>${escapeHtml(title)}</strong>
+          <small>${escapeHtml(body)}</small>
+        </div>
+      </a>
+    </article>
+  `;
+}
+
+function myRealTripFeedRailItems() {
   if (!state.myrealtrip.loaded) return [];
-  const cards = [];
+  const items = [];
   const tours = state.myrealtrip.tours.slice(0, 6);
-  const stays = state.myrealtrip.stays.slice(0, 6);
-  const flights = state.myrealtrip.flights.slice(0, 6);
-  const maxLength = Math.max(tours.length, stays.length, flights.length);
+  const stays = state.myrealtrip.stays.slice(0, 4);
+  const maxLength = Math.max(tours.length, stays.length);
 
   for (let index = 0; index < maxLength; index += 1) {
-    cards.push(
-      renderMrtFeedProduct("tour", tours[index]),
-      renderMrtFeedProduct("stay", stays[index]),
-      renderMrtFeedFlight(flights[index])
-    );
+    if (tours[index]) items.push(renderMrtRailProduct("tour", tours[index]));
+    if (index % 2 === 0 && stays[index]) items.push(renderMrtRailProduct("stay", stays[index]));
   }
 
-  cards.push(
-    renderMrtSearchAdCard("stay"),
-    renderMrtSearchAdCard("tour"),
-    renderMrtSearchAdCard("flight")
+  items.push(
+    renderMrtRailSearchCard("tour"),
+    renderMrtRailSearchCard("stay")
   );
 
-  return cards.filter(Boolean);
+  return items.filter(Boolean);
+}
+
+function renderMrtFeedModule(seed = "main", position = 0) {
+  const items = myRealTripFeedRailItems();
+  if (!items.length) return "";
+
+  const offset = (adRotationOffset(seed) + position) % items.length;
+  const rotated = [...items.slice(offset), ...items.slice(0, offset)];
+  const visible = rotated.slice(0, Math.min(4, rotated.length));
+
+  return `
+    <section class="mrt-feed-module" aria-label="서울 여행 예약 추천">
+      <div class="mrt-feed-module-head">
+        <div>
+          <p class="eyebrow">Travel Pick</p>
+          <h3>서울에서 주목할 만한 상품</h3>
+        </div>
+        <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권">더보기</a>
+      </div>
+      <div class="mrt-feed-tabs" aria-label="상품 종류">
+        <span class="is-active">투어·티켓</span>
+        <span>국내숙소</span>
+        <span>입장권</span>
+      </div>
+      <div class="mrt-rail">
+        ${visible.join("")}
+      </div>
+    </section>
+  `;
 }
 
 function adRotationOffset(seed = "") {
@@ -799,16 +880,13 @@ function adRotationOffset(seed = "") {
 
 function buildNewsFeedMarkup(feedItems, seed = "main") {
   const blocks = [];
-  const mrtCards = myRealTripFeedCards();
-  const offset = adRotationOffset(seed);
 
   feedItems.forEach((item, index) => {
     const articleNumber = index + 1;
     blocks.push(newsListCard(item));
 
-    if (articleNumber % MRT_FEED_INTERVAL === 0 && mrtCards.length) {
-      const mrtIndex = (articleNumber / MRT_FEED_INTERVAL - 1 + offset) % mrtCards.length;
-      blocks.push(mrtCards[mrtIndex]);
+    if (articleNumber % MRT_FEED_INTERVAL === 0) {
+      blocks.push(renderMrtFeedModule(seed, articleNumber / MRT_FEED_INTERVAL));
     }
   });
 
@@ -817,16 +895,13 @@ function buildNewsFeedMarkup(feedItems, seed = "main") {
 
 function buildCategoryListMarkup(items, seed = "category") {
   const blocks = [];
-  const mrtCards = myRealTripFeedCards();
-  const offset = adRotationOffset(seed);
 
   items.forEach((item, index) => {
     const articleNumber = index + 1;
     blocks.push(categoryListCard(item));
 
-    if (articleNumber % MRT_FEED_INTERVAL === 0 && mrtCards.length) {
-      const mrtIndex = (articleNumber / MRT_FEED_INTERVAL - 1 + offset) % mrtCards.length;
-      blocks.push(mrtCards[mrtIndex]);
+    if (articleNumber % MRT_FEED_INTERVAL === 0) {
+      blocks.push(renderMrtFeedModule(seed, articleNumber / MRT_FEED_INTERVAL));
     }
   });
 
@@ -2021,6 +2096,11 @@ function bindFooterLinks() {
     event.preventDefault();
 
     const keyword = link.getAttribute("data-mrt-keyword");
+    if (keyword && tab === "stay") {
+      const input = $("#mrtStayForm")?.elements.keyword;
+      if (input) input.value = keyword;
+    }
+
     if (keyword && tab === "tour") {
       const input = $("#mrtTourForm")?.elements.keyword;
       if (input) input.value = keyword;
