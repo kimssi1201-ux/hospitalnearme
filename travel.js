@@ -10,6 +10,7 @@ const state = {
     loaded: false,
     error: false
   },
+  activeMrtTab: "stay",
   apiLoaded: false,
   apiError: false,
   activeRegionId: "seoul",
@@ -764,6 +765,35 @@ function renderMrtPanel(title, subtitle, items, renderer, emptyText) {
   `;
 }
 
+function activeMrtPanelConfig() {
+  const tab = state.activeMrtTab || "stay";
+  if (tab === "tour") {
+    return {
+      title: "투어·티켓 검색 결과",
+      subtitle: "입장권, 체험, 공연, 투어 상품을 검색 조건에 맞춰 보여드립니다.",
+      items: state.myrealtrip.tours.slice(0, 9),
+      renderer: renderMrtTourCard,
+      emptyText: "표시할 투어·티켓 상품이 없습니다. 검색어를 바꿔 다시 시도해 주세요."
+    };
+  }
+  if (tab === "flight") {
+    return {
+      title: "항공권 검색 결과",
+      subtitle: "출발지와 도착지 기준으로 확인 가능한 최저가 흐름을 보여드립니다.",
+      items: state.myrealtrip.flights.slice(0, 9),
+      renderer: renderMrtFlightCard,
+      emptyText: "표시할 항공권 정보가 없습니다. 도착 공항 코드를 바꿔 다시 검색해 주세요."
+    };
+  }
+  return {
+    title: "숙소 검색 결과",
+    subtitle: "지역, 체크인 날짜, 인원 조건에 맞는 숙소를 보여드립니다.",
+    items: state.myrealtrip.stays.slice(0, 9),
+    renderer: renderMrtStayCard,
+    emptyText: "표시할 숙소 상품이 없습니다. 지역이나 날짜를 바꿔 다시 검색해 주세요."
+  };
+}
+
 function renderMyRealTripProducts() {
   const grid = $("#myrealtripGrid");
   const status = $("#myrealtripStatus");
@@ -785,6 +815,17 @@ function renderMyRealTripProducts() {
 
   status.textContent = "";
   status.hidden = true;
+  grid.classList.add("is-single");
+  const activePanel = activeMrtPanelConfig();
+  grid.innerHTML = renderMrtPanel(
+    activePanel.title,
+    activePanel.subtitle,
+    activePanel.items,
+    activePanel.renderer,
+    activePanel.emptyText
+  );
+  return;
+
   grid.innerHTML = [
     renderMrtPanel(
       "서울 투어·티켓",
@@ -832,6 +873,7 @@ function setDefaultMrtDates() {
 }
 
 function setActiveMrtTab(tab) {
+  state.activeMrtTab = tab || "stay";
   document.querySelectorAll("[data-mrt-tab]").forEach((button) => {
     const isActive = button.dataset.mrtTab === tab;
     button.classList.toggle("is-active", isActive);
@@ -840,6 +882,7 @@ function setActiveMrtTab(tab) {
   document.querySelectorAll("[data-mrt-form]").forEach((form) => {
     form.classList.toggle("is-active", form.dataset.mrtForm === tab);
   });
+  renderMyRealTripProducts();
 }
 
 function regionIdFromAutocomplete(payload) {
@@ -848,6 +891,7 @@ function regionIdFromAutocomplete(payload) {
 }
 
 async function searchMrtStay(form) {
+  state.activeMrtTab = "stay";
   const values = formValues(form);
   setMrtSearchStatus("숙소를 검색하는 중입니다.");
   const regionPayload = await fetchMyRealTrip("accommodation-region-autocomplete", {
@@ -873,6 +917,7 @@ async function searchMrtStay(form) {
 }
 
 async function searchMrtTour(form) {
+  state.activeMrtTab = "tour";
   const values = formValues(form);
   setMrtSearchStatus("투어·티켓을 검색하는 중입니다.");
   const payload = await fetchMyRealTrip("tna-search", {
@@ -892,6 +937,7 @@ async function searchMrtTour(form) {
 }
 
 async function searchMrtFlight(form) {
+  state.activeMrtTab = "flight";
   const values = formValues(form);
   setMrtSearchStatus("항공권 최저가를 검색하는 중입니다.");
   const payload = await fetchMyRealTrip("flight-calendar-lowest", {

@@ -804,6 +804,14 @@ main {
   gap: 16px;
 }
 
+.mrt-grid.is-single {
+  grid-template-columns: minmax(0, 760px);
+}
+
+.mrt-grid.is-single .mrt-panel {
+  width: 100%;
+}
+
 .mrt-panel {
   min-width: 0;
   padding: 16px;
