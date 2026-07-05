@@ -1,4 +1,6 @@
 const OPENAI_ENDPOINT = "https://api.openai.com/v1/responses";
+const MYREALTRIP_API_BASE = "https://partner-ext-api.myrealtrip.com";
+const MYREALTRIP_DEFAULT_ENDPOINT = `${MYREALTRIP_API_BASE}/v1/products/accommodation/search`;
 
 export default {
   async fetch(request, env) {
@@ -41,7 +43,7 @@ async function handleMyRealTripApi(request, env) {
   }
 
   const apiKey = String(env.MYREALTRIP_API_KEY || "").trim();
-  const endpoint = String(env.MYREALTRIP_API_ENDPOINT || "").trim();
+  const endpoint = normalizeMyRealTripEndpoint(env.MYREALTRIP_API_ENDPOINT);
 
   if (!apiKey) {
     return jsonResponse(
@@ -49,18 +51,6 @@ async function handleMyRealTripApi(request, env) {
         ok: false,
         code: "missing_myrealtrip_key",
         message: "MYREALTRIP_API_KEY 환경변수가 설정되지 않았습니다."
-      },
-      500,
-      request
-    );
-  }
-
-  if (!endpoint) {
-    return jsonResponse(
-      {
-        ok: false,
-        code: "missing_myrealtrip_endpoint",
-        message: "MYREALTRIP_API_ENDPOINT 환경변수가 설정되지 않았습니다. 마이리얼트립 API 문서의 실제 요청 URL을 등록해야 합니다."
       },
       500,
       request
@@ -133,6 +123,13 @@ async function handleMyRealTripApi(request, env) {
       request
     );
   }
+}
+
+function normalizeMyRealTripEndpoint(value) {
+  const endpoint = String(value || "").trim();
+  if (!endpoint) return MYREALTRIP_DEFAULT_ENDPOINT;
+  if (endpoint.startsWith("/")) return `${MYREALTRIP_API_BASE}${endpoint}`;
+  return endpoint;
 }
 
 async function handleSeoulEventsApi(request, env) {
