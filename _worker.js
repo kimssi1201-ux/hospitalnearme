@@ -3,12 +3,24 @@ const MYREALTRIP_API_BASE = "https://partner-ext-api.myrealtrip.com";
 const MYREALTRIP_ENDPOINTS = {
   "tna-categories": "/v1/products/tna/categories",
   "airport-autocomplete": "/v1/products/flight/airport-autocomplete",
+  "flight-airport-autocomplete": "/v1/products/flight/airport-autocomplete",
+  "flight-airports": "/v1/products/flight/airports",
+  "flight-calendar": "/v1/products/flight/calendar",
+  "flight-calendar-window": "/v1/products/flight/calendar/window",
+  "flight-calendar-lowest": "/v1/products/flight/calendar/lowest",
+  "flight-calendar-bulk-lowest": "/v1/products/flight/calendar/bulk-lowest",
   "accommodation-region": "/v1/products/accommodation/region-autocomplete",
   "accommodation-region-autocomplete": "/v1/products/accommodation/region-autocomplete",
   "accommodation-search": "/v1/products/accommodation/search"
 };
 const MYREALTRIP_DEFAULT_ENDPOINT = `${MYREALTRIP_API_BASE}${MYREALTRIP_ENDPOINTS["tna-categories"]}`;
 const MYREALTRIP_POST_PATHS = new Set([
+  "/v1/products/flight/airport-autocomplete",
+  "/v1/products/flight/airports",
+  "/v1/products/flight/calendar",
+  "/v1/products/flight/calendar/window",
+  "/v1/products/flight/calendar/lowest",
+  "/v1/products/flight/calendar/bulk-lowest",
   "/v1/products/accommodation/region-autocomplete",
   "/v1/products/accommodation/search"
 ]);
@@ -190,6 +202,55 @@ async function buildMyRealTripPostBody(request, pathname, queryParams) {
     return searchBody;
   }
 
+  if (pathname === "/v1/products/flight/airport-autocomplete") {
+    return {
+      keyword: String(body.keyword || body.q || body.search || "인천").trim(),
+      size: parseInteger(body.size, 5)
+    };
+  }
+
+  if (pathname === "/v1/products/flight/airports") {
+    return {
+      sort: String(body.sort || "airportKoName"),
+      order: String(body.order || "asc"),
+      size: parseInteger(body.size, 10000),
+      page: parseInteger(body.page, 0)
+    };
+  }
+
+  if (pathname === "/v1/products/flight/calendar") {
+    return {
+      depCityCd: normalizeAirportCode(body.depCityCd || body.depAirport || body.from, "ICN"),
+      arrCityCd: normalizeAirportCode(body.arrCityCd || body.arrAirport || body.to, "BKK"),
+      period: parseInteger(body.period, 5),
+      startDate: body.startDate || dateOffset(30),
+      endDate: body.endDate || dateOffset(60)
+    };
+  }
+
+  if (pathname === "/v1/products/flight/calendar/window") {
+    return {
+      depCityCd: normalizeAirportCode(body.depCityCd || body.depAirport || body.from, "ICN"),
+      arrCityCd: normalizeAirportCode(body.arrCityCd || body.arrAirport || body.to, "BKK"),
+      period: parseInteger(body.period, 5)
+    };
+  }
+
+  if (pathname === "/v1/products/flight/calendar/lowest") {
+    return {
+      depCityCd: normalizeAirportCode(body.depCityCd || body.depAirport || body.from, "ICN"),
+      arrCityCds: normalizeAirportCodes(body.arrCityCds || body.arrAirports || body.to, ["BKK", "NRT", "TYO"]),
+      period: parseInteger(body.period, 5)
+    };
+  }
+
+  if (pathname === "/v1/products/flight/calendar/bulk-lowest") {
+    return {
+      depCityCd: normalizeAirportCode(body.depCityCd || body.depAirport || body.from, "ICN"),
+      period: parseInteger(body.period, 5)
+    };
+  }
+
   return body;
 }
 
@@ -216,6 +277,17 @@ function dateOffset(days) {
   const date = new Date();
   date.setDate(date.getDate() + days);
   return date.toISOString().slice(0, 10);
+}
+
+function normalizeAirportCode(value, fallback) {
+  const code = String(value || fallback || "").trim().toUpperCase();
+  return /^[A-Z]{3}$/.test(code) ? code : fallback;
+}
+
+function normalizeAirportCodes(value, fallback) {
+  const list = Array.isArray(value) ? value : String(value || "").split(",");
+  const codes = list.map((code) => normalizeAirportCode(code, "")).filter(Boolean);
+  return codes.length ? codes.slice(0, 50) : fallback;
 }
 
 async function handleSeoulEventsApi(request, env) {
