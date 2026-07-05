@@ -245,7 +245,7 @@ async function handleSeoulParkingApi(request, env) {
     const lat = Number(url.searchParams.get("lat"));
     const lng = Number(url.searchParams.get("lng"));
     const endpoint = `http://openapi.seoul.go.kr:8088/${encodeURIComponent(apiKey)}/json/GetParkInfo/1/${limit}/`;
-    const cacheRequest = new Request(`${url.origin}/api/seoul-parking/cache?limit=${limit}`, { method: "GET" });
+    const cacheRequest = new Request(`${url.origin}/api/seoul-parking/cache?v=2&limit=${limit}`, { method: "GET" });
     const cached = await readCache(cacheRequest);
     let rows;
 
@@ -311,9 +311,9 @@ async function handleSeoulParkingApi(request, env) {
 
 function normalizeParkingRows(row) {
   const rows = Array.isArray(row) ? row : row ? [row] : [];
-  return rows
+  return uniqueParkingRows(rows
     .map(normalizeParkingLot)
-    .filter((item) => item.name);
+    .filter((item) => item.name));
 }
 
 function normalizeParkingLot(item) {
@@ -341,6 +341,16 @@ function normalizeParkingLot(item) {
     lat,
     lng
   };
+}
+
+function uniqueParkingRows(rows) {
+  const seen = new Set();
+  return rows.filter((item) => {
+    const key = `${item.name}|${item.address}`.replace(/\s+/g, "");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function normalizeSeoulLatitude(value) {
