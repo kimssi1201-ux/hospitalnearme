@@ -253,7 +253,6 @@ function mapSeoulCategory(category = "") {
     "전시/미술": { category: "전시/미술", categorySlug: "exhibition" },
     "교육/체험": { category: "교육/체험", categorySlug: "experience" },
     "영화": { category: "영화", categorySlug: "movie" },
-    "기타": { category: "기타", categorySlug: "etc" },
     "클래식": { category: "공연/무대", categorySlug: "performance" },
     "연극": { category: "공연/무대", categorySlug: "performance" },
     "콘서트": { category: "공연/무대", categorySlug: "performance" },
@@ -265,10 +264,10 @@ function mapSeoulCategory(category = "") {
     "축제-관광/체육": { category: "축제", categorySlug: "festival" },
     "축제-전통/역사": { category: "축제", categorySlug: "festival" }
   };
-  const mapped = directMap[value] || { category: "기타", categorySlug: "etc" };
+  const mapped = directMap[value] || { category: "서울 행사", categorySlug: "seoul-event" };
   return {
     rawCategory: value || "서울 문화행사",
-    subCategory: value || "기타",
+    subCategory: value || "서울 문화행사",
     category: mapped.category,
     categorySlug: mapped.categorySlug
   };
@@ -478,20 +477,50 @@ function buildCategoryNewsGroups() {
   const julyItems = state.julyArticles || [];
   const localItems = (julyItems || []).map(withGroupedCategory);
   const allItems = uniqueArticles([...apiItems, ...localItems]);
-  const groupMeta = [
-    { id: "exhibition", title: "전시/미술", subtitle: "미술관, 갤러리, 전시 공간에서 열리는 서울 문화행사" },
-    { id: "performance", title: "공연/무대", subtitle: "클래식, 연극, 콘서트, 무용, 국악, 뮤지컬 공연" },
-    { id: "experience", title: "교육/체험", subtitle: "어린이, 가족, 성인 대상 체험과 강좌 프로그램" },
-    { id: "movie", title: "영화", subtitle: "영화 상영, 영화제, 영상 관련 문화행사" },
-    { id: "festival", title: "축제", subtitle: "문화예술, 관광, 전통, 체육 성격의 서울 축제" },
-    { id: "etc", title: "기타", subtitle: "그 외 서울에서 진행되는 문화행사와 방문 정보" }
-  ];
+  const groupText = {
+    ko: [
+      { id: "exhibition", title: "전시/미술", subtitle: "미술관, 갤러리, 전시 공간에서 열리는 서울 문화행사" },
+      { id: "performance", title: "공연/무대", subtitle: "클래식, 연극, 콘서트, 무용, 국악, 뮤지컬 공연" },
+      { id: "experience", title: "교육/체험", subtitle: "어린이, 가족, 성인 대상 체험과 강좌 프로그램" },
+      { id: "movie", title: "영화", subtitle: "영화 상영, 영화제, 영상 관련 문화행사" },
+      { id: "festival", title: "축제", subtitle: "문화예술, 관광, 전통, 체육 성격의 서울 축제" }
+    ],
+    en: [
+      { id: "exhibition", title: "Exhibitions", subtitle: "Museums, galleries, and art events in Seoul" },
+      { id: "performance", title: "Performances", subtitle: "Classical music, theater, concerts, dance, gugak, and musicals" },
+      { id: "experience", title: "Classes & Experiences", subtitle: "Hands-on programs for children, families, and adults" },
+      { id: "movie", title: "Film", subtitle: "Film screenings, festivals, and media events" },
+      { id: "festival", title: "Festivals", subtitle: "Culture, tourism, tradition, and sports festivals in Seoul" }
+    ],
+    ja: [
+      { id: "exhibition", title: "展示・美術", subtitle: "美術館、ギャラリー、展示空間で開かれるソウルの文化行事" },
+      { id: "performance", title: "公演・舞台", subtitle: "クラシック、演劇、コンサート、舞踊、国楽、ミュージカル" },
+      { id: "experience", title: "教育・体験", subtitle: "子ども、家族、大人向けの体験プログラム" },
+      { id: "movie", title: "映画", subtitle: "映画上映、映画祭、映像関連イベント" },
+      { id: "festival", title: "祭り", subtitle: "文化芸術、観光、伝統、スポーツ系のソウルの祭り" }
+    ],
+    zh: [
+      { id: "exhibition", title: "展览/美术", subtitle: "首尔美术馆、画廊和展览空间的文化活动" },
+      { id: "performance", title: "演出/舞台", subtitle: "古典音乐、戏剧、演唱会、舞蹈、国乐和音乐剧" },
+      { id: "experience", title: "教育/体验", subtitle: "儿童、家庭和成人可参加的体验项目" },
+      { id: "movie", title: "电影", subtitle: "电影放映、电影节和影像相关活动" },
+      { id: "festival", title: "庆典", subtitle: "文化艺术、旅游、传统和体育类首尔庆典" }
+    ]
+  };
+  const groupMeta = groupText[state.language] || groupText.ko;
+  const categoryById = {
+    exhibition: "전시/미술",
+    performance: "공연/무대",
+    experience: "교육/체험",
+    movie: "영화",
+    festival: "축제"
+  };
 
   return groupMeta
     .map((group, index) => ({
       ...group,
       items: categoryItems(
-        allItems.filter((item) => item.category === group.title),
+        allItems.filter((item) => item.category === categoryById[group.id]),
         [],
         index,
         8

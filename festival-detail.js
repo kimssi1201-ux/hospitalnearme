@@ -1520,11 +1520,184 @@ function getFactByLabels(article, labels, fallback = "") {
   return usefulValue(match?.[1]) || usefulValue(fallback);
 }
 
+function cleanCopy() {
+  const table = {
+    ko: {
+      eventContent: "행사 내용",
+      basicInfo: "기본 정보",
+      highlightTitle: "관람 포인트",
+      officialTitle: "상세 안내",
+      visitCheck: "방문 전 체크",
+      closingTitle: "마무리",
+      defaultTarget: "가족, 친구, 연인, 혼자 방문하는 여행자",
+      rowNotes: {
+        date: "방문 날짜와 종료일을 먼저 확인하세요.",
+        place: "지도 앱에서 정확한 입구와 이동 경로를 확인하세요.",
+        time: "프로그램별 시간이 다를 수 있습니다.",
+        fee: "무료 행사도 일부 체험은 유료일 수 있습니다.",
+        target: "동행자 연령 제한 여부를 확인하세요.",
+        subCategory: "서울 문화행사 원본 분류 기준입니다.",
+        contact: "변경 사항은 공식 문의처가 가장 정확합니다."
+      },
+      labels: {
+        date: "일정",
+        place: "장소",
+        time: "운영시간",
+        fee: "입장료",
+        target: "이용대상",
+        subCategory: "세부 분류",
+        contact: "문의"
+      },
+      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 서울 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
+      intro: (title, category, place) => `${title}은 ${category || "서울 행사"} 분야의 행사로, ${place ? `${place}에서 진행됩니다` : "서울 지역에서 진행됩니다"}. 방문자는 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
+      highlights: (article, context, feeText, targetText, scheduleText) => [
+        ["무엇을 볼 수 있나요?", `${article.title}은 ${context.category || "서울 행사"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
+        ["언제 방문하면 좋나요?", `${scheduleText} 일정에 맞춰 운영됩니다. 주말이나 저녁 시간대에는 방문객이 몰릴 수 있어, 사진 촬영이나 여유로운 관람을 원한다면 비교적 이른 시간에 도착하는 편이 좋습니다.`],
+        ["누구에게 잘 맞나요?", `${targetText}에게 참고하기 좋은 행사입니다. 입장료는 ${feeText} 기준으로 확인되며, 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`]
+      ],
+      tips: (place, time, fee) => [
+        time ? `방문 전 ${time} 기준 운영 여부를 한 번 더 확인하세요.` : "방문 전 공식 안내에서 당일 운영 여부를 확인하세요.",
+        place ? `${place} 주변은 행사 시간대에 혼잡할 수 있으므로 대중교통과 주차 동선을 함께 확인하세요.` : "행사장 위치와 이동 동선을 먼저 확인하세요.",
+        fee ? `요금은 ${fee} 기준으로 확인되지만, 체험·예약·좌석·주차 비용은 별도로 운영될 수 있습니다.` : "무료 여부와 사전 예약 필요 여부를 확인하세요.",
+        "야외 행사라면 날씨, 우산이나 우비, 보조배터리, 물을 준비하면 현장 체류가 더 편합니다."
+      ],
+      closing: (title) => `${title}은 일정, 장소, 요금, 이동 정보를 함께 확인하고 방문하면 더 안정적으로 즐길 수 있습니다. 특히 주말이나 방학 기간에는 혼잡도가 높아질 수 있으니 방문 시간을 여유 있게 잡는 것이 좋습니다.`
+    },
+    en: {
+      eventContent: "Event Overview",
+      basicInfo: "Basic Information",
+      highlightTitle: "What to Know",
+      officialTitle: "Additional Details",
+      visitCheck: "Before You Visit",
+      closingTitle: "Final Note",
+      defaultTarget: "families, friends, couples, and solo travelers",
+      rowNotes: {
+        date: "Check both the start and end date before visiting.",
+        place: "Confirm the entrance and route in a map app.",
+        time: "Program times may differ from the main event hours.",
+        fee: "Some activities may require separate payment.",
+        target: "Check whether age or companion restrictions apply.",
+        subCategory: "Original category from the Seoul cultural event data.",
+        contact: "Official contact channels are the safest source for updates."
+      },
+      labels: {
+        date: "Date",
+        place: "Place",
+        time: "Hours",
+        fee: "Fee",
+        target: "Audience",
+        subCategory: "Subcategory",
+        contact: "Contact"
+      },
+      defaultOverview: (title) => `${title} is a Seoul event worth checking with its schedule, place, and operating details before you go. Conditions may change by date and time, so review the official notice before leaving.`,
+      intro: (title, category, place) => `${title} is grouped under ${category || "Seoul events"} and ${place ? `takes place at ${place}` : "takes place in Seoul"}. Plan your route, visit time, and nearby transport after checking the event type and operating information.`,
+      highlights: (article, context, feeText, targetText, scheduleText) => [
+        ["What can you expect?", `${article.title} is useful for visitors comparing Seoul events by date and location. Depending on the event type, exhibitions, performances, workshops, or outdoor programs may be available.`],
+        ["When is a good time to visit?", `The event is scheduled for ${scheduleText}. Weekends and evenings can be crowded, so arrive earlier if you want photos or a slower visit.`],
+        ["Who is it suitable for?", `This event can work well for ${targetText}. Fees are listed as ${feeText}, but some programs may require separate booking or on-site registration.`]
+      ],
+      tips: (place, time, fee) => [
+        time ? `Check same-day operation based on ${time}.` : "Check the official notice before visiting.",
+        place ? `Around ${place}, traffic may increase during event hours. Check public transport and parking routes together.` : "Confirm the venue and route before leaving.",
+        fee ? `The listed fee is ${fee}, but activities, seats, bookings, or parking may cost extra.` : "Check whether admission is free and whether booking is required.",
+        "For outdoor events, check the weather and bring rain gear, a battery pack, and water."
+      ],
+      closing: (title) => `${title} is easier to enjoy when schedule, place, fee, and transport are checked together. Allow extra time on weekends or during school holidays.`
+    },
+    ja: {
+      eventContent: "イベント内容",
+      basicInfo: "基本情報",
+      highlightTitle: "見どころ",
+      officialTitle: "詳細案内",
+      visitCheck: "訪問前チェック",
+      closingTitle: "まとめ",
+      defaultTarget: "家族、友人、カップル、一人旅の旅行者",
+      rowNotes: {
+        date: "開始日と終了日を確認してください。",
+        place: "地図アプリで入口と移動経路を確認してください。",
+        time: "プログラムごとに時間が異なる場合があります。",
+        fee: "一部体験は別料金の場合があります。",
+        target: "年齢制限や同伴条件を確認してください。",
+        subCategory: "ソウル文化行事データの元分類です。",
+        contact: "変更事項は公式問い合わせ先で確認するのが安全です。"
+      },
+      labels: {
+        date: "日程",
+        place: "場所",
+        time: "運営時間",
+        fee: "料金",
+        target: "対象",
+        subCategory: "詳細分類",
+        contact: "問い合わせ"
+      },
+      defaultOverview: (title) => `${title}は、訪問前に日程、場所、運営情報を確認しておきたいソウルのイベントです。日付や時間帯によって状況が変わることがあるため、出発前に公式案内を確認してください。`,
+      intro: (title, category, place) => `${title}は${category || "ソウルイベント"}分野の行事で、${place ? `${place}で開催されます` : "ソウル市内で開催されます"}。イベントの性格と運営情報を確認したうえで、移動経路、観覧時間、周辺交通を一緒に計画すると便利です。`,
+      highlights: (article, context, feeText, targetText, scheduleText) => [
+        ["何が見られますか？", `${article.title}は、日程と場所を基準にソウルのイベントを比較したい人に役立つ情報です。分類によって展示、公演、体験、屋外プログラムなどが運営される場合があります。`],
+        ["いつ訪問するとよいですか？", `${scheduleText}の日程で運営されます。週末や夜の時間帯は混雑しやすいため、写真撮影やゆっくり観覧したい場合は早めの到着がおすすめです。`],
+        ["誰に向いていますか？", `${targetText}に参考になるイベントです。料金は${feeText}基準で確認されますが、一部プログラムは別途予約や現場受付が必要な場合があります。`]
+      ],
+      tips: (place, time, fee) => [
+        time ? `訪問前に${time}基準の運営可否を確認してください。` : "訪問前に公式案内で当日の運営可否を確認してください。",
+        place ? `${place}周辺はイベント時間帯に混雑することがあります。公共交通と駐車動線を一緒に確認してください。` : "会場の位置と移動経路を先に確認してください。",
+        fee ? `料金は${fee}基準ですが、体験・予約・座席・駐車料金は別途発生する場合があります。` : "無料かどうか、事前予約が必要かを確認してください。",
+        "屋外イベントの場合は天気、雨具、補助バッテリー、水を準備すると安心です。"
+      ],
+      closing: (title) => `${title}は、日程、場所、料金、移動情報を一緒に確認して訪問するとより安心して楽しめます。週末や休暇期間は時間に余裕を持って計画してください。`
+    },
+    zh: {
+      eventContent: "活动内容",
+      basicInfo: "基本信息",
+      highlightTitle: "参观重点",
+      officialTitle: "详细说明",
+      visitCheck: "出发前确认",
+      closingTitle: "总结",
+      defaultTarget: "家庭、朋友、情侣和独自旅行者",
+      rowNotes: {
+        date: "请先确认开始和结束日期。",
+        place: "请在地图应用中确认入口和路线。",
+        time: "不同项目的时间可能不同。",
+        fee: "部分体验可能需要另行付费。",
+        target: "请确认年龄或同行限制。",
+        subCategory: "首尔文化活动数据中的原始分类。",
+        contact: "官方联系方式是确认变更信息的可靠渠道。"
+      },
+      labels: {
+        date: "日期",
+        place: "地点",
+        time: "运营时间",
+        fee: "费用",
+        target: "对象",
+        subCategory: "详细分类",
+        contact: "咨询"
+      },
+      defaultOverview: (title) => `${title}是出发前值得确认日程、地点和运营信息的首尔活动。现场情况可能因日期和时间而变化，建议出发前查看官方公告。`,
+      intro: (title, category, place) => `${title}属于${category || "首尔活动"}类别，${place ? `在${place}举行` : "在首尔举行"}。建议先确认活动类型和运营信息，再规划路线、参观时间和周边交通。`,
+      highlights: (article, context, feeText, targetText, scheduleText) => [
+        ["可以看到什么？", `${article.title}适合想按日期和地点比较首尔活动的访客参考。根据活动类型，可能包含展览、演出、体验或户外项目。`],
+        ["什么时候去比较好？", `活动日程为${scheduleText}。周末和晚间可能较拥挤，如果想拍照或从容参观，建议较早到达。`],
+        ["适合哪些人？", `该活动可供${targetText}参考。费用以${feeText}为准，但部分项目可能需要另行预约或现场登记。`]
+      ],
+      tips: (place, time, fee) => [
+        time ? `出发前请按${time}确认当天是否正常运营。` : "出发前请查看官方公告确认当天运营情况。",
+        place ? `${place}周边在活动时段可能拥挤，请同时确认公共交通和停车路线。` : "请先确认会场位置和移动路线。",
+        fee ? `费用以${fee}为准，但体验、预约、座位或停车可能另收费。` : "请确认是否免费以及是否需要提前预约。",
+        "户外活动请提前查看天气，并准备雨具、充电宝和饮用水。"
+      ],
+      closing: (title) => `${title}在确认日程、地点、费用和交通后访问会更安心。周末或假期建议预留更充足的时间。`
+    }
+  };
+
+  return table[state.language] || table.ko;
+}
+
 function cleanBodyOverview(article) {
+  const copy = cleanCopy();
+  if (state.language !== "ko") return copy.defaultOverview(article.title);
   const overview = usefulValue(article.overview);
   const summary = usefulValue(article.summary);
   if (overview && overview !== summary) return overview;
-  return `${article.title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 서울 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`;
+  return copy.defaultOverview(article.title);
 }
 
 function cleanEventContext(article) {
@@ -1546,36 +1719,36 @@ function cleanEventContext(article) {
 }
 
 function CleanIntroSection(article) {
+  const copy = cleanCopy();
   const context = cleanEventContext(article);
-  const categoryText = context.category ? `${context.category} 분야의 행사` : "서울에서 열리는 행사";
-  const placeText = context.place ? `${context.place}에서 진행됩니다` : "서울 지역에서 진행됩니다";
 
   return `
     <section class="clean-article-section">
-      <h2>행사 내용</h2>
+      <h2>${escapeHtml(copy.eventContent)}</h2>
       <p>${escapeHtml(cleanBodyOverview(article))}</p>
-      <p>${escapeHtml(`${article.title}은 ${categoryText}로, ${placeText}. 방문자는 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`)}</p>
+      <p>${escapeHtml(copy.intro(article.title, context.category, context.place))}</p>
     </section>
   `;
 }
 
 function CleanInfoSection(article) {
+  const copy = cleanCopy();
   const rows = [
-    ["일정", getFactByLabels(article, "일정", article.date || textFor("date.needCheck")), "방문 날짜와 종료일을 먼저 확인하세요."],
-    ["장소", getFactByLabels(article, "장소", article.address || textFor("place.needCheck")), "지도 앱에서 정확한 입구와 이동 경로를 확인하세요."],
-    ["운영시간", getFactByLabels(article, ["운영", "행사 시간"], fallbackTime || textFor("official.check")), "프로그램별 시간이 다를 수 있습니다."],
-    ["입장료", getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || textFor("official.check")), "무료 행사도 일부 체험은 유료일 수 있습니다."],
-    ["이용대상", usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], textFor("official.check")), "동행자 연령 제한 여부를 확인하세요."],
-    ["세부 분류", usefulValue(article.subCategory) || usefulValue(article.rawCategory) || "", "서울 문화행사 원본 분류 기준입니다."],
-    ["문의", usefulValue(article.tel) || getFactByLabels(article, "문의", ""), "변경 사항은 공식 문의처가 가장 정확합니다."]
+    [copy.labels.date, getFactByLabels(article, "일정", article.date || textFor("date.needCheck")), copy.rowNotes.date],
+    [copy.labels.place, getFactByLabels(article, "장소", article.address || textFor("place.needCheck")), copy.rowNotes.place],
+    [copy.labels.time, getFactByLabels(article, ["운영", "행사 시간"], fallbackTime || textFor("official.check")), copy.rowNotes.time],
+    [copy.labels.fee, getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || textFor("official.check")), copy.rowNotes.fee],
+    [copy.labels.target, usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], textFor("official.check")), copy.rowNotes.target],
+    [copy.labels.subCategory, usefulValue(article.subCategory) || usefulValue(article.rawCategory) || "", copy.rowNotes.subCategory],
+    [copy.labels.contact, usefulValue(article.tel) || getFactByLabels(article, "문의", ""), copy.rowNotes.contact]
   ].filter(([, value]) => usefulValue(value));
 
   return `
     <section class="clean-article-section clean-info-section">
-      <h2>기본 정보</h2>
+      <h2>${escapeHtml(copy.basicInfo)}</h2>
       <div class="clean-info-table-wrap">
         <table class="clean-info-table">
-          <caption>${escapeHtml(article.title)} 기본 정보</caption>
+          <caption>${escapeHtml(`${article.title} ${copy.basicInfo}`)}</caption>
           <tbody>
             ${rows.map(([label, value, note]) => `
               <tr>
@@ -1593,29 +1766,16 @@ function CleanInfoSection(article) {
 }
 
 function CleanHighlightSection(article) {
+  const copy = cleanCopy();
   const context = cleanEventContext(article);
   const feeText = context.fee || textFor("official.check");
-  const targetText = context.target || "가족, 친구, 연인, 혼자 방문하는 여행자";
+  const targetText = context.target || copy.defaultTarget;
   const scheduleText = context.schedule || textFor("date.needCheck");
-
-  const highlights = [
-    [
-      "무엇을 볼 수 있나요?",
-      `${article.title}은 ${context.category || "서울 행사"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`
-    ],
-    [
-      "언제 방문하면 좋나요?",
-      `${scheduleText} 일정에 맞춰 운영됩니다. 주말이나 저녁 시간대에는 방문객이 몰릴 수 있어, 사진 촬영이나 여유로운 관람을 원한다면 비교적 이른 시간에 도착하는 편이 좋습니다.`
-    ],
-    [
-      "누구에게 잘 맞나요?",
-      `${targetText}에게 참고하기 좋은 행사입니다. 입장료는 ${feeText} 기준으로 확인되며, 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`
-    ]
-  ];
+  const highlights = copy.highlights(article, context, feeText, targetText, scheduleText);
 
   return `
     <section class="clean-article-section clean-highlight-section">
-      <h2>관람 포인트</h2>
+      <h2>${escapeHtml(copy.highlightTitle)}</h2>
       ${highlights.map(([title, body]) => `
         <article>
           <h3>${escapeHtml(title)}</h3>
@@ -1627,6 +1787,7 @@ function CleanHighlightSection(article) {
 }
 
 function CleanOfficialInfoSection(article) {
+  const copy = cleanCopy();
   const hiddenLabels = ["행사 장소", "행사 시간", "운영 시간", "이용 요금", "문의 전화", "이용 대상", "참가 연령", "정보 기준일", "유무료"];
   const details = (Array.isArray(article.detailInfo) ? article.detailInfo : [])
     .map((item) => ({
@@ -1648,7 +1809,7 @@ function CleanOfficialInfoSection(article) {
 
   return `
     <section class="clean-article-section clean-official-section">
-      <h2>상세 안내</h2>
+      <h2>${escapeHtml(copy.officialTitle)}</h2>
       ${unique.map((item) => `
         <article>
           <h3>${escapeHtml(item.label)}</h3>
@@ -1660,19 +1821,15 @@ function CleanOfficialInfoSection(article) {
 }
 
 function CleanVisitTipSection(article) {
+  const copy = cleanCopy();
   const place = getFactByLabels(article, "장소", article.address || "");
   const time = getFactByLabels(article, ["운영", "행사 시간"], "");
   const fee = getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || "");
-  const tips = [
-    time ? `방문 전 ${time} 기준 운영 여부를 한 번 더 확인하세요.` : "방문 전 공식 안내에서 당일 운영 여부를 확인하세요.",
-    place ? `${place} 주변은 행사 시간대에 혼잡할 수 있으므로 대중교통과 주차 동선을 함께 확인하세요.` : "행사장 위치와 이동 동선을 먼저 확인하세요.",
-    fee ? `요금은 ${fee} 기준으로 확인되지만, 체험·예약·좌석·주차 비용은 별도로 운영될 수 있습니다.` : "무료 여부와 사전 예약 필요 여부를 확인하세요.",
-    "야외 행사라면 날씨, 우산이나 우비, 보조배터리, 물을 준비하면 현장 체류가 더 편합니다."
-  ];
+  const tips = copy.tips(place, time, fee);
 
   return `
     <section class="clean-article-section clean-tip-section">
-      <h2>방문 전 체크</h2>
+      <h2>${escapeHtml(copy.visitCheck)}</h2>
       <ul>
         ${tips.map((tip) => `<li>${escapeHtml(tip)}</li>`).join("")}
       </ul>
@@ -1681,10 +1838,11 @@ function CleanVisitTipSection(article) {
 }
 
 function CleanClosingSection(article) {
+  const copy = cleanCopy();
   return `
     <section class="clean-article-section clean-closing-section">
-      <h2>마무리</h2>
-      <p>${escapeHtml(article.title)}은 일정, 장소, 요금, 이동 정보를 함께 확인하고 방문하면 더 안정적으로 즐길 수 있습니다. 특히 주말이나 방학 기간에는 혼잡도가 높아질 수 있으니 방문 시간을 여유 있게 잡는 것이 좋습니다.</p>
+      <h2>${escapeHtml(copy.closingTitle)}</h2>
+      <p>${escapeHtml(copy.closing(article.title))}</p>
     </section>
   `;
 }
