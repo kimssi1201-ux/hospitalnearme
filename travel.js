@@ -11,11 +11,11 @@ const state = {
 
 const I18N = {
   ko: {
-    "meta.title": "서울여행노트 | 서울 여행 정보 매거진",
-    "brand.name": "서울여행노트",
-    "brand.tagline": "서울 여행 정보 매거진",
-    "footer.tagline": "서울 여행 선택을 돕는 정보 포털",
-    "footer.description": "서울 축제 일정, 방문 준비, 교통과 주변 여행 정보를 한 흐름으로 연결하는 서울 여행 매거진입니다.",
+    "meta.title": "서울여행뉴스 | 서울 여행 정보 뉴스",
+    "brand.name": "서울여행뉴스",
+    "brand.tagline": "서울 여행 정보 뉴스",
+    "footer.tagline": "서울 여행 선택을 돕는 뉴스 포털",
+    "footer.description": "서울 문화행사, 축제 일정, 방문 준비, 교통과 주변 여행 정보를 뉴스 피드로 정리합니다.",
     "nav.menu": "메뉴 열기",
     "nav.july": "서울 여행 뉴스",
     "nav.places": "서울 축제",
@@ -48,11 +48,11 @@ const I18N = {
     "summary.julyFallback": "7월 일정이 포함된 서울 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요."
   },
   en: {
-    "meta.title": "Seoul Travel Note | Seoul Travel Magazine",
-    "brand.name": "Seoul Travel Note",
-    "brand.tagline": "Seoul travel magazine",
-    "footer.tagline": "A guide for choosing festivals",
-    "footer.description": "A festival magazine that connects schedules, travel preparation, transport, and lodging checks in one flow.",
+    "meta.title": "Seoul Travel News | Seoul Travel Information",
+    "brand.name": "Seoul Travel News",
+    "brand.tagline": "Seoul travel information",
+    "footer.tagline": "A news guide for Seoul trips",
+    "footer.description": "A Seoul travel news feed covering cultural events, festivals, visit preparation, transport, and nearby information.",
     "nav.menu": "Open menu",
     "nav.july": "Festival News",
     "nav.places": "By Region",
@@ -85,11 +85,11 @@ const I18N = {
     "summary.julyFallback": "A festival that includes July dates. Check schedule, location, fees, and transport before visiting."
   },
   ja: {
-    "meta.title": "フェスティバルノート | 韓国フェスティバルマガジン",
-    "brand.name": "フェスティバルノート",
-    "brand.tagline": "韓国フェスティバル情報マガジン",
-    "footer.tagline": "フェス選びを助ける情報ポータル",
-    "footer.description": "全国のフェス日程、訪問準備、交通、宿泊チェックをひとつの流れで確認できるマガジンです。",
+    "meta.title": "ソウル旅行ニュース | ソウル旅行情報",
+    "brand.name": "ソウル旅行ニュース",
+    "brand.tagline": "ソウル旅行情報ニュース",
+    "footer.tagline": "ソウル旅行選びを助けるニュースポータル",
+    "footer.description": "ソウルの文化行事、祭りの日程、訪問準備、交通情報をニュース形式で整理します。",
     "nav.menu": "メニューを開く",
     "nav.july": "フェスニュース",
     "nav.places": "地域別",
@@ -122,11 +122,11 @@ const I18N = {
     "summary.julyFallback": "7月の日程を含むフェスです。訪問前に日程、場所、料金、交通情報を確認しましょう。"
   },
   zh: {
-    "meta.title": "Seoul Travel Note | 首尔旅行信息杂志",
-    "brand.name": "Seoul Travel Note",
-    "brand.tagline": "韩国庆典信息杂志",
-    "footer.tagline": "帮助选择庆典的信息门户",
-    "footer.description": "这里把全国庆典日程、出行准备、交通和住宿确认事项整理成一个清晰的浏览流程。",
+    "meta.title": "首尔旅行新闻 | 首尔旅行信息",
+    "brand.name": "首尔旅行新闻",
+    "brand.tagline": "首尔旅行信息新闻",
+    "footer.tagline": "帮助规划首尔旅行的新闻门户",
+    "footer.description": "以新闻信息流整理首尔文化活动、庆典日程、出行准备、交通和周边信息。",
     "nav.menu": "打开菜单",
     "nav.july": "庆典新闻",
     "nav.places": "按地区查找",
@@ -533,7 +533,18 @@ function renderTopCategoryTabs(groups = buildCategoryNewsGroups()) {
   const target = $("#topCategoryTabs");
   if (!target) return;
 
-  target.innerHTML = groups.map((group, index) => `
+  const allLabels = {
+    ko: "전체",
+    en: "All",
+    ja: "すべて",
+    zh: "全部"
+  };
+  const tabs = [
+    { id: "july", title: allLabels[state.language] || allLabels.ko },
+    ...groups
+  ];
+
+  target.innerHTML = tabs.map((group, index) => `
     <a class="category-tab ${index === 0 ? "is-active" : ""}" href="#${escapeHtml(group.id)}">
       ${escapeHtml(group.title)}
     </a>
