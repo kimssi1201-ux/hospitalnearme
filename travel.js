@@ -247,25 +247,38 @@ function displayReadTime(item) {
   return item.readTime || "";
 }
 
-function groupedCategoryName(category = "") {
+function mapSeoulCategory(category = "") {
   const value = String(category || "").trim();
-  if (!value) return "기타";
-  if (value === "전시/미술") return "전시/미술";
-  if (value === "교육/체험") return "교육/체험";
-  if (value === "영화") return "영화";
-  if (value.startsWith("축제-")) return "축제";
-  if (["클래식", "연극", "콘서트", "무용", "국악", "뮤지컬/오페라", "독주/독창회"].includes(value)) {
-    return "공연/무대";
-  }
-  return "기타";
+  const directMap = {
+    "전시/미술": { category: "전시/미술", categorySlug: "exhibition" },
+    "교육/체험": { category: "교육/체험", categorySlug: "experience" },
+    "영화": { category: "영화", categorySlug: "movie" },
+    "기타": { category: "기타", categorySlug: "etc" },
+    "클래식": { category: "공연/무대", categorySlug: "performance" },
+    "연극": { category: "공연/무대", categorySlug: "performance" },
+    "콘서트": { category: "공연/무대", categorySlug: "performance" },
+    "무용": { category: "공연/무대", categorySlug: "performance" },
+    "국악": { category: "공연/무대", categorySlug: "performance" },
+    "뮤지컬/오페라": { category: "공연/무대", categorySlug: "performance" },
+    "독주/독창회": { category: "공연/무대", categorySlug: "performance" },
+    "축제-문화/예술": { category: "축제", categorySlug: "festival" },
+    "축제-관광/체육": { category: "축제", categorySlug: "festival" },
+    "축제-전통/역사": { category: "축제", categorySlug: "festival" }
+  };
+  const mapped = directMap[value] || { category: "기타", categorySlug: "etc" };
+  return {
+    rawCategory: value || "서울 문화행사",
+    subCategory: value || "기타",
+    category: mapped.category,
+    categorySlug: mapped.categorySlug
+  };
 }
 
 function withGroupedCategory(item) {
-  const rawCategory = item.category || "서울 문화행사";
+  const mapped = mapSeoulCategory(item.rawCategory || item.subCategory || item.category || "서울 문화행사");
   return {
     ...item,
-    rawCategory,
-    category: groupedCategoryName(rawCategory)
+    ...mapped
   };
 }
 
@@ -280,6 +293,9 @@ function detailUrl(item) {
       id: item.id || "",
       title: item.title || "",
       category: item.category || "",
+      rawCategory: item.rawCategory || item.subCategory || "",
+      subCategory: item.subCategory || item.rawCategory || "",
+      categorySlug: item.categorySlug || "",
       date: item.date || "",
       image: item.image || "",
       address: item.address || item.place || "",
@@ -305,6 +321,9 @@ function detailUrl(item) {
       contentTypeId: item.contentTypeId || "",
       title: item.title || "",
       category: item.category || "",
+      rawCategory: item.rawCategory || item.subCategory || "",
+      subCategory: item.subCategory || item.rawCategory || "",
+      categorySlug: item.categorySlug || "",
       date: item.date || "",
       image: item.image || "",
       address: item.address || item.summaryParams?.address || "",
@@ -337,29 +356,31 @@ function normalizeSeoulCultureItems(items) {
   return list
     .filter((item) => item && item.title)
     .filter((item) => overlapsCurrentMonthByDateText(item.date))
-    .map((item, index) => ({
-      id: item.id || `seoul-culture-${index}`,
-      source: "seoul",
-      rawCategory: item.category || "서울 문화행사",
-      category: groupedCategoryName(item.category || "서울 문화행사"),
-      title: item.title,
-      summary: item.summary || `${item.address || "서울"}에서 진행되는 문화행사입니다.`,
-      date: item.date || "일정 확인 필요",
-      readTime: item.readTime || "서울 행사 정보",
-      image: String(item.image || "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80").replace(/^http:/, "https:"),
-      address: item.address || item.place || "",
-      place: item.place || "",
-      tel: item.tel || "",
-      homepage: item.homepage || "",
-      fee: item.fee || "",
-      time: item.time || "",
-      org: item.org || "",
-      target: item.target || "",
-      isFree: item.isFree || "",
-      updatedAt: item.updatedAt || "",
-      lat: item.lat || "",
-      lng: item.lng || ""
-    }));
+    .map((item, index) => {
+      const mapped = mapSeoulCategory(item.category || "서울 문화행사");
+      return {
+        id: item.id || `seoul-culture-${index}`,
+        source: "seoul",
+        ...mapped,
+        title: item.title,
+        summary: item.summary || `${item.address || "서울"}에서 진행되는 문화행사입니다.`,
+        date: item.date || "일정 확인 필요",
+        readTime: item.readTime || "서울 행사 정보",
+        image: String(item.image || "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80").replace(/^http:/, "https:"),
+        address: item.address || item.place || "",
+        place: item.place || "",
+        tel: item.tel || "",
+        homepage: item.homepage || "",
+        fee: item.fee || "",
+        time: item.time || "",
+        org: item.org || "",
+        target: item.target || "",
+        isFree: item.isFree || "",
+        updatedAt: item.updatedAt || "",
+        lat: item.lat || "",
+        lng: item.lng || ""
+      };
+    });
 }
 
 function newsFeaturedCard(item) {

@@ -18,6 +18,9 @@ const id = params.get("id");
 const fallbackTitle = params.get("title");
 const fallbackContentTypeId = params.get("contentTypeId") || "15";
 const fallbackCategory = params.get("category");
+const fallbackRawCategory = params.get("rawCategory");
+const fallbackSubCategory = params.get("subCategory");
+const fallbackCategorySlug = params.get("categorySlug");
 const fallbackDate = params.get("date");
 const fallbackImage = params.get("image");
 const fallbackAddress = params.get("address");
@@ -509,6 +512,9 @@ function fallbackArticleFromParams() {
     contentId: id || "",
     contentTypeId: fallbackContentTypeId,
     category: fallbackCategory || textFor("category.festival"),
+    rawCategory: fallbackRawCategory || fallbackSubCategory || fallbackCategory || "",
+    subCategory: fallbackSubCategory || fallbackRawCategory || fallbackCategory || "",
+    categorySlug: fallbackCategorySlug || "",
     title,
     summary,
     date: fallbackDate || textFor("date.needCheck"),
@@ -1523,6 +1529,7 @@ function cleanBodyOverview(article) {
 
 function cleanEventContext(article) {
   const category = usefulValue(article.category) || displayArticleCategory(article);
+  const subCategory = usefulValue(article.subCategory) || usefulValue(article.rawCategory);
   const place = getFactByLabels(article, "장소", article.address || "");
   const schedule = getFactByLabels(article, "일정", article.date || "");
   const fee = getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || "");
@@ -1530,6 +1537,7 @@ function cleanEventContext(article) {
 
   return {
     category,
+    subCategory,
     place,
     schedule,
     fee,
@@ -1558,6 +1566,7 @@ function CleanInfoSection(article) {
     ["운영시간", getFactByLabels(article, ["운영", "행사 시간"], fallbackTime || textFor("official.check")), "프로그램별 시간이 다를 수 있습니다."],
     ["입장료", getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || textFor("official.check")), "무료 행사도 일부 체험은 유료일 수 있습니다."],
     ["이용대상", usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], textFor("official.check")), "동행자 연령 제한 여부를 확인하세요."],
+    ["세부 분류", usefulValue(article.subCategory) || usefulValue(article.rawCategory) || "", "서울 문화행사 원본 분류 기준입니다."],
     ["문의", usefulValue(article.tel) || getFactByLabels(article, "문의", ""), "변경 사항은 공식 문의처가 가장 정확합니다."]
   ].filter(([, value]) => usefulValue(value));
 
