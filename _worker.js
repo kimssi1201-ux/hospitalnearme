@@ -70,6 +70,18 @@ async function handleMyRealTripApi(request, env) {
   try {
     const requestUrl = new URL(request.url);
     const apiUrl = new URL(endpoint);
+    const privatePath = apiUrl.pathname.toLowerCase();
+    if (privatePath.includes("/revenues") || privatePath.includes("/settlement") || privatePath.includes("/orders")) {
+      return jsonResponse(
+        {
+          ok: false,
+          code: "private_myrealtrip_endpoint_blocked",
+          message: "정산, 주문, 매출 API는 공개 웹사이트 프록시로 연결할 수 없습니다. 사이트에는 상품/투어 목록용 공개 제휴 API endpoint만 연결하세요."
+        },
+        403,
+        request
+      );
+    }
     requestUrl.searchParams.forEach((value, key) => {
       apiUrl.searchParams.set(key, value);
     });
