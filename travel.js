@@ -920,6 +920,30 @@ function setActiveMrtTab(tab) {
   renderMyRealTripProducts();
 }
 
+function focusActiveMrtForm() {
+  const activeForm = Array.from(document.querySelectorAll(".mrt-search-form"))
+    .find((form) => form.dataset.mrtForm === state.activeMrtTab);
+  activeForm?.querySelector("input, select, button")?.focus({ preventScroll: true });
+}
+
+function openBookingSearch(tab = state.activeMrtTab || "stay") {
+  const panel = $("#bookingSearch");
+  if (!panel) return;
+  setActiveMrtTab(tab);
+  panel.classList.add("is-open");
+  panel.setAttribute("aria-hidden", "false");
+  document.body.classList.add("booking-search-open");
+  window.setTimeout(focusActiveMrtForm, 50);
+}
+
+function closeBookingSearch() {
+  const panel = $("#bookingSearch");
+  if (!panel) return;
+  panel.classList.remove("is-open");
+  panel.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("booking-search-open");
+}
+
 function regionIdFromAutocomplete(payload) {
   const region = firstArrayFrom(payload)[0] || {};
   return region.regionId || region.id || region.code || region.regionCode || 2573;
@@ -1948,7 +1972,6 @@ function bindFooterLinks() {
 
     const tab = link.getAttribute("data-mrt-open");
     event.preventDefault();
-    setActiveMrtTab(tab);
 
     const keyword = link.getAttribute("data-mrt-keyword");
     if (keyword && tab === "tour") {
@@ -1964,10 +1987,28 @@ function bindFooterLinks() {
       if (flightForm?.elements.arrCityCds && arrCities) flightForm.elements.arrCityCds.value = arrCities;
     }
 
-    $("#bookingSearch")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    const activeForm = Array.from(document.querySelectorAll(".mrt-search-form"))
-      .find((form) => form.dataset.mrtForm === tab);
-    activeForm?.querySelector("input, select, button")?.focus({ preventScroll: true });
+    openBookingSearch(tab);
+  });
+}
+
+function bindBookingSearchPanel() {
+  document.addEventListener("click", (event) => {
+    const closeButton = event.target.closest("[data-booking-close]");
+    if (closeButton) {
+      event.preventDefault();
+      closeBookingSearch();
+      return;
+    }
+
+    const bookingLink = event.target.closest('a[href="#bookingSearch"]:not([data-mrt-open])');
+    if (!bookingLink) return;
+
+    event.preventDefault();
+    openBookingSearch(state.activeMrtTab || "stay");
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeBookingSearch();
   });
 }
 
@@ -2012,6 +2053,7 @@ function init() {
   bindRegionChips();
   bindRegionLinks();
   bindFooterLinks();
+  bindBookingSearchPanel();
   bindMyRealTripSearch();
   bindTopCategoryTabs();
   bindLanguageSwitch();

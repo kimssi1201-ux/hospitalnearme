@@ -725,6 +725,59 @@ main {
   border-top: 1px solid var(--line);
 }
 
+body.booking-search-open {
+  overflow: hidden;
+}
+
+.booking-search-panel {
+  display: none;
+}
+
+.booking-search-panel.is-open {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  overflow-y: auto;
+  width: 100%;
+  max-width: none;
+  padding: 82px max(18px, calc((100vw - var(--max)) / 2)) 34px;
+  border-top: 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+}
+
+.booking-search-panel .section-heading,
+.booking-search-panel .mrt-search-box,
+.booking-search-panel .section-status,
+.booking-search-panel .mrt-grid {
+  width: min(100%, 760px);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.booking-search-panel .section-heading {
+  position: relative;
+  padding-right: 84px;
+}
+
+.booking-search-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .mrt-search-box {
   display: grid;
   gap: 14px;
@@ -1594,6 +1647,20 @@ main {
   .mrt-section {
     gap: 14px;
     padding: 12px 0 34px;
+  }
+
+  .booking-search-panel.is-open {
+    padding: 78px 14px 28px;
+  }
+
+  .booking-search-panel .section-heading {
+    padding-right: 0;
+  }
+
+  .booking-search-close {
+    position: static;
+    width: fit-content;
+    margin-top: 4px;
   }
 
   .mrt-search-box {
