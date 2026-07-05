@@ -727,23 +727,40 @@ function renderMrtFeedFlight(item) {
 
 function myRealTripFeedCards() {
   if (!state.myrealtrip.loaded) return [];
-  return [
-    renderMrtFeedProduct("tour", state.myrealtrip.tours[0]),
-    renderMrtFeedProduct("stay", state.myrealtrip.stays[0]),
-    renderMrtFeedFlight(state.myrealtrip.flights[0])
-  ].filter(Boolean);
+  const cards = [];
+  const tours = state.myrealtrip.tours.slice(0, 6);
+  const stays = state.myrealtrip.stays.slice(0, 6);
+  const flights = state.myrealtrip.flights.slice(0, 6);
+  const maxLength = Math.max(tours.length, stays.length, flights.length);
+
+  for (let index = 0; index < maxLength; index += 1) {
+    cards.push(
+      renderMrtFeedProduct("tour", tours[index]),
+      renderMrtFeedProduct("stay", stays[index]),
+      renderMrtFeedFlight(flights[index])
+    );
+  }
+
+  return cards.filter(Boolean);
 }
 
-function buildNewsFeedMarkup(feedItems) {
+function adRotationOffset(seed = "") {
+  return String(seed)
+    .split("")
+    .reduce((total, char) => total + char.charCodeAt(0), 0);
+}
+
+function buildNewsFeedMarkup(feedItems, seed = "main") {
   const blocks = [];
   const mrtCards = myRealTripFeedCards();
+  const offset = adRotationOffset(seed);
 
   feedItems.forEach((item, index) => {
     const articleNumber = index + 1;
     blocks.push(newsListCard(item));
 
     if (articleNumber % 3 === 0 && mrtCards.length) {
-      const mrtIndex = (articleNumber / 3 - 1) % mrtCards.length;
+      const mrtIndex = (articleNumber / 3 - 1 + offset) % mrtCards.length;
       blocks.push(mrtCards[mrtIndex]);
     }
   });
@@ -751,16 +768,17 @@ function buildNewsFeedMarkup(feedItems) {
   return blocks.filter(Boolean).join("");
 }
 
-function buildCategoryListMarkup(items) {
+function buildCategoryListMarkup(items, seed = "category") {
   const blocks = [];
   const mrtCards = myRealTripFeedCards();
+  const offset = adRotationOffset(seed);
 
   items.forEach((item, index) => {
     const articleNumber = index + 1;
     blocks.push(categoryListCard(item));
 
     if (articleNumber % 3 === 0 && mrtCards.length) {
-      const mrtIndex = (articleNumber / 3 - 1) % mrtCards.length;
+      const mrtIndex = (articleNumber / 3 - 1 + offset) % mrtCards.length;
       blocks.push(mrtCards[mrtIndex]);
     }
   });
@@ -1213,7 +1231,7 @@ function renderCategoryNewsBlock(group) {
       ` : ""}
       ${list.length ? `
         <div class="category-list-feed">
-          ${buildCategoryListMarkup(list)}
+          ${buildCategoryListMarkup(list, group.id)}
         </div>
       ` : ""}
     </section>
