@@ -581,6 +581,89 @@
   }
 }
 
+/* Last mobile override: readable article text and full poster images. */
+@media (max-width: 760px) {
+  .detail-main {
+    padding-right: 18px !important;
+    padding-left: 18px !important;
+  }
+
+  .detail-hero-image,
+  .api-image-gallery,
+  .api-image-grid figure {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: auto !important;
+    overflow: visible !important;
+  }
+
+  .detail-hero-image img,
+  .api-image-grid img {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+
+  .blog-body p,
+  .blog-body li,
+  .blog-body dd {
+    font-size: 18px !important;
+    line-height: 1.72 !important;
+    font-weight: 500 !important;
+    letter-spacing: 0 !important;
+    word-break: keep-all !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .blog-body h2,
+  .spot-info-card h2,
+  .official-detail-list h2,
+  .nearby-parking-section h2,
+  .travel-tip-box h2,
+  .closing-note h2 {
+    font-size: 26px !important;
+    line-height: 1.28 !important;
+    letter-spacing: 0 !important;
+    word-break: keep-all !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .blog-body h3,
+  .course-timeline h3,
+  .nearby-spot-grid h3,
+  .parking-card h3 {
+    font-size: 21px !important;
+    line-height: 1.35 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .blog-body .compact-info-card {
+    padding: 0 0 28px !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .compact-info-row {
+    grid-template-columns: 70px minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .compact-info-row span {
+    font-size: 15px !important;
+    line-height: 1.45 !important;
+    font-weight: 800 !important;
+  }
+
+  .compact-info-row p {
+    font-size: 18px !important;
+    line-height: 1.6 !important;
+    font-weight: 650 !important;
+  }
+}
+
 @media (max-width: 760px) {
   .blog-body .compact-info-card {
     display: block !important;

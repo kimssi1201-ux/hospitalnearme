@@ -12,8 +12,8 @@
     <meta property="og:description" content="서울 축제와 서울 여행 정보를 블로그형 상세 글로 확인하세요." />
     <meta property="og:type" content="article" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="travel.css?v=20260705-mobile-info-table-1" />
-    <link rel="stylesheet" href="festival-detail.css?v=20260705-mobile-info-table-1" />
+    <link rel="stylesheet" href="travel.css?v=20260705-mobile-readable-final-1" />
+    <link rel="stylesheet" href="festival-detail.css?v=20260705-mobile-readable-final-1" />
     <style>
       @media (max-width: 760px) {
         html,
@@ -105,9 +105,38 @@
 
         .compact-info-row p {
           margin: 0 !important;
-          font-size: 17px !important;
-          line-height: 1.58 !important;
+          font-size: 18px !important;
+          line-height: 1.6 !important;
           font-weight: 650 !important;
+          word-break: keep-all !important;
+          overflow-wrap: anywhere !important;
+        }
+
+        .detail-hero-image,
+        .api-image-gallery,
+        .api-image-grid figure {
+          width: 100% !important;
+          height: auto !important;
+          aspect-ratio: auto !important;
+          overflow: visible !important;
+        }
+
+        .detail-hero-image img,
+        .api-image-grid img {
+          width: 100% !important;
+          height: auto !important;
+          max-height: none !important;
+          object-fit: contain !important;
+          display: block !important;
+        }
+
+        .blog-body p,
+        .blog-body li,
+        .blog-body dd {
+          font-size: 18px !important;
+          line-height: 1.72 !important;
+          font-weight: 500 !important;
+          letter-spacing: 0 !important;
           word-break: keep-all !important;
           overflow-wrap: anywhere !important;
         }
