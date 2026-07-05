@@ -280,6 +280,24 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function TenpingAdBox(label = "Advertisement") {
+  return `
+    <aside class="tenping-ad-slot" aria-label="${escapeHtml(label)}">
+      <span>Advertisement</span>
+      <tenping class="adsbytenping" style="width: 100%; margin: 0 auto; display: block; max-width: 768px;" tenping-ad-client="%2fnyDIt3jSiYh7KXeo4%2bsm7S2Hydb6U%2fzbuFekGjT%2frlZrkiEUQ%2btrnyYLz7zJ6Li" tenping-ad-display-type="1LawCE8FqKOhetXZhMopsQ%3d%3d"></tenping>
+    </aside>
+  `;
+}
+
+function refreshTenpingAds() {
+  document.getElementById("tenping-ad-script")?.remove();
+  const script = document.createElement("script");
+  script.id = "tenping-ad-script";
+  script.async = true;
+  script.src = "https://ads.tenping.kr/scripts/adsbytenping.min.js";
+  document.body.appendChild(script);
+}
+
 function stripHtml(value) {
   const div = document.createElement("div");
   div.innerHTML = value || "";
@@ -1589,6 +1607,7 @@ function renderArticle(article) {
     </div>
   `;
   hydrateNearbyParking(article);
+  refreshTenpingAds();
 }
 
 function applyStaticLanguage() {
@@ -2267,6 +2286,7 @@ function renderTravelDetailBody(article, sections) {
   return `
     ${CleanIntroSection(article)}
     ${CleanInfoSection(article)}
+    ${TenpingAdBox("Tenping article advertisement")}
     ${CleanHighlightSection(article)}
     ${renderImageGallery(article)}
     ${CleanOfficialInfoSection(article)}

@@ -229,6 +229,24 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function TenpingAdBox(label = "Advertisement") {
+  return `
+    <aside class="tenping-ad-slot" aria-label="${escapeHtml(label)}">
+      <span>Advertisement</span>
+      <tenping class="adsbytenping" style="width: 100%; margin: 0 auto; display: block; max-width: 768px;" tenping-ad-client="%2fnyDIt3jSiYh7KXeo4%2bsm7S2Hydb6U%2fzbuFekGjT%2frlZrkiEUQ%2btrnyYLz7zJ6Li" tenping-ad-display-type="1LawCE8FqKOhetXZhMopsQ%3d%3d"></tenping>
+    </aside>
+  `;
+}
+
+function refreshTenpingAds() {
+  document.getElementById("tenping-ad-script")?.remove();
+  const script = document.createElement("script");
+  script.id = "tenping-ad-script";
+  script.async = true;
+  script.src = "https://ads.tenping.kr/scripts/adsbytenping.min.js";
+  document.body.appendChild(script);
+}
+
 function imageMarkup(item, size = "card") {
   const title = displayArticleTitle(item);
   return `
@@ -1047,7 +1065,13 @@ function renderJulyFestivals() {
   status.hidden = true;
 
   recommended.innerHTML = items.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
-  feed.innerHTML = items.slice(3, 18).map((item) => newsListCard(item)).join("");
+  const feedItems = items.slice(3, 18);
+  feed.innerHTML = [
+    ...feedItems.slice(0, 5).map((item) => newsListCard(item)),
+    TenpingAdBox("Tenping native advertisement"),
+    ...feedItems.slice(5).map((item) => newsListCard(item))
+  ].join("");
+  refreshTenpingAds();
 }
 
 async function loadSeoulCultureEvents() {
