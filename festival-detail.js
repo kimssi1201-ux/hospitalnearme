@@ -784,6 +784,44 @@ function localizedSummary(article) {
   return textFor("summary.localized", { title: localizedEventReference(article) });
 }
 
+function localizedArticleTitle(article) {
+  if (state.language === "ko") return article.title;
+  const category = String(article.category || article.subCategory || article.rawCategory || "");
+  const key = category.includes("전시") ? "exhibition"
+    : category.includes("공연") || category.includes("클래식") || category.includes("연극") || category.includes("콘서트") || category.includes("무용") || category.includes("국악") || category.includes("뮤지컬") ? "performance"
+    : category.includes("교육") || category.includes("체험") ? "experience"
+    : category.includes("영화") ? "movie"
+    : category.includes("축제") ? "festival"
+    : "event";
+  const table = {
+    en: {
+      exhibition: "Seoul Exhibition Guide",
+      performance: "Seoul Performance Guide",
+      experience: "Seoul Culture Experience Guide",
+      movie: "Seoul Film Event Guide",
+      festival: "Seoul Festival Guide",
+      event: "Seoul Event Guide"
+    },
+    ja: {
+      exhibition: "ソウル展示ガイド",
+      performance: "ソウル公演ガイド",
+      experience: "ソウル文化体験ガイド",
+      movie: "ソウル映画イベントガイド",
+      festival: "ソウル祭りガイド",
+      event: "ソウルイベントガイド"
+    },
+    zh: {
+      exhibition: "首尔展览指南",
+      performance: "首尔演出指南",
+      experience: "首尔文化体验指南",
+      movie: "首尔电影活动指南",
+      festival: "首尔节庆指南",
+      event: "首尔活动指南"
+    }
+  };
+  return (table[state.language] || table.en)[key];
+}
+
 function localizedEventReference(article) {
   if (state.language === "ko") return article.title;
   const table = {
@@ -1012,10 +1050,11 @@ function renderRichInfoSection(article) {
 }
 
 function updateDocumentMeta(article) {
-  document.title = `${article.title} | ${textFor("meta.suffix")}`;
+  const title = localizedArticleTitle(article);
+  document.title = `${title} | ${textFor("meta.suffix")}`;
   const description = document.querySelector('meta[name="description"]');
   if (description) {
-    description.setAttribute("content", textFor("meta.description", { title: article.title }).slice(0, 150));
+    description.setAttribute("content", textFor("meta.description", { title }).slice(0, 150));
   }
 }
 
@@ -1518,6 +1557,7 @@ function renderTravelDetailBody(article, sections) {
 
 function renderArticle(article) {
   updateDocumentMeta(article);
+  const displayTitle = localizedArticleTitle(article);
   const sections = article.overview && state.language === "ko"
     ? [
         {
@@ -1534,7 +1574,7 @@ function renderArticle(article) {
   $("#detailArticle").innerHTML = `
     <header class="blog-header">
       <p class="eyebrow">${escapeHtml(displayArticleCategory(article))}</p>
-      <h1>${escapeHtml(article.title)}</h1>
+      <h1>${escapeHtml(displayTitle)}</h1>
       <p class="blog-lede">${escapeHtml(localizedSummary(article))}</p>
       <div class="article-meta">
         <span>${escapeHtml(article.date)}</span>
@@ -1542,7 +1582,7 @@ function renderArticle(article) {
       </div>
     </header>
     <div class="detail-hero-image">
-      <img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" />
+      <img src="${escapeHtml(article.image)}" alt="${escapeHtml(displayTitle)}" />
     </div>
     <div class="blog-body">
       ${renderTravelDetailBody(article, sections)}
