@@ -534,9 +534,13 @@ main {
 }
 
 .news-feed-heading {
-  display: grid;
+  display: none;
   gap: 8px;
   max-width: 760px;
+}
+
+.featured-news {
+  display: none !important;
 }
 
 .news-feed-heading h1 {
