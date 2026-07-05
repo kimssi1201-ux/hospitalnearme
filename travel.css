@@ -725,6 +725,79 @@ main {
   border-top: 1px solid var(--line);
 }
 
+.mrt-search-box {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(20, 20, 20, 0.04);
+}
+
+.mrt-search-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mrt-search-tabs button,
+.mrt-search-form button {
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.mrt-search-tabs button.is-active,
+.mrt-search-form button {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+.mrt-search-form {
+  display: none;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.mrt-search-form.is-active {
+  display: grid;
+}
+
+.mrt-search-form label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.mrt-search-form input,
+.mrt-search-form select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+}
+
+.mrt-search-form button {
+  min-width: 128px;
+  padding: 0 18px;
+}
+
 .mrt-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1502,6 +1575,36 @@ main {
   .mrt-section {
     gap: 14px;
     padding: 12px 0 34px;
+  }
+
+  .mrt-search-box {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .mrt-search-tabs {
+    gap: 6px;
+  }
+
+  .mrt-search-tabs button,
+  .mrt-search-form button {
+    min-height: 42px;
+    font-size: 14px;
+  }
+
+  .mrt-search-form,
+  .mrt-search-form.is-active {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .mrt-search-form input,
+  .mrt-search-form select {
+    min-height: 46px;
+  }
+
+  .mrt-search-form button {
+    width: 100%;
   }
 
   .mrt-grid {

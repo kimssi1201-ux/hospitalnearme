@@ -16,10 +16,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="travel.css?v=20260706-mrt-feed-ads-1" />
+    <link rel="stylesheet" href="travel.css?v=20260706-mrt-search-1" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
     <script src="travel-data.js?v=20260705-category-groups-1" defer></script>
-    <script src="travel.js?v=20260706-mrt-feed-ads-1" defer></script>
+    <script src="travel.js?v=20260706-mrt-search-1" defer></script>
     <title>서울여행뉴스 | 서울 여행 정보 뉴스</title>
   </head>
   <body>
@@ -60,6 +60,75 @@
         <div class="section-status" id="julyStatus" data-i18n="july.loading">서울 축제 정보를 불러오는 중입니다.</div>
         <div class="recommend-news-row" id="recommendedArticles" aria-label="추천 축제 기사"></div>
         <div class="news-list-feed" id="newsFeedList"></div>
+      </section>
+
+      <section class="mrt-section" id="bookingSearch" aria-labelledby="bookingSearchTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Travel Search</p>
+          <h2 id="bookingSearchTitle">서울 여행 예약 검색</h2>
+          <p>숙소, 투어·티켓, 항공권을 한 곳에서 비교할 수 있도록 검색 기능을 연결했습니다.</p>
+        </div>
+        <div class="mrt-search-box">
+          <div class="mrt-search-tabs" role="tablist" aria-label="마이리얼트립 검색 종류">
+            <button class="is-active" type="button" data-mrt-tab="stay" role="tab" aria-selected="true">숙소</button>
+            <button type="button" data-mrt-tab="tour" role="tab" aria-selected="false">투어·티켓</button>
+            <button type="button" data-mrt-tab="flight" role="tab" aria-selected="false">항공권</button>
+          </div>
+
+          <form class="mrt-search-form is-active" id="mrtStayForm" data-mrt-form="stay">
+            <label>
+              <span>지역</span>
+              <input name="keyword" type="search" value="서울" placeholder="서울, 강남, 명동" autocomplete="off" />
+            </label>
+            <label>
+              <span>체크인</span>
+              <input name="checkIn" type="date" />
+            </label>
+            <label>
+              <span>체크아웃</span>
+              <input name="checkOut" type="date" />
+            </label>
+            <label>
+              <span>인원</span>
+              <input name="adultCount" type="number" min="1" max="8" value="2" />
+            </label>
+            <button type="submit">숙소 검색</button>
+          </form>
+
+          <form class="mrt-search-form" id="mrtTourForm" data-mrt-form="tour">
+            <label>
+              <span>검색어</span>
+              <input name="keyword" type="search" value="서울" placeholder="서울 투어, 공연, 입장권" autocomplete="off" />
+            </label>
+            <label>
+              <span>정렬</span>
+              <select name="sort">
+                <option value="review_score_desc">평점순</option>
+                <option value="price_asc">낮은 가격순</option>
+                <option value="recent">최신순</option>
+              </select>
+            </label>
+            <button type="submit">투어·티켓 검색</button>
+          </form>
+
+          <form class="mrt-search-form" id="mrtFlightForm" data-mrt-form="flight">
+            <label>
+              <span>출발</span>
+              <input name="depCityCd" type="text" value="ICN" placeholder="ICN" maxlength="3" />
+            </label>
+            <label>
+              <span>도착</span>
+              <input name="arrCityCds" type="text" value="CJU,BKK,NRT" placeholder="CJU,BKK,NRT" />
+            </label>
+            <label>
+              <span>여행 기간</span>
+              <input name="period" type="number" min="1" max="30" value="5" />
+            </label>
+            <button type="submit">항공권 검색</button>
+          </form>
+        </div>
+        <div class="section-status" id="myrealtripStatus"></div>
+        <div class="mrt-grid" id="myrealtripGrid"></div>
       </section>
 
       <section class="category-news-wrapper" id="categoryNews" aria-label="카테고리별 축제 뉴스">

@@ -551,6 +551,66 @@ async function fetchMyRealTrip(type, params = {}) {
   return payload?.data?.data || payload?.data || {};
 }
 
+function firstArrayFrom(value) {
+  if (Array.isArray(value)) return value;
+  if (!value || typeof value !== "object") return [];
+
+  const preferredKeys = ["items", "products", "list", "contents", "results", "regions", "airfares", "data"];
+  for (const key of preferredKeys) {
+    const found = firstArrayFrom(value[key]);
+    if (found.length) return found;
+  }
+
+  for (const child of Object.values(value)) {
+    const found = firstArrayFrom(child);
+    if (found.length) return found;
+  }
+
+  return [];
+}
+
+function normalizeMrtProductItem(item = {}, kind = "tour") {
+  const title = item.itemName || item.title || item.name || item.productName || item.accommodationName || item.hotelName || "";
+  const imageUrl = item.imageUrl || item.thumbnailUrl || item.thumbnail || item.mainImageUrl || item.image || item.representativeImageUrl || "";
+  const productUrl = item.productUrl || item.url || item.webUrl || item.deepLink || item.link || "";
+  const salePrice = item.salePrice || item.price || item.priceAmount || item.minPrice || item.discountedPrice || item.lowestPrice || 0;
+
+  return {
+    ...item,
+    itemName: title || (kind === "stay" ? "서울 숙소" : "서울 투어·티켓"),
+    imageUrl,
+    productUrl,
+    salePrice,
+    originalPrice: item.originalPrice || item.normalPrice || salePrice,
+    priceDisplay: item.priceDisplay || item.displayPrice || item.priceText || "",
+    reviewScore: item.reviewScore || item.rating || item.score || "",
+    reviewCount: item.reviewCount || item.reviewCnt || item.reviewsCount || 0,
+    category: item.category || item.categoryName || item.productType || (kind === "stay" ? "숙소" : "투어·티켓"),
+    description: item.description || item.summary || item.shortDescription || item.subtitle || ""
+  };
+}
+
+function normalizeMrtProducts(payload, kind) {
+  return firstArrayFrom(payload).map((item) => normalizeMrtProductItem(item, kind));
+}
+
+function normalizeMrtFlightItem(item = {}) {
+  const totalPrice = item.totalPrice || item.price || item.lowestPrice || item.amount || item.fare || 0;
+  return {
+    ...item,
+    fromCity: item.fromCity || item.depCityName || item.depCityCd || item.departureAirport || "ICN",
+    toCity: item.toCity || item.arrCityName || item.arrCityCd || item.arrivalAirport || "",
+    departureDate: item.departureDate || item.depDate || item.startDate || "",
+    returnDate: item.returnDate || item.arrivalDate || item.endDate || "",
+    totalPrice,
+    airline: item.airline || item.airlineName || item.carrier || ""
+  };
+}
+
+function normalizeMrtFlights(payload) {
+  return firstArrayFrom(payload).map(normalizeMrtFlightItem);
+}
+
 function mrtExternalLink(url, label) {
   if (!url) return "";
   return `
@@ -750,6 +810,134 @@ function renderMyRealTripProducts() {
   ].join("");
 }
 
+function setMrtSearchStatus(message, isError = false) {
+  const status = $("#myrealtripStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.hidden = !message;
+  status.classList.toggle("is-error", isError);
+}
+
+function formValues(form) {
+  return Object.fromEntries(new FormData(form).entries());
+}
+
+function setDefaultMrtDates() {
+  const stayForm = $("#mrtStayForm");
+  if (!stayForm) return;
+  const checkIn = stayForm.elements.checkIn;
+  const checkOut = stayForm.elements.checkOut;
+  if (checkIn && !checkIn.value) checkIn.value = dateOffsetIso(1);
+  if (checkOut && !checkOut.value) checkOut.value = dateOffsetIso(2);
+}
+
+function setActiveMrtTab(tab) {
+  document.querySelectorAll("[data-mrt-tab]").forEach((button) => {
+    const isActive = button.dataset.mrtTab === tab;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+  document.querySelectorAll("[data-mrt-form]").forEach((form) => {
+    form.classList.toggle("is-active", form.dataset.mrtForm === tab);
+  });
+}
+
+function regionIdFromAutocomplete(payload) {
+  const region = firstArrayFrom(payload)[0] || {};
+  return region.regionId || region.id || region.code || region.regionCode || 2573;
+}
+
+async function searchMrtStay(form) {
+  const values = formValues(form);
+  setMrtSearchStatus("숙소를 검색하는 중입니다.");
+  const regionPayload = await fetchMyRealTrip("accommodation-region-autocomplete", {
+    keyword: values.keyword || "서울",
+    isDomestic: true
+  });
+  const stayPayload = await fetchMyRealTrip("accommodation-search", {
+    regionId: regionIdFromAutocomplete(regionPayload),
+    checkIn: values.checkIn || dateOffsetIso(1),
+    checkOut: values.checkOut || dateOffsetIso(2),
+    adultCount: values.adultCount || 2,
+    childCount: 0,
+    size: 9
+  });
+  state.myrealtrip = {
+    ...state.myrealtrip,
+    stays: normalizeMrtProducts(stayPayload, "stay"),
+    loaded: true,
+    error: false
+  };
+  renderMyRealTripProducts();
+  setMrtSearchStatus("");
+}
+
+async function searchMrtTour(form) {
+  const values = formValues(form);
+  setMrtSearchStatus("투어·티켓을 검색하는 중입니다.");
+  const payload = await fetchMyRealTrip("tna-search", {
+    keyword: values.keyword || "서울",
+    sort: values.sort || "review_score_desc",
+    page: 1,
+    size: 9
+  });
+  state.myrealtrip = {
+    ...state.myrealtrip,
+    tours: normalizeMrtProducts(payload, "tour"),
+    loaded: true,
+    error: false
+  };
+  renderMyRealTripProducts();
+  setMrtSearchStatus("");
+}
+
+async function searchMrtFlight(form) {
+  const values = formValues(form);
+  setMrtSearchStatus("항공권 최저가를 검색하는 중입니다.");
+  const payload = await fetchMyRealTrip("flight-calendar-lowest", {
+    depCityCd: values.depCityCd || "ICN",
+    arrCityCds: values.arrCityCds || "CJU,BKK,NRT",
+    period: values.period || 5
+  });
+  state.myrealtrip = {
+    ...state.myrealtrip,
+    flights: normalizeMrtFlights(payload),
+    loaded: true,
+    error: false
+  };
+  renderMyRealTripProducts();
+  setMrtSearchStatus("");
+}
+
+function bindMyRealTripSearch() {
+  setDefaultMrtDates();
+
+  document.querySelectorAll("[data-mrt-tab]").forEach((button) => {
+    button.addEventListener("click", () => setActiveMrtTab(button.dataset.mrtTab));
+  });
+
+  const handlers = {
+    stay: searchMrtStay,
+    tour: searchMrtTour,
+    flight: searchMrtFlight
+  };
+
+  document.querySelectorAll("[data-mrt-form]").forEach((form) => {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const handler = handlers[form.dataset.mrtForm];
+      if (!handler) return;
+
+      try {
+        await handler(form);
+      } catch (error) {
+        console.warn("MyRealTrip search failed.", error);
+        setMrtSearchStatus("검색 결과를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.", true);
+      }
+    });
+  });
+}
+
 async function loadMyRealTripProducts() {
   renderMyRealTripProducts();
   const checkIn = dateOffsetIso(1);
@@ -778,9 +966,9 @@ async function loadMyRealTripProducts() {
     ]);
 
     state.myrealtrip = {
-      tours: tourResult.status === "fulfilled" ? (tourResult.value.items || []) : [],
-      stays: stayResult.status === "fulfilled" ? (stayResult.value.items || []) : [],
-      flights: flightResult.status === "fulfilled" ? (Array.isArray(flightResult.value) ? flightResult.value : []) : [],
+      tours: tourResult.status === "fulfilled" ? normalizeMrtProducts(tourResult.value, "tour") : [],
+      stays: stayResult.status === "fulfilled" ? normalizeMrtProducts(stayResult.value, "stay") : [],
+      flights: flightResult.status === "fulfilled" ? normalizeMrtFlights(flightResult.value) : [],
       loaded: true,
       error: [tourResult, stayResult, flightResult].some((result) => result.status === "rejected")
     };
@@ -1669,6 +1857,7 @@ function init() {
   bindMenu();
   bindRegionChips();
   bindRegionLinks();
+  bindMyRealTripSearch();
   bindTopCategoryTabs();
   bindLanguageSwitch();
   applyLanguage();
