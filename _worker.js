@@ -2,6 +2,10 @@ const OPENAI_ENDPOINT = "https://api.openai.com/v1/responses";
 const MYREALTRIP_API_BASE = "https://partner-ext-api.myrealtrip.com";
 const MYREALTRIP_ENDPOINTS = {
   "tna-categories": "/v1/products/tna/categories",
+  "tna-search": "/v1/products/tna/search",
+  "tna-detail": "/v1/products/tna/detail",
+  "tna-options": "/v1/products/tna/options",
+  "tna-calendars": "/v1/products/tna/calendars",
   "airport-autocomplete": "/v1/products/flight/airport-autocomplete",
   "flight-airport-autocomplete": "/v1/products/flight/airport-autocomplete",
   "flight-airports": "/v1/products/flight/airports",
@@ -15,6 +19,11 @@ const MYREALTRIP_ENDPOINTS = {
 };
 const MYREALTRIP_DEFAULT_ENDPOINT = `${MYREALTRIP_API_BASE}${MYREALTRIP_ENDPOINTS["tna-categories"]}`;
 const MYREALTRIP_POST_PATHS = new Set([
+  "/v1/products/tna/categories",
+  "/v1/products/tna/search",
+  "/v1/products/tna/detail",
+  "/v1/products/tna/options",
+  "/v1/products/tna/calendars",
   "/v1/products/flight/airport-autocomplete",
   "/v1/products/flight/airports",
   "/v1/products/flight/calendar",
@@ -178,6 +187,38 @@ function collectProxyParams(searchParams) {
 async function buildMyRealTripPostBody(request, pathname, queryParams) {
   const postedBody = request.method === "POST" ? await readJsonBody(request) : {};
   const body = { ...queryParams, ...postedBody };
+
+  if (pathname === "/v1/products/tna/categories") {
+    return {
+      city: String(body.city || "서울").trim()
+    };
+  }
+
+  if (pathname === "/v1/products/tna/search") {
+    const searchBody = {
+      keyword: String(body.keyword || body.q || body.search || "서울 투어").trim(),
+      page: parseInteger(body.page, 1),
+      size: parseInteger(body.size, 20)
+    };
+    if (body.category && body.category !== "all") searchBody.category = String(body.category);
+    if (body.minPrice) searchBody.minPrice = parseInteger(body.minPrice, 0);
+    if (body.maxPrice) searchBody.maxPrice = parseInteger(body.maxPrice, 0);
+    if (body.sort) searchBody.sort = String(body.sort);
+    return searchBody;
+  }
+
+  if (pathname === "/v1/products/tna/detail") {
+    return {
+      gid: String(body.gid || "").trim()
+    };
+  }
+
+  if (pathname === "/v1/products/tna/options" || pathname === "/v1/products/tna/calendars") {
+    return {
+      gid: String(body.gid || "").trim(),
+      selectedDate: body.selectedDate || dateOffset(30)
+    };
+  }
 
   if (pathname === "/v1/products/accommodation/region-autocomplete") {
     return {
