@@ -713,7 +713,13 @@ function renderCategoryNewsSections() {
 
   const groups = buildCategoryNewsGroups();
   renderTopCategoryTabs(groups);
-  target.innerHTML = groups.map((group) => renderCategoryNewsBlock(group)).join("");
+  target.innerHTML = groups
+    .map((group, index) => [
+      renderCategoryNewsBlock(group),
+      index === 0 ? TenpingAdBox("Tenping category advertisement", "list") : ""
+    ].join(""))
+    .join("");
+  refreshTenpingAds();
 }
 
 function contentTypeName(contentTypeId) {
