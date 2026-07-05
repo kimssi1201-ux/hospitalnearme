@@ -1206,9 +1206,10 @@ main {
   }
 
   .top-category-bar {
-    top: 94px;
-    margin-bottom: 0;
-    padding: 8px 12px;
+    position: static;
+    z-index: auto;
+    margin: 0 calc(50% - 50vw) 12px;
+    padding: 10px 12px;
   }
 
   .top-region-bar .region-button {
@@ -1256,6 +1257,7 @@ main {
     overflow: visible;
     margin-right: 0;
     padding: 0;
+    clear: both;
   }
 
   .news-recommend-card {
