@@ -237,44 +237,6 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function TenpingAdBox(label = "Advertisement", variant = "small") {
-  const configs = {
-    large: {
-      maxWidth: 768,
-      displayType: "1LawCE8FqKOhetXZhMopsQ%3d%3d"
-    },
-    small: {
-      maxWidth: 580,
-      displayType: "UD8Mia8gyIoT5Z2MT6VB3Q%3d%3d"
-    },
-    list: {
-      maxWidth: 768,
-      displayType: "67%2be3LHzHbblsB9oLrOpWQ%3d%3d"
-    }
-  };
-  const config = configs[variant] || configs.small;
-  return `
-    <aside class="tenping-ad-slot tenping-ad-slot--${escapeHtml(variant)}" aria-label="${escapeHtml(label)}">
-      <span>Advertisement</span>
-      <tenping class="adsbytenping" style="width: 100%; margin: 0 auto; display: block; max-width: ${config.maxWidth}px;" tenping-ad-client="%2fnyDIt3jSiYh7KXeo4%2bsm7S2Hydb6U%2fzbuFekGjT%2frlZrkiEUQ%2btrnyYLz7zJ6Li" tenping-ad-display-type="${config.displayType}"></tenping>
-    </aside>
-  `;
-}
-
-function refreshTenpingAds() {
-  document.querySelectorAll(".tenping-ad-loader").forEach((script) => {
-    script.parentNode?.removeChild(script);
-  });
-  document.querySelectorAll("tenping.adsbytenping").forEach((slot, index) => {
-    const script = document.createElement("script");
-    script.className = "tenping-ad-loader";
-    script.dataset.tenpingSlot = String(index);
-    script.async = true;
-    script.src = "https://ads.tenping.kr/scripts/adsbytenping.min.js";
-    slot.insertAdjacentElement("afterend", script);
-  });
-}
-
 function imageMarkup(item, size = "card") {
   const title = displayArticleTitle(item);
   return `
@@ -724,10 +686,6 @@ function buildNewsFeedMarkup(feedItems) {
     const articleNumber = index + 1;
     blocks.push(newsListCard(item));
 
-    if (articleNumber % 3 === 0) {
-      blocks.push(TenpingAdBox(`Tenping list advertisement ${articleNumber / 3}`, "list"));
-    }
-
     const mrtIndex = mrtInsertAfter.get(articleNumber);
     if (mrtIndex !== undefined && mrtCards[mrtIndex]) {
       blocks.push(mrtCards[mrtIndex]);
@@ -1021,13 +979,7 @@ function renderCategoryNewsSections() {
 
   const groups = buildCategoryNewsGroups();
   renderTopCategoryTabs(groups);
-  target.innerHTML = groups
-    .map((group, index) => [
-      renderCategoryNewsBlock(group),
-      index === 0 ? TenpingAdBox("Tenping category advertisement", "list") : ""
-    ].join(""))
-    .join("");
-  refreshTenpingAds();
+  target.innerHTML = groups.map((group) => renderCategoryNewsBlock(group)).join("");
 }
 
 function contentTypeName(contentTypeId) {
@@ -1396,7 +1348,6 @@ function renderJulyFestivals() {
   recommended.innerHTML = items.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
   const feedItems = items.slice(3, 18);
   feed.innerHTML = buildNewsFeedMarkup(feedItems);
-  refreshTenpingAds();
 }
 
 async function loadSeoulCultureEvents() {
