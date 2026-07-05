@@ -3,6 +3,13 @@ const supportedLanguages = ["ko", "en", "ja", "zh"];
 const state = {
   apiArticles: [],
   julyArticles: [],
+  myrealtrip: {
+    tours: [],
+    stays: [],
+    flights: [],
+    loaded: false,
+    error: false
+  },
   apiLoaded: false,
   apiError: false,
   activeRegionId: "seoul",
@@ -195,6 +202,7 @@ function applyLanguage() {
   renderPlaces();
   renderBooking();
   renderCuration();
+  renderMyRealTripProducts();
   renderJulyFestivals();
   renderCategoryNewsSections();
 }
@@ -536,6 +544,212 @@ function newsListCard(item) {
       </a>
     </article>
   `;
+}
+
+function formatWon(value) {
+  const number = Number(value || 0);
+  if (!Number.isFinite(number) || number <= 0) return "가격 확인";
+  return `${number.toLocaleString("ko-KR")}원`;
+}
+
+function formatMrtDate(value) {
+  if (!value) return "일정 확인";
+  const text = String(value);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+  return `${text.slice(5, 7)}.${text.slice(8, 10)}`;
+}
+
+function dateOffsetIso(days) {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function myRealTripUrl(type, params = {}) {
+  const query = new URLSearchParams({ type });
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") query.set(key, value);
+  });
+  return `/api/myrealtrip?${query.toString()}`;
+}
+
+async function fetchMyRealTrip(type, params = {}) {
+  const response = await fetch(myRealTripUrl(type, params), {
+    headers: { Accept: "application/json" }
+  });
+  const payload = await response.json();
+  if (!response.ok || payload?.ok === false) {
+    throw new Error(payload?.message || `MyRealTrip ${type} request failed`);
+  }
+  return payload?.data?.data || payload?.data || {};
+}
+
+function mrtExternalLink(url, label) {
+  if (!url) return "";
+  return `
+    <a class="mrt-link" href="${escapeHtml(url)}" target="_blank" rel="sponsored noopener noreferrer">
+      ${escapeHtml(label)}
+    </a>
+  `;
+}
+
+function mrtImage(url, title) {
+  if (!url) {
+    return `<div class="mrt-placeholder" aria-hidden="true">SN</div>`;
+  }
+  return `<img src="${escapeHtml(url)}" alt="${escapeHtml(title)}" loading="lazy" />`;
+}
+
+function renderMrtTourCard(item) {
+  const title = item.itemName || "서울 투어 상품";
+  return `
+    <article class="mrt-product-card">
+      ${mrtImage(item.imageUrl, title)}
+      <div>
+        <em>${escapeHtml(item.category || "투어")}</em>
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(item.description || "서울에서 즐길 수 있는 투어/티켓 상품입니다.")}</p>
+        <small>${escapeHtml(item.priceDisplay || formatWon(item.salePrice))} · 평점 ${escapeHtml(item.reviewScore || "확인")}</small>
+        ${mrtExternalLink(item.productUrl, "상품 보기")}
+      </div>
+    </article>
+  `;
+}
+
+function renderMrtStayCard(item) {
+  const title = item.itemName || "서울 숙소";
+  return `
+    <article class="mrt-product-card">
+      ${mrtImage(item.imageUrl, title)}
+      <div>
+        <em>${Number(item.starRating || 0) ? `${item.starRating}성급` : "숙소"}</em>
+        <h3>${escapeHtml(title)}</h3>
+        <p>리뷰 ${escapeHtml(item.reviewCount || 0)}개 · 평점 ${escapeHtml(item.reviewScore || "확인")}</p>
+        <small>${escapeHtml(formatWon(item.salePrice || item.originalPrice))}</small>
+        ${mrtExternalLink(item.productUrl, "숙소 보기")}
+      </div>
+    </article>
+  `;
+}
+
+function renderMrtFlightCard(item) {
+  const title = `${item.fromCity || "ICN"} → ${item.toCity || "BKK"}`;
+  const schedule = `${formatMrtDate(item.departureDate)} 출발${item.returnDate ? ` · ${formatMrtDate(item.returnDate)} 귀국` : ""}`;
+  return `
+    <article class="mrt-flight-card">
+      <span>${escapeHtml(title)}</span>
+      <strong>${escapeHtml(formatWon(item.totalPrice))}</strong>
+      <small>${escapeHtml(schedule)} · ${escapeHtml(item.airline || "항공사 확인")}</small>
+    </article>
+  `;
+}
+
+function renderMrtPanel(title, subtitle, items, renderer, emptyText) {
+  return `
+    <section class="mrt-panel">
+      <div class="mrt-panel-heading">
+        <h3>${escapeHtml(title)}</h3>
+        <p>${escapeHtml(subtitle)}</p>
+      </div>
+      <div class="mrt-card-list">
+        ${items.length ? items.map(renderer).join("") : `<p class="mrt-empty">${escapeHtml(emptyText)}</p>`}
+      </div>
+    </section>
+  `;
+}
+
+function renderMyRealTripProducts() {
+  const grid = $("#myrealtripGrid");
+  const status = $("#myrealtripStatus");
+  if (!grid || !status) return;
+
+  if (!state.myrealtrip.loaded && !state.myrealtrip.error) {
+    status.textContent = "마이리얼트립 정보를 불러오는 중입니다.";
+    status.hidden = false;
+    grid.innerHTML = "";
+    return;
+  }
+
+  if (state.myrealtrip.error && !state.myrealtrip.tours.length && !state.myrealtrip.stays.length && !state.myrealtrip.flights.length) {
+    status.textContent = "예약 정보를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.";
+    status.hidden = false;
+    grid.innerHTML = "";
+    return;
+  }
+
+  status.textContent = "";
+  status.hidden = true;
+  grid.innerHTML = [
+    renderMrtPanel(
+      "서울 투어·티켓",
+      "후기와 가격을 기준으로 서울 체험 상품을 확인하세요.",
+      state.myrealtrip.tours.slice(0, 3),
+      renderMrtTourCard,
+      "표시할 투어 상품이 없습니다."
+    ),
+    renderMrtPanel(
+      "서울 숙소",
+      "축제와 공연 방문 전 숙소 위치와 리뷰를 함께 비교하세요.",
+      state.myrealtrip.stays.slice(0, 3),
+      renderMrtStayCard,
+      "표시할 숙소 상품이 없습니다."
+    ),
+    renderMrtPanel(
+      "항공 최저가",
+      "서울 출발 인기 노선의 최저가 흐름을 빠르게 확인하세요.",
+      state.myrealtrip.flights.slice(0, 4),
+      renderMrtFlightCard,
+      "표시할 항공권 정보가 없습니다."
+    )
+  ].join("");
+}
+
+async function loadMyRealTripProducts() {
+  renderMyRealTripProducts();
+  const checkIn = dateOffsetIso(1);
+  const checkOut = dateOffsetIso(2);
+
+  try {
+    const [tourResult, stayResult, flightResult] = await Promise.allSettled([
+      fetchMyRealTrip("tna-search", {
+        keyword: "서울 투어",
+        page: 1,
+        size: 3,
+        sort: "review_score_desc"
+      }),
+      fetchMyRealTrip("accommodation-search", {
+        checkIn,
+        checkOut,
+        adultCount: 2,
+        childCount: 0,
+        size: 3
+      }),
+      fetchMyRealTrip("flight-calendar-lowest", {
+        depCityCd: "ICN",
+        arrCityCds: "CJU,BKK,NRT,TYO",
+        period: 5
+      })
+    ]);
+
+    state.myrealtrip = {
+      tours: tourResult.status === "fulfilled" ? (tourResult.value.items || []) : [],
+      stays: stayResult.status === "fulfilled" ? (stayResult.value.items || []) : [],
+      flights: flightResult.status === "fulfilled" ? (Array.isArray(flightResult.value) ? flightResult.value : []) : [],
+      loaded: true,
+      error: [tourResult, stayResult, flightResult].some((result) => result.status === "rejected")
+    };
+  } catch (error) {
+    console.warn("MyRealTrip products could not be loaded.", error);
+    state.myrealtrip = {
+      tours: [],
+      stays: [],
+      flights: [],
+      loaded: true,
+      error: true
+    };
+  }
+
+  renderMyRealTripProducts();
 }
 
 function categoryFeaturedCard(item) {
@@ -1411,6 +1625,7 @@ function init() {
   renderPlaces();
   renderBooking();
   renderCuration();
+  renderMyRealTripProducts();
   renderCategoryNewsSections();
   renderCategoryGroups();
   renderFaq();
@@ -1423,6 +1638,7 @@ function init() {
   applyLanguage();
   loadSeoulCultureEvents();
   loadJulyFestivalPosts();
+  loadMyRealTripProducts();
 }
 
 document.addEventListener("DOMContentLoaded", init);

@@ -676,6 +676,166 @@ main {
   border-top: 1px solid var(--line);
 }
 
+.mrt-section {
+  display: grid;
+  gap: 18px;
+  padding: 10px 0 46px;
+  border-top: 1px solid var(--line);
+}
+
+.mrt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.mrt-panel {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #fff;
+}
+
+.mrt-panel-heading {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.mrt-panel-heading h3 {
+  margin: 0;
+  font-size: 23px;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.mrt-panel-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.mrt-card-list {
+  display: grid;
+  gap: 12px;
+}
+
+.mrt-product-card {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.mrt-product-card:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.mrt-product-card img,
+.mrt-placeholder {
+  width: 104px;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  object-fit: cover;
+  background: var(--surface);
+}
+
+.mrt-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.mrt-product-card div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mrt-product-card em {
+  color: var(--gold);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.mrt-product-card h3 {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.32;
+  letter-spacing: -0.025em;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.mrt-product-card p,
+.mrt-product-card small,
+.mrt-flight-card small {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.mrt-product-card small {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.mrt-link {
+  width: fit-content;
+  margin-top: 4px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.mrt-flight-card {
+  display: grid;
+  gap: 3px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.mrt-flight-card:last-child {
+  border-bottom: 0;
+}
+
+.mrt-flight-card span {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.mrt-flight-card strong {
+  color: var(--ink);
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.mrt-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 #categoryNewsSections {
   display: grid;
   gap: 40px;
@@ -1173,6 +1333,9 @@ main {
   }
 
   .mobile-news-feed,
+  .mrt-section,
+  .mrt-grid,
+  .mrt-panel,
   .category-news-wrapper,
   #categoryNewsSections,
   .news-feature-card,
@@ -1186,6 +1349,7 @@ main {
   .news-feature-body *,
   .news-list-card *,
   .news-recommend-card *,
+  .mrt-section *,
   .category-news-block * {
     overflow-wrap: anywhere;
   }
@@ -1291,6 +1455,44 @@ main {
 
   .category-news-wrapper {
     padding-top: 8px;
+  }
+
+  .mrt-section {
+    gap: 14px;
+    padding: 12px 0 34px;
+  }
+
+  .mrt-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .mrt-panel {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .mrt-panel-heading h3 {
+    font-size: 21px;
+  }
+
+  .mrt-product-card {
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 11px;
+  }
+
+  .mrt-product-card img,
+  .mrt-placeholder {
+    width: 92px;
+    border-radius: 14px;
+  }
+
+  .mrt-product-card h3 {
+    font-size: 16px;
+  }
+
+  .mrt-flight-card strong {
+    font-size: 19px;
   }
 
   #categoryNewsSections {
