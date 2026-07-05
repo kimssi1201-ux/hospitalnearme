@@ -80,6 +80,7 @@ async function handleMyRealTripApi(request, env) {
       );
     }
     requestUrl.searchParams.forEach((value, key) => {
+      if (key === "type" || key === "endpoint") return;
       apiUrl.searchParams.set(key, value);
     });
 
