@@ -16,10 +16,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="travel.css?v=20260706-product-rail-1" />
+    <link rel="stylesheet" href="travel.css?v=20260706-flight-layout-1" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
     <script src="travel-data.js?v=20260705-category-groups-1" defer></script>
-    <script src="travel.js?v=20260706-product-rail-1" defer></script>
+    <script src="travel.js?v=20260706-flight-layout-1" defer></script>
     <title>서울여행뉴스 | 서울 여행 정보 뉴스</title>
   </head>
   <body>
@@ -76,6 +76,17 @@
             <button type="button" data-mrt-tab="flight" role="tab" aria-selected="false">항공권</button>
           </div>
 
+          <div class="mrt-flight-promo" aria-label="항공권 특가 안내">
+            <article>
+              <span>매일 만나는 항공권 특가</span>
+              <strong>서울 출발 인기 노선을 한 번에 확인하세요</strong>
+            </article>
+            <article>
+              <span>추천 노선</span>
+              <strong>일본·동남아 단기 여행 최저가 흐름</strong>
+            </article>
+          </div>
+
           <form class="mrt-search-form is-active" id="mrtStayForm" data-mrt-form="stay">
             <label>
               <span>지역</span>
@@ -113,6 +124,11 @@
           </form>
 
           <form class="mrt-search-form" id="mrtFlightForm" data-mrt-form="flight">
+            <div class="mrt-flight-trip-tabs" aria-label="항공권 여정 종류">
+              <span class="is-active">왕복</span>
+              <span>편도</span>
+              <span>다구간</span>
+            </div>
             <label>
               <span>출발</span>
               <input name="depCityCd" type="text" value="ICN" placeholder="ICN" maxlength="3" />

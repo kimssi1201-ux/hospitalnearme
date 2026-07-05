@@ -672,6 +672,71 @@ function renderMrtFlightCard(item) {
   `;
 }
 
+function flightDestinationName(code = "") {
+  const table = {
+    NRT: "도쿄",
+    HND: "도쿄",
+    KIX: "오사카",
+    FUK: "후쿠오카",
+    CJU: "제주",
+    BKK: "방콕",
+    TPE: "타이베이",
+    SIN: "싱가포르",
+    DAD: "다낭",
+    CEB: "세부"
+  };
+  const key = String(code || "").toUpperCase();
+  return table[key] || key || "추천 도시";
+}
+
+function renderMrtFlightDestination(item = {}) {
+  const code = String(item.arrCityCd || item.toCity || item.arrivalAirport || "").toUpperCase();
+  const city = flightDestinationName(code);
+  const price = formatWon(item.totalPrice || item.price || item.lowestPrice);
+  const schedule = [
+    item.departureDate ? `${formatMrtDate(item.departureDate)} 출발` : "",
+    item.returnDate ? `${formatMrtDate(item.returnDate)} 귀국` : "",
+    item.airline || ""
+  ].filter(Boolean).join(" · ");
+
+  return `
+    <a class="mrt-flight-destination" href="#bookingSearch" data-mrt-open="flight" data-mrt-dep-city="${escapeHtml(String(item.depCityCd || item.fromCity || "ICN").toUpperCase())}" data-mrt-arr-cities="${escapeHtml(code || "NRT")}" aria-label="${escapeHtml(`${city} 항공권 검색`)}">
+      <span aria-hidden="true">${escapeHtml(code ? code.slice(0, 2) : "AIR")}</span>
+      <strong>${escapeHtml(city)} <em>${escapeHtml(price)} ~</em></strong>
+      <small>${escapeHtml(schedule || "서울 출발 추천 노선")}</small>
+      <b aria-hidden="true">›</b>
+    </a>
+  `;
+}
+
+function renderMrtFlightDiscovery(items = []) {
+  const fallback = [
+    { depCityCd: "ICN", arrCityCd: "NRT", totalPrice: 190500, departureDate: dateOffsetIso(44), returnDate: dateOffsetIso(47), airline: "3일" },
+    { depCityCd: "ICN", arrCityCd: "KIX", totalPrice: 204870, departureDate: dateOffsetIso(18), returnDate: dateOffsetIso(21), airline: "3일" },
+    { depCityCd: "ICN", arrCityCd: "FUK", totalPrice: 283400, departureDate: dateOffsetIso(31), returnDate: dateOffsetIso(34), airline: "3일" }
+  ];
+  const list = (items.length ? items : fallback).slice(0, 6);
+
+  return `
+    <section class="mrt-flight-discovery" aria-labelledby="mrtFlightDiscoveryTitle">
+      <div class="mrt-flight-destination-head">
+        <h3 id="mrtFlightDiscoveryTitle">언제, 어디로 떠날까요?</h3>
+        <p>인천 출발 기준으로 확인 가능한 추천 노선을 보여드립니다.</p>
+      </div>
+      <div class="mrt-flight-region-tabs" aria-label="항공권 추천 지역">
+        <span class="is-active">추천</span>
+        <span>동아시아</span>
+        <span>동남아시아</span>
+        <span>미주</span>
+        <span>유럽</span>
+      </div>
+      <div class="mrt-flight-destination-list">
+        ${list.map(renderMrtFlightDestination).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function mrtFeedImage(url, title) {
   return `
     <div class="image-frame image-frame--feed mrt-feed-thumb">
@@ -974,6 +1039,13 @@ function renderMyRealTripProducts() {
   status.hidden = true;
   grid.classList.add("is-single");
   const activePanel = activeMrtPanelConfig();
+  if ((state.activeMrtTab || "stay") === "flight") {
+    grid.classList.add("is-flight");
+    grid.innerHTML = renderMrtFlightDiscovery(activePanel.items);
+    return;
+  }
+
+  grid.classList.remove("is-flight");
   grid.innerHTML = renderMrtPanel(
     activePanel.title,
     activePanel.subtitle,
@@ -1039,6 +1111,7 @@ function setActiveMrtTab(tab) {
   document.querySelectorAll("[data-mrt-form]").forEach((form) => {
     form.classList.toggle("is-active", form.dataset.mrtForm === tab);
   });
+  $("#bookingSearch .mrt-search-box")?.classList.toggle("is-flight-mode", tab === "flight");
   renderMyRealTripProducts();
 }
 

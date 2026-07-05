@@ -973,6 +973,48 @@ body.booking-search-open {
   color: #fff;
 }
 
+.mrt-flight-promo {
+  display: none;
+  grid-template-columns: minmax(0, 1.35fr) minmax(150px, 0.65fr);
+  gap: 10px;
+}
+
+.mrt-search-box.is-flight-mode .mrt-flight-promo {
+  display: grid;
+}
+
+.mrt-flight-promo article {
+  display: grid;
+  align-content: end;
+  min-height: 108px;
+  padding: 16px;
+  overflow: hidden;
+  border-radius: 16px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(11, 44, 68, 0.85), rgba(15, 92, 74, 0.5)),
+    url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80") center / cover;
+}
+
+.mrt-flight-promo article:nth-child(2) {
+  background:
+    linear-gradient(135deg, rgba(17, 17, 17, 0.78), rgba(188, 125, 50, 0.45)),
+    url("https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?auto=format&fit=crop&w=600&q=80") center / cover;
+}
+
+.mrt-flight-promo span {
+  font-size: 12px;
+  font-weight: 900;
+  opacity: 0.88;
+}
+
+.mrt-flight-promo strong {
+  max-width: 320px;
+  font-size: 24px;
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+}
+
 .mrt-search-form {
   display: none;
   grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
@@ -1009,6 +1051,42 @@ body.booking-search-open {
 .mrt-search-form button {
   min-width: 128px;
   padding: 0 18px;
+}
+
+.mrt-flight-trip-tabs {
+  display: none;
+}
+
+.mrt-search-form[data-mrt-form="flight"].is-active {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 18px;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 12px 34px rgba(20, 20, 20, 0.08);
+}
+
+.mrt-search-form[data-mrt-form="flight"].is-active .mrt-flight-trip-tabs {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 12px;
+}
+
+.mrt-flight-trip-tabs span {
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.mrt-flight-trip-tabs .is-active {
+  color: var(--ink);
+}
+
+.mrt-search-form[data-mrt-form="flight"].is-active button {
+  grid-column: 1 / -1;
+  min-height: 54px;
+  border-color: #111;
+  border-radius: 12px;
+  background: #111;
 }
 
 .mrt-grid {
@@ -1164,6 +1242,124 @@ body.booking-search-open {
   color: var(--ink);
   font-size: 21px;
   line-height: 1.2;
+}
+
+.mrt-grid.is-flight {
+  grid-template-columns: minmax(0, 760px);
+}
+
+.mrt-flight-discovery {
+  display: grid;
+  gap: 14px;
+}
+
+.mrt-flight-destination-head {
+  display: grid;
+  gap: 5px;
+}
+
+.mrt-flight-destination-head h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 25px;
+  line-height: 1.22;
+  letter-spacing: -0.035em;
+}
+
+.mrt-flight-destination-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mrt-flight-region-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.mrt-flight-region-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.mrt-flight-region-tabs span {
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 900;
+  background: #fff;
+}
+
+.mrt-flight-region-tabs .is-active {
+  border-color: #111;
+  color: #fff;
+  background: #111;
+}
+
+.mrt-flight-destination-list {
+  display: grid;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #f6f8f7;
+}
+
+.mrt-flight-destination {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 28px;
+  gap: 13px;
+  align-items: center;
+  min-height: 82px;
+  padding: 14px 16px;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(20, 20, 20, 0.06);
+}
+
+.mrt-flight-destination:last-child {
+  border-bottom: 0;
+}
+
+.mrt-flight-destination > span {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  color: #c90025;
+  font-size: 13px;
+  font-weight: 900;
+  background: #fff;
+}
+
+.mrt-flight-destination strong {
+  display: block;
+  color: var(--ink);
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+.mrt-flight-destination em {
+  color: #1687c9;
+  font-style: normal;
+}
+
+.mrt-flight-destination small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.mrt-flight-destination b {
+  color: #9aa1a6;
+  font-size: 34px;
+  font-weight: 300;
 }
 
 .mrt-empty {
@@ -1848,6 +2044,34 @@ body.booking-search-open {
     gap: 10px;
   }
 
+  .mrt-flight-promo {
+    grid-template-columns: minmax(260px, 1fr) minmax(180px, 0.7fr);
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .mrt-flight-promo::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mrt-flight-promo article {
+    min-height: 106px;
+  }
+
+  .mrt-flight-promo strong {
+    font-size: 21px;
+  }
+
+  .mrt-search-form[data-mrt-form="flight"].is-active {
+    grid-template-columns: 1fr 1fr;
+    padding: 14px;
+  }
+
+  .mrt-search-form[data-mrt-form="flight"].is-active label:nth-of-type(3) {
+    grid-column: 1 / -1;
+  }
+
   .mrt-search-form input,
   .mrt-search-form select {
     min-height: 46px;
@@ -1860,6 +2084,26 @@ body.booking-search-open {
   .mrt-grid {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  .mrt-flight-destination-head h3 {
+    font-size: 23px;
+  }
+
+  .mrt-flight-destination {
+    grid-template-columns: 48px minmax(0, 1fr) 22px;
+    gap: 11px;
+    min-height: 76px;
+    padding: 13px 14px;
+  }
+
+  .mrt-flight-destination > span {
+    width: 48px;
+    height: 48px;
+  }
+
+  .mrt-flight-destination strong {
+    font-size: 17px;
   }
 
   .mrt-panel {
