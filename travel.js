@@ -247,6 +247,28 @@ function displayReadTime(item) {
   return item.readTime || "";
 }
 
+function groupedCategoryName(category = "") {
+  const value = String(category || "").trim();
+  if (!value) return "기타";
+  if (value === "전시/미술") return "전시/미술";
+  if (value === "교육/체험") return "교육/체험";
+  if (value === "영화") return "영화";
+  if (value.startsWith("축제-")) return "축제";
+  if (["클래식", "연극", "콘서트", "무용", "국악", "뮤지컬/오페라", "독주/독창회"].includes(value)) {
+    return "공연/무대";
+  }
+  return "기타";
+}
+
+function withGroupedCategory(item) {
+  const rawCategory = item.category || "서울 문화행사";
+  return {
+    ...item,
+    rawCategory,
+    category: groupedCategoryName(rawCategory)
+  };
+}
+
 function articleMeta(item) {
   return `<span>${escapeHtml(item.date)}</span><span>${escapeHtml(displayReadTime(item))}</span>`;
 }
@@ -318,7 +340,8 @@ function normalizeSeoulCultureItems(items) {
     .map((item, index) => ({
       id: item.id || `seoul-culture-${index}`,
       source: "seoul",
-      category: item.category || "서울 문화행사",
+      rawCategory: item.category || "서울 문화행사",
+      category: groupedCategoryName(item.category || "서울 문화행사"),
       title: item.title,
       summary: item.summary || `${item.address || "서울"}에서 진행되는 문화행사입니다.`,
       date: item.date || "일정 확인 필요",
@@ -430,28 +453,30 @@ function categoryItems(seedItems, fallbackItems, offset = 0, limit = 8) {
 }
 
 function buildCategoryNewsGroups() {
-  const apiItems = state.apiArticles || [];
+  const apiItems = (state.apiArticles || []).map(withGroupedCategory);
   const julyItems = state.julyArticles || [];
-  const localItems = [];
-  const allItems = uniqueArticles([...apiItems, ...julyItems, ...localItems]);
-  const guideItems = localItems.filter((item) => /준비|체크|방문|야간|가족|입장권|우천|요령/.test(`${item.category} ${item.title}`));
-  const summerItems = uniqueArticles([
-    ...julyItems,
-    ...localItems.filter((item) => /여름|7월|야간|먹거리|비 오는/.test(`${item.category} ${item.title}`))
-  ]);
-  const regionItems = uniqueArticles([
-    ...apiItems,
-    ...julyItems.filter((item) => /서울/.test(`${item.category} ${item.address || ""}`))
-  ]);
+  const localItems = (julyItems || []).map(withGroupedCategory);
+  const allItems = uniqueArticles([...apiItems, ...localItems]);
+  const groupMeta = [
+    { id: "exhibition", title: "전시/미술", subtitle: "미술관, 갤러리, 전시 공간에서 열리는 서울 문화행사" },
+    { id: "performance", title: "공연/무대", subtitle: "클래식, 연극, 콘서트, 무용, 국악, 뮤지컬 공연" },
+    { id: "experience", title: "교육/체험", subtitle: "어린이, 가족, 성인 대상 체험과 강좌 프로그램" },
+    { id: "movie", title: "영화", subtitle: "영화 상영, 영화제, 영상 관련 문화행사" },
+    { id: "festival", title: "축제", subtitle: "문화예술, 관광, 전통, 체육 성격의 서울 축제" },
+    { id: "etc", title: "기타", subtitle: "그 외 서울에서 진행되는 문화행사와 방문 정보" }
+  ];
 
-  return [
-    { id: "festival", title: "Festival", subtitle: "지금 확인할 서울 축제", items: categoryItems(allItems, localItems, 0) },
-    { id: "places", title: "Seoul", subtitle: "서울에서 열리는 축제 뉴스", items: categoryItems(regionItems, allItems, 1) },
-    { id: "collection", title: "Collection", subtitle: "사진으로 먼저 보는 서울 추천 행사", items: categoryItems(julyItems, allItems, 2) },
-    { id: "travel", title: "Travel", subtitle: "축제와 함께 잡는 서울 여행 동선", items: categoryItems(summerItems, allItems, 3) },
-    { id: "booking", title: "Check", subtitle: "방문 전 확인할 준비 정보", items: categoryItems(guideItems, allItems, 4) },
-    { id: "info", title: "Guide", subtitle: "현장에서 도움이 되는 이용 가이드", items: categoryItems(guideItems, allItems, 5) }
-  ].filter((group) => group.items.length);
+  return groupMeta
+    .map((group, index) => ({
+      ...group,
+      items: categoryItems(
+        allItems.filter((item) => item.category === group.title),
+        [],
+        index,
+        8
+      )
+    }))
+    .filter((group) => group.items.length);
 }
 
 function renderCategoryNewsBlock(group) {
