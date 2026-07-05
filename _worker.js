@@ -16,9 +16,112 @@ export default {
       return handleSeoulParkingApi(request, env);
     }
 
+    if (url.pathname === "/api/myrealtrip") {
+      return handleMyRealTripApi(request, env);
+    }
+
     return env.ASSETS.fetch(request);
   }
 };
+
+async function handleMyRealTripApi(request, env) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: apiHeaders(request)
+    });
+  }
+
+  if (request.method !== "GET") {
+    return jsonResponse({ ok: false, message: "GET method required." }, 405, request);
+  }
+
+  if (!isSameOriginRequest(request)) {
+    return jsonResponse({ ok: false, message: "Forbidden origin." }, 403, request);
+  }
+
+  const apiKey = String(env.MYREALTRIP_API_KEY || "").trim();
+  const endpoint = String(env.MYREALTRIP_API_ENDPOINT || "").trim();
+
+  if (!apiKey) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "missing_myrealtrip_key",
+        message: "MYREALTRIP_API_KEY 환경변수가 설정되지 않았습니다."
+      },
+      500,
+      request
+    );
+  }
+
+  if (!endpoint) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "missing_myrealtrip_endpoint",
+        message: "MYREALTRIP_API_ENDPOINT 환경변수가 설정되지 않았습니다. 마이리얼트립 API 문서의 실제 요청 URL을 등록해야 합니다."
+      },
+      500,
+      request
+    );
+  }
+
+  try {
+    const requestUrl = new URL(request.url);
+    const apiUrl = new URL(endpoint);
+    requestUrl.searchParams.forEach((value, key) => {
+      apiUrl.searchParams.set(key, value);
+    });
+
+    const response = await fetch(apiUrl.toString(), {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        "x-api-key": apiKey
+      }
+    });
+    const contentType = response.headers.get("content-type") || "";
+    const payload = contentType.includes("application/json")
+      ? await response.json()
+      : { raw: await response.text() };
+
+    if (!response.ok) {
+      return jsonResponse(
+        {
+          ok: false,
+          code: "myrealtrip_request_failed",
+          status: response.status,
+          message: payload?.message || payload?.error || "MyRealTrip API 요청에 실패했습니다.",
+          data: payload
+        },
+        response.status,
+        request
+      );
+    }
+
+    return jsonResponse(
+      {
+        ok: true,
+        source: "MyRealTrip",
+        data: payload
+      },
+      200,
+      request,
+      { "cache-control": "public, max-age=900" }
+    );
+  } catch (error) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "myrealtrip_proxy_error",
+        message: error?.message || "MyRealTrip API 프록시 처리 중 오류가 발생했습니다."
+      },
+      500,
+      request
+    );
+  }
+}
 
 async function handleSeoulEventsApi(request, env) {
   if (request.method === "OPTIONS") {
