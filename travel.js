@@ -479,6 +479,30 @@ function buildCategoryNewsGroups() {
     .filter((group) => group.items.length);
 }
 
+function renderTopCategoryTabs(groups = buildCategoryNewsGroups()) {
+  const target = $("#topCategoryTabs");
+  if (!target) return;
+
+  target.innerHTML = groups.map((group, index) => `
+    <a class="category-tab ${index === 0 ? "is-active" : ""}" href="#${escapeHtml(group.id)}">
+      ${escapeHtml(group.title)}
+    </a>
+  `).join("");
+}
+
+function bindTopCategoryTabs() {
+  const target = $("#topCategoryTabs");
+  if (!target) return;
+
+  target.addEventListener("click", (event) => {
+    const link = event.target.closest(".category-tab");
+    if (!link) return;
+    target.querySelectorAll(".category-tab").forEach((item) => {
+      item.classList.toggle("is-active", item === link);
+    });
+  });
+}
+
 function renderCategoryNewsBlock(group) {
   const [featured, ...rest] = group.items;
   const recommended = rest.slice(0, 3);
@@ -510,6 +534,7 @@ function renderCategoryNewsSections() {
   if (!target) return;
 
   const groups = buildCategoryNewsGroups();
+  renderTopCategoryTabs(groups);
   target.innerHTML = groups.map((group) => renderCategoryNewsBlock(group)).join("");
 }
 
@@ -1200,6 +1225,7 @@ function init() {
   bindMenu();
   bindRegionChips();
   bindRegionLinks();
+  bindTopCategoryTabs();
   bindLanguageSwitch();
   applyLanguage();
   loadSeoulCultureEvents();
