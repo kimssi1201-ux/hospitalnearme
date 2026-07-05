@@ -1,6 +1,11 @@
 const OPENAI_ENDPOINT = "https://api.openai.com/v1/responses";
 const MYREALTRIP_API_BASE = "https://partner-ext-api.myrealtrip.com";
-const MYREALTRIP_DEFAULT_ENDPOINT = `${MYREALTRIP_API_BASE}/v1/products/accommodation/search`;
+const MYREALTRIP_ENDPOINTS = {
+  "tna-categories": "/v1/products/tna/categories",
+  "airport-autocomplete": "/v1/products/flight/airport-autocomplete",
+  "accommodation-search": "/v1/products/accommodation/search"
+};
+const MYREALTRIP_DEFAULT_ENDPOINT = `${MYREALTRIP_API_BASE}${MYREALTRIP_ENDPOINTS["tna-categories"]}`;
 
 export default {
   async fetch(request, env) {
@@ -43,7 +48,10 @@ async function handleMyRealTripApi(request, env) {
   }
 
   const apiKey = String(env.MYREALTRIP_API_KEY || "").trim();
-  const endpoint = normalizeMyRealTripEndpoint(env.MYREALTRIP_API_ENDPOINT);
+  const requestUrl = new URL(request.url);
+  const endpoint = normalizeMyRealTripEndpoint(
+    requestUrl.searchParams.get("endpoint") || requestUrl.searchParams.get("type") || env.MYREALTRIP_API_ENDPOINT
+  );
 
   if (!apiKey) {
     return jsonResponse(
@@ -58,7 +66,6 @@ async function handleMyRealTripApi(request, env) {
   }
 
   try {
-    const requestUrl = new URL(request.url);
     const apiUrl = new URL(endpoint);
     const privatePath = apiUrl.pathname.toLowerCase();
     if (privatePath.includes("/revenues") || privatePath.includes("/settlement") || privatePath.includes("/orders")) {
@@ -128,6 +135,7 @@ async function handleMyRealTripApi(request, env) {
 function normalizeMyRealTripEndpoint(value) {
   const endpoint = String(value || "").trim();
   if (!endpoint) return MYREALTRIP_DEFAULT_ENDPOINT;
+  if (MYREALTRIP_ENDPOINTS[endpoint]) return `${MYREALTRIP_API_BASE}${MYREALTRIP_ENDPOINTS[endpoint]}`;
   if (endpoint.startsWith("/")) return `${MYREALTRIP_API_BASE}${endpoint}`;
   return endpoint;
 }
