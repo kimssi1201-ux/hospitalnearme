@@ -767,7 +767,7 @@ main {
   display: none;
 }
 
-.mrt-feed-tabs span {
+.mrt-feed-tabs button {
   flex: 0 0 auto;
   padding: 9px 14px;
   border: 1px solid var(--line);
@@ -776,12 +776,20 @@ main {
   font-size: 14px;
   font-weight: 800;
   background: #fff;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .mrt-feed-tabs .is-active {
   border-color: #111;
   color: #fff;
   background: #111;
+}
+
+.mrt-feed-module[data-active-filter="tour"] .mrt-rail-card:not([data-filter="tour"]),
+.mrt-feed-module[data-active-filter="stay"] .mrt-rail-card:not([data-filter="stay"]),
+.mrt-feed-module[data-active-filter="ticket"] .mrt-rail-card:not([data-filter="ticket"]) {
+  display: none;
 }
 
 .mrt-rail {

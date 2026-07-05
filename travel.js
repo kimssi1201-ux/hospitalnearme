@@ -840,8 +840,23 @@ function mrtProductLinkAttrs(kind, item = {}) {
   return `href="#bookingSearch" data-mrt-open="${tab}" data-mrt-keyword="${escapeHtml(keyword)}"`;
 }
 
+function mrtRailFilterKind(kind, item = {}) {
+  if (kind === "stay") return "stay";
+  const text = [
+    item.itemName,
+    item.title,
+    item.category,
+    item.categoryName,
+    item.description
+  ].filter(Boolean).join(" ");
+  return /입장|티켓|전시|미술관|박물관|아쿠아리움|전망대|테마파크|궁궐/.test(text)
+    ? "ticket"
+    : "tour";
+}
+
 function renderMrtRailProduct(kind, item = {}) {
   const isStay = kind === "stay";
+  const filterKind = mrtRailFilterKind(kind, item);
   const title = item.itemName || (isStay ? "서울 숙소 검색" : "서울 투어·티켓 검색");
   const category = isStay ? "국내숙소" : item.category || "투어·티켓";
   const price = item.priceDisplay || formatWon(item.salePrice || item.originalPrice);
@@ -849,7 +864,7 @@ function renderMrtRailProduct(kind, item = {}) {
   const meta = [rating, price].filter(Boolean).join(" · ");
 
   return `
-    <article class="mrt-rail-card">
+    <article class="mrt-rail-card" data-mrt-rail-card data-filter="${escapeHtml(filterKind)}">
       <a ${mrtProductLinkAttrs(kind, item)} aria-label="${escapeHtml(title)}">
         <div class="mrt-rail-image">
           ${item.imageUrl
@@ -868,12 +883,14 @@ function renderMrtRailProduct(kind, item = {}) {
 
 function renderMrtRailSearchCard(kind) {
   const isStay = kind === "stay";
+  const isTicket = kind === "ticket";
   const title = isStay ? "서울 숙소 조건별 검색" : "서울 입장권·체험 검색";
-  const label = isStay ? "국내숙소" : "투어·티켓";
+  const label = isStay ? "국내숙소" : (isTicket ? "입장권" : "투어·티켓");
   const body = isStay ? "지역, 체크인, 인원 기준으로 비교" : "전시, 공연, 체험 상품 한 번에 확인";
+  const filterKind = isStay ? "stay" : (isTicket ? "ticket" : "tour");
 
   return `
-    <article class="mrt-rail-card mrt-rail-card--cta">
+    <article class="mrt-rail-card mrt-rail-card--cta" data-mrt-rail-card data-filter="${escapeHtml(filterKind)}">
       <a href="#bookingSearch" data-mrt-open="${isStay ? "stay" : "tour"}" data-mrt-keyword="${escapeHtml(isStay ? "서울" : "서울 입장권")}" aria-label="${escapeHtml(title)}">
         <div class="mrt-rail-image" aria-hidden="true">
           <span>${escapeHtml(isStay ? "STAY" : "TICKET")}</span>
@@ -902,6 +919,7 @@ function myRealTripFeedRailItems() {
 
   items.push(
     renderMrtRailSearchCard("tour"),
+    renderMrtRailSearchCard("ticket"),
     renderMrtRailSearchCard("stay")
   );
 
@@ -914,10 +932,9 @@ function renderMrtFeedModule(seed = "main", position = 0) {
 
   const offset = (adRotationOffset(seed) + position) % items.length;
   const rotated = [...items.slice(offset), ...items.slice(0, offset)];
-  const visible = rotated.slice(0, Math.min(4, rotated.length));
 
   return `
-    <section class="mrt-feed-module" aria-label="서울 여행 예약 추천">
+    <section class="mrt-feed-module" data-active-filter="tour" aria-label="서울 여행 예약 추천">
       <div class="mrt-feed-module-head">
         <div>
           <p class="eyebrow">Travel Pick</p>
@@ -926,12 +943,12 @@ function renderMrtFeedModule(seed = "main", position = 0) {
         <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권">더보기</a>
       </div>
       <div class="mrt-feed-tabs" aria-label="상품 종류">
-        <span class="is-active">투어·티켓</span>
-        <span>국내숙소</span>
-        <span>입장권</span>
+        <button class="is-active" type="button" data-mrt-rail-filter="tour" aria-pressed="true">투어·티켓</button>
+        <button type="button" data-mrt-rail-filter="stay" aria-pressed="false">국내숙소</button>
+        <button type="button" data-mrt-rail-filter="ticket" aria-pressed="false">입장권</button>
       </div>
       <div class="mrt-rail">
-        ${visible.join("")}
+        ${rotated.join("")}
       </div>
     </section>
   `;
@@ -2160,6 +2177,25 @@ function renderFooter() {
   `).join("");
 }
 
+function bindMrtRailFilters() {
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-mrt-rail-filter]");
+    if (!button) return;
+
+    const module = button.closest(".mrt-feed-module");
+    if (!module) return;
+
+    event.preventDefault();
+    const filter = button.getAttribute("data-mrt-rail-filter") || "tour";
+    module.setAttribute("data-active-filter", filter);
+    module.querySelectorAll("[data-mrt-rail-filter]").forEach((item) => {
+      const isActive = item === button;
+      item.classList.toggle("is-active", isActive);
+      item.setAttribute("aria-pressed", String(isActive));
+    });
+  });
+}
+
 function bindFooterLinks() {
   document.addEventListener("click", (event) => {
     const link = event.target.closest("a[data-mrt-open]");
@@ -2284,6 +2320,7 @@ function init() {
   bindRegionChips();
   bindRegionLinks();
   bindFooterLinks();
+  bindMrtRailFilters();
   bindBookingSearchPanel();
   bindMyRealTripSearch();
   bindTopCategoryTabs();
