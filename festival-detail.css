@@ -581,6 +581,208 @@
   }
 }
 
+/* Absolute final mobile text guard: do not crop article copy. */
+@media (max-width: 760px) {
+  html,
+  body,
+  .detail-main,
+  .blog-article,
+  .blog-header,
+  .blog-body,
+  .blog-body section {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .blog-header,
+  .blog-body {
+    overflow-y: visible !important;
+  }
+
+  .blog-header h1,
+  .blog-lede,
+  .article-meta,
+  .blog-body h2,
+  .blog-body h3,
+  .blog-body p,
+  .blog-body li,
+  .blog-body dd,
+  .blog-body strong,
+  .blog-body span {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    -webkit-line-clamp: unset !important;
+    -webkit-box-orient: initial !important;
+    word-break: keep-all !important;
+    overflow-wrap: anywhere !important;
+    line-break: auto !important;
+  }
+
+  .blog-header h1 {
+    font-size: 30px !important;
+    line-height: 1.28 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .blog-lede {
+    font-size: 18px !important;
+    line-height: 1.76 !important;
+    color: #4f4942 !important;
+  }
+
+  .article-meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px 12px !important;
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+
+  .blog-body h2 {
+    font-size: 26px !important;
+    line-height: 1.32 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .blog-body h3 {
+    font-size: 21px !important;
+    line-height: 1.38 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .blog-body p,
+  .blog-body li,
+  .blog-body dd {
+    font-size: 18px !important;
+    line-height: 1.78 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .detail-hero-image,
+  .detail-hero-image img,
+  .api-image-gallery,
+  .api-image-grid,
+  .api-image-grid figure,
+  .api-image-grid img {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    aspect-ratio: auto !important;
+  }
+
+  .detail-hero-image img,
+  .api-image-grid img {
+    object-fit: contain !important;
+  }
+}
+
+/* Absolute final mobile text guard: do not crop article copy. */
+@media (max-width: 760px) {
+  html,
+  body,
+  .detail-main,
+  .blog-article,
+  .blog-header,
+  .blog-body,
+  .blog-body section {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .blog-header,
+  .blog-body {
+    overflow-y: visible !important;
+  }
+
+  .blog-header h1,
+  .blog-lede,
+  .article-meta,
+  .blog-body h2,
+  .blog-body h3,
+  .blog-body p,
+  .blog-body li,
+  .blog-body dd,
+  .blog-body strong,
+  .blog-body span {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    -webkit-line-clamp: unset !important;
+    -webkit-box-orient: initial !important;
+    word-break: keep-all !important;
+    overflow-wrap: anywhere !important;
+    line-break: auto !important;
+  }
+
+  .blog-header h1 {
+    font-size: 30px !important;
+    line-height: 1.28 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .blog-lede {
+    font-size: 18px !important;
+    line-height: 1.76 !important;
+    color: #4f4942 !important;
+  }
+
+  .article-meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px 12px !important;
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+
+  .blog-body h2 {
+    font-size: 26px !important;
+    line-height: 1.32 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .blog-body h3 {
+    font-size: 21px !important;
+    line-height: 1.38 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .blog-body p,
+  .blog-body li,
+  .blog-body dd {
+    font-size: 18px !important;
+    line-height: 1.78 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .detail-hero-image,
+  .detail-hero-image img,
+  .api-image-gallery,
+  .api-image-grid,
+  .api-image-grid figure,
+  .api-image-grid img {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    aspect-ratio: auto !important;
+  }
+
+  .detail-hero-image img,
+  .api-image-grid img {
+    object-fit: contain !important;
+  }
+}
+
 /* Last mobile override: readable article text and full poster images. */
 @media (max-width: 760px) {
   .detail-main {

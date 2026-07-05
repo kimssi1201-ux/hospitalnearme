@@ -12,8 +12,8 @@
     <meta property="og:description" content="서울 축제와 서울 여행 정보를 블로그형 상세 글로 확인하세요." />
     <meta property="og:type" content="article" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="travel.css?v=20260705-mobile-readable-final-1" />
-    <link rel="stylesheet" href="festival-detail.css?v=20260705-mobile-readable-final-1" />
+    <link rel="stylesheet" href="travel.css?v=20260705-no-crop-1" />
+    <link rel="stylesheet" href="festival-detail.css?v=20260705-no-crop-1" />
     <style>
       @media (max-width: 760px) {
         html,
@@ -140,8 +140,42 @@
           word-break: keep-all !important;
           overflow-wrap: anywhere !important;
         }
+
+        .blog-header h1,
+        .blog-lede,
+        .article-meta,
+        .blog-body h2,
+        .blog-body h3,
+        .blog-body p,
+        .blog-body li,
+        .blog-body dd,
+        .blog-body strong,
+        .blog-body span {
+          height: auto !important;
+          max-height: none !important;
+          overflow: visible !important;
+          white-space: normal !important;
+          text-overflow: clip !important;
+          -webkit-line-clamp: unset !important;
+          -webkit-box-orient: initial !important;
+          word-break: keep-all !important;
+          overflow-wrap: anywhere !important;
+        }
+
+        .blog-header h1 {
+          font-size: 30px !important;
+          line-height: 1.28 !important;
+          letter-spacing: 0 !important;
+        }
+
+        .article-meta {
+          display: flex !important;
+          flex-wrap: wrap !important;
+          gap: 8px 12px !important;
+        }
       }
     </style>
+    <link rel="stylesheet" href="festival-mobile-fix.css?v=20260705-no-crop-1" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
     <script src="travel-data.js?v=20260705-month-filter-1" defer></script>
     <script src="festival-detail.js?v=20260705-mobile-info-table-1" defer></script>

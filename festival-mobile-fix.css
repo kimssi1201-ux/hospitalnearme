@@ -1,0 +1,151 @@
+@media (max-width: 760px) {
+  html,
+  body {
+    width: 100%;
+    overflow-x: hidden !important;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  .detail-main {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 18px 18px 40px !important;
+    overflow-x: hidden !important;
+  }
+
+  .blog-article,
+  .blog-header,
+  .blog-body,
+  .blog-body section {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .blog-header {
+    padding: 0 0 24px !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .blog-header h1 {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    color: var(--ink) !important;
+    font-size: 30px !important;
+    line-height: 1.28 !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    word-break: keep-all !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .blog-lede {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 16px 0 0 !important;
+    color: #4f4942 !important;
+    font-size: 18px !important;
+    line-height: 1.76 !important;
+    font-weight: 500 !important;
+    letter-spacing: 0 !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    -webkit-line-clamp: unset !important;
+    -webkit-box-orient: initial !important;
+    word-break: keep-all !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .article-meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-top: 12px !important;
+    overflow: visible !important;
+    color: var(--muted) !important;
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+
+  .detail-hero-image,
+  .api-image-gallery,
+  .api-image-grid,
+  .api-image-grid figure {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    overflow: visible !important;
+  }
+
+  .detail-hero-image img,
+  .api-image-grid img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    object-fit: contain !important;
+  }
+
+  .blog-body h2,
+  .blog-body h3,
+  .blog-body p,
+  .blog-body li,
+  .blog-body dd,
+  .blog-body strong,
+  .blog-body span {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    -webkit-line-clamp: unset !important;
+    -webkit-box-orient: initial !important;
+    word-break: keep-all !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .blog-body h2 {
+    font-size: 26px !important;
+    line-height: 1.32 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .blog-body h3 {
+    font-size: 21px !important;
+    line-height: 1.38 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .blog-body p,
+  .blog-body li,
+  .blog-body dd {
+    font-size: 18px !important;
+    line-height: 1.78 !important;
+    letter-spacing: 0 !important;
+  }
+
+  .spot-detail-section p {
+    display: block !important;
+  }
+}
