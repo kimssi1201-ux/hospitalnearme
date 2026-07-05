@@ -237,34 +237,6 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function FeedAdBox(index) {
-  return `
-    <aside class="feed-ad-slot" aria-label="Advertisement ${index}">
-      <span>ADVERTISEMENT</span>
-      <ins
-        class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-8468106244002167"
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      ></ins>
-    </aside>
-  `;
-}
-
-function refreshFeedAds() {
-  if (!window.adsbygoogle) return;
-
-  document.querySelectorAll(".feed-ad-slot ins.adsbygoogle:not([data-ad-loaded])").forEach((slot) => {
-    slot.dataset.adLoaded = "true";
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (error) {
-      console.info("AdSense feed slot is not ready yet.", error);
-    }
-  });
-}
-
 function imageMarkup(item, size = "card") {
   const title = displayArticleTitle(item);
   return `
@@ -704,22 +676,13 @@ function myRealTripFeedCards() {
 function buildNewsFeedMarkup(feedItems) {
   const blocks = [];
   const mrtCards = myRealTripFeedCards();
-  const mrtInsertAfter = new Map([
-    [5, 0],
-    [10, 1],
-    [14, 2]
-  ]);
 
   feedItems.forEach((item, index) => {
     const articleNumber = index + 1;
     blocks.push(newsListCard(item));
 
-    if (articleNumber % 3 === 0) {
-      blocks.push(FeedAdBox(articleNumber / 3));
-    }
-
-    const mrtIndex = mrtInsertAfter.get(articleNumber);
-    if (mrtIndex !== undefined && mrtCards[mrtIndex]) {
+    if (articleNumber % 3 === 0 && mrtCards.length) {
+      const mrtIndex = (articleNumber / 3 - 1) % mrtCards.length;
       blocks.push(mrtCards[mrtIndex]);
     }
   });
@@ -1380,7 +1343,6 @@ function renderJulyFestivals() {
   recommended.innerHTML = items.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
   const feedItems = items.slice(3, 18);
   feed.innerHTML = buildNewsFeedMarkup(feedItems);
-  refreshFeedAds();
 }
 
 async function loadSeoulCultureEvents() {
