@@ -1268,7 +1268,7 @@ async function hydrateNearbyParking(article) {
   }
 
   try {
-    const query = new URLSearchParams({ lat, lng, limit: "300" });
+    const query = new URLSearchParams({ lat, lng, limit: "1000" });
     const response = await fetch(`/api/seoul-parking?${query.toString()}`, {
       headers: { Accept: "application/json" }
     });

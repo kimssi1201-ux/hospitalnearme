@@ -317,8 +317,8 @@ function normalizeParkingRows(row) {
 }
 
 function normalizeParkingLot(item) {
-  const lat = toNumber(item.LAT || item.LATITUDE || item.Y_CODE);
-  const lng = toNumber(item.LNG || item.LONGITUDE || item.LOT || item.X_CODE);
+  const lat = normalizeSeoulLatitude(toNumber(item.LAT || item.LATITUDE || item.Y_CODE));
+  const lng = normalizeSeoulLongitude(toNumber(item.LNG || item.LONGITUDE || item.LOT || item.X_CODE));
   const weekday = formatParkingHours(item.WEEKDAY_BEGIN_TIME, item.WEEKDAY_END_TIME);
   const weekend = formatParkingHours(item.WEEKEND_BEGIN_TIME, item.WEEKEND_END_TIME);
   const holiday = formatParkingHours(item.HOLIDAY_BEGIN_TIME, item.HOLIDAY_END_TIME);
@@ -341,6 +341,14 @@ function normalizeParkingLot(item) {
     lat,
     lng
   };
+}
+
+function normalizeSeoulLatitude(value) {
+  return Number.isFinite(value) && value >= 37 && value <= 38 ? value : null;
+}
+
+function normalizeSeoulLongitude(value) {
+  return Number.isFinite(value) && value >= 126 && value <= 128 ? value : null;
 }
 
 function rankParkingRows(rows, lat, lng) {
