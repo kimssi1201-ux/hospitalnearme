@@ -1283,6 +1283,48 @@ function regionLinkMarkup(label) {
   return `<a href="${regionId ? "#places" : "#"}"${dataAttr}>${escapeHtml(label)}</a>`;
 }
 
+function footerLinkTarget(label = "", groupTitle = "") {
+  const text = `${groupTitle} ${label}`;
+  const normalized = text.replace(/\s+/g, "");
+
+  if (normalized.includes("숙소")) {
+    return { href: "#bookingSearch", attrs: ' data-mrt-open="stay"' };
+  }
+  if (normalized.includes("입장권") || normalized.includes("예매") || normalized.includes("티켓")) {
+    return { href: "#bookingSearch", attrs: ' data-mrt-open="tour" data-mrt-keyword="서울 입장권"' };
+  }
+  if (normalized.includes("교통") || normalized.includes("항공")) {
+    return { href: "#bookingSearch", attrs: ' data-mrt-open="flight"' };
+  }
+  if (normalized.includes("할인")) {
+    return { href: "#bookingSearch", attrs: ' data-mrt-open="tour" data-mrt-keyword="서울 할인"' };
+  }
+  if (normalized.includes("축제정보") || normalized.includes("서울축제")) {
+    return { href: "#july", attrs: "" };
+  }
+  if (normalized.includes("예약전체크")) {
+    return { href: "#bookingSearch", attrs: "" };
+  }
+  if (normalized.includes("방문가이드")) {
+    return { href: "#faqTitle", attrs: "" };
+  }
+  if (normalized.includes("큐레이션") || normalized.includes("매거진")) {
+    return { href: "#categoryNews", attrs: "" };
+  }
+
+  const regionId = regionIdFromText(label);
+  if (regionId) {
+    return { href: "#places", attrs: ` data-region-id="${escapeHtml(regionId)}"` };
+  }
+
+  return { href: "#top", attrs: "" };
+}
+
+function footerLinkMarkup(label, groupTitle = "") {
+  const target = footerLinkTarget(label, groupTitle);
+  return `<a href="${escapeHtml(target.href)}"${target.attrs}>${escapeHtml(label)}</a>`;
+}
+
 function selectRegion(regionId) {
   if (!regionId || regionId === state.activeRegionId) return;
 
@@ -1812,9 +1854,31 @@ function renderFooter() {
   $("#footerLinks").innerHTML = data.footerGroups.map((group) => `
     <nav aria-label="${escapeHtml(group.title)}">
       <h2>${escapeHtml(group.title)}</h2>
-      ${group.links.map((link) => regionLinkMarkup(link)).join("")}
+      ${group.links.map((link) => footerLinkMarkup(link, group.title)).join("")}
     </nav>
   `).join("");
+}
+
+function bindFooterLinks() {
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[data-mrt-open]");
+    if (!link) return;
+
+    const tab = link.getAttribute("data-mrt-open");
+    event.preventDefault();
+    setActiveMrtTab(tab);
+
+    const keyword = link.getAttribute("data-mrt-keyword");
+    if (keyword && tab === "tour") {
+      const input = $("#mrtTourForm")?.elements.keyword;
+      if (input) input.value = keyword;
+    }
+
+    $("#bookingSearch")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const activeForm = Array.from(document.querySelectorAll(".mrt-search-form"))
+      .find((form) => form.dataset.mrtForm === tab);
+    activeForm?.querySelector("input, select, button")?.focus({ preventScroll: true });
+  });
 }
 
 function bindRegionLinks() {
@@ -1857,6 +1921,7 @@ function init() {
   bindMenu();
   bindRegionChips();
   bindRegionLinks();
+  bindFooterLinks();
   bindMyRealTripSearch();
   bindTopCategoryTabs();
   bindLanguageSwitch();
