@@ -711,7 +711,7 @@ function renderMrtFeedFlight(item) {
   const schedule = `${formatMrtDate(item.departureDate)} 출발${item.returnDate ? ` · ${formatMrtDate(item.returnDate)} 귀국` : ""}`;
   return `
     <article class="news-list-card mrt-feed-card mrt-feed-card--flight">
-      <a href="#july" aria-label="${escapeHtml(title)}">
+      <a href="#bookingSearch" data-mrt-open="flight" data-mrt-dep-city="${escapeHtml(String(item.depCityCd || item.fromCity || "ICN").toUpperCase())}" data-mrt-arr-cities="${escapeHtml(String(item.arrCityCd || item.toCity || item.arrivalAirport || "").toUpperCase())}" aria-label="${escapeHtml(title)}">
         <div class="image-frame image-frame--feed mrt-feed-thumb mrt-feed-thumb--flight" aria-hidden="true">
           <span>AIR</span>
         </div>
@@ -1954,6 +1954,14 @@ function bindFooterLinks() {
     if (keyword && tab === "tour") {
       const input = $("#mrtTourForm")?.elements.keyword;
       if (input) input.value = keyword;
+    }
+
+    if (tab === "flight") {
+      const flightForm = $("#mrtFlightForm");
+      const depCity = link.getAttribute("data-mrt-dep-city");
+      const arrCities = link.getAttribute("data-mrt-arr-cities");
+      if (flightForm?.elements.depCityCd && depCity) flightForm.elements.depCityCd.value = depCity;
+      if (flightForm?.elements.arrCityCds && arrCities) flightForm.elements.arrCityCds.value = arrCities;
     }
 
     $("#bookingSearch")?.scrollIntoView({ behavior: "smooth", block: "start" });
