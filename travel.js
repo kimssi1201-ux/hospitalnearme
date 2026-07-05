@@ -751,6 +751,23 @@ function buildNewsFeedMarkup(feedItems) {
   return blocks.filter(Boolean).join("");
 }
 
+function buildCategoryListMarkup(items) {
+  const blocks = [];
+  const mrtCards = myRealTripFeedCards();
+
+  items.forEach((item, index) => {
+    const articleNumber = index + 1;
+    blocks.push(categoryListCard(item));
+
+    if (articleNumber % 3 === 0 && mrtCards.length) {
+      const mrtIndex = (articleNumber / 3 - 1) % mrtCards.length;
+      blocks.push(mrtCards[mrtIndex]);
+    }
+  });
+
+  return blocks.filter(Boolean).join("");
+}
+
 function renderMrtPanel(title, subtitle, items, renderer, emptyText) {
   return `
     <section class="mrt-panel">
@@ -1031,6 +1048,7 @@ async function loadMyRealTripProducts() {
 
   renderMyRealTripProducts();
   renderJulyFestivals();
+  renderCategoryNewsSections();
 }
 
 function categoryFeaturedCard(item) {
@@ -1195,7 +1213,7 @@ function renderCategoryNewsBlock(group) {
       ` : ""}
       ${list.length ? `
         <div class="category-list-feed">
-          ${list.map((item) => categoryListCard(item)).join("")}
+          ${buildCategoryListMarkup(list)}
         </div>
       ` : ""}
     </section>

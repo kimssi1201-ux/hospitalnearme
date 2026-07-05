@@ -1051,6 +1051,17 @@ main {
   border-bottom: 0;
 }
 
+.category-list-feed .mrt-feed-card {
+  margin: 8px 0;
+  border: 1px solid #d8e5dd;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(20, 20, 20, 0.04);
+}
+
+.category-list-feed .mrt-feed-card a {
+  padding: 10px;
+}
+
 .category-list-card a {
   display: grid;
   grid-template-columns: 108px minmax(0, 1fr);
