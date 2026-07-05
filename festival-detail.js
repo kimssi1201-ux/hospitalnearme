@@ -1219,6 +1219,42 @@ function NearbyParkingSection(article) {
   `;
 }
 
+function parkingMapLinks(item) {
+  const query = [item.name, item.address].filter(Boolean).join(" ").trim();
+  const encodedQuery = encodeURIComponent(query || item.name || "서울 공영주차장");
+  const hasPoint = Number.isFinite(Number(item.lat)) && Number.isFinite(Number(item.lng));
+  const googleQuery = hasPoint
+    ? `${Number(item.lat)},${Number(item.lng)}`
+    : (query || item.name || "서울 공영주차장");
+
+  return [
+    {
+      label: "네이버지도",
+      url: `https://map.naver.com/p/search/${encodedQuery}`
+    },
+    {
+      label: "카카오맵",
+      url: `https://map.kakao.com/link/search/${encodedQuery}`
+    },
+    {
+      label: "구글지도",
+      url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(googleQuery)}`
+    }
+  ];
+}
+
+function parkingMapLinkMarkup(item) {
+  return `
+    <div class="parking-map-links" aria-label="${escapeHtml(`${item.name} 지도 링크`)}">
+      ${parkingMapLinks(item).map((link) => `
+        <a class="parking-map-link" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
+          ${escapeHtml(link.label)}
+        </a>
+      `).join("")}
+    </div>
+  `;
+}
+
 async function hydrateNearbyParking(article) {
   const section = $("#nearbyParkingSection");
   const target = $("#nearbyParkingList");
@@ -1260,6 +1296,7 @@ async function hydrateNearbyParking(article) {
           ${item.payType ? `<div><dt>요금구분</dt><dd>${escapeHtml(item.payType)}</dd></div>` : ""}
           ${item.tel ? `<div><dt>문의</dt><dd>${escapeHtml(item.tel)}</dd></div>` : ""}
         </dl>
+        ${parkingMapLinkMarkup(item)}
       </article>
     `).join("");
   } catch (error) {
