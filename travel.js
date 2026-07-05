@@ -933,17 +933,15 @@ async function loadTourApiPlaces() {
 
 function renderJulyFestivals() {
   const status = $("#julyStatus");
-  const featured = $("#featuredArticle");
   const recommended = $("#recommendedArticles");
   const feed = $("#newsFeedList");
-  if (!status || !featured || !recommended || !feed) return;
+  if (!status || !recommended || !feed) return;
 
   const month = currentSeoulMonth();
   const items = state.apiArticles.length ? state.apiArticles : state.julyArticles;
 
   if (!items.length) {
     status.textContent = `${month.label}에 표시할 서울 축제 정보를 불러오는 중입니다.`;
-    featured.innerHTML = "";
     recommended.innerHTML = "";
     feed.innerHTML = "";
     return;
@@ -953,10 +951,8 @@ function renderJulyFestivals() {
     ? `서울 기준 ${items.length}개의 여행 기사를 보여드립니다.`
     : "서울 추천 여행 기사를 준비했습니다. 실제 서울 축제 정보가 불러와지면 자동으로 교체됩니다.";
 
-  const [main, ...rest] = items;
-  featured.innerHTML = newsFeaturedCard(main);
-  recommended.innerHTML = rest.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
-  feed.innerHTML = rest.slice(3, 15).map((item) => newsListCard(item)).join("");
+  recommended.innerHTML = items.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
+  feed.innerHTML = items.slice(3, 18).map((item) => newsListCard(item)).join("");
 }
 
 async function loadSeoulCultureEvents() {
