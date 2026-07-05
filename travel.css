@@ -671,6 +671,29 @@ main {
   font-size: 13px;
 }
 
+.feed-ad-slot {
+  display: grid;
+  gap: 10px;
+  min-height: 96px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.04);
+}
+
+.feed-ad-slot > span {
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.feed-ad-slot ins {
+  display: block;
+  min-height: 72px;
+}
+
 .mrt-feed-card {
   border-color: #d8e5dd;
   background: linear-gradient(0deg, #f8fbf9, #fff);
