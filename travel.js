@@ -230,9 +230,10 @@ function escapeHtml(value) {
 }
 
 function imageMarkup(item, size = "card") {
+  const title = displayArticleTitle(item);
   return `
     <div class="image-frame image-frame--${size}">
-      <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" />
+      <img src="${escapeHtml(item.image)}" alt="${escapeHtml(title)}" loading="lazy" />
     </div>
   `;
 }
@@ -245,6 +246,79 @@ function displaySummary(item) {
 function displayReadTime(item) {
   if (item.readTimeKey) return textFor(item.readTimeKey);
   return item.readTime || "";
+}
+
+function categoryKeyFor(item = {}) {
+  const value = String(item.categorySlug || item.category || item.rawCategory || item.subCategory || "");
+  if (value.includes("exhibition") || value.includes("전시")) return "exhibition";
+  if (value.includes("performance") || value.includes("공연") || value.includes("클래식") || value.includes("연극") || value.includes("콘서트") || value.includes("무용") || value.includes("국악") || value.includes("뮤지컬")) return "performance";
+  if (value.includes("experience") || value.includes("교육") || value.includes("체험")) return "experience";
+  if (value.includes("movie") || value.includes("영화")) return "movie";
+  if (value.includes("festival") || value.includes("축제")) return "festival";
+  return "event";
+}
+
+function displayCategoryLabel(item = {}) {
+  if (state.language === "ko") return item.category || "서울 행사";
+  const labels = {
+    en: {
+      exhibition: "Exhibitions",
+      performance: "Performances",
+      experience: "Classes & Experiences",
+      movie: "Film",
+      festival: "Festivals",
+      event: "Seoul Events"
+    },
+    ja: {
+      exhibition: "展示・美術",
+      performance: "公演・舞台",
+      experience: "教育・体験",
+      movie: "映画",
+      festival: "祭り",
+      event: "ソウルイベント"
+    },
+    zh: {
+      exhibition: "展览/美术",
+      performance: "演出/舞台",
+      experience: "教育/体验",
+      movie: "电影",
+      festival: "庆典",
+      event: "首尔活动"
+    }
+  };
+  return (labels[state.language] || labels.en)[categoryKeyFor(item)];
+}
+
+function displayEventDate(item = {}) {
+  const match = String(item.date || "").match(/(\d{4})[-.](\d{1,2})[-.](\d{1,2})/);
+  if (!match) {
+    return {
+      en: "Latest",
+      ja: "最新",
+      zh: "最新"
+    }[state.language] || "";
+  }
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (state.language === "en") {
+    const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return `${names[month - 1] || match[2]} ${day}`;
+  }
+  if (state.language === "ja") return `${month}月${day}日`;
+  if (state.language === "zh") return `${month}月${day}日`;
+  return item.date || "";
+}
+
+function displayArticleTitle(item = {}) {
+  if (state.language === "ko") return item.title || "";
+  const category = displayCategoryLabel(item);
+  const date = displayEventDate(item);
+  const templates = {
+    en: `${date} Seoul ${category} Guide`,
+    ja: `${date}の${category}ガイド`,
+    zh: `${date}${category}指南`
+  };
+  return templates[state.language] || item.title || "";
 }
 
 function mapSeoulCategory(category = "") {
@@ -337,12 +411,14 @@ function detailUrl(item) {
 }
 
 function articleCard(item, variant = "") {
+  const title = displayArticleTitle(item);
+  const category = displayCategoryLabel(item);
   return `
     <article class="article-card ${variant}">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item)}
-        <span class="category-label">${escapeHtml(item.category)}</span>
-        <h3>${escapeHtml(item.title)}</h3>
+        <span class="category-label">${escapeHtml(category)}</span>
+        <h3>${escapeHtml(title)}</h3>
         <p>${escapeHtml(displaySummary(item))}</p>
         <div class="article-meta">${articleMeta(item)}</div>
       </a>
@@ -383,13 +459,15 @@ function normalizeSeoulCultureItems(items) {
 }
 
 function newsFeaturedCard(item) {
+  const title = displayArticleTitle(item);
+  const category = displayCategoryLabel(item);
   return `
     <article class="news-feature-card">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "hero")}
         <div class="news-feature-body">
-          <span class="category-label">${escapeHtml(item.category)}</span>
-          <h2>${escapeHtml(item.title)}</h2>
+          <span class="category-label">${escapeHtml(category)}</span>
+          <h2>${escapeHtml(title)}</h2>
           <p>${escapeHtml(displaySummary(item))}</p>
           <div class="article-meta">${articleMeta(item)}</div>
         </div>
@@ -399,24 +477,27 @@ function newsFeaturedCard(item) {
 }
 
 function newsRecommendCard(item) {
+  const title = displayArticleTitle(item);
   return `
     <article class="news-recommend-card">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "recommend")}
-        <strong>${escapeHtml(item.title)}</strong>
+        <strong>${escapeHtml(title)}</strong>
       </a>
     </article>
   `;
 }
 
 function newsListCard(item) {
+  const title = displayArticleTitle(item);
+  const category = displayCategoryLabel(item);
   return `
     <article class="news-list-card">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "feed")}
         <span>
-          <em>${escapeHtml(item.category)}</em>
-          <strong>${escapeHtml(item.title)}</strong>
+          <em>${escapeHtml(category)}</em>
+          <strong>${escapeHtml(title)}</strong>
           <small>${escapeHtml(item.date)} · ${escapeHtml(displayReadTime(item))}</small>
         </span>
       </a>
@@ -425,33 +506,36 @@ function newsListCard(item) {
 }
 
 function categoryFeaturedCard(item) {
+  const title = displayArticleTitle(item);
   return `
     <article class="category-feature-card">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "categoryHero")}
-        <strong>${escapeHtml(item.title)}</strong>
+        <strong>${escapeHtml(title)}</strong>
       </a>
     </article>
   `;
 }
 
 function categoryMiniCard(item) {
+  const title = displayArticleTitle(item);
   return `
     <article class="category-mini-card">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "mini")}
-        <strong>${escapeHtml(item.title)}</strong>
+        <strong>${escapeHtml(title)}</strong>
       </a>
     </article>
   `;
 }
 
 function categoryListCard(item) {
+  const title = displayArticleTitle(item);
   return `
     <article class="category-list-card">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${item.title} ${textFor("card.detail")}`)}">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "feed")}
-        <strong>${escapeHtml(item.title)}</strong>
+        <strong>${escapeHtml(title)}</strong>
       </a>
     </article>
   `;
@@ -1198,18 +1282,22 @@ function renderCuration() {
   }
 
   target.innerHTML = items
-    .map((item) => `
+    .map((item) => {
+      const title = displayArticleTitle(item);
+      const category = displayCategoryLabel(item);
+      return `
       <article class="curation-card">
-        <a href="${escapeHtml(detailUrl(item))}">
+        <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
           ${imageMarkup(item, "thumb")}
           <span>
-            <em>${escapeHtml(item.category)}</em>
-            <strong>${escapeHtml(item.title)}</strong>
+            <em>${escapeHtml(category)}</em>
+            <strong>${escapeHtml(title)}</strong>
             <small>${escapeHtml(displaySummary(item))}</small>
           </span>
         </a>
       </article>
-    `)
+    `;
+    })
     .join("");
 }
 
