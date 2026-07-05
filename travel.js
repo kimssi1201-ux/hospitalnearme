@@ -229,11 +229,20 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function TenpingAdBox(label = "Advertisement") {
+function TenpingAdBox(label = "Advertisement", variant = "small") {
+  const config = variant === "large"
+    ? {
+        maxWidth: 768,
+        displayType: "1LawCE8FqKOhetXZhMopsQ%3d%3d"
+      }
+    : {
+        maxWidth: 580,
+        displayType: "UD8Mia8gyIoT5Z2MT6VB3Q%3d%3d"
+      };
   return `
-    <aside class="tenping-ad-slot" aria-label="${escapeHtml(label)}">
+    <aside class="tenping-ad-slot tenping-ad-slot--${escapeHtml(variant)}" aria-label="${escapeHtml(label)}">
       <span>Advertisement</span>
-      <tenping class="adsbytenping" style="width: 100%; margin: 0 auto; display: block; max-width: 768px;" tenping-ad-client="%2fnyDIt3jSiYh7KXeo4%2bsm7S2Hydb6U%2fzbuFekGjT%2frlZrkiEUQ%2btrnyYLz7zJ6Li" tenping-ad-display-type="1LawCE8FqKOhetXZhMopsQ%3d%3d"></tenping>
+      <tenping class="adsbytenping" style="width: 100%; margin: 0 auto; display: block; max-width: ${config.maxWidth}px;" tenping-ad-client="%2fnyDIt3jSiYh7KXeo4%2bsm7S2Hydb6U%2fzbuFekGjT%2frlZrkiEUQ%2btrnyYLz7zJ6Li" tenping-ad-display-type="${config.displayType}"></tenping>
     </aside>
   `;
 }

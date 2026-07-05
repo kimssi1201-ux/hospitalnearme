@@ -1386,6 +1386,15 @@ main {
   box-shadow: 0 10px 28px rgba(20, 20, 20, 0.05);
 }
 
+.tenping-ad-slot--small {
+  max-width: 580px;
+  padding: 12px;
+}
+
+.tenping-ad-slot--large {
+  max-width: 768px;
+}
+
 .tenping-ad-slot > span {
   display: block;
   margin: 0 0 10px;
