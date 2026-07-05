@@ -178,7 +178,7 @@ async function buildMyRealTripPostBody(request, pathname, queryParams) {
     const checkIn = body.checkIn || dateOffset(1);
     const checkOut = body.checkOut || dateOffset(2);
     const searchBody = {
-      regionId: parseInteger(body.regionId, 178308),
+      regionId: parseInteger(body.regionId, 2573),
       checkIn,
       checkOut,
       adultCount: parseInteger(body.adultCount, 2),
