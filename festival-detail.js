@@ -1521,42 +1521,104 @@ function cleanBodyOverview(article) {
   return `${article.title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 서울 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`;
 }
 
+function cleanEventContext(article) {
+  const category = usefulValue(article.category) || displayArticleCategory(article);
+  const place = getFactByLabels(article, "장소", article.address || "");
+  const schedule = getFactByLabels(article, "일정", article.date || "");
+  const fee = getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || "");
+  const target = usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], "");
+
+  return {
+    category,
+    place,
+    schedule,
+    fee,
+    target
+  };
+}
+
 function CleanIntroSection(article) {
+  const context = cleanEventContext(article);
+  const categoryText = context.category ? `${context.category} 분야의 행사` : "서울에서 열리는 행사";
+  const placeText = context.place ? `${context.place}에서 진행됩니다` : "서울 지역에서 진행됩니다";
+
   return `
     <section class="clean-article-section">
-      <h2>행사 소개</h2>
+      <h2>행사 내용</h2>
       <p>${escapeHtml(cleanBodyOverview(article))}</p>
+      <p>${escapeHtml(`${article.title}은 ${categoryText}로, ${placeText}. 방문자는 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`)}</p>
     </section>
   `;
 }
 
 function CleanInfoSection(article) {
   const rows = [
-    ["일정", getFactByLabels(article, "일정", article.date || textFor("date.needCheck"))],
-    ["장소", getFactByLabels(article, "장소", article.address || textFor("place.needCheck"))],
-    ["운영시간", getFactByLabels(article, ["운영", "행사 시간"], fallbackTime || textFor("official.check"))],
-    ["입장료", getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || textFor("official.check"))],
-    ["문의", usefulValue(article.tel) || getFactByLabels(article, "문의", "")]
+    ["일정", getFactByLabels(article, "일정", article.date || textFor("date.needCheck")), "방문 날짜와 종료일을 먼저 확인하세요."],
+    ["장소", getFactByLabels(article, "장소", article.address || textFor("place.needCheck")), "지도 앱에서 정확한 입구와 이동 경로를 확인하세요."],
+    ["운영시간", getFactByLabels(article, ["운영", "행사 시간"], fallbackTime || textFor("official.check")), "프로그램별 시간이 다를 수 있습니다."],
+    ["입장료", getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || textFor("official.check")), "무료 행사도 일부 체험은 유료일 수 있습니다."],
+    ["이용대상", usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], textFor("official.check")), "동행자 연령 제한 여부를 확인하세요."],
+    ["문의", usefulValue(article.tel) || getFactByLabels(article, "문의", ""), "변경 사항은 공식 문의처가 가장 정확합니다."]
   ].filter(([, value]) => usefulValue(value));
 
   return `
     <section class="clean-article-section clean-info-section">
       <h2>기본 정보</h2>
-      <dl class="clean-info-list">
-        ${rows.map(([label, value]) => `
-          <div>
-            <dt>${escapeHtml(label)}</dt>
-            <dd>${escapeHtml(value)}</dd>
-          </div>
-        `).join("")}
-      </dl>
+      <div class="clean-info-table-wrap">
+        <table class="clean-info-table">
+          <caption>${escapeHtml(article.title)} 기본 정보</caption>
+          <tbody>
+            ${rows.map(([label, value, note]) => `
+              <tr>
+                <th scope="row">${escapeHtml(label)}</th>
+                <td>${escapeHtml(value)}</td>
+                <td>${escapeHtml(note)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
       ${article.homepage ? `<a class="official-link-inline" href="${escapeHtml(article.homepage)}" target="_blank" rel="noopener noreferrer">${escapeHtml(textFor("official.link"))}</a>` : ""}
     </section>
   `;
 }
 
+function CleanHighlightSection(article) {
+  const context = cleanEventContext(article);
+  const feeText = context.fee || textFor("official.check");
+  const targetText = context.target || "가족, 친구, 연인, 혼자 방문하는 여행자";
+  const scheduleText = context.schedule || textFor("date.needCheck");
+
+  const highlights = [
+    [
+      "무엇을 볼 수 있나요?",
+      `${article.title}은 ${context.category || "서울 행사"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`
+    ],
+    [
+      "언제 방문하면 좋나요?",
+      `${scheduleText} 일정에 맞춰 운영됩니다. 주말이나 저녁 시간대에는 방문객이 몰릴 수 있어, 사진 촬영이나 여유로운 관람을 원한다면 비교적 이른 시간에 도착하는 편이 좋습니다.`
+    ],
+    [
+      "누구에게 잘 맞나요?",
+      `${targetText}에게 참고하기 좋은 행사입니다. 입장료는 ${feeText} 기준으로 확인되며, 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`
+    ]
+  ];
+
+  return `
+    <section class="clean-article-section clean-highlight-section">
+      <h2>관람 포인트</h2>
+      ${highlights.map(([title, body]) => `
+        <article>
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(body)}</p>
+        </article>
+        `).join("")}
+    </section>
+  `;
+}
+
 function CleanOfficialInfoSection(article) {
-  const hiddenLabels = ["운영 시간", "이용 요금", "문의 전화", "정보 기준일"];
+  const hiddenLabels = ["행사 장소", "행사 시간", "운영 시간", "이용 요금", "문의 전화", "이용 대상", "참가 연령", "정보 기준일", "유무료"];
   const details = (Array.isArray(article.detailInfo) ? article.detailInfo : [])
     .map((item) => ({
       label: usefulValue(item.label),
@@ -1591,9 +1653,11 @@ function CleanOfficialInfoSection(article) {
 function CleanVisitTipSection(article) {
   const place = getFactByLabels(article, "장소", article.address || "");
   const time = getFactByLabels(article, ["운영", "행사 시간"], "");
+  const fee = getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || "");
   const tips = [
     time ? `방문 전 ${time} 기준 운영 여부를 한 번 더 확인하세요.` : "방문 전 공식 안내에서 당일 운영 여부를 확인하세요.",
     place ? `${place} 주변은 행사 시간대에 혼잡할 수 있으므로 대중교통과 주차 동선을 함께 확인하세요.` : "행사장 위치와 이동 동선을 먼저 확인하세요.",
+    fee ? `요금은 ${fee} 기준으로 확인되지만, 체험·예약·좌석·주차 비용은 별도로 운영될 수 있습니다.` : "무료 여부와 사전 예약 필요 여부를 확인하세요.",
     "야외 행사라면 날씨, 우산이나 우비, 보조배터리, 물을 준비하면 현장 체류가 더 편합니다."
   ];
 
@@ -1620,6 +1684,7 @@ function renderTravelDetailBody(article, sections) {
   return `
     ${CleanIntroSection(article)}
     ${CleanInfoSection(article)}
+    ${CleanHighlightSection(article)}
     ${renderImageGallery(article)}
     ${CleanOfficialInfoSection(article)}
     ${NearbyParkingSection(article)}
