@@ -711,6 +711,32 @@ function myRealTripFeedCards() {
   ].filter(Boolean);
 }
 
+function buildNewsFeedMarkup(feedItems) {
+  const blocks = [];
+  const mrtCards = myRealTripFeedCards();
+  const mrtInsertAfter = new Map([
+    [5, 0],
+    [10, 1],
+    [14, 2]
+  ]);
+
+  feedItems.forEach((item, index) => {
+    const articleNumber = index + 1;
+    blocks.push(newsListCard(item));
+
+    if (articleNumber % 3 === 0) {
+      blocks.push(TenpingAdBox(`Tenping list advertisement ${articleNumber / 3}`, "list"));
+    }
+
+    const mrtIndex = mrtInsertAfter.get(articleNumber);
+    if (mrtIndex !== undefined && mrtCards[mrtIndex]) {
+      blocks.push(mrtCards[mrtIndex]);
+    }
+  });
+
+  return blocks.filter(Boolean).join("");
+}
+
 function renderMrtPanel(title, subtitle, items, renderer, emptyText) {
   return `
     <section class="mrt-panel">
@@ -1369,17 +1395,7 @@ function renderJulyFestivals() {
 
   recommended.innerHTML = items.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
   const feedItems = items.slice(3, 18);
-  const mrtCards = myRealTripFeedCards();
-  feed.innerHTML = [
-    ...feedItems.slice(0, 4).map((item) => newsListCard(item)),
-    mrtCards[0] || "",
-    ...feedItems.slice(4, 8).map((item) => newsListCard(item)),
-    TenpingAdBox("Tenping list advertisement", "list"),
-    mrtCards[1] || "",
-    ...feedItems.slice(8, 12).map((item) => newsListCard(item)),
-    mrtCards[2] || "",
-    ...feedItems.slice(12).map((item) => newsListCard(item))
-  ].filter(Boolean).join("");
+  feed.innerHTML = buildNewsFeedMarkup(feedItems);
   refreshTenpingAds();
 }
 
