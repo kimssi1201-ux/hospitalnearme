@@ -18,6 +18,21 @@ const state = {
   language: getStoredLanguage()
 };
 
+const MRT_SEARCH_COPY = {
+  stay: {
+    title: "여행지나 숙소 검색",
+    description: "지역이나 숙소명을 입력하거나 인기 지역을 선택하세요."
+  },
+  tour: {
+    title: "투어·티켓 검색",
+    description: "입장권, 전시, 공연, 체험 상품을 빠르게 찾아보세요."
+  },
+  flight: {
+    title: "항공권 검색",
+    description: "출발지와 도착지를 선택하고 최저가 흐름을 확인하세요."
+  }
+};
+
 const I18N = {
   ko: {
     "meta.title": "서울여행뉴스 | 서울 여행 정보 뉴스",
@@ -1150,17 +1165,27 @@ function setDefaultMrtDates() {
   if (checkOut && !checkOut.value) checkOut.value = dateOffsetIso(2);
 }
 
+function updateMrtSearchHeading(tab) {
+  const copy = MRT_SEARCH_COPY[tab] || MRT_SEARCH_COPY.stay;
+  const title = $("#bookingSearchTitle");
+  const description = $("#bookingSearchDesc");
+
+  if (title) title.textContent = copy.title;
+  if (description) description.textContent = copy.description;
+}
+
 function setActiveMrtTab(tab) {
   state.activeMrtTab = tab || "stay";
+  updateMrtSearchHeading(state.activeMrtTab);
   document.querySelectorAll("[data-mrt-tab]").forEach((button) => {
-    const isActive = button.dataset.mrtTab === tab;
+    const isActive = button.dataset.mrtTab === state.activeMrtTab;
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-selected", String(isActive));
   });
   document.querySelectorAll("[data-mrt-form]").forEach((form) => {
-    form.classList.toggle("is-active", form.dataset.mrtForm === tab);
+    form.classList.toggle("is-active", form.dataset.mrtForm === state.activeMrtTab);
   });
-  $("#bookingSearch .mrt-search-box")?.classList.toggle("is-flight-mode", tab === "flight");
+  $("#bookingSearch .mrt-search-box")?.classList.toggle("is-flight-mode", state.activeMrtTab === "flight");
   setCouponPanelVisible(false);
   renderMyRealTripProducts();
 }
@@ -1270,6 +1295,7 @@ async function searchMrtFlight(form) {
 
 function bindMyRealTripSearch() {
   setDefaultMrtDates();
+  updateMrtSearchHeading(state.activeMrtTab);
 
   document.querySelectorAll("[data-mrt-tab]").forEach((button) => {
     button.addEventListener("click", () => setActiveMrtTab(button.dataset.mrtTab));
@@ -1294,6 +1320,44 @@ function bindMyRealTripSearch() {
         setMrtSearchStatus("검색 결과를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.", true);
       }
     });
+  });
+}
+
+function bindMrtQuickSearch() {
+  document.addEventListener("click", (event) => {
+    const chip = event.target.closest("[data-mrt-chip]");
+    if (!chip) return;
+
+    const form = chip.closest("[data-mrt-form]");
+    const targetName = chip.getAttribute("data-mrt-target");
+    const value = chip.getAttribute("data-mrt-value") || chip.textContent.trim();
+    const target = form?.elements?.[targetName];
+    if (!form || !target) return;
+
+    event.preventDefault();
+    target.value = value;
+
+    form.querySelectorAll(`[data-mrt-chip][data-mrt-target="${targetName}"]`).forEach((item) => {
+      item.classList.toggle("is-selected", item === chip);
+    });
+
+    if (targetName === "arrCityCds") {
+      const helper = form.querySelector("[data-mrt-flight-helper]");
+      if (helper) helper.value = chip.textContent.trim();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    const helper = event.target.closest("[data-mrt-flight-helper]");
+    if (!helper || event.key !== "Enter") return;
+
+    const form = helper.closest("[data-mrt-form]");
+    const value = helper.value.trim().toUpperCase();
+    if (!form || !value) return;
+
+    event.preventDefault();
+    const target = form.elements.arrCityCds;
+    if (target) target.value = value;
   });
 }
 
@@ -2374,6 +2438,7 @@ function init() {
   bindMrtRailFilters();
   bindBookingSearchPanel();
   bindMyRealTripSearch();
+  bindMrtQuickSearch();
   bindTopCategoryTabs();
   bindLanguageSwitch();
   applyLanguage();

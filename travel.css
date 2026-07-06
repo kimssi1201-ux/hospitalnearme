@@ -1043,6 +1043,67 @@ body.booking-search-open {
   font-weight: 800;
 }
 
+.mrt-quick-search {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 14px;
+}
+
+.mrt-search-field {
+  position: relative;
+  display: block;
+}
+
+.mrt-search-field > span {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  z-index: 1;
+  color: var(--muted);
+  font-size: 24px;
+  line-height: 1;
+  transform: translateY(-50%);
+}
+
+.mrt-search-field input {
+  padding-left: 48px;
+}
+
+.mrt-chip-group {
+  display: grid;
+  gap: 10px;
+}
+
+.mrt-chip-group h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.mrt-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mrt-chip-list button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.mrt-chip-list button.is-selected {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
 .mrt-search-form input,
 .mrt-search-form select {
   width: 100%;
@@ -2088,22 +2149,76 @@ body.booking-search-open {
   }
 
   .booking-search-panel.is-open {
-    padding: 78px 14px 28px;
+    align-content: end;
+    gap: 0;
+    overflow-y: auto;
+    padding: 82px 0 0;
+    background: rgba(17, 17, 17, 0.48);
+    backdrop-filter: none;
   }
 
   .booking-search-panel .section-heading {
-    padding-right: 0;
+    width: 100%;
+    padding: 42px 28px 10px;
+    border-radius: 26px 26px 0 0;
+    background: #fff;
   }
 
   .booking-search-close {
-    position: static;
-    width: fit-content;
-    margin-top: 4px;
+    position: absolute;
+    top: 34px;
+    right: 20px;
+    width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: 0;
+  }
+
+  .booking-search-close::before {
+    content: "×";
+    color: var(--ink);
+    font-size: 34px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .booking-search-panel .section-heading::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    width: 54px;
+    height: 4px;
+    border-radius: 999px;
+    background: #d2d2d2;
+    transform: translateX(-50%);
+  }
+
+  .booking-search-panel .section-heading .eyebrow,
+  .booking-search-panel .section-heading p {
+    display: none;
+  }
+
+  .booking-search-panel .section-heading h2 {
+    max-width: calc(100% - 60px);
+    font-size: 24px;
+    line-height: 1.25;
+  }
+
+  .booking-search-panel .mrt-search-box,
+  .booking-search-panel .section-status,
+  .booking-search-panel .mrt-grid {
+    width: 100%;
+    border-radius: 0;
+    background: #fff;
   }
 
   .mrt-search-box {
-    padding: 12px;
-    border-radius: 18px;
+    padding: 16px 28px 28px;
+    border: 0;
+    box-shadow: none;
   }
 
   .mrt-search-tabs {
@@ -2112,21 +2227,18 @@ body.booking-search-open {
 
   .mrt-search-tabs button,
   .mrt-search-form button {
-    min-height: 42px;
-    font-size: 14px;
+    min-height: 46px;
+    font-size: 15px;
   }
 
   .mrt-search-form,
   .mrt-search-form.is-active {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 14px;
   }
 
   .mrt-flight-promo {
-    grid-template-columns: minmax(260px, 1fr) minmax(180px, 0.7fr);
-    overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: none;
+    display: none !important;
   }
 
   .mrt-flight-promo::-webkit-scrollbar {
@@ -2141,13 +2253,62 @@ body.booking-search-open {
     font-size: 21px;
   }
 
-  .mrt-search-form[data-mrt-form="flight"].is-active {
-    grid-template-columns: 1fr 1fr;
-    padding: 14px;
+  .mrt-quick-search {
+    gap: 22px;
   }
 
-  .mrt-search-form[data-mrt-form="flight"].is-active label:nth-of-type(3) {
-    grid-column: 1 / -1;
+  .mrt-search-field input {
+    min-height: 62px;
+    padding-right: 18px;
+    padding-left: 52px;
+    border: 0;
+    border-radius: 18px;
+    background: #f4f5f6;
+    font-size: 17px;
+  }
+
+  .mrt-search-field > span {
+    left: 18px;
+    font-size: 26px;
+  }
+
+  .mrt-chip-group {
+    gap: 12px;
+  }
+
+  .mrt-chip-group h3 {
+    font-size: 19px;
+  }
+
+  .mrt-chip-list {
+    gap: 10px 9px;
+  }
+
+  .mrt-chip-list button {
+    min-height: 44px;
+    padding: 0 19px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(20, 20, 20, 0.03);
+    font-size: 16px;
+  }
+
+  .mrt-search-form[data-mrt-form="flight"].is-active {
+    grid-template-columns: 1fr;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .mrt-search-form[data-mrt-form="flight"].is-active .mrt-flight-trip-tabs {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .mrt-search-form[data-mrt-form="flight"].is-active > label {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
   }
 
   .mrt-coupon-panel {
