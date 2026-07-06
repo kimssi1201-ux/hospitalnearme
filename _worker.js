@@ -18,6 +18,8 @@ const MYREALTRIP_ENDPOINTS = {
   "accommodation-search": "/v1/products/accommodation/search"
 };
 const MYREALTRIP_DEFAULT_ENDPOINT = `${MYREALTRIP_API_BASE}${MYREALTRIP_ENDPOINTS["tna-categories"]}`;
+const MYREALTRIP_API_HOST = new URL(MYREALTRIP_API_BASE).host;
+const MYREALTRIP_ALLOWED_PATHS = new Set(Object.values(MYREALTRIP_ENDPOINTS));
 const MYREALTRIP_POST_PATHS = new Set([
   "/v1/products/tna/categories",
   "/v1/products/tna/search",
@@ -76,9 +78,6 @@ async function handleMyRealTripApi(request, env) {
 
   const apiKey = String(env.MYREALTRIP_API_KEY || "").trim();
   const requestUrl = new URL(request.url);
-  const endpoint = normalizeMyRealTripEndpoint(
-    requestUrl.searchParams.get("endpoint") || requestUrl.searchParams.get("type") || env.MYREALTRIP_API_ENDPOINT
-  );
 
   if (!apiKey) {
     return jsonResponse(
@@ -88,6 +87,23 @@ async function handleMyRealTripApi(request, env) {
         message: "MYREALTRIP_API_KEY 환경변수가 설정되지 않았습니다."
       },
       500,
+      request
+    );
+  }
+
+  let endpoint;
+  try {
+    endpoint = normalizeMyRealTripEndpoint(
+      requestUrl.searchParams.get("endpoint") || requestUrl.searchParams.get("type") || env.MYREALTRIP_API_ENDPOINT
+    );
+  } catch {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "invalid_myrealtrip_endpoint",
+        message: "허용되지 않은 MyRealTrip API endpoint입니다."
+      },
+      400,
       request
     );
   }
@@ -169,10 +185,24 @@ async function handleMyRealTripApi(request, env) {
 
 function normalizeMyRealTripEndpoint(value) {
   const endpoint = String(value || "").trim();
-  if (!endpoint) return MYREALTRIP_DEFAULT_ENDPOINT;
-  if (MYREALTRIP_ENDPOINTS[endpoint]) return `${MYREALTRIP_API_BASE}${MYREALTRIP_ENDPOINTS[endpoint]}`;
-  if (endpoint.startsWith("/")) return `${MYREALTRIP_API_BASE}${endpoint}`;
-  return endpoint;
+  let url;
+
+  if (!endpoint) {
+    url = new URL(MYREALTRIP_DEFAULT_ENDPOINT);
+  } else if (MYREALTRIP_ENDPOINTS[endpoint]) {
+    url = new URL(MYREALTRIP_ENDPOINTS[endpoint], `${MYREALTRIP_API_BASE}/`);
+  } else if (endpoint.startsWith("/")) {
+    url = new URL(endpoint, `${MYREALTRIP_API_BASE}/`);
+  } else {
+    url = new URL(endpoint);
+  }
+
+  if (url.host !== MYREALTRIP_API_HOST || !MYREALTRIP_ALLOWED_PATHS.has(url.pathname)) {
+    throw new Error("Unsupported MyRealTrip endpoint.");
+  }
+
+  url.protocol = "https:";
+  return url.toString();
 }
 
 function collectProxyParams(searchParams) {

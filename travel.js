@@ -1,5 +1,6 @@
 const data = window.TRAVEL_PORTAL_DATA;
 const supportedLanguages = ["ko", "en", "ja", "zh"];
+const MRT_FETCH_TIMEOUT_MS = 12000;
 const state = {
   apiArticles: [],
   julyArticles: [],
@@ -236,6 +237,20 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function safeExternalUrl(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+
+  const normalized = text.startsWith("//") ? `https:${text}` : text;
+  if (!/^https:\/\//i.test(normalized)) return "";
+
+  try {
+    return new URL(normalized).href;
+  } catch {
+    return "";
+  }
 }
 
 function imageMarkup(item, size = "card") {
@@ -542,10 +557,30 @@ function myRealTripUrl(type, params = {}) {
 }
 
 async function fetchMyRealTrip(type, params = {}) {
-  const response = await fetch(myRealTripUrl(type, params), {
-    headers: { Accept: "application/json" }
-  });
-  const payload = await response.json();
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), MRT_FETCH_TIMEOUT_MS);
+  let response;
+  let payload;
+
+  try {
+    response = await fetch(myRealTripUrl(type, params), {
+      headers: { Accept: "application/json" },
+      signal: controller.signal
+    });
+
+    const contentType = response.headers.get("content-type") || "";
+    payload = contentType.includes("application/json")
+      ? await response.json()
+      : { message: (await response.text()).slice(0, 200) };
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      throw new Error("MyRealTrip request timed out");
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+  }
+
   if (!response.ok || payload?.ok === false) {
     throw new Error(payload?.message || `MyRealTrip ${type} request failed`);
   }
@@ -573,7 +608,7 @@ function firstArrayFrom(value) {
 function normalizeMrtProductItem(item = {}, kind = "tour") {
   const title = item.itemName || item.title || item.name || item.productName || item.accommodationName || item.hotelName || "";
   const imageUrl = item.imageUrl || item.thumbnailUrl || item.thumbnail || item.mainImageUrl || item.image || item.representativeImageUrl || "";
-  const productUrl = item.productUrl || item.url || item.webUrl || item.deepLink || item.link || "";
+  const productUrl = safeExternalUrl(item.productUrl || item.url || item.webUrl || item.deepLink || item.link || "");
   const salePrice = item.salePrice || item.price || item.priceAmount || item.minPrice || item.discountedPrice || item.lowestPrice || 0;
 
   return {
@@ -613,9 +648,10 @@ function normalizeMrtFlights(payload) {
 }
 
 function mrtExternalLink(url, label) {
-  if (!url) return "";
+  const safeUrl = safeExternalUrl(url);
+  if (!safeUrl) return "";
   return `
-    <a class="mrt-link" href="${escapeHtml(url)}" target="_blank" rel="sponsored noopener noreferrer">
+    <a class="mrt-link" href="${escapeHtml(safeUrl)}" target="_blank" rel="sponsored noopener noreferrer">
       ${escapeHtml(label)}
     </a>
   `;
@@ -832,8 +868,9 @@ function renderMrtSearchAdCard(kind) {
 const MRT_FEED_INTERVAL = 6;
 
 function mrtProductLinkAttrs(kind, item = {}) {
-  if (item.productUrl) {
-    return `href="${escapeHtml(item.productUrl)}" target="_blank" rel="sponsored noopener noreferrer"`;
+  const safeUrl = safeExternalUrl(item.productUrl);
+  if (safeUrl) {
+    return `href="${escapeHtml(safeUrl)}" target="_blank" rel="sponsored noopener noreferrer"`;
   }
   const tab = kind === "stay" ? "stay" : "tour";
   const keyword = kind === "stay" ? "서울" : "서울 입장권";
@@ -1606,25 +1643,29 @@ function regionLinkMarkup(label) {
   return `<a href="${regionId ? "#places" : "#"}"${dataAttr}>${escapeHtml(label)}</a>`;
 }
 
+function footerMrtTarget(tab, keyword = "", options = {}) {
+  const attrs = [`data-mrt-open="${escapeHtml(tab)}"`];
+  if (keyword) attrs.push(`data-mrt-keyword="${escapeHtml(keyword)}"`);
+  if (options.coupon) attrs.push('data-mrt-coupon="true"');
+  return { href: "#bookingSearch", attrs: ` ${attrs.join(" ")}` };
+}
+
 function footerLinkTarget(label = "", groupTitle = "") {
   if (`${groupTitle} ${label}`.replace(/\s+/g, "").includes("할인")) {
-    return { href: "#bookingSearch", attrs: ' data-mrt-open="tour" data-mrt-keyword="서울 할인" data-mrt-coupon="true"' };
+    return footerMrtTarget("tour", "서울 할인", { coupon: true });
   }
 
   const text = `${groupTitle} ${label}`;
   const normalized = text.replace(/\s+/g, "");
 
   if (normalized.includes("숙소")) {
-    return { href: "#bookingSearch", attrs: ' data-mrt-open="stay"' };
+    return footerMrtTarget("stay");
   }
   if (normalized.includes("입장권") || normalized.includes("예매") || normalized.includes("티켓")) {
-    return { href: "#bookingSearch", attrs: ' data-mrt-open="tour" data-mrt-keyword="서울 입장권"' };
+    return footerMrtTarget("tour", "서울 입장권");
   }
   if (normalized.includes("교통") || normalized.includes("항공")) {
-    return { href: "#bookingSearch", attrs: ' data-mrt-open="flight"' };
-  }
-  if (normalized.includes("할인")) {
-    return { href: "#bookingSearch", attrs: ' data-mrt-open="tour" data-mrt-keyword="서울 할인"' };
+    return footerMrtTarget("flight");
   }
   if (normalized.includes("축제정보") || normalized.includes("서울축제")) {
     return { href: "#july", attrs: "" };
