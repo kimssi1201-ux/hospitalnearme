@@ -16,10 +16,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="travel.css?v=20260706-search-sheet-1" />
+    <link rel="stylesheet" href="travel.css?v=20260706-search-sheet-2" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
     <script src="travel-data.js?v=20260705-category-groups-1" defer></script>
-    <script src="travel.js?v=20260706-search-sheet-1" defer></script>
+    <script src="travel.js?v=20260706-search-sheet-2" defer></script>
     <title>서울여행뉴스 | 서울 여행 정보 뉴스</title>
   </head>
   <body>
@@ -71,9 +71,9 @@
         </div>
         <div class="mrt-search-box">
           <div class="mrt-search-tabs" role="tablist" aria-label="마이리얼트립 검색 종류">
-            <button class="is-active" type="button" data-mrt-tab="stay" role="tab" aria-selected="true">숙소</button>
+            <button class="is-active" type="button" data-mrt-tab="stay" role="tab" aria-selected="true">호텔·리조트</button>
             <button type="button" data-mrt-tab="tour" role="tab" aria-selected="false">투어·티켓</button>
-            <button type="button" data-mrt-tab="flight" role="tab" aria-selected="false">항공권</button>
+            <button type="button" data-mrt-tab="flight" role="tab" aria-selected="false">국내 항공</button>
           </div>
 
           <div class="mrt-flight-promo" aria-label="항공권 특가 안내">
@@ -108,19 +108,24 @@
                 </div>
               </div>
             </div>
-            <label>
-              <span>체크인</span>
-              <input name="checkIn" type="date" />
-            </label>
-            <label>
-              <span>체크아웃</span>
-              <input name="checkOut" type="date" />
-            </label>
-            <label>
-              <span>인원</span>
-              <input name="adultCount" type="number" min="1" max="8" value="2" />
-            </label>
             <button type="submit">숙소 검색</button>
+            <details class="mrt-search-options">
+              <summary>날짜·인원 선택</summary>
+              <div class="mrt-option-grid">
+                <label>
+                  <span>체크인</span>
+                  <input name="checkIn" type="date" />
+                </label>
+                <label>
+                  <span>체크아웃</span>
+                  <input name="checkOut" type="date" />
+                </label>
+                <label>
+                  <span>인원</span>
+                  <input name="adultCount" type="number" min="1" max="8" value="2" />
+                </label>
+              </div>
+            </details>
           </form>
 
           <form class="mrt-search-form" id="mrtTourForm" data-mrt-form="tour">
@@ -141,15 +146,20 @@
                 </div>
               </div>
             </div>
-            <label>
-              <span>정렬</span>
-              <select name="sort">
-                <option value="review_score_desc">평점순</option>
-                <option value="price_asc">낮은 가격순</option>
-                <option value="recent">최신순</option>
-              </select>
-            </label>
             <button type="submit">투어·티켓 검색</button>
+            <details class="mrt-search-options">
+              <summary>정렬 조건</summary>
+              <div class="mrt-option-grid">
+                <label>
+                  <span>정렬</span>
+                  <select name="sort">
+                    <option value="review_score_desc">평점순</option>
+                    <option value="price_asc">낮은 가격순</option>
+                    <option value="recent">최신순</option>
+                  </select>
+                </label>
+              </div>
+            </details>
           </form>
 
           <form class="mrt-search-form" id="mrtFlightForm" data-mrt-form="flight">
@@ -185,19 +195,24 @@
                 </div>
               </div>
             </div>
-            <label>
-              <span>출발</span>
-              <input name="depCityCd" type="text" value="ICN" placeholder="ICN" maxlength="3" />
-            </label>
-            <label>
-              <span>도착</span>
-              <input name="arrCityCds" type="text" value="CJU,BKK,NRT" placeholder="CJU,BKK,NRT" />
-            </label>
-            <label>
-              <span>여행 기간</span>
-              <input name="period" type="number" min="1" max="30" value="5" />
-            </label>
             <button type="submit">항공권 검색</button>
+            <details class="mrt-search-options">
+              <summary>공항코드·기간 직접 입력</summary>
+              <div class="mrt-option-grid">
+                <label>
+                  <span>출발</span>
+                  <input name="depCityCd" type="text" value="ICN" placeholder="ICN" maxlength="3" />
+                </label>
+                <label>
+                  <span>도착</span>
+                  <input name="arrCityCds" type="text" value="CJU,BKK,NRT" placeholder="CJU,BKK,NRT" />
+                </label>
+                <label>
+                  <span>여행 기간</span>
+                  <input name="period" type="number" min="1" max="30" value="5" />
+                </label>
+              </div>
+            </details>
           </form>
 
           <section class="mrt-coupon-panel" id="mrtCouponPanel" aria-labelledby="mrtCouponTitle" hidden>

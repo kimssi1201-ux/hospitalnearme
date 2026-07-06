@@ -20,15 +20,15 @@ const state = {
 
 const MRT_SEARCH_COPY = {
   stay: {
-    title: "여행지나 숙소 검색",
+    title: "여행지 선택",
     description: "지역이나 숙소명을 입력하거나 인기 지역을 선택하세요."
   },
   tour: {
-    title: "투어·티켓 검색",
+    title: "상품 선택",
     description: "입장권, 전시, 공연, 체험 상품을 빠르게 찾아보세요."
   },
   flight: {
-    title: "항공권 검색",
+    title: "출발지 선택",
     description: "출발지와 도착지를 선택하고 최저가 흐름을 확인하세요."
   }
 };
