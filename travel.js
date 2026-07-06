@@ -1124,7 +1124,16 @@ function setActiveMrtTab(tab) {
     form.classList.toggle("is-active", form.dataset.mrtForm === tab);
   });
   $("#bookingSearch .mrt-search-box")?.classList.toggle("is-flight-mode", tab === "flight");
+  setCouponPanelVisible(false);
   renderMyRealTripProducts();
+}
+
+function setCouponPanelVisible(show) {
+  const panel = $("#mrtCouponPanel");
+  const box = $("#bookingSearch .mrt-search-box");
+  if (!panel) return;
+  panel.hidden = !show;
+  box?.classList.toggle("is-coupon-mode", Boolean(show));
 }
 
 function focusActiveMrtForm() {
@@ -1133,10 +1142,11 @@ function focusActiveMrtForm() {
   activeForm?.querySelector("input, select, button")?.focus({ preventScroll: true });
 }
 
-function openBookingSearch(tab = state.activeMrtTab || "stay") {
+function openBookingSearch(tab = state.activeMrtTab || "stay", options = {}) {
   const panel = $("#bookingSearch");
   if (!panel) return;
   setActiveMrtTab(tab);
+  setCouponPanelVisible(Boolean(options.showCoupon));
   panel.classList.add("is-open");
   panel.setAttribute("aria-hidden", "false");
   document.body.classList.add("booking-search-open");
@@ -1597,6 +1607,10 @@ function regionLinkMarkup(label) {
 }
 
 function footerLinkTarget(label = "", groupTitle = "") {
+  if (`${groupTitle} ${label}`.replace(/\s+/g, "").includes("할인")) {
+    return { href: "#bookingSearch", attrs: ' data-mrt-open="tour" data-mrt-keyword="서울 할인" data-mrt-coupon="true"' };
+  }
+
   const text = `${groupTitle} ${label}`;
   const normalized = text.replace(/\s+/g, "");
 
@@ -2218,7 +2232,7 @@ function bindFooterLinks() {
       if (flightForm?.elements.arrCityCds && arrCities) flightForm.elements.arrCityCds.value = arrCities;
     }
 
-    openBookingSearch(tab);
+    openBookingSearch(tab, { showCoupon: link.hasAttribute("data-mrt-coupon") });
   });
 }
 
@@ -2246,6 +2260,7 @@ function bindBookingSearchPanel() {
 function applyBookingSearchQuery() {
   const params = new URLSearchParams(window.location.search);
   const requestedTab = params.get("booking") || params.get("mrt");
+  const showCoupon = params.get("coupon") === "1" || params.get("coupon") === "true";
   const shouldOpen = window.location.hash === "#bookingSearch" || Boolean(requestedTab);
   if (!shouldOpen) return;
 
@@ -2271,7 +2286,7 @@ function applyBookingSearchQuery() {
     if (flightForm?.elements.arrCityCds && arrCities) flightForm.elements.arrCityCds.value = arrCities;
   }
 
-  window.setTimeout(() => openBookingSearch(tab), 120);
+  window.setTimeout(() => openBookingSearch(tab, { showCoupon }), 120);
 }
 
 function bindRegionLinks() {

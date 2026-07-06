@@ -1097,6 +1097,73 @@ body.booking-search-open {
   background: #111;
 }
 
+.mrt-coupon-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px dashed #d7c6ad;
+  border-radius: 20px;
+  background: #fffaf2;
+}
+
+.mrt-coupon-panel[hidden] {
+  display: none !important;
+}
+
+.mrt-coupon-panel h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 23px;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.mrt-coupon-panel p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.mrt-coupon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mrt-coupon-grid article {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.mrt-coupon-grid strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.mrt-coupon-grid span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.mrt-coupon-link {
+  width: fit-content;
+  padding: 10px 14px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  text-decoration: none;
+  background: var(--accent);
+}
+
 .mrt-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2078,6 +2145,19 @@ body.booking-search-open {
 
   .mrt-search-form[data-mrt-form="flight"].is-active label:nth-of-type(3) {
     grid-column: 1 / -1;
+  }
+
+  .mrt-coupon-panel {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .mrt-coupon-panel h3 {
+    font-size: 21px;
+  }
+
+  .mrt-coupon-grid {
+    grid-template-columns: 1fr;
   }
 
   .mrt-search-form input,

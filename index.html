@@ -16,10 +16,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="travel.css?v=20260706-single-pick-1" />
+    <link rel="stylesheet" href="travel.css?v=20260706-coupon-panel-1" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
     <script src="travel-data.js?v=20260705-category-groups-1" defer></script>
-    <script src="travel.js?v=20260706-single-pick-1" defer></script>
+    <script src="travel.js?v=20260706-coupon-panel-1" defer></script>
     <title>서울여행뉴스 | 서울 여행 정보 뉴스</title>
   </head>
   <body>
@@ -143,6 +143,29 @@
             </label>
             <button type="submit">항공권 검색</button>
           </form>
+
+          <section class="mrt-coupon-panel" id="mrtCouponPanel" aria-labelledby="mrtCouponTitle" hidden>
+            <div>
+              <p class="eyebrow">Discount Check</p>
+              <h3 id="mrtCouponTitle">할인코드 확인</h3>
+              <p>예약 전 적용 가능한 쿠폰, 특가 상품, 결제 단계 할인 조건을 함께 확인하세요.</p>
+            </div>
+            <div class="mrt-coupon-grid">
+              <article>
+                <strong>숙소 할인</strong>
+                <span>체크인 날짜와 지역에 따라 적용 가능한 쿠폰을 확인합니다.</span>
+              </article>
+              <article>
+                <strong>입장권 할인</strong>
+                <span>전시, 공연, 체험 상품의 특가와 쿠폰 적용 여부를 확인합니다.</span>
+              </article>
+              <article>
+                <strong>결제 전 확인</strong>
+                <span>최종 할인은 상품 상세와 결제 단계에서 한 번 더 확인해야 합니다.</span>
+              </article>
+            </div>
+            <a class="mrt-coupon-link" href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 할인">할인 상품 검색</a>
+          </section>
         </div>
         <div class="section-status" id="myrealtripStatus"></div>
         <div class="mrt-grid" id="myrealtripGrid"></div>
