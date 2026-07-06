@@ -1046,6 +1046,9 @@ body.booking-search-open {
 .mrt-search-form input,
 .mrt-search-form select {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   min-height: 48px;
   padding: 0 13px;
   border: 1px solid var(--line);
