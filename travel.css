@@ -2176,23 +2176,23 @@ body.booking-search-open {
     justify-items: center;
     gap: 0;
     overflow-y: auto;
-    padding: 56px 0 28px;
-    background: rgba(255, 255, 255, 0.94);
+    padding: 34px 0 28px;
+    background: #fff;
     backdrop-filter: none;
   }
 
   .booking-search-panel .section-heading {
-    width: min(398px, calc(100vw - 52px));
-    padding: 54px 24px 10px;
-    border-radius: 30px 30px 0 0;
+    width: min(430px, calc(100vw - 32px));
+    padding: 20px 20px 12px;
+    border-radius: 24px 24px 0 0;
     background: #fff;
-    box-shadow: 0 20px 46px rgba(20, 20, 20, 0.08);
+    box-shadow: none;
   }
 
   .booking-search-close {
     position: absolute;
-    top: 44px;
-    right: 18px;
+    top: 14px;
+    right: 12px;
     width: 44px;
     min-height: 44px;
     padding: 0;
@@ -2210,15 +2210,7 @@ body.booking-search-open {
   }
 
   .booking-search-panel .section-heading::before {
-    content: "";
-    position: absolute;
-    top: 14px;
-    left: 50%;
-    width: 54px;
-    height: 4px;
-    border-radius: 999px;
-    background: #d2d2d2;
-    transform: translateX(-50%);
+    display: none;
   }
 
   .booking-search-panel .section-heading .eyebrow,
@@ -2228,37 +2220,38 @@ body.booking-search-open {
 
   .booking-search-panel .section-heading h2 {
     max-width: calc(100% - 60px);
-    font-size: 22px;
+    font-size: 24px;
     line-height: 1.25;
   }
 
   .booking-search-panel .mrt-search-box,
   .booking-search-panel .section-status,
   .booking-search-panel .mrt-grid {
-    width: min(398px, calc(100vw - 52px));
+    width: min(430px, calc(100vw - 32px));
     border-radius: 0;
     background: #fff;
   }
 
   .mrt-search-box {
-    min-height: min(620px, calc(100dvh - 206px));
+    min-height: min(620px, calc(100dvh - 156px));
     align-content: start;
-    padding: 10px 24px 28px;
+    padding: 8px 20px 28px;
     border: 0;
-    border-radius: 0 0 30px 30px;
+    border-radius: 0 0 24px 24px;
     box-shadow: none;
   }
 
   .mrt-search-tabs {
-    order: -1;
-    grid-template-columns: repeat(3, max-content);
-    gap: 0;
-    width: calc(100% + 48px);
-    margin: -64px -24px 38px;
-    padding: 0 12px;
-    overflow-x: auto;
-    border-radius: 30px 30px 0 0;
-    background: #d2d2d2;
+    order: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    margin: 0 0 22px;
+    padding: 4px;
+    overflow: visible;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #f6f5f2;
     scrollbar-width: none;
   }
 
@@ -2267,10 +2260,10 @@ body.booking-search-open {
   }
 
   .mrt-search-tabs button {
-    min-height: 30px;
-    padding: 0 17px;
+    min-height: 42px;
+    padding: 0 6px;
     border: 0;
-    border-radius: 0;
+    border-radius: 999px;
     background: transparent;
     color: #111;
     font-size: 13px;
@@ -2279,10 +2272,9 @@ body.booking-search-open {
 
   .mrt-search-tabs button.is-active {
     border: 0;
-    background: transparent;
-    color: #000;
-    text-decoration: underline;
-    text-underline-offset: 7px;
+    background: #111;
+    color: #fff;
+    text-decoration: none;
   }
 
   .mrt-search-form button {
