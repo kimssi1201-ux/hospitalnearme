@@ -967,8 +967,8 @@ function buildNewsFeedMarkup(feedItems, seed = "main") {
     const articleNumber = index + 1;
     blocks.push(newsListCard(item));
 
-    if (articleNumber % MRT_FEED_INTERVAL === 0) {
-      blocks.push(renderMrtFeedModule(seed, articleNumber / MRT_FEED_INTERVAL));
+    if (articleNumber === MRT_FEED_INTERVAL) {
+      blocks.push(renderMrtFeedModule(seed, 1));
     }
   });
 
@@ -979,12 +979,7 @@ function buildCategoryListMarkup(items, seed = "category") {
   const blocks = [];
 
   items.forEach((item, index) => {
-    const articleNumber = index + 1;
     blocks.push(categoryListCard(item));
-
-    if (articleNumber % MRT_FEED_INTERVAL === 0) {
-      blocks.push(renderMrtFeedModule(seed, articleNumber / MRT_FEED_INTERVAL));
-    }
   });
 
   return blocks.filter(Boolean).join("");
