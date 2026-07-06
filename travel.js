@@ -1187,6 +1187,7 @@ function setActiveMrtTab(tab) {
   });
   $("#bookingSearch .mrt-search-box")?.classList.toggle("is-flight-mode", state.activeMrtTab === "flight");
   setCouponPanelVisible(false);
+  setBookingResultsVisible(false);
   renderMyRealTripProducts();
 }
 
@@ -1198,10 +1199,8 @@ function setCouponPanelVisible(show) {
   box?.classList.toggle("is-coupon-mode", Boolean(show));
 }
 
-function focusActiveMrtForm() {
-  const activeForm = Array.from(document.querySelectorAll(".mrt-search-form"))
-    .find((form) => form.dataset.mrtForm === state.activeMrtTab);
-  activeForm?.querySelector("input, select, button")?.focus({ preventScroll: true });
+function setBookingResultsVisible(show) {
+  $("#bookingSearch")?.classList.toggle("has-results", Boolean(show));
 }
 
 function openBookingSearch(tab = state.activeMrtTab || "stay", options = {}) {
@@ -1209,16 +1208,17 @@ function openBookingSearch(tab = state.activeMrtTab || "stay", options = {}) {
   if (!panel) return;
   setActiveMrtTab(tab);
   setCouponPanelVisible(Boolean(options.showCoupon));
+  setBookingResultsVisible(Boolean(options.showResults));
   panel.classList.add("is-open");
   panel.setAttribute("aria-hidden", "false");
   document.body.classList.add("booking-search-open");
-  window.setTimeout(focusActiveMrtForm, 50);
 }
 
 function closeBookingSearch() {
   const panel = $("#bookingSearch");
   if (!panel) return;
   panel.classList.remove("is-open");
+  panel.classList.remove("has-results");
   panel.setAttribute("aria-hidden", "true");
   document.body.classList.remove("booking-search-open");
 }
@@ -1231,6 +1231,7 @@ function regionIdFromAutocomplete(payload) {
 async function searchMrtStay(form) {
   state.activeMrtTab = "stay";
   const values = formValues(form);
+  setBookingResultsVisible(true);
   setMrtSearchStatus("숙소를 검색하는 중입니다.");
   const regionPayload = await fetchMyRealTrip("accommodation-region-autocomplete", {
     keyword: values.keyword || "서울",
@@ -1257,6 +1258,7 @@ async function searchMrtStay(form) {
 async function searchMrtTour(form) {
   state.activeMrtTab = "tour";
   const values = formValues(form);
+  setBookingResultsVisible(true);
   setMrtSearchStatus("투어·티켓을 검색하는 중입니다.");
   const payload = await fetchMyRealTrip("tna-search", {
     keyword: values.keyword || "서울",
@@ -1277,6 +1279,7 @@ async function searchMrtTour(form) {
 async function searchMrtFlight(form) {
   state.activeMrtTab = "flight";
   const values = formValues(form);
+  setBookingResultsVisible(true);
   setMrtSearchStatus("항공권 최저가를 검색하는 중입니다.");
   const payload = await fetchMyRealTrip("flight-calendar-lowest", {
     depCityCd: values.depCityCd || "ICN",
@@ -1317,6 +1320,7 @@ function bindMyRealTripSearch() {
         await handler(form);
       } catch (error) {
         console.warn("MyRealTrip search failed.", error);
+        setBookingResultsVisible(true);
         setMrtSearchStatus("검색 결과를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.", true);
       }
     });
