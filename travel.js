@@ -468,7 +468,7 @@ function articleCard(item, variant = "") {
 
 function normalizeSeoulCultureItems(items) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
-  return list
+  const normalized = list
     .filter((item) => item && item.title)
     .filter((item) => overlapsCurrentMonthByDateText(item.date))
     .map((item, index) => {
@@ -496,6 +496,8 @@ function normalizeSeoulCultureItems(items) {
         lng: item.lng || ""
       };
     });
+
+  return uniqueArticles(normalized);
 }
 
 function newsFeaturedCard(item) {
@@ -1680,12 +1682,60 @@ function categoryListCard(item) {
   `;
 }
 
+function normalizeArticleKeyPart(value = "") {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function articleIdentityKey(item, index = 0) {
+  const title = normalizeArticleKeyPart(item.title);
+  const place = normalizeArticleKeyPart(item.place || item.address);
+  const category = normalizeArticleKeyPart(item.category);
+
+  if (title && place) return `${title}|${place}|${category}`;
+  return item.contentId || item.id || `${title || "article"}-${index}`;
+}
+
+function articleSpecificityScore(item = {}) {
+  const date = String(item.date || "");
+  let score = date.length;
+  if (/[~-]/.test(date)) score += 20;
+  score += articleDateSpanScore(date);
+  if (item.image) score += 2;
+  if (item.homepage) score += 2;
+  if (item.tel) score += 1;
+  return score;
+}
+
+function articleDateSpanScore(date = "") {
+  const tokens = String(date).match(/\d{4}[-.]\d{2}[-.]\d{2}|\d{8}/g) || [];
+  if (tokens.length < 2) return 0;
+
+  const normalizeDate = (value) => {
+    const compact = String(value).replace(/\D/g, "");
+    if (compact.length !== 8) return null;
+    return Date.UTC(Number(compact.slice(0, 4)), Number(compact.slice(4, 6)) - 1, Number(compact.slice(6, 8)));
+  };
+  const start = normalizeDate(tokens[0]);
+  const end = normalizeDate(tokens[tokens.length - 1]);
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return 0;
+  return Math.round((end - start) / 86400000);
+}
+
 function uniqueArticles(items) {
-  return [...new Map(
-    items
-      .filter(Boolean)
-      .map((item, index) => [item.contentId || item.id || `${item.title}-${index}`, item])
-  ).values()];
+  const map = new Map();
+
+  items.filter(Boolean).forEach((item, index) => {
+    const key = articleIdentityKey(item, index);
+    const current = map.get(key);
+    if (!current || articleSpecificityScore(item) > articleSpecificityScore(current)) {
+      map.set(key, item);
+    }
+  });
+
+  return [...map.values()];
 }
 
 function categoryItems(seedItems, fallbackItems, offset = 0, limit = 8) {
