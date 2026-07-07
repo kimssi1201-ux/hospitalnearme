@@ -455,6 +455,17 @@ main {
   padding: 0 0 44px;
 }
 
+.tenping-ad-section {
+  width: 100%;
+  padding: 8px 0 38px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tenping-ad-section--detail {
+  padding: 8px 0 34px;
+  border-top: 1px solid var(--line);
+}
+
 .top-region-bar {
   position: sticky;
   top: 76px;
@@ -507,7 +518,8 @@ main {
 
 .is-loading-news .top-category-bar,
 .is-loading-news .category-news-wrapper,
-.is-loading-news .faq-section {
+.is-loading-news .faq-section,
+.is-loading-news .tenping-ad-section {
   display: none;
 }
 
