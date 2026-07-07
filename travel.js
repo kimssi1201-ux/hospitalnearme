@@ -15,6 +15,7 @@ const state = {
   apiLoaded: false,
   apiError: false,
   activeRegionId: "seoul",
+  newsLoading: true,
   language: getStoredLanguage()
 };
 
@@ -1239,6 +1240,35 @@ function buildCategoryListMarkup(items, seed = "category") {
   return blocks.filter(Boolean).join("");
 }
 
+function loadingCardMarkup(type = "list") {
+  return `
+    <article class="news-loading-card news-loading-card--${escapeHtml(type)}" aria-hidden="true">
+      <div class="news-loading-thumb"></div>
+      <div class="news-loading-lines">
+        <span></span>
+        <strong></strong>
+        <small></small>
+      </div>
+    </article>
+  `;
+}
+
+function renderNewsLoadingSkeleton() {
+  const recommended = $("#recommendedArticles");
+  const feed = $("#newsFeedList");
+  if (recommended) {
+    recommended.innerHTML = Array.from({ length: 3 }, () => loadingCardMarkup("recommend")).join("");
+  }
+  if (feed) {
+    feed.innerHTML = Array.from({ length: 7 }, () => loadingCardMarkup("list")).join("");
+  }
+}
+
+function setNewsLoading(isLoading) {
+  state.newsLoading = Boolean(isLoading);
+  document.body.classList.toggle("is-loading-news", state.newsLoading);
+}
+
 function renderMrtPanel(title, subtitle, items, renderer, emptyText) {
   return `
     <section class="mrt-panel">
@@ -2198,6 +2228,14 @@ function renderJulyFestivals() {
   const items = state.apiArticles.length ? state.apiArticles : state.julyArticles;
 
   if (!items.length) {
+    if (state.newsLoading && !state.apiLoaded && !state.apiError) {
+      status.textContent = "";
+      status.hidden = true;
+      renderNewsLoadingSkeleton();
+      return;
+    }
+
+    setNewsLoading(false);
     status.textContent = `${month.label}에 표시할 서울 축제 정보를 불러오는 중입니다.`;
     status.hidden = false;
     recommended.innerHTML = "";
@@ -2205,6 +2243,7 @@ function renderJulyFestivals() {
     return;
   }
 
+  setNewsLoading(false);
   status.textContent = "";
   status.hidden = true;
 
@@ -2626,6 +2665,7 @@ function bindMenu() {
 }
 
 function init() {
+  setNewsLoading(true);
   renderRegionChips();
   updateRegionHeading();
   renderJulyFestivals();
