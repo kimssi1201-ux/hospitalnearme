@@ -880,7 +880,7 @@ function renderMrtSearchAdCard(kind) {
   `;
 }
 
-const MRT_FEED_INTERVAL = 6;
+const MRT_FEED_INTERVAL = 3;
 
 function mrtProductLinkAttrs(kind, item = {}) {
   const safeUrl = safeExternalUrl(item.productUrl);
@@ -1006,6 +1006,203 @@ function renderMrtFeedModule(seed = "main", position = 0) {
   `;
 }
 
+function mrtProductLinkAttrsV2(kind, item = {}) {
+  const safeUrl = safeExternalUrl(item.productUrl);
+  if (safeUrl) {
+    return `href="${escapeHtml(safeUrl)}" target="_blank" rel="sponsored noopener noreferrer"`;
+  }
+
+  if (kind === "stay") {
+    return `href="#bookingSearch" data-mrt-open="stay" data-mrt-keyword="서울"`;
+  }
+
+  if (kind === "flight") {
+    const depCity = String(item.depCityCd || item.fromCity || "ICN").toUpperCase();
+    const arrCity = String(item.arrCityCd || item.toCity || item.arrivalAirport || "TYO").toUpperCase();
+    return `href="#bookingSearch" data-mrt-open="flight" data-mrt-dep-city="${escapeHtml(depCity)}" data-mrt-arr-cities="${escapeHtml(arrCity)}"`;
+  }
+
+  return `href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권"`;
+}
+
+function renderMrtRailProductV2(kind, item = {}) {
+  const isStay = kind === "stay";
+  const title = item.itemName || (isStay ? "서울 숙소 검색" : "서울 입장권·체험 검색");
+  const category = isStay ? "국내숙소" : item.category || "입장권";
+  const price = item.priceDisplay || formatWon(item.salePrice || item.originalPrice);
+  const rating = item.reviewScore ? `★ ${item.reviewScore}` : "";
+  const meta = [rating, price].filter(Boolean).join(" · ");
+
+  return `
+    <article class="mrt-rail-card" data-mrt-rail-card data-filter="${escapeHtml(isStay ? "stay" : "tour")}">
+      <a ${mrtProductLinkAttrsV2(kind, item)} aria-label="${escapeHtml(title)}">
+        <div class="mrt-rail-image">
+          ${item.imageUrl
+            ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(title)}" loading="lazy" />`
+            : `<span aria-hidden="true">${escapeHtml(isStay ? "STAY" : "TICKET")}</span>`}
+        </div>
+        <div class="mrt-rail-copy">
+          <em>${escapeHtml(category)}</em>
+          <strong>${escapeHtml(title)}</strong>
+          <small>${escapeHtml(meta || "조건별 상품 보기")}</small>
+        </div>
+      </a>
+    </article>
+  `;
+}
+
+function renderMrtRailFlightCardV2(item = {}) {
+  const depCity = String(item.depCityCd || item.fromCity || "ICN").toUpperCase();
+  const arrCity = String(item.arrCityCd || item.toCity || item.arrivalAirport || "TYO").toUpperCase();
+  const title = `${depCity} → ${arrCity} 항공 최저가`;
+  const schedule = [
+    item.departureDate ? `${formatMrtDate(item.departureDate)} 출발` : "",
+    item.returnDate ? `${formatMrtDate(item.returnDate)} 귀국` : "",
+    item.airline || ""
+  ].filter(Boolean).join(" · ");
+
+  return `
+    <article class="mrt-rail-card mrt-rail-card--flight" data-mrt-rail-card data-filter="flight">
+      <a ${mrtProductLinkAttrsV2("flight", item)} aria-label="${escapeHtml(title)}">
+        <div class="mrt-rail-image" aria-hidden="true">
+          <span>AIR</span>
+        </div>
+        <div class="mrt-rail-copy">
+          <em>항공 최저가</em>
+          <strong>${escapeHtml(title)}</strong>
+          <small>${escapeHtml(formatWon(item.totalPrice))} · ${escapeHtml(schedule || "출발지와 도착지 선택")}</small>
+        </div>
+      </a>
+    </article>
+  `;
+}
+
+function renderMrtRailSearchCardV2(kind) {
+  const configs = {
+    tour: {
+      filter: "tour",
+      tab: "tour",
+      keyword: "서울 입장권",
+      thumb: "TICKET",
+      label: "입장권",
+      title: "서울 입장권·체험 검색",
+      body: "전시, 공연, 체험 상품을 한 번에 확인"
+    },
+    stay: {
+      filter: "stay",
+      tab: "stay",
+      keyword: "서울",
+      thumb: "STAY",
+      label: "국내숙소",
+      title: "서울 숙소 조건별 검색",
+      body: "지역, 날짜, 인원 기준으로 비교"
+    },
+    flight: {
+      filter: "flight",
+      tab: "flight",
+      keyword: "",
+      thumb: "AIR",
+      label: "항공권",
+      title: "서울 출발 항공권 검색",
+      body: "도착지와 여행 기간 기준으로 확인"
+    }
+  };
+  const config = configs[kind] || configs.tour;
+  const keywordAttr = config.keyword ? ` data-mrt-keyword="${escapeHtml(config.keyword)}"` : "";
+
+  return `
+    <article class="mrt-rail-card mrt-rail-card--cta" data-mrt-rail-card data-filter="${escapeHtml(config.filter)}">
+      <a href="#bookingSearch" data-mrt-open="${escapeHtml(config.tab)}"${keywordAttr} aria-label="${escapeHtml(config.title)}">
+        <div class="mrt-rail-image" aria-hidden="true">
+          <span>${escapeHtml(config.thumb)}</span>
+        </div>
+        <div class="mrt-rail-copy">
+          <em>${escapeHtml(config.label)}</em>
+          <strong>${escapeHtml(config.title)}</strong>
+          <small>${escapeHtml(config.body)}</small>
+        </div>
+      </a>
+    </article>
+  `;
+}
+
+function myRealTripFeedRailItemsV2() {
+  if (!state.myrealtrip.loaded) return [];
+
+  const items = [];
+  const tours = state.myrealtrip.tours.slice(0, 9);
+  const stays = state.myrealtrip.stays.slice(0, 9);
+  const flights = state.myrealtrip.flights.slice(0, 9);
+  const maxLength = Math.max(tours.length, stays.length, flights.length);
+
+  for (let index = 0; index < maxLength; index += 1) {
+    if (tours[index]) items.push(renderMrtRailProductV2("tour", tours[index]));
+    if (stays[index]) items.push(renderMrtRailProductV2("stay", stays[index]));
+    if (flights[index]) items.push(renderMrtRailFlightCardV2(flights[index]));
+  }
+
+  items.push(
+    renderMrtRailSearchCardV2("tour"),
+    renderMrtRailSearchCardV2("stay"),
+    renderMrtRailSearchCardV2("flight")
+  );
+
+  return items.filter(Boolean);
+}
+
+function renderMrtFeedModuleV2(seed = "main", position = 0) {
+  const items = myRealTripFeedRailItemsV2();
+  if (!items.length) return "";
+
+  const variants = [
+    {
+      filter: "tour",
+      title: "서울 입장권과 체험 상품",
+      linkTab: "tour",
+      linkText: "입장권 검색",
+      keyword: "서울 입장권"
+    },
+    {
+      filter: "stay",
+      title: "방문 전 함께 볼 숙소",
+      linkTab: "stay",
+      linkText: "숙소 검색",
+      keyword: "서울"
+    },
+    {
+      filter: "flight",
+      title: "서울 출발 항공권 흐름",
+      linkTab: "flight",
+      linkText: "항공권 검색",
+      keyword: ""
+    }
+  ];
+  const variant = variants[Math.abs(position - 1) % variants.length];
+  const offset = (adRotationOffset(seed) + position) % items.length;
+  const rotated = [...items.slice(offset), ...items.slice(0, offset)];
+  const keywordAttr = variant.keyword ? ` data-mrt-keyword="${escapeHtml(variant.keyword)}"` : "";
+
+  return `
+    <section class="mrt-feed-module" data-active-filter="${escapeHtml(variant.filter)}" aria-label="마이리얼트립 추천 상품">
+      <div class="mrt-feed-module-head">
+        <div>
+          <p class="eyebrow">Travel Pick</p>
+          <h3>${escapeHtml(variant.title)}</h3>
+        </div>
+        <a href="#bookingSearch" data-mrt-open="${escapeHtml(variant.linkTab)}"${keywordAttr}>${escapeHtml(variant.linkText)}</a>
+      </div>
+      <div class="mrt-feed-tabs" aria-label="상품 종류">
+        <button class="${variant.filter === "tour" ? "is-active" : ""}" type="button" data-mrt-rail-filter="tour" aria-pressed="${variant.filter === "tour" ? "true" : "false"}">입장권</button>
+        <button class="${variant.filter === "stay" ? "is-active" : ""}" type="button" data-mrt-rail-filter="stay" aria-pressed="${variant.filter === "stay" ? "true" : "false"}">숙소</button>
+        <button class="${variant.filter === "flight" ? "is-active" : ""}" type="button" data-mrt-rail-filter="flight" aria-pressed="${variant.filter === "flight" ? "true" : "false"}">항공권</button>
+      </div>
+      <div class="mrt-rail">
+        ${rotated.join("")}
+      </div>
+    </section>
+  `;
+}
+
 function adRotationOffset(seed = "") {
   return String(seed)
     .split("")
@@ -1019,8 +1216,8 @@ function buildNewsFeedMarkup(feedItems, seed = "main") {
     const articleNumber = index + 1;
     blocks.push(newsListCard(item));
 
-    if (articleNumber === MRT_FEED_INTERVAL) {
-      blocks.push(renderMrtFeedModule(seed, 1));
+    if (articleNumber % MRT_FEED_INTERVAL === 0 && articleNumber < feedItems.length) {
+      blocks.push(renderMrtFeedModuleV2(seed, articleNumber / MRT_FEED_INTERVAL));
     }
   });
 
@@ -1031,7 +1228,12 @@ function buildCategoryListMarkup(items, seed = "category") {
   const blocks = [];
 
   items.forEach((item, index) => {
+    const articleNumber = index + 1;
     blocks.push(categoryListCard(item));
+
+    if (articleNumber % MRT_FEED_INTERVAL === 0 && articleNumber < items.length) {
+      blocks.push(renderMrtFeedModuleV2(seed, articleNumber / MRT_FEED_INTERVAL));
+    }
   });
 
   return blocks.filter(Boolean).join("");
@@ -1375,7 +1577,7 @@ async function loadMyRealTripProducts() {
       fetchMyRealTrip("tna-search", {
         keyword: "서울 투어",
         page: 1,
-        size: 3,
+        size: 9,
         sort: "review_score_desc"
       }),
       fetchMyRealTrip("accommodation-search", {
@@ -1383,7 +1585,7 @@ async function loadMyRealTripProducts() {
         checkOut,
         adultCount: 2,
         childCount: 0,
-        size: 3
+        size: 9
       }),
       fetchMyRealTrip("flight-calendar-lowest", {
         depCityCd: "ICN",

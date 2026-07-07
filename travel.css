@@ -788,7 +788,8 @@ main {
 
 .mrt-feed-module[data-active-filter="tour"] .mrt-rail-card:not([data-filter="tour"]),
 .mrt-feed-module[data-active-filter="stay"] .mrt-rail-card:not([data-filter="stay"]),
-.mrt-feed-module[data-active-filter="ticket"] .mrt-rail-card:not([data-filter="ticket"]) {
+.mrt-feed-module[data-active-filter="ticket"] .mrt-rail-card:not([data-filter="ticket"]),
+.mrt-feed-module[data-active-filter="flight"] .mrt-rail-card:not([data-filter="flight"]) {
   display: none;
 }
 
@@ -879,6 +880,14 @@ main {
 .mrt-rail-card--cta {
   border-style: dashed;
   background: #fbfaf6;
+}
+
+.mrt-rail-card--flight {
+  background: #fffaf2;
+}
+
+.mrt-rail-card--flight .mrt-rail-image {
+  background: #efe2cf;
 }
 
 .category-news-wrapper {
