@@ -881,7 +881,7 @@ function renderMrtSearchAdCard(kind) {
   `;
 }
 
-const MRT_FEED_INTERVAL = 3;
+const MRT_FEED_INTERVAL = 6;
 
 function mrtProductLinkAttrs(kind, item = {}) {
   const safeUrl = safeExternalUrl(item.productUrl);
@@ -1212,29 +1212,26 @@ function adRotationOffset(seed = "") {
 
 function buildNewsFeedMarkup(feedItems, seed = "main") {
   const blocks = [];
+  let hasInsertedMrt = false;
 
   feedItems.forEach((item, index) => {
     const articleNumber = index + 1;
     blocks.push(newsListCard(item));
 
-    if (articleNumber % MRT_FEED_INTERVAL === 0 && articleNumber < feedItems.length) {
-      blocks.push(renderMrtFeedModuleV2(seed, articleNumber / MRT_FEED_INTERVAL));
+    if (!hasInsertedMrt && articleNumber === MRT_FEED_INTERVAL && articleNumber < feedItems.length) {
+      blocks.push(renderMrtFeedModuleV2(seed, 1));
+      hasInsertedMrt = true;
     }
   });
 
   return blocks.filter(Boolean).join("");
 }
 
-function buildCategoryListMarkup(items, seed = "category") {
+function buildCategoryListMarkup(items) {
   const blocks = [];
 
-  items.forEach((item, index) => {
-    const articleNumber = index + 1;
+  items.forEach((item) => {
     blocks.push(categoryListCard(item));
-
-    if (articleNumber % MRT_FEED_INTERVAL === 0 && articleNumber < items.length) {
-      blocks.push(renderMrtFeedModuleV2(seed, articleNumber / MRT_FEED_INTERVAL));
-    }
   });
 
   return blocks.filter(Boolean).join("");
