@@ -977,7 +977,7 @@ body.booking-search-open {
 }
 
 .mrt-search-tabs button,
-.mrt-search-form button {
+.mrt-search-form > button {
   min-height: 46px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -989,7 +989,7 @@ body.booking-search-open {
 }
 
 .mrt-search-tabs button.is-active,
-.mrt-search-form button {
+.mrt-search-form > button {
   border-color: var(--accent);
   background: var(--accent);
   color: #fff;
@@ -1152,7 +1152,7 @@ body.booking-search-open {
   font-weight: 800;
 }
 
-.mrt-search-form button {
+.mrt-search-form > button {
   min-width: 128px;
   padding: 0 18px;
 }
@@ -2286,7 +2286,7 @@ body.booking-search-open {
     text-decoration: none;
   }
 
-  .mrt-search-form button {
+  .mrt-search-form > button {
     min-height: 46px;
     font-size: 15px;
   }
@@ -2347,7 +2347,9 @@ body.booking-search-open {
   .mrt-chip-list button {
     min-height: 44px;
     padding: 0 17px;
+    border: 1px solid var(--line);
     background: #fff;
+    color: var(--ink);
     box-shadow: 0 2px 6px rgba(20, 20, 20, 0.03);
     font-size: 15px;
   }
@@ -2422,7 +2424,7 @@ body.booking-search-open {
     min-height: 46px;
   }
 
-  .mrt-search-form button {
+  .mrt-search-form > button {
     width: 100%;
   }
 
