@@ -466,6 +466,111 @@ main {
   border-top: 1px solid var(--line);
 }
 
+.coupang-section {
+  display: grid;
+  gap: 16px;
+  padding: 8px 0 44px;
+  border-bottom: 1px solid var(--line);
+}
+
+.coupang-section[hidden] {
+  display: none !important;
+}
+
+.coupang-section .section-heading {
+  margin: 0;
+  padding: 0;
+}
+
+.coupang-section .section-heading a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.coupang-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.coupang-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(20, 20, 20, 0.05);
+}
+
+.coupang-card a {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  min-height: 134px;
+  color: inherit;
+}
+
+.coupang-card img,
+.coupang-placeholder {
+  width: 118px;
+  height: 100%;
+  min-height: 134px;
+  object-fit: cover;
+  background: #f0eadf;
+}
+
+.coupang-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.coupang-card span {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.coupang-card em {
+  color: var(--warm);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.coupang-card strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.32;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.coupang-card small {
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.coupang-disclosure {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .top-region-bar {
   position: sticky;
   top: 76px;
@@ -2708,6 +2813,46 @@ body.booking-search-open {
   .side-card a,
   .curation-card a {
     grid-template-columns: 92px minmax(0, 1fr);
+  }
+
+  .coupang-section {
+    gap: 14px;
+    padding: 4px 0 34px;
+  }
+
+  .coupang-section .section-heading {
+    display: grid;
+    gap: 10px;
+  }
+
+  .coupang-section .section-heading h2 {
+    font-size: 24px;
+    line-height: 1.2;
+  }
+
+  .coupang-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .coupang-card {
+    border-radius: 18px;
+    box-shadow: none;
+  }
+
+  .coupang-card a {
+    grid-template-columns: 96px minmax(0, 1fr);
+    min-height: 112px;
+  }
+
+  .coupang-card img,
+  .coupang-placeholder {
+    width: 96px;
+    min-height: 112px;
+  }
+
+  .coupang-card strong {
+    font-size: 15px;
   }
 
   .card-grid,

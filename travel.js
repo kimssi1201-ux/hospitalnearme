@@ -11,6 +11,12 @@ const state = {
     loaded: false,
     error: false
   },
+  coupang: {
+    items: [],
+    loaded: false,
+    error: false,
+    keyword: "여행 준비물"
+  },
   activeMrtTab: "stay",
   apiLoaded: false,
   apiError: false,
@@ -663,6 +669,107 @@ function normalizeMrtFlightItem(item = {}) {
 
 function normalizeMrtFlights(payload) {
   return firstArrayFrom(payload).map(normalizeMrtFlightItem);
+}
+
+async function fetchCoupangProducts(keyword = "여행 준비물", limit = 6) {
+  const query = new URLSearchParams({
+    keyword,
+    limit: String(limit)
+  });
+  const response = await fetch(`/api/coupang?${query.toString()}`, {
+    headers: { Accept: "application/json" }
+  });
+  const payload = await response.json();
+  if (!response.ok || payload?.ok === false) {
+    throw new Error(payload?.message || `Coupang request failed ${response.status}`);
+  }
+  return payload;
+}
+
+function normalizeCoupangProducts(payload = {}) {
+  const data = payload.data || payload;
+  const productData = Array.isArray(data.productData) ? data.productData : [];
+  const items = productData.length ? productData : firstArrayFrom(data);
+
+  return items
+    .map((item = {}) => {
+      const title = item.productName || item.title || item.name || "";
+      const url = safeExternalUrl(item.productUrl || item.url || item.link || "");
+      return {
+        id: item.productId || item.itemId || title,
+        title,
+        image: item.productImage || item.imageUrl || item.image || "",
+        url,
+        price: item.productPrice || item.price || item.salePrice || 0,
+        category: item.categoryName || item.category || "여행 준비물",
+        isRocket: Boolean(item.isRocket),
+        isFreeShipping: Boolean(item.isFreeShipping)
+      };
+    })
+    .filter((item) => item.title && item.url)
+    .slice(0, 6);
+}
+
+function renderCoupangProducts() {
+  const section = $("#coupangEssentials");
+  const grid = $("#coupangGrid");
+  const status = $("#coupangStatus");
+  const moreLink = $("#coupangMoreLink");
+  if (!section || !grid || !status) return;
+
+  const items = state.coupang.items || [];
+  if (!items.length) {
+    section.hidden = true;
+    grid.innerHTML = "";
+    status.textContent = "";
+    return;
+  }
+
+  section.hidden = false;
+  status.textContent = "";
+  if (moreLink && items[0]?.url) moreLink.href = items[0].url;
+  grid.innerHTML = items.map((item) => {
+    const badges = [
+      item.isRocket ? "로켓" : "",
+      item.isFreeShipping ? "무료배송" : ""
+    ].filter(Boolean);
+
+    return `
+      <article class="coupang-card">
+        <a href="${escapeHtml(item.url)}" target="_blank" rel="sponsored noopener noreferrer" aria-label="${escapeHtml(`${item.title} 상품 보기`)}">
+          ${item.image
+            ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" />`
+            : `<div class="coupang-placeholder" aria-hidden="true">CP</div>`}
+          <span>
+            <em>${escapeHtml(item.category)}</em>
+            <strong>${escapeHtml(item.title)}</strong>
+            <small>${escapeHtml(formatWon(item.price))}${badges.length ? ` · ${escapeHtml(badges.join(" · "))}` : ""}</small>
+          </span>
+        </a>
+      </article>
+    `;
+  }).join("");
+}
+
+async function loadCoupangProducts() {
+  try {
+    const payload = await fetchCoupangProducts(state.coupang.keyword, 6);
+    state.coupang = {
+      ...state.coupang,
+      items: normalizeCoupangProducts(payload),
+      loaded: true,
+      error: false
+    };
+  } catch (error) {
+    console.warn("Coupang products could not be loaded.", error);
+    state.coupang = {
+      ...state.coupang,
+      items: [],
+      loaded: true,
+      error: true
+    };
+  }
+  renderCoupangProducts();
 }
 
 function mrtExternalLink(url, label) {
@@ -2720,6 +2827,7 @@ function init() {
   renderBooking();
   renderCuration();
   renderMyRealTripProducts();
+  renderCoupangProducts();
   renderCategoryNewsSections();
   renderCategoryGroups();
   renderFaq();
@@ -2739,6 +2847,7 @@ function init() {
   loadSeoulCultureEvents();
   loadJulyFestivalPosts();
   loadMyRealTripProducts();
+  loadCoupangProducts();
 }
 
 document.addEventListener("DOMContentLoaded", init);

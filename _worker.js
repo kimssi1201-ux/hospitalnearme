@@ -1,5 +1,7 @@
 const OPENAI_ENDPOINT = "https://api.openai.com/v1/responses";
 const MYREALTRIP_API_BASE = "https://partner-ext-api.myrealtrip.com";
+const COUPANG_API_BASE = "https://api-gateway.coupang.com";
+const COUPANG_PRODUCT_SEARCH_PATH = "/v2/providers/affiliate_open_api/apis/openapi/v1/products/search";
 const MYREALTRIP_ENDPOINTS = {
   "tna-categories": "/v1/products/tna/categories",
   "tna-search": "/v1/products/tna/search",
@@ -56,9 +58,143 @@ export default {
       return handleMyRealTripApi(request, env);
     }
 
+    if (url.pathname === "/api/coupang") {
+      return handleCoupangApi(request, env);
+    }
+
     return env.ASSETS.fetch(request);
   }
 };
+
+async function handleCoupangApi(request, env) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: apiHeaders(request)
+    });
+  }
+
+  if (request.method !== "GET") {
+    return jsonResponse({ ok: false, message: "GET method required." }, 405, request);
+  }
+
+  if (!isSameOriginRequest(request)) {
+    return jsonResponse({ ok: false, message: "Forbidden origin." }, 403, request);
+  }
+
+  const accessKey = String(env.COUPANG_ACCESS_KEY || "").trim();
+  const secretKey = String(env.COUPANG_SECRET_KEY || "").trim();
+
+  if (!accessKey || !secretKey) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "missing_coupang_key",
+        message: "COUPANG_ACCESS_KEY and COUPANG_SECRET_KEY are required."
+      },
+      500,
+      request
+    );
+  }
+
+  const requestUrl = new URL(request.url);
+  const keyword = String(requestUrl.searchParams.get("keyword") || requestUrl.searchParams.get("q") || "여행 준비물")
+    .trim()
+    .slice(0, 60);
+  const limit = clampNumber(requestUrl.searchParams.get("limit"), 3, 12, 6);
+  const subId = String(requestUrl.searchParams.get("subId") || env.COUPANG_PARTNER_ID || env.COUPANG_SUB_ID || "")
+    .trim()
+    .slice(0, 80);
+
+  try {
+    const apiUrl = new URL(COUPANG_PRODUCT_SEARCH_PATH, COUPANG_API_BASE);
+    apiUrl.searchParams.set("keyword", keyword || "여행 준비물");
+    apiUrl.searchParams.set("limit", String(limit));
+    apiUrl.searchParams.set("imageSize", "300x300");
+    if (subId) apiUrl.searchParams.set("subId", subId);
+
+    const signedDate = coupangSignedDate();
+    const signature = await hmacSha256Hex(secretKey, `${signedDate}GET${apiUrl.pathname}${apiUrl.search.slice(1)}`);
+    const authorization = `CEA algorithm=HmacSHA256, access-key=${accessKey}, signed-date=${signedDate}, signature=${signature}`;
+
+    const response = await fetch(apiUrl.toString(), {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: authorization
+      }
+    });
+    const contentType = response.headers.get("content-type") || "";
+    const payload = contentType.includes("application/json")
+      ? await response.json()
+      : { raw: await response.text() };
+
+    if (!response.ok) {
+      return jsonResponse(
+        {
+          ok: false,
+          code: "coupang_request_failed",
+          status: response.status,
+          message: payload?.message || payload?.rMessage || "Coupang API request failed.",
+          data: payload
+        },
+        response.status,
+        request
+      );
+    }
+
+    return jsonResponse(
+      {
+        ok: true,
+        source: "Coupang Partners",
+        keyword,
+        data: payload?.data || payload
+      },
+      200,
+      request,
+      { "cache-control": "public, max-age=1800" }
+    );
+  } catch (error) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "coupang_proxy_error",
+        message: error?.message || "Coupang API proxy error."
+      },
+      500,
+      request
+    );
+  }
+}
+
+function coupangSignedDate(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return [
+    String(date.getUTCFullYear()).slice(2),
+    pad(date.getUTCMonth() + 1),
+    pad(date.getUTCDate()),
+    "T",
+    pad(date.getUTCHours()),
+    pad(date.getUTCMinutes()),
+    pad(date.getUTCSeconds()),
+    "Z"
+  ].join("");
+}
+
+async function hmacSha256Hex(secret, message) {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(message));
+  return [...new Uint8Array(signature)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
 
 async function handleMyRealTripApi(request, env) {
   if (request.method === "OPTIONS") {
