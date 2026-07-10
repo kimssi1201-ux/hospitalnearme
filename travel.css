@@ -2578,24 +2578,36 @@ body.booking-search-open {
   }
 
   .editorial-card a {
-    grid-template-columns: 108px minmax(0, 1fr);
-    align-items: center;
+    grid-template-columns: 104px minmax(0, 1fr);
+    align-items: stretch;
+    min-height: 126px;
   }
 
   .editorial-card .image-frame {
-    height: 100%;
-    min-height: 112px;
+    width: 104px;
+    max-width: 104px;
+    height: auto;
+    min-height: 126px;
+    aspect-ratio: auto;
+    align-self: stretch;
     border-radius: 0;
   }
 
+  .editorial-card .image-frame img {
+    min-height: 126px;
+  }
+
   .editorial-card span {
+    min-width: 0;
     padding: 12px;
+    align-content: center;
   }
 
   .editorial-card strong,
   .editorial-card--lead strong {
     font-size: 17px;
     line-height: 1.32;
+    -webkit-line-clamp: 2;
   }
 
   .editorial-card small {
