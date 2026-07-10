@@ -227,6 +227,7 @@ function applyLanguage() {
   renderPlaces();
   renderBooking();
   renderCuration();
+  renderEditorialPosts();
   renderMyRealTripProducts();
   renderJulyFestivals();
   renderCategoryNewsSections();
@@ -305,9 +306,38 @@ function categoryKeyFor(item = {}) {
   return "event";
 }
 
+function articleDateValue(item = {}) {
+  const match = String(item.date || "").match(/\d{4}[-.]\d{1,2}[-.]\d{1,2}/);
+  if (!match) return 0;
+  const compact = match[0].replace(/\D/g, "");
+  return Number(compact) || 0;
+}
+
+function articleQualityScore(item = {}) {
+  let score = 0;
+  if (item.image && !String(item.image).includes("unsplash.com")) score += 4;
+  if (item.address || item.place) score += 4;
+  if (item.date) score += 3;
+  if (item.fee || item.isFree) score += 2;
+  if (item.time) score += 2;
+  if (item.tel) score += 2;
+  if (item.homepage) score += 2;
+  if (item.lat && item.lng) score += 2;
+  if (item.summary && String(item.summary).length > 80) score += 1;
+  return score;
+}
+
+function sortByQualityAndDate(items = []) {
+  return [...items].sort((a, b) => {
+    const qualityDiff = articleQualityScore(b) - articleQualityScore(a);
+    if (qualityDiff) return qualityDiff;
+    return articleDateValue(b) - articleDateValue(a);
+  });
+}
+
 function primaryNewsItems() {
   const source = state.apiArticles.length ? state.apiArticles : state.julyArticles;
-  return uniqueArticles((source || []).map(withGroupedCategory));
+  return sortByQualityAndDate(uniqueArticles((source || []).map(withGroupedCategory)));
 }
 
 function filteredNewsItems(items = primaryNewsItems()) {
@@ -2196,6 +2226,7 @@ function selectRegion(regionId) {
   renderCategoryNewsSections();
   renderPlaces();
   renderCuration();
+  renderEditorialPosts();
   loadTourApiPlaces();
 }
 
@@ -2387,6 +2418,7 @@ async function loadTourApiPlaces() {
 
     renderPlaces();
     renderCuration();
+    renderEditorialPosts();
     renderJulyFestivals();
     renderCategoryNewsSections();
   } catch (error) {
@@ -2397,6 +2429,7 @@ async function loadTourApiPlaces() {
     updatePlacesStatus("서울 축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
     renderPlaces();
     renderCuration();
+    renderEditorialPosts();
     renderJulyFestivals();
     renderCategoryNewsSections();
   } finally {
@@ -2481,6 +2514,7 @@ async function loadSeoulCultureEvents() {
 
     renderPlaces();
     renderCuration();
+    renderEditorialPosts();
     renderJulyFestivals();
     renderCategoryNewsSections();
   } catch (error) {
@@ -2527,6 +2561,7 @@ async function loadJulyFestivalPosts() {
     state.julyArticles = cached;
     renderJulyFestivals();
     renderCuration();
+    renderEditorialPosts();
     renderCategoryNewsSections();
     return;
   }
@@ -2557,6 +2592,7 @@ async function loadJulyFestivalPosts() {
     writeJulyFestivalCache(deduped);
     renderJulyFestivals();
     renderCuration();
+    renderEditorialPosts();
     renderCategoryNewsSections();
   } catch (error) {
     console.warn("July festival posts could not be loaded.", error);
@@ -2699,6 +2735,32 @@ function renderCuration() {
     `;
     })
     .join("");
+}
+
+function renderEditorialPosts() {
+  const target = $("#editorialList");
+  if (!target) return;
+
+  const posts = Array.isArray(data.editorialPosts) && data.editorialPosts.length
+    ? data.editorialPosts
+    : data.articles || [];
+
+  target.innerHTML = posts.slice(0, 6).map((item, index) => {
+    const href = item.href || detailUrl(item);
+    return `
+      <article class="editorial-card ${index === 0 ? "editorial-card--lead" : ""}">
+        <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${item.title} 자세히 보기`)}">
+          ${imageMarkup(item, index === 0 ? "hero" : "thumb")}
+          <span>
+            <em>${escapeHtml(item.category || "서울 여행")}</em>
+            <strong>${escapeHtml(item.title)}</strong>
+            <small>${escapeHtml(item.summary || "")}</small>
+            <b>${escapeHtml(item.date || "")} · ${escapeHtml(item.readTime || "정보 글")}</b>
+          </span>
+        </a>
+      </article>
+    `;
+  }).join("");
 }
 
 function renderCategoryGroups() {
@@ -2870,6 +2932,7 @@ function init() {
   renderPlaces();
   renderBooking();
   renderCuration();
+  renderEditorialPosts();
   renderMyRealTripProducts();
   renderCoupangProducts();
   renderCategoryNewsSections();

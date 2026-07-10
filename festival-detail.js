@@ -496,8 +496,34 @@ function extractAddressFromOverview(value) {
   return match ? match[1].trim() : "";
 }
 
+function enrichLocalArticle(article = {}) {
+  const address = article.address || "서울 전역";
+  const time = article.time || "행사별 운영 시간이 다릅니다";
+  const fee = article.fee || "행사별 상이";
+  return {
+    ...article,
+    source: article.source || "editorial",
+    address,
+    time,
+    fee,
+    galleryImages: article.galleryImages || (article.image ? [article.image] : []),
+    facts: article.facts || [
+      ["일정", article.date || textFor("date.needCheck")],
+      ["장소", address],
+      ["운영", time],
+      ["요금", fee],
+      ["분류", article.category || textFor("category.festival")],
+      ["읽는 시간", article.readTime || textFor("read.detail")]
+    ]
+  };
+}
+
 function findLocalArticle() {
-  return data.articles.find((article) => article.id === id) || data.articles[0];
+  const localArticles = [
+    ...(Array.isArray(data.editorialPosts) ? data.editorialPosts : []),
+    ...(Array.isArray(data.articles) ? data.articles : [])
+  ];
+  return enrichLocalArticle(localArticles.find((article) => article.id === id) || localArticles[0] || data.articles[0]);
 }
 
 function fallbackArticleFromParams() {

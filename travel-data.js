@@ -109,6 +109,68 @@ window.TRAVEL_PORTAL_DATA = {
       href: "#"
     }
   ],
+  editorialPosts: [
+    {
+      id: "seoul-weekend-exhibition-guide",
+      category: "서울 전시",
+      title: "이번 주 서울 전시 추천, 미술관과 실내 문화공간을 함께 보는 코스",
+      summary: "비가 오거나 더운 날에도 방문하기 좋은 서울 전시와 미술관 일정을 중심으로 동선, 예매, 관람 시간을 함께 확인하는 방법을 정리했습니다.",
+      date: "2026.07.10",
+      readTime: "7분 읽기",
+      image: "https://images.unsplash.com/photo-1564399579883-451a5d44ec08?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-weekend-exhibition-guide"
+    },
+    {
+      id: "seoul-family-free-events",
+      category: "가족 여행",
+      title: "아이와 가기 좋은 서울 무료·저가 문화행사 체크리스트",
+      summary: "어린이 대상 공연, 체험, 도서관 프로그램은 요금보다 연령 제한과 운영 시간이 중요합니다. 가족 방문 전 확인해야 할 기준을 정리했습니다.",
+      date: "2026.07.10",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-family-free-events"
+    },
+    {
+      id: "jongno-junggu-culture-route",
+      category: "서울 코스",
+      title: "종로·중구 문화행사 하루 코스, 전시와 공연을 같이 보는 동선",
+      summary: "세종문화회관, 서울시립미술관, 국립극장처럼 중심권에 모인 행사를 하루 일정으로 묶을 때 확인할 이동 동선과 식사 시간을 안내합니다.",
+      date: "2026.07.09",
+      readTime: "8분 읽기",
+      image: "https://images.unsplash.com/photo-1534274867514-d5b47ef89ed7?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=jongno-junggu-culture-route"
+    },
+    {
+      id: "seoul-night-event-safety-route",
+      category: "야간 행사",
+      title: "서울 야간 공연과 축제 방문 전, 귀가 동선부터 확인하는 법",
+      summary: "야간 행사는 분위기가 좋지만 막차, 택시 승차 위치, 조명 구간을 먼저 확인해야 합니다. 늦은 시간 방문 기준을 정리했습니다.",
+      date: "2026.07.09",
+      readTime: "5분 읽기",
+      image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-night-event-safety-route"
+    },
+    {
+      id: "seoul-rainy-day-culture-course",
+      category: "실내 여행",
+      title: "비 오는 날 서울 실내 여행, 전시·공연·체험을 고르는 기준",
+      summary: "우천 예보가 있는 날에는 야외 축제보다 실내 전시와 체험 프로그램이 안정적입니다. 취소 가능성, 이동 거리, 대기 시간을 함께 비교해 봅니다.",
+      date: "2026.07.08",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-rainy-day-culture-course"
+    },
+    {
+      id: "seoul-ticket-parking-check",
+      category: "방문 전 체크",
+      title: "서울 행사 예매 전 확인할 주차, 입장료, 운영시간 체크포인트",
+      summary: "행사 정보가 좋아 보여도 주차, 요금, 입장 방식, 운영 시간이 맞지 않으면 일정이 흔들립니다. 방문 전에 확인할 핵심 항목을 정리했습니다.",
+      date: "2026.07.08",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-ticket-parking-check"
+    }
+  ],
   bookingChecks: [
     {
       title: "숙소",
