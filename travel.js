@@ -1983,12 +1983,15 @@ function renderTopCategoryTabs(groups = buildCategoryNewsGroups()) {
     }))
   ];
 
-  target.innerHTML = tabs.map((group, index) => `
-    <button class="category-tab ${state.activeCategoryFilter === group.id || (index === 0 && state.activeCategoryFilter === "all") ? "is-active" : ""}" type="button" data-category-filter="${escapeHtml(group.id)}">
+  target.innerHTML = tabs.map((group, index) => {
+    const isActive = state.activeCategoryFilter === group.id || (index === 0 && state.activeCategoryFilter === "all");
+    return `
+    <button class="category-tab ${isActive ? "is-active" : ""}" type="button" data-category-filter="${escapeHtml(group.id)}" aria-pressed="${isActive ? "true" : "false"}">
       <span>${escapeHtml(group.title)}</span>
       <strong>${Number(group.count || 0).toLocaleString("ko-KR")}</strong>
     </button>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function bindTopCategoryTabs() {
@@ -2000,7 +2003,9 @@ function bindTopCategoryTabs() {
     if (!button) return;
     state.activeCategoryFilter = button.getAttribute("data-category-filter") || "all";
     target.querySelectorAll(".category-tab").forEach((item) => {
-      item.classList.toggle("is-active", item === button);
+      const isActive = item === button;
+      item.classList.toggle("is-active", isActive);
+      item.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
     renderJulyFestivals();
   });
@@ -2156,7 +2161,7 @@ function regionIdFromText(value) {
 function regionLinkMarkup(label) {
   const regionId = regionIdFromText(label);
   const dataAttr = regionId ? ` data-region-id="${escapeHtml(regionId)}"` : "";
-  return `<a href="${regionId ? "#places" : "#"}"${dataAttr}>${escapeHtml(label)}</a>`;
+  return `<a href="${regionId ? "#allArticles" : "#"}"${dataAttr}>${escapeHtml(label)}</a>`;
 }
 
 function footerMrtTarget(tab, keyword = "", options = {}) {
@@ -2198,7 +2203,7 @@ function footerLinkTarget(label = "", groupTitle = "") {
 
   const regionId = regionIdFromText(label);
   if (regionId) {
-    return { href: "#places", attrs: ` data-region-id="${escapeHtml(regionId)}"` };
+    return { href: "#allArticles", attrs: ` data-region-id="${escapeHtml(regionId)}"` };
   }
 
   return { href: "#top", attrs: "" };
@@ -2260,7 +2265,7 @@ function normalizeTourItems(items, regionOverride = activeRegion()) {
         address,
         mapx: item.mapx || "",
         mapy: item.mapy || "",
-        href: "#places"
+        href: "#allArticles"
       };
     });
 }
@@ -2909,7 +2914,7 @@ function bindRegionLinks() {
 
     event.preventDefault();
     selectRegion(regionId);
-    $("#places")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    $("#allArticles")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 }
 

@@ -6,6 +6,7 @@
   --muted: #61717d;
   --line: #dbeaf0;
   --accent: #2d9cbd;
+  --accent-deep: #12708d;
   --accent-soft: #e8f7fb;
   --gold: #e47c5d;
   --shadow: 0 18px 45px rgba(39, 137, 165, 0.12);
@@ -652,7 +653,7 @@ main {
   flex: 0 0 auto;
   min-height: 44px;
   padding: 9px 16px;
-  border: 1px solid var(--line);
+  border: 1px solid #cfe5ed;
   border-radius: 999px;
   background: #fff;
   color: var(--ink);
@@ -663,15 +664,16 @@ main {
 }
 
 .category-tab strong {
-  color: var(--gold);
+  color: var(--accent-deep);
   font-size: 14px;
 }
 
 .category-tab:hover,
 .category-tab.is-active {
   border-color: var(--accent);
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), #58c7da);
   color: #fff;
+  box-shadow: 0 10px 24px rgba(45, 156, 189, 0.2);
 }
 
 .category-tab:hover strong,
@@ -1129,9 +1131,9 @@ main {
 }
 
 .mrt-feed-tabs .is-active {
-  border-color: #111;
+  border-color: var(--accent);
   color: #fff;
-  background: #111;
+  background: var(--accent);
 }
 
 .mrt-feed-module[data-active-filter="tour"] .mrt-rail-card:not([data-filter="tour"]),
@@ -1536,9 +1538,9 @@ body.booking-search-open {
 .mrt-search-form[data-mrt-form="flight"].is-active > button {
   grid-column: 1 / -1;
   min-height: 54px;
-  border-color: #111;
+  border-color: var(--accent-deep);
   border-radius: 12px;
-  background: #111;
+  background: var(--accent-deep);
   color: #fff;
 }
 
@@ -1817,9 +1819,9 @@ body.booking-search-open {
 }
 
 .mrt-flight-region-tabs .is-active {
-  border-color: #111;
+  border-color: var(--accent);
   color: #fff;
-  background: #111;
+  background: var(--accent);
 }
 
 .mrt-flight-destination-list {
@@ -2724,14 +2726,14 @@ body.booking-search-open {
     border: 0;
     border-radius: 999px;
     background: transparent;
-    color: #111;
+    color: var(--ink);
     font-size: 13px;
     white-space: nowrap;
   }
 
   .mrt-search-tabs button.is-active {
     border: 0;
-    background: #111;
+    background: var(--accent);
     color: #fff;
     text-decoration: none;
   }
@@ -2864,8 +2866,8 @@ body.booking-search-open {
   }
 
   .mrt-search-form[data-mrt-form="flight"].is-active > button {
-    border-color: #111;
-    background: #111;
+    border-color: var(--accent-deep);
+    background: var(--accent-deep);
     color: #fff;
   }
 
