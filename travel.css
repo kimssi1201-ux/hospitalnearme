@@ -393,6 +393,11 @@ main {
   border-radius: 16px;
 }
 
+.image-frame--magazine {
+  aspect-ratio: 16 / 10;
+  border-radius: 4px;
+}
+
 .image-frame--categoryHero {
   aspect-ratio: 16 / 9;
   border-radius: 0;
@@ -599,17 +604,27 @@ main {
 
 .tripview-summary {
   display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
   gap: 18px;
-  padding: 34px 0 24px;
+  padding: 12px 0 18px;
   border-bottom: 1px solid var(--line);
+}
+
+.tripview-summary > div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
 }
 
 .tripview-summary h1 {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(32px, 5vw, 52px);
-  line-height: 1.08;
-  letter-spacing: -0.04em;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
 }
 
 .top-category-bar {
@@ -944,6 +959,44 @@ main {
 .news-list-card small {
   color: var(--muted);
   font-size: 13px;
+}
+
+.category-magazine-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px 22px;
+}
+
+.category-magazine-card a {
+  display: grid;
+  gap: 7px;
+}
+
+.category-magazine-card strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.38;
+  letter-spacing: -0.025em;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.category-magazine-card p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.category-magazine-card small {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .editorial-section {
@@ -1907,15 +1960,18 @@ body.booking-search-open {
 }
 
 .category-news-heading {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 4px;
 }
 
 .category-news-heading h2 {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(31px, 5vw, 46px);
-  line-height: 1;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.1;
   letter-spacing: -0.035em;
 }
 
@@ -1923,6 +1979,150 @@ body.booking-search-open {
   margin: 0;
   color: var(--muted);
   font-size: 15px;
+}
+
+.category-news-heading a {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+@media (min-width: 861px) {
+  .mobile-news-feed {
+    grid-template-columns: minmax(0, 1.45fr) minmax(340px, 0.9fr);
+    grid-template-areas:
+      "title title"
+      "status status"
+      "feature recommend"
+      "all all"
+      "feed feed";
+    gap: 18px;
+    padding-top: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mobile-news-feed > .tripview-section-title:first-child {
+    grid-area: title;
+    display: none;
+  }
+
+  #julyStatus {
+    grid-area: status;
+  }
+
+  .featured-news-card {
+    grid-area: feature;
+    min-height: 474px;
+  }
+
+  .featured-news-card .news-feature-card,
+  .featured-news-card .news-feature-card a {
+    height: 100%;
+  }
+
+  .news-feature-card a {
+    position: relative;
+    display: block;
+  }
+
+  .news-feature-card .image-frame--hero {
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .news-feature-body {
+    position: absolute;
+    inset: auto 0 0;
+    gap: 10px;
+    padding: 96px 28px 28px;
+    color: #fff;
+    background: linear-gradient(180deg, rgba(3, 15, 24, 0), rgba(3, 15, 24, 0.84));
+  }
+
+  .news-feature-body h2,
+  .news-feature-body p,
+  .news-feature-body .article-meta,
+  .news-feature-body .category-label {
+    color: #fff;
+  }
+
+  .news-feature-body h2 {
+    max-width: 720px;
+    font-size: clamp(34px, 4vw, 54px);
+    line-height: 1.06;
+  }
+
+  .recommend-news-row {
+    grid-area: recommend;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 10px;
+    min-height: 474px;
+  }
+
+  .news-recommend-card a {
+    position: relative;
+    display: block;
+    height: 100%;
+  }
+
+  .news-recommend-card .image-frame--recommend {
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+
+  .news-recommend-card strong {
+    position: absolute;
+    inset: auto 0 0;
+    min-height: 0;
+    padding: 48px 14px 14px;
+    color: #fff;
+    background: linear-gradient(180deg, rgba(3, 15, 24, 0), rgba(3, 15, 24, 0.82));
+    font-size: 16px;
+  }
+
+  .tripview-section-title--all {
+    grid-area: all;
+    margin-top: 12px;
+    padding-top: 26px;
+  }
+
+  .news-list-feed {
+    grid-area: feed;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px 22px;
+  }
+
+  .news-list-feed .mrt-feed-module {
+    grid-column: 1 / -1;
+  }
+
+  .news-list-card {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .news-list-card a {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .news-list-card .image-frame--feed {
+    aspect-ratio: 16 / 10;
+    border-radius: 4px;
+  }
+
+  .news-list-card strong {
+    font-size: 18px;
+    line-height: 1.38;
+    -webkit-line-clamp: 2;
+  }
 }
 
 .category-feature-card,
@@ -2409,6 +2609,8 @@ body.booking-search-open {
   .mrt-panel,
   .category-news-wrapper,
   #categoryNewsSections,
+  .category-magazine-grid,
+  .category-magazine-card,
   .news-feature-card,
   .news-recommend-card,
   .news-list-card,
@@ -2436,13 +2638,20 @@ body.booking-search-open {
   }
 
   .tripview-summary {
+    grid-template-columns: 1fr;
     gap: 14px;
     padding: 24px 0 18px;
+  }
+
+  .tripview-summary > div {
+    display: grid;
+    gap: 6px;
   }
 
   .tripview-summary h1 {
     font-size: 30px;
     line-height: 1.12;
+    white-space: normal;
   }
 
   .top-region-bar {
@@ -2545,6 +2754,10 @@ body.booking-search-open {
     padding: 0 8px 10px;
     font-size: 12px;
     line-height: 1.35;
+  }
+
+  .recommend-news-row .news-recommend-card:nth-child(n+4) {
+    display: none;
   }
 
   .news-list-card a {
@@ -3008,6 +3221,34 @@ body.booking-search-open {
   .category-news-heading h2 {
     font-size: 27px;
     line-height: 1.18;
+  }
+
+  .category-news-heading {
+    align-items: start;
+  }
+
+  .category-magazine-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .category-magazine-card a {
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 10px 12px;
+    align-items: start;
+  }
+
+  .category-magazine-card .image-frame {
+    grid-row: span 4;
+    aspect-ratio: 4 / 3;
+  }
+
+  .category-magazine-card strong {
+    font-size: 16px;
+  }
+
+  .category-magazine-card p {
+    -webkit-line-clamp: 1;
   }
 
   .category-feature-card,

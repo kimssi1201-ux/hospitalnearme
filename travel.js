@@ -1843,6 +1843,22 @@ function categoryListCard(item) {
   `;
 }
 
+function categoryMagazineCard(item) {
+  const title = displayArticleTitle(item);
+  const category = displayCategoryLabel(item);
+  return `
+    <article class="category-magazine-card">
+      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
+        ${imageMarkup(item, "magazine")}
+        <span class="category-label">${escapeHtml(category)}</span>
+        <strong>${escapeHtml(title)}</strong>
+        <p>${escapeHtml(displaySummary(item))}</p>
+        <small>${escapeHtml(item.date)} · ${escapeHtml(displayReadTime(item))}</small>
+      </a>
+    </article>
+  `;
+}
+
 function normalizeArticleKeyPart(value = "") {
   return String(value || "")
     .replace(/\s+/g, " ")
@@ -2012,29 +2028,71 @@ function bindCategoryResetLinks() {
 }
 
 function renderCategoryNewsBlock(group) {
-  const [featured, ...rest] = group.items;
-  const recommended = rest.slice(0, 3);
-  const list = rest.slice(3, 8);
+  const cards = group.items.slice(0, 6);
 
   return `
     <section class="category-news-block" id="${escapeHtml(group.id)}" aria-labelledby="${escapeHtml(group.id)}Title">
       <div class="category-news-heading">
-        <h2 id="${escapeHtml(group.id)}Title">${escapeHtml(group.title)}</h2>
-        <p>${escapeHtml(group.subtitle)}</p>
+        <div>
+          <p class="eyebrow">${escapeHtml(group.eyebrow || "Travel")}</p>
+          <h2 id="${escapeHtml(group.id)}Title">${escapeHtml(group.title)}</h2>
+        </div>
+        <a href="#allArticles" data-category-reset>${state.language === "ko" ? "더보기" : "More"} ›</a>
       </div>
-      ${featured ? categoryFeaturedCard(featured) : ""}
-      ${recommended.length ? `
-        <div class="category-mini-row">
-          ${recommended.map((item) => categoryMiniCard(item)).join("")}
-        </div>
-      ` : ""}
-      ${list.length ? `
-        <div class="category-list-feed">
-          ${buildCategoryListMarkup(list, group.id)}
-        </div>
-      ` : ""}
+      <div class="category-magazine-grid">
+        ${cards.map((item) => categoryMagazineCard(item)).join("")}
+      </div>
     </section>
   `;
+}
+
+function takeMagazineItems(candidates, usedKeys, limit = 6) {
+  const picked = [];
+
+  candidates.forEach((item, index) => {
+    if (picked.length >= limit) return;
+    const key = articleIdentityKey(item, index);
+    if (usedKeys.has(key)) return;
+    usedKeys.add(key);
+    picked.push(item);
+  });
+
+  return picked;
+}
+
+function buildMagazineNewsSections() {
+  const items = primaryNewsItems();
+  const used = new Set();
+  const latest = [...items].sort((a, b) => articleDateValue(b) - articleDateValue(a));
+  const byCategory = (keys) => items.filter((item) => keys.includes(categoryKeyFor(item)));
+  const fallback = (picked, offset = 0) => picked.length ? picked : items.slice(offset, offset + 6);
+
+  return [
+    {
+      id: "places",
+      eyebrow: "Places",
+      title: "가볼만한 곳",
+      items: fallback(takeMagazineItems(items, used, 9), 0)
+    },
+    {
+      id: "latest-news",
+      eyebrow: "Latest",
+      title: "최신 여행뉴스",
+      items: fallback(takeMagazineItems(latest, used, 6), 6)
+    },
+    {
+      id: "scene",
+      eyebrow: "Scene",
+      title: "생생한 문화",
+      items: fallback(takeMagazineItems(byCategory(["exhibition", "performance", "movie"]), used, 6), 12)
+    },
+    {
+      id: "before-trip",
+      eyebrow: "Read Before",
+      title: "여행 전 체크할 거리",
+      items: fallback(takeMagazineItems(byCategory(["experience", "festival", "event"]), used, 6), 18)
+    }
+  ].filter((group) => group.items.length);
 }
 
 function renderCategoryNewsSections() {
@@ -2042,8 +2100,11 @@ function renderCategoryNewsSections() {
   if (!target) return;
 
   const groups = buildCategoryNewsGroups();
+  const magazineGroups = buildMagazineNewsSections();
+  const section = $("#categoryNews");
   renderTopCategoryTabs(groups);
-  target.innerHTML = groups.map((group) => renderCategoryNewsBlock(group)).join("");
+  if (section) section.hidden = !magazineGroups.length;
+  target.innerHTML = magazineGroups.map((group) => renderCategoryNewsBlock(group)).join("");
 }
 
 function contentTypeName(contentTypeId) {
@@ -2484,8 +2545,8 @@ function renderJulyFestivals() {
   status.hidden = true;
 
   featured.innerHTML = newsFeaturedCard(items[0]);
-  recommended.innerHTML = items.slice(1, 4).map((item) => newsRecommendCard(item)).join("");
-  feed.innerHTML = buildNewsFeedMarkup(items.slice(0, 60));
+  recommended.innerHTML = items.slice(1, 5).map((item) => newsRecommendCard(item)).join("");
+  feed.innerHTML = buildNewsFeedMarkup(items.slice(5, 65));
 }
 
 async function loadSeoulCultureEvents() {
