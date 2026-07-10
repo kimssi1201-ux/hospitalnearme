@@ -169,6 +169,146 @@ window.TRAVEL_PORTAL_DATA = {
       readTime: "6분 읽기",
       image: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?auto=format&fit=crop&w=1200&q=80",
       href: "festival-detail?id=seoul-ticket-parking-check"
+    },
+    {
+      id: "seoul-subway-culture-route",
+      category: "지하철 여행",
+      title: "지하철로 가기 좋은 서울 문화행사, 환승 적은 코스 고르는 법",
+      summary: "서울 문화행사는 지하철 접근성이 좋은 곳이 많습니다. 이동 시간을 줄이려면 역 출구, 환승 횟수, 행사장 입구 위치를 함께 확인해야 합니다.",
+      date: "2026.07.07",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-subway-culture-route"
+    },
+    {
+      id: "seoul-free-exhibition-monthly",
+      category: "무료 전시",
+      title: "서울 무료 전시 찾는 법, 미술관·도서관·문화센터 일정 확인하기",
+      summary: "무료 전시는 입장료보다 사전 예약과 운영 시간이 더 중요합니다. 서울에서 무료 전시를 고를 때 확인해야 할 기준을 정리했습니다.",
+      date: "2026.07.07",
+      readTime: "5분 읽기",
+      image: "https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-free-exhibition-monthly"
+    },
+    {
+      id: "seoul-couple-evening-course",
+      category: "데이트 코스",
+      title: "서울 저녁 데이트 코스, 공연과 야경을 함께 보는 일정 만들기",
+      summary: "저녁 시간대 서울 공연과 야간 산책을 묶으면 이동 부담이 적은 데이트 코스가 됩니다. 공연 종료 시간과 귀가 동선을 함께 계산하는 방법입니다.",
+      date: "2026.07.06",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-couple-evening-course"
+    },
+    {
+      id: "seoul-kids-museum-experience",
+      category: "아이와 체험",
+      title: "아이와 서울 박물관 체험 가기 전, 연령 제한과 체류 시간을 먼저 보세요",
+      summary: "어린이 체험 프로그램은 재미보다 참여 가능 연령, 보호자 동반 기준, 쉬는 공간이 중요합니다. 가족 방문 기준으로 확인할 내용을 정리했습니다.",
+      date: "2026.07.06",
+      readTime: "7분 읽기",
+      image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-kids-museum-experience"
+    },
+    {
+      id: "seoul-gangnam-coex-event-guide",
+      category: "강남 코스",
+      title: "강남·코엑스 행사 방문 전, 전시 일정과 주차 혼잡을 확인하는 법",
+      summary: "코엑스와 강남권 행사는 접근성이 좋지만 주말 주차와 입장 대기가 길 수 있습니다. 전시 일정, 식사 시간, 대중교통 동선을 함께 봅니다.",
+      date: "2026.07.05",
+      readTime: "7분 읽기",
+      image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-gangnam-coex-event-guide"
+    },
+    {
+      id: "seoul-hongdae-mapo-culture-walk",
+      category: "마포 산책",
+      title: "홍대·마포 문화행사 산책 코스, 전시와 카페를 함께 묶는 방법",
+      summary: "마포권은 소규모 전시, 공연, 책방, 카페를 한 번에 둘러보기 좋습니다. 걸어서 이동 가능한 거리와 쉬는 지점을 기준으로 코스를 잡습니다.",
+      date: "2026.07.05",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-hongdae-mapo-culture-walk"
+    },
+    {
+      id: "seoul-summer-indoor-events",
+      category: "여름 실내",
+      title: "무더운 날 서울 실내 행사 추천, 전시·공연·체험을 비교하는 기준",
+      summary: "여름에는 이동 거리와 냉방, 대기 시간이 만족도를 좌우합니다. 실내 행사 중에서도 체류 시간이 적당한 일정을 고르는 방법을 안내합니다.",
+      date: "2026.07.04",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-summer-indoor-events"
+    },
+    {
+      id: "seoul-one-day-culture-plan",
+      category: "당일치기",
+      title: "서울 당일치기 문화여행, 오전 전시와 오후 공연을 연결하는 방법",
+      summary: "하루 일정은 욕심을 줄이고 이동 동선을 짧게 잡아야 합니다. 오전 전시, 점심, 오후 공연, 저녁 산책으로 이어지는 계획법입니다.",
+      date: "2026.07.04",
+      readTime: "8분 읽기",
+      image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-one-day-culture-plan"
+    },
+    {
+      id: "seoul-library-culture-programs",
+      category: "도서관 행사",
+      title: "서울 도서관 문화프로그램 찾기, 무료 강좌와 전시 일정 확인법",
+      summary: "구립도서관과 문화재단 프로그램은 무료 또는 저가가 많지만 모집 인원이 적습니다. 접수 기간과 대상 연령을 먼저 확인하세요.",
+      date: "2026.07.03",
+      readTime: "5분 읽기",
+      image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-library-culture-programs"
+    },
+    {
+      id: "seoul-performance-seat-guide",
+      category: "공연 관람",
+      title: "서울 공연 예매 전 좌석, 관람 연령, 러닝타임 확인하는 법",
+      summary: "공연은 제목보다 좌석 위치와 관람 연령, 공연 시간이 중요합니다. 가족, 데이트, 혼자 관람할 때 확인할 기준을 나눠 정리했습니다.",
+      date: "2026.07.03",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-performance-seat-guide"
+    },
+    {
+      id: "seoul-budget-culture-day",
+      category: "가성비 여행",
+      title: "서울 문화생활 비용 줄이는 법, 무료 행사와 저가 공연 활용하기",
+      summary: "입장료가 낮은 행사라도 교통비, 식사, 주차비가 더해지면 부담이 커집니다. 예산을 정하고 행사 유형을 고르는 방법을 정리했습니다.",
+      date: "2026.07.02",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-budget-culture-day"
+    },
+    {
+      id: "seoul-solo-culture-trip",
+      category: "혼자 여행",
+      title: "혼자 가기 좋은 서울 문화행사, 조용히 보기 좋은 전시와 산책 코스",
+      summary: "혼자 방문할 때는 대기 시간이 짧고 머무는 시간을 조절하기 쉬운 행사가 좋습니다. 전시, 도서관, 산책 동선을 중심으로 안내합니다.",
+      date: "2026.07.02",
+      readTime: "5분 읽기",
+      image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-solo-culture-trip"
+    },
+    {
+      id: "seoul-traditional-palace-events",
+      category: "전통 행사",
+      title: "서울 궁궐·전통문화 행사 방문 전, 야간개장과 해설 시간을 확인하세요",
+      summary: "궁궐과 전통문화 행사는 사진 포인트가 좋지만 입장 마감과 해설 시간이 중요합니다. 야간개장, 예약, 복장 기준까지 함께 확인합니다.",
+      date: "2026.07.01",
+      readTime: "7분 읽기",
+      image: "https://images.unsplash.com/photo-1534274867514-d5b47ef89ed7?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-traditional-palace-events"
+    },
+    {
+      id: "seoul-weekend-culture-with-parents",
+      category: "부모님과 여행",
+      title: "부모님과 가기 좋은 서울 문화행사, 이동 편한 장소를 고르는 기준",
+      summary: "부모님과 함께라면 행사 내용보다 이동 거리, 좌석, 화장실, 식사 동선이 중요합니다. 편안한 서울 문화 나들이 기준을 정리했습니다.",
+      date: "2026.07.01",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-weekend-culture-with-parents"
     }
   ],
   bookingChecks: [

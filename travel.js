@@ -2745,7 +2745,7 @@ function renderEditorialPosts() {
     ? data.editorialPosts
     : data.articles || [];
 
-  target.innerHTML = posts.slice(0, 6).map((item, index) => {
+  target.innerHTML = posts.slice(0, 20).map((item, index) => {
     const href = item.href || detailUrl(item);
     return `
       <article class="editorial-card ${index === 0 ? "editorial-card--lead" : ""}">

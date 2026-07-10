@@ -2,6 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://view1.kr/</loc><priority>1.0</priority></url>
   <url><loc>https://view1.kr/festival-detail</loc><priority>0.9</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-weekend-exhibition-guide</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-family-free-events</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=jongno-junggu-culture-route</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-night-event-safety-route</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-rainy-day-culture-course</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-ticket-parking-check</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-subway-culture-route</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-free-exhibition-monthly</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-couple-evening-course</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-kids-museum-experience</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-gangnam-coex-event-guide</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-hongdae-mapo-culture-walk</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-summer-indoor-events</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-one-day-culture-plan</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-library-culture-programs</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-performance-seat-guide</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-budget-culture-day</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-solo-culture-trip</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-traditional-palace-events</loc><priority>0.8</priority></url>
+  <url><loc>https://view1.kr/festival-detail?id=seoul-weekend-culture-with-parents</loc><priority>0.8</priority></url>
   <url><loc>https://view1.kr/articles.html</loc><priority>0.9</priority></url>
   <url><loc>https://view1.kr/resources.html</loc><priority>0.8</priority></url>
   <url><loc>https://view1.kr/about.html</loc><priority>0.7</priority></url>
