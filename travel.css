@@ -455,14 +455,6 @@ main {
   padding: 0 0 44px;
 }
 
-.tenping-ad-section {
-  display: none !important;
-}
-
-.tenping-ad-section--detail {
-  display: none !important;
-}
-
 .coupang-section {
   display: grid;
   gap: 16px;
