@@ -1865,6 +1865,14 @@ function detailCopy() {
       visitCheck: "방문 전 체크",
       closingTitle: "마무리",
       defaultTarget: "가족, 친구, 연인, 혼자 방문하는 여행자",
+      fallbacks: {
+        date: "공식 안내에서 일정을 확인하세요",
+        place: "공식 안내에서 장소를 확인하세요",
+        time: "방문 전 공식 운영시간을 확인하세요",
+        fee: "방문 전 공식 안내에서 확인하세요",
+        target: "방문 전 대상 연령을 확인하세요",
+        category: "서울 문화행사"
+      },
       rowNotes: {
         date: "시작일과 종료일을 함께 확인하세요.",
         place: "지도 앱에서 정확한 입구와 이동 경로를 확인하세요.",
@@ -1888,7 +1896,7 @@ function detailCopy() {
       highlights: (article, context, feeText, targetText, scheduleText) => [
         ["무엇을 볼 수 있나요?", `${context.eventName}은 ${context.category || "서울 행사"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
         ["언제 방문하면 좋나요?", `${scheduleText} 일정에 맞춰 운영됩니다. 주말이나 저녁 시간대에는 방문객이 몰릴 수 있어, 사진 촬영이나 여유로운 관람을 원한다면 비교적 이른 시간에 도착하는 편이 좋습니다.`],
-        ["누구에게 잘 맞나요?", `${targetText}에게 참고하기 좋은 행사입니다. 입장료는 ${feeText} 기준으로 확인되며, 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`]
+        ["누구에게 잘 맞나요?", `${targetText}에게 참고하기 좋은 행사입니다. 입장료와 예약 방식은 ${feeText}. 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`]
       ],
       tips: (place, time, fee) => [
         time ? `방문 전 ${time} 기준 운영 여부를 한 번 더 확인하세요.` : "방문 전 공식 안내에서 당일 운영 여부를 확인하세요.",
@@ -1908,6 +1916,14 @@ function detailCopy() {
       visitCheck: "Before You Visit",
       closingTitle: "Final Note",
       defaultTarget: "families, friends, couples, and solo travelers",
+      fallbacks: {
+        date: "Check the official schedule",
+        place: "Confirm the event venue",
+        time: "Check hours before visiting",
+        fee: "Check admission and booking rules",
+        target: "Check audience or age limits",
+        category: "Seoul event"
+      },
       rowNotes: {
         date: "Check both the start and end date.",
         place: "Confirm the exact entrance and route in a map app.",
@@ -1951,6 +1967,14 @@ function detailCopy() {
       visitCheck: "訪問前チェック",
       closingTitle: "まとめ",
       defaultTarget: "家族、友人、カップル、一人旅の旅行者",
+      fallbacks: {
+        date: "公式日程の確認が必要",
+        place: "会場確認が必要",
+        time: "訪問前に運営時間を確認",
+        fee: "料金と予約方法を確認",
+        target: "観覧可能年齢を確認",
+        category: "ソウル文化イベント"
+      },
       rowNotes: {
         date: "開始日と終了日を確認してください。",
         place: "地図アプリで入口と移動経路を確認してください。",
@@ -1994,6 +2018,14 @@ function detailCopy() {
       visitCheck: "出发前确认",
       closingTitle: "总结",
       defaultTarget: "家庭、朋友、情侣和独自旅行者",
+      fallbacks: {
+        date: "需要确认官方日程",
+        place: "需要确认活动地点",
+        time: "出发前确认运营时间",
+        fee: "确认门票和预约规则",
+        target: "确认适用年龄或对象",
+        category: "首尔文化活动"
+      },
       rowNotes: {
         date: "请同时确认开始日期和结束日期。",
         place: "请在地图应用中确认入口和路线。",
@@ -2030,6 +2062,29 @@ function detailCopy() {
   };
 
   return table[state.language] || table.ko;
+}
+
+function weakDetailValue(value = "") {
+  const text = usefulValue(stripHtml(value));
+  if (!text) return true;
+  return [
+    "공식 안내 확인",
+    "Check official notice",
+    "公式案内を確認",
+    "查看官方说明",
+    "일정 확인 필요",
+    "장소 확인 필요"
+  ].some((weak) => text === weak || text.includes(weak));
+}
+
+function detailFallback(type) {
+  const copy = detailCopy();
+  return copy.fallbacks?.[type] || textFor("official.check");
+}
+
+function cleanDetailValue(value, type) {
+  const text = usefulValue(stripHtml(value));
+  return weakDetailValue(text) ? detailFallback(type) : text;
 }
 
 function parkingCopy() {
@@ -2131,14 +2186,14 @@ function cleanBodyOverview(article) {
 function cleanEventContext(article) {
   const category = localizedCategoryLabel(usefulValue(article.category) || displayArticleCategory(article));
   const subCategory = usefulValue(article.subCategory) || usefulValue(article.rawCategory);
-  const place = getFactByLabels(article, "장소", article.address || "");
-  const schedule = getFactByLabels(article, "일정", article.date || "");
-  const fee = getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || "");
-  const target = usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], "");
+  const place = cleanDetailValue(getFactByLabels(article, "장소", article.address || ""), "place");
+  const schedule = cleanDetailValue(getFactByLabels(article, "일정", article.date || ""), "date");
+  const fee = cleanDetailValue(getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || ""), "fee");
+  const target = cleanDetailValue(usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], ""), "target");
 
   return {
     eventName: localizedEventReference(article),
-    category,
+    category: cleanDetailValue(category, "category"),
     subCategory,
     place,
     schedule,
@@ -2163,12 +2218,12 @@ function CleanIntroSection(article) {
 function CleanInfoSection(article) {
   const copy = detailCopy();
   const rows = [
-    [copy.labels.date, getFactByLabels(article, "일정", article.date || textFor("date.needCheck")), copy.rowNotes.date],
-    [copy.labels.place, getFactByLabels(article, "장소", article.address || textFor("place.needCheck")), copy.rowNotes.place],
-    [copy.labels.time, getFactByLabels(article, ["운영", "행사 시간"], fallbackTime || textFor("official.check")), copy.rowNotes.time],
-    [copy.labels.fee, getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || textFor("official.check")), copy.rowNotes.fee],
-    [copy.labels.target, usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], textFor("official.check")), copy.rowNotes.target],
-    [copy.labels.subCategory, localizedCategoryLabel(usefulValue(article.subCategory) || usefulValue(article.rawCategory) || usefulValue(article.category)), copy.rowNotes.subCategory],
+    [copy.labels.date, cleanDetailValue(getFactByLabels(article, "일정", article.date || ""), "date"), copy.rowNotes.date],
+    [copy.labels.place, cleanDetailValue(getFactByLabels(article, "장소", article.address || ""), "place"), copy.rowNotes.place],
+    [copy.labels.time, cleanDetailValue(getFactByLabels(article, ["운영", "행사 시간"], fallbackTime || ""), "time"), copy.rowNotes.time],
+    [copy.labels.fee, cleanDetailValue(getFactByLabels(article, ["요금", "이용 요금"], fallbackFee || ""), "fee"), copy.rowNotes.fee],
+    [copy.labels.target, cleanDetailValue(usefulValue(fallbackTarget) || getFactByLabels(article, ["이용 대상", "참가 연령"], ""), "target"), copy.rowNotes.target],
+    [copy.labels.subCategory, cleanDetailValue(localizedCategoryLabel(usefulValue(article.subCategory) || usefulValue(article.rawCategory) || usefulValue(article.category)), "category"), copy.rowNotes.subCategory],
     [copy.labels.contact, usefulValue(article.tel) || getFactByLabels(article, "문의", ""), copy.rowNotes.contact]
   ].filter(([, value]) => usefulValue(value));
 
@@ -2197,9 +2252,9 @@ function CleanInfoSection(article) {
 function CleanHighlightSection(article) {
   const copy = detailCopy();
   const context = cleanEventContext(article);
-  const feeText = context.fee || textFor("official.check");
+  const feeText = context.fee || detailFallback("fee");
   const targetText = context.target || copy.defaultTarget;
-  const scheduleText = context.schedule || textFor("date.needCheck");
+  const scheduleText = context.schedule || detailFallback("date");
   const highlights = copy.highlights(article, context, feeText, targetText, scheduleText);
 
   return `
