@@ -1969,22 +1969,13 @@ function renderTopCategoryTabs(groups = buildCategoryNewsGroups()) {
 
   const items = primaryNewsItems();
   const counts = categoryCountMap(items);
-  const allLabels = {
-    ko: "전체글",
-    en: "All",
-    ja: "すべて",
-    zh: "全部"
-  };
-  const tabs = [
-    { id: "all", title: allLabels[state.language] || allLabels.ko, count: items.length },
-    ...groups.map((group) => ({
-      ...group,
-      count: counts.get(group.id) || 0
-    }))
-  ];
+  const tabs = groups.map((group) => ({
+    ...group,
+    count: counts.get(group.id) || 0
+  }));
 
-  target.innerHTML = tabs.map((group, index) => {
-    const isActive = state.activeCategoryFilter === group.id || (index === 0 && state.activeCategoryFilter === "all");
+  target.innerHTML = tabs.map((group) => {
+    const isActive = state.activeCategoryFilter === group.id;
     return `
     <button class="category-tab ${isActive ? "is-active" : ""}" type="button" data-category-filter="${escapeHtml(group.id)}" aria-pressed="${isActive ? "true" : "false"}">
       <span>${escapeHtml(group.title)}</span>
@@ -2007,6 +1998,15 @@ function bindTopCategoryTabs() {
       item.classList.toggle("is-active", isActive);
       item.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
+    renderJulyFestivals();
+  });
+}
+
+function bindCategoryResetLinks() {
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("[data-category-reset]");
+    if (!link) return;
+    state.activeCategoryFilter = "all";
     renderJulyFestivals();
   });
 }
@@ -2953,6 +2953,7 @@ function init() {
   bindMyRealTripSearch();
   bindMrtQuickSearch();
   bindTopCategoryTabs();
+  bindCategoryResetLinks();
   bindLanguageSwitch();
   applyLanguage();
   applyBookingSearchQuery();

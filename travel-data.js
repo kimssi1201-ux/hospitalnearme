@@ -383,7 +383,7 @@ window.TRAVEL_PORTAL_DATA = {
     },
     {
       title: "매거진",
-      links: ["축제 정보", "예약 전 체크", "방문 가이드", "큐레이션"]
+      links: ["축제 정보", "예약 전 체크", "방문 가이드", "추천 글"]
     },
     {
       title: "Language",
