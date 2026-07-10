@@ -456,14 +456,11 @@ main {
 }
 
 .tenping-ad-section {
-  width: 100%;
-  padding: 8px 0 38px;
-  border-bottom: 1px solid var(--line);
+  display: none !important;
 }
 
 .tenping-ad-section--detail {
-  padding: 8px 0 34px;
-  border-top: 1px solid var(--line);
+  display: none !important;
 }
 
 .coupang-section {
@@ -623,8 +620,7 @@ main {
 
 .is-loading-news .top-category-bar,
 .is-loading-news .category-news-wrapper,
-.is-loading-news .faq-section,
-.is-loading-news .tenping-ad-section {
+.is-loading-news .faq-section {
   display: none;
 }
 
