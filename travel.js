@@ -2069,12 +2069,6 @@ function buildMagazineNewsSections() {
 
   return [
     {
-      id: "places",
-      eyebrow: "Places",
-      title: "가볼만한 곳",
-      items: fallback(takeMagazineItems(items, used, 9), 0)
-    },
-    {
       id: "latest-news",
       eyebrow: "Latest",
       title: "최신 여행뉴스",

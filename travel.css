@@ -712,6 +712,16 @@ main {
   letter-spacing: -0.035em;
 }
 
+.section-kicker {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .tripview-section-title a {
   flex: 0 0 auto;
   color: var(--accent);
@@ -1989,16 +1999,63 @@ body.booking-search-open {
 }
 
 @media (min-width: 861px) {
+  main {
+    width: min(1180px, calc(100% - 48px));
+    padding-top: 16px;
+  }
+
+  .tripview-summary {
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: 14px;
+    padding: 10px 0 14px;
+  }
+
+  .tripview-summary > div {
+    display: grid;
+    gap: 0;
+  }
+
+  .tripview-summary .eyebrow {
+    color: #e53c51;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  .tripview-summary h1 {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--muted);
+  }
+
+  .category-tab-list {
+    gap: 8px;
+    justify-content: flex-start;
+    overflow: hidden;
+  }
+
+  .category-tab {
+    min-height: 30px;
+    padding: 5px 12px;
+    border-color: transparent;
+    background: #f6f8fa;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .category-tab strong {
+    font-size: 11px;
+  }
+
   .mobile-news-feed {
-    grid-template-columns: minmax(0, 1.45fr) minmax(340px, 0.9fr);
+    grid-template-columns: minmax(0, 1.5fr) minmax(360px, 0.82fr);
     grid-template-areas:
       "title title"
       "status status"
       "feature recommend"
       "all all"
       "feed feed";
-    gap: 18px;
-    padding-top: 18px;
+    gap: 8px;
+    padding-top: 16px;
     border-bottom: 1px solid var(--line);
   }
 
@@ -2013,7 +2070,18 @@ body.booking-search-open {
 
   .featured-news-card {
     grid-area: feature;
-    min-height: 474px;
+    min-height: 520px;
+  }
+
+  .news-feature-card,
+  .news-recommend-card {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .featured-news-card .news-feature-card {
+    border-radius: 0;
   }
 
   .featured-news-card .news-feature-card,
@@ -2035,7 +2103,7 @@ body.booking-search-open {
     position: absolute;
     inset: auto 0 0;
     gap: 10px;
-    padding: 96px 28px 28px;
+    padding: 120px 28px 28px;
     color: #fff;
     background: linear-gradient(180deg, rgba(3, 15, 24, 0), rgba(3, 15, 24, 0.84));
   }
@@ -2049,7 +2117,7 @@ body.booking-search-open {
 
   .news-feature-body h2 {
     max-width: 720px;
-    font-size: clamp(34px, 4vw, 54px);
+    font-size: clamp(34px, 3.6vw, 50px);
     line-height: 1.06;
   }
 
@@ -2057,8 +2125,8 @@ body.booking-search-open {
     grid-area: recommend;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: 1fr;
-    gap: 10px;
-    min-height: 474px;
+    gap: 8px;
+    min-height: 520px;
   }
 
   .news-recommend-card a {
@@ -2085,14 +2153,20 @@ body.booking-search-open {
 
   .tripview-section-title--all {
     grid-area: all;
-    margin-top: 12px;
-    padding-top: 26px;
+    margin-top: 26px;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .tripview-section-title--all h2 {
+    font-size: 25px;
+    line-height: 1.1;
   }
 
   .news-list-feed {
     grid-area: feed;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 28px 22px;
+    gap: 34px 22px;
   }
 
   .news-list-feed .mrt-feed-module {
@@ -2114,14 +2188,36 @@ body.booking-search-open {
   }
 
   .news-list-card .image-frame--feed {
-    aspect-ratio: 16 / 10;
-    border-radius: 4px;
+    aspect-ratio: 16 / 9;
+    border-radius: 3px;
   }
 
   .news-list-card strong {
-    font-size: 18px;
+    font-size: 17px;
     line-height: 1.38;
     -webkit-line-clamp: 2;
+  }
+
+  .category-news-wrapper {
+    padding-top: 32px;
+    border-top: 0;
+  }
+
+  #categoryNewsSections {
+    gap: 48px;
+  }
+
+  .category-news-block {
+    gap: 18px;
+    padding-bottom: 40px;
+  }
+
+  .category-magazine-grid {
+    gap: 34px 22px;
+  }
+
+  .category-magazine-card .image-frame--magazine {
+    aspect-ratio: 16 / 9;
   }
 }
 
