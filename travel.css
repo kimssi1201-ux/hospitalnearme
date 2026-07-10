@@ -42,6 +42,10 @@ img {
   max-width: 100%;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 button,
 input {
   font: inherit;
@@ -592,16 +596,25 @@ main {
   font-size: 15px;
 }
 
-.top-category-bar {
-  position: sticky;
-  top: 76px;
-  z-index: 9;
-  margin: 0 calc(50% - 50vw) 0;
-  padding: 9px max(16px, calc((100vw - var(--max)) / 2));
-  border-top: 1px solid var(--line);
+.tripview-summary {
+  display: grid;
+  gap: 18px;
+  padding: 34px 0 24px;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(12px);
+}
+
+.tripview-summary h1 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.top-category-bar {
+  margin: 0;
+  padding: 0;
+  background: transparent;
 }
 
 .section-status:empty,
@@ -610,7 +623,6 @@ main {
   display: none;
 }
 
-.is-loading-news .top-category-bar,
 .is-loading-news .category-news-wrapper,
 .is-loading-news .faq-section {
   display: none;
@@ -622,9 +634,9 @@ main {
 
 .category-tab-list {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding: 2px 0 4px;
   scrollbar-width: none;
 }
 
@@ -633,16 +645,26 @@ main {
 }
 
 .category-tab {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  gap: 8px;
   flex: 0 0 auto;
-  min-height: 38px;
-  padding: 8px 15px;
+  min-height: 44px;
+  padding: 9px 16px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: #fff;
   color: var(--ink);
-  font-size: 15px;
+  cursor: pointer;
+  font-size: 16px;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.category-tab strong {
+  color: var(--gold);
+  font-size: 14px;
 }
 
 .category-tab:hover,
@@ -650,6 +672,45 @@ main {
   border-color: var(--accent);
   background: var(--accent);
   color: #fff;
+}
+
+.category-tab:hover strong,
+.category-tab.is-active strong {
+  color: #fff;
+}
+
+.tripview-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 4px;
+}
+
+.tripview-section-title h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.tripview-section-title a {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.tripview-section-title--all {
+  margin-top: 12px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.tripview-section-title--all span {
+  color: var(--gold);
+  font-size: 0.72em;
 }
 
 .news-feed-heading {
@@ -687,6 +748,18 @@ main {
 
 .news-feature-card {
   box-shadow: var(--shadow);
+}
+
+.featured-news-card {
+  display: grid;
+}
+
+.featured-news-card:empty {
+  display: none;
+}
+
+.featured-news-card .news-feature-card {
+  border-radius: 24px;
 }
 
 .news-feature-card a {
@@ -757,6 +830,15 @@ main {
 .news-loading-card--recommend {
   display: grid;
   gap: 9px;
+}
+
+.news-loading-card--feature {
+  min-height: 420px;
+}
+
+.news-loading-card--feature .news-loading-thumb {
+  aspect-ratio: 16 / 10;
+  border-radius: 22px 22px 0 0;
 }
 
 .news-loading-card--list {
@@ -2273,6 +2355,16 @@ body.booking-search-open {
     padding-top: 0;
   }
 
+  .tripview-summary {
+    gap: 14px;
+    padding: 24px 0 18px;
+  }
+
+  .tripview-summary h1 {
+    font-size: 30px;
+    line-height: 1.12;
+  }
+
   .top-region-bar {
     top: 94px;
     margin-top: -8px;
@@ -2282,8 +2374,8 @@ body.booking-search-open {
   .top-category-bar {
     position: static;
     z-index: auto;
-    margin: 0 calc(50% - 50vw) 12px;
-    padding: 10px 12px;
+    margin: 0;
+    padding: 0;
   }
 
   .top-region-bar .region-button {
@@ -2293,9 +2385,21 @@ body.booking-search-open {
   }
 
   .category-tab {
-    min-height: 36px;
-    padding: 7px 14px;
+    min-height: 38px;
+    padding: 7px 12px;
     font-size: 14px;
+  }
+
+  .category-tab strong {
+    font-size: 12px;
+  }
+
+  .tripview-section-title h2 {
+    font-size: 26px;
+  }
+
+  .tripview-section-title a {
+    font-size: 13px;
   }
 
   .news-feed-heading h1 {

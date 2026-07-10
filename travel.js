@@ -21,6 +21,7 @@ const state = {
   apiLoaded: false,
   apiError: false,
   activeRegionId: "seoul",
+  activeCategoryFilter: "all",
   newsLoading: true,
   language: getStoredLanguage()
 };
@@ -302,6 +303,25 @@ function categoryKeyFor(item = {}) {
   if (value.includes("movie") || value.includes("영화")) return "movie";
   if (value.includes("festival") || value.includes("축제")) return "festival";
   return "event";
+}
+
+function primaryNewsItems() {
+  const source = state.apiArticles.length ? state.apiArticles : state.julyArticles;
+  return uniqueArticles((source || []).map(withGroupedCategory));
+}
+
+function filteredNewsItems(items = primaryNewsItems()) {
+  const filter = state.activeCategoryFilter || "all";
+  if (filter === "all") return items;
+  return items.filter((item) => categoryKeyFor(item) === filter);
+}
+
+function categoryCountMap(items = primaryNewsItems()) {
+  return items.reduce((map, item) => {
+    const key = categoryKeyFor(item);
+    map.set(key, (map.get(key) || 0) + 1);
+    return map;
+  }, new Map());
 }
 
 function displayCategoryLabel(item = {}) {
@@ -1360,8 +1380,12 @@ function loadingCardMarkup(type = "list") {
 }
 
 function renderNewsLoadingSkeleton() {
+  const featured = $("#featuredArticle");
   const recommended = $("#recommendedArticles");
   const feed = $("#newsFeedList");
+  if (featured) {
+    featured.innerHTML = loadingCardMarkup("feature");
+  }
   if (recommended) {
     recommended.innerHTML = Array.from({ length: 3 }, () => loadingCardMarkup("recommend")).join("");
   }
@@ -1913,21 +1937,27 @@ function renderTopCategoryTabs(groups = buildCategoryNewsGroups()) {
   const target = $("#topCategoryTabs");
   if (!target) return;
 
+  const items = primaryNewsItems();
+  const counts = categoryCountMap(items);
   const allLabels = {
-    ko: "전체",
+    ko: "전체글",
     en: "All",
     ja: "すべて",
     zh: "全部"
   };
   const tabs = [
-    { id: "july", title: allLabels[state.language] || allLabels.ko },
-    ...groups
+    { id: "all", title: allLabels[state.language] || allLabels.ko, count: items.length },
+    ...groups.map((group) => ({
+      ...group,
+      count: counts.get(group.id) || 0
+    }))
   ];
 
   target.innerHTML = tabs.map((group, index) => `
-    <a class="category-tab ${index === 0 ? "is-active" : ""}" href="#${escapeHtml(group.id)}">
-      ${escapeHtml(group.title)}
-    </a>
+    <button class="category-tab ${state.activeCategoryFilter === group.id || (index === 0 && state.activeCategoryFilter === "all") ? "is-active" : ""}" type="button" data-category-filter="${escapeHtml(group.id)}">
+      <span>${escapeHtml(group.title)}</span>
+      <strong>${Number(group.count || 0).toLocaleString("ko-KR")}</strong>
+    </button>
   `).join("");
 }
 
@@ -1936,11 +1966,13 @@ function bindTopCategoryTabs() {
   if (!target) return;
 
   target.addEventListener("click", (event) => {
-    const link = event.target.closest(".category-tab");
-    if (!link) return;
+    const button = event.target.closest("[data-category-filter]");
+    if (!button) return;
+    state.activeCategoryFilter = button.getAttribute("data-category-filter") || "all";
     target.querySelectorAll(".category-tab").forEach((item) => {
-      item.classList.toggle("is-active", item === link);
+      item.classList.toggle("is-active", item === button);
     });
+    renderJulyFestivals();
   });
 }
 
@@ -2374,24 +2406,36 @@ async function loadTourApiPlaces() {
 
 function renderJulyFestivals() {
   const status = $("#julyStatus");
+  const featured = $("#featuredArticle");
   const recommended = $("#recommendedArticles");
   const feed = $("#newsFeedList");
-  if (!status || !recommended || !feed) return;
+  const countTarget = $("#allArticleCount");
+  if (!status || !featured || !recommended || !feed) return;
 
   const month = currentSeoulMonth();
-  const items = state.apiArticles.length ? state.apiArticles : state.julyArticles;
+  const allItems = primaryNewsItems();
+  const items = filteredNewsItems(allItems);
+  renderTopCategoryTabs();
+
+  if (countTarget) {
+    countTarget.textContent = `${items.length.toLocaleString("ko-KR")}개`;
+  }
 
   if (!items.length) {
     if (state.newsLoading && !state.apiLoaded && !state.apiError) {
       status.textContent = "";
       status.hidden = true;
+      featured.innerHTML = "";
       renderNewsLoadingSkeleton();
       return;
     }
 
     setNewsLoading(false);
-    status.textContent = `${month.label}에 표시할 서울 축제 정보를 불러오는 중입니다.`;
+    status.textContent = state.activeCategoryFilter === "all"
+      ? `${month.label}에 표시할 서울 여행 정보를 불러오는 중입니다.`
+      : "선택한 분류에 표시할 서울 여행 정보가 없습니다.";
     status.hidden = false;
+    featured.innerHTML = "";
     recommended.innerHTML = "";
     feed.innerHTML = "";
     return;
@@ -2401,9 +2445,9 @@ function renderJulyFestivals() {
   status.textContent = "";
   status.hidden = true;
 
-  recommended.innerHTML = items.slice(0, 3).map((item) => newsRecommendCard(item)).join("");
-  const feedItems = items.slice(3, 18);
-  feed.innerHTML = buildNewsFeedMarkup(feedItems);
+  featured.innerHTML = newsFeaturedCard(items[0]);
+  recommended.innerHTML = items.slice(1, 4).map((item) => newsRecommendCard(item)).join("");
+  feed.innerHTML = buildNewsFeedMarkup(items.slice(0, 60));
 }
 
 async function loadSeoulCultureEvents() {

@@ -16,10 +16,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="stylesheet" href="travel.css?v=20260710-no-tenping-2" />
+    <link rel="stylesheet" href="travel.css?v=20260710-tripview-home-1" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8468106244002167" crossorigin="anonymous"></script>
     <script src="travel-data.js?v=20260705-category-groups-1" defer></script>
-    <script src="travel.js?v=20260710-coupang-1" defer></script>
+    <script src="travel.js?v=20260710-tripview-home-1" defer></script>
     <title>서울여행뉴스 | 서울 여행 정보 뉴스</title>
   </head>
   <body class="is-loading-news">
@@ -38,7 +38,7 @@
       </button>
       <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴">
         <a href="#july" data-i18n="nav.july">서울 여행 뉴스</a>
-        <a href="#places" data-i18n="nav.places">서울 축제</a>
+        <a href="#allArticles" data-i18n="nav.places">서울 축제</a>
         <a href="#bookingSearch" data-i18n="nav.booking">방문 전 체크</a>
         <a href="#info" data-i18n="nav.guide">방문 가이드</a>
       </nav>
@@ -51,14 +51,27 @@
     </header>
 
     <main id="top">
-      <nav class="top-category-bar" aria-label="서울 문화행사 카테고리">
-        <div class="category-tab-list" id="topCategoryTabs"></div>
-      </nav>
+      <section class="tripview-summary" aria-labelledby="tripviewHomeTitle">
+        <div>
+          <p class="eyebrow">Seoul Travel News</p>
+          <h1 id="tripviewHomeTitle">서울 여행 최신 큐레이션</h1>
+        </div>
+        <nav class="top-category-bar" aria-label="서울 문화행사 카테고리">
+          <div class="category-tab-list" id="topCategoryTabs"></div>
+        </nav>
+      </section>
 
       <section class="mobile-news-feed" id="july" aria-labelledby="julyTitle">
-        <h1 class="sr-only" id="julyTitle" data-i18n="july.title">오늘 볼 만한 서울 여행 뉴스</h1>
+        <div class="tripview-section-title">
+          <h2 id="julyTitle">최신글</h2>
+          <a href="#allArticles">전체글 보기</a>
+        </div>
         <div class="section-status" id="julyStatus" data-i18n="july.loading">서울 축제 정보를 불러오는 중입니다.</div>
+        <div class="featured-news-card" id="featuredArticle"></div>
         <div class="recommend-news-row" id="recommendedArticles" aria-label="추천 축제 기사"></div>
+        <div class="tripview-section-title tripview-section-title--all" id="allArticles">
+          <h2>전체글 <span id="allArticleCount"></span></h2>
+        </div>
         <div class="news-list-feed" id="newsFeedList"></div>
       </section>
 
@@ -256,11 +269,11 @@
         <div class="mrt-grid" id="myrealtripGrid"></div>
       </section>
 
-      <section class="category-news-wrapper" id="categoryNews" aria-label="카테고리별 축제 뉴스">
+      <section class="category-news-wrapper" id="categoryNews" aria-label="카테고리별 축제 뉴스" hidden>
         <div id="categoryNewsSections"></div>
       </section>
 
-      <section class="faq-section" aria-labelledby="faqTitle">
+      <section class="faq-section" id="info" aria-labelledby="faqTitle">
         <div class="section-heading">
           <p class="eyebrow">Guide</p>
           <h2 id="faqTitle" data-i18n="faq.title">이용 가이드</h2>
