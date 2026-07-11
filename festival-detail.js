@@ -1172,6 +1172,62 @@ function travelRegionName(article) {
   return category.replace("축제", "").trim() || "국내";
 }
 
+const DETAIL_DESTINATION_HINTS = [
+  "강남", "강남구", "강동", "강동구", "강북", "강북구", "강서", "강서구",
+  "관악", "관악구", "광진", "광진구", "구로", "구로구", "금천", "금천구",
+  "노원", "노원구", "도봉", "도봉구", "동대문", "동대문구", "동작", "동작구",
+  "마포", "마포구", "서대문", "서대문구", "서초", "서초구", "성동", "성동구",
+  "성북", "성북구", "송파", "송파구", "양천", "양천구", "영등포", "영등포구",
+  "용산", "용산구", "은평", "은평구", "종로", "종로구", "중구", "중랑", "중랑구",
+  "코엑스", "잠실", "롯데월드", "한강", "여의도", "홍대", "명동", "광화문",
+  "경복궁", "덕수궁", "창경궁", "창덕궁", "남산", "서울숲", "DDP", "동대문",
+  "북촌", "서촌", "익선동", "성수", "연남", "이태원", "압구정", "망원",
+  "세종문화회관", "예술의전당", "국립중앙박물관", "서울시립미술관", "국립극장"
+];
+
+const DETAIL_LANDMARK_HINTS = [
+  "세종문화회관", "예술의전당", "국립중앙박물관", "서울시립미술관", "국립극장",
+  "코엑스", "롯데월드", "경복궁", "덕수궁", "창경궁", "창덕궁", "한강",
+  "여의도", "광화문", "서울숲", "DDP", "북촌", "서촌", "익선동", "남산"
+];
+
+function detailDestinationKeyword(article = {}) {
+  const text = [
+    article.address,
+    article.place,
+    article.title,
+    article.category,
+    article.rawCategory,
+    article.subCategory
+  ].filter(Boolean).join(" ")
+    .replace(/서울특별시|서울시|서울/g, " ")
+    .replace(/[()[\]{}"'“”‘’]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const landmark = DETAIL_LANDMARK_HINTS.find((item) => text.includes(item));
+  if (landmark) return landmark;
+  const districtMatch = text.match(/[가-힣]{1,6}구/);
+  if (districtMatch) return districtMatch[0];
+  const hint = DETAIL_DESTINATION_HINTS.find((item) => text.includes(item));
+  return hint || travelRegionName(article) || "서울";
+}
+
+function detailTourSearchKeyword(article = {}) {
+  const keyword = detailDestinationKeyword(article);
+  const text = [
+    article.title,
+    article.category,
+    article.rawCategory,
+    article.subCategory,
+    article.summary
+  ].filter(Boolean).join(" ");
+  if (/공연|무대|콘서트|뮤지컬|오페라|연극|국악|클래식|발레|독주/.test(text)) return `${keyword} 공연`;
+  if (/전시|미술|박물관|미술관|갤러리|아트/.test(text)) return `${keyword} 전시`;
+  if (/궁|궁궐|고궁|전통|역사|덕수궁|경복궁|창덕궁|창경궁/.test(text)) return `${keyword} 궁궐 투어`;
+  if (/어린이|키즈|가족|체험|교육/.test(text)) return `${keyword} 키즈 체험`;
+  return `${keyword} 입장권`;
+}
+
 function factValueByLabels(article, labels, fallback = "") {
   const facts = article.facts || localFacts(article);
   const list = Array.isArray(labels) ? labels : [labels];
@@ -2346,11 +2402,10 @@ function CleanClosingSection(article) {
 
 function bookingSearchUrl(kind, article) {
   const params = new URLSearchParams({ booking: kind });
-  const region = travelRegionName(article) || "서울";
-  const title = localizedEventReference(article);
+  const destination = detailDestinationKeyword(article);
 
-  if (kind === "stay") params.set("keyword", region);
-  if (kind === "tour") params.set("keyword", `${title} 서울`);
+  if (kind === "stay") params.set("keyword", destination);
+  if (kind === "tour") params.set("keyword", detailTourSearchKeyword(article));
   if (kind === "flight") {
     params.set("depCityCd", "ICN");
     params.set("arrCityCds", "CJU,BKK,NRT");
