@@ -1,6 +1,15 @@
 const data = window.TRAVEL_PORTAL_DATA;
 const supportedLanguages = ["ko", "en", "ja", "zh"];
 const MRT_FETCH_TIMEOUT_MS = 12000;
+const COUPANG_WIDGET_SCRIPT = "https://ads-partners.coupang.com/g.js";
+const COUPANG_WIDGET_CONFIG = {
+  id: 1003200,
+  trackingCode: "AF1488183",
+  subId: null,
+  template: "carousel",
+  width: "680",
+  height: "140"
+};
 const state = {
   apiArticles: [],
   julyArticles: [],
@@ -25,6 +34,7 @@ const state = {
   newsLoading: true,
   language: getStoredLanguage()
 };
+let coupangWidgetScriptPromise = null;
 
 const MRT_SEARCH_COPY = {
   stay: {
@@ -801,6 +811,58 @@ function renderCoupangProducts() {
   }).join("");
 }
 
+function coupangWidgetMarkup(slot = "feed") {
+  const safeSlot = String(slot).replace(/[^a-z0-9_-]/gi, "-").toLowerCase();
+  return `
+    <aside class="coupang-widget-ad" aria-label="쿠팡 파트너스 광고">
+      <div class="coupang-widget-label">Advertisement</div>
+      <div class="coupang-widget-frame" id="coupangWidget-${escapeHtml(safeSlot)}" data-coupang-widget></div>
+      <p class="coupang-widget-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+    </aside>
+  `;
+}
+
+function loadCoupangWidgetScript() {
+  if (window.PartnersCoupang?.G) return Promise.resolve();
+  if (coupangWidgetScriptPromise) return coupangWidgetScriptPromise;
+
+  coupangWidgetScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = COUPANG_WIDGET_SCRIPT;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Coupang widget script failed to load."));
+    document.head.appendChild(script);
+  });
+
+  return coupangWidgetScriptPromise;
+}
+
+async function hydrateCoupangWidgets() {
+  const targets = [...document.querySelectorAll("[data-coupang-widget]:not([data-coupang-loaded])")];
+  if (!targets.length) return;
+
+  try {
+    await loadCoupangWidgetScript();
+    targets.forEach((target) => {
+      target.dataset.coupangLoaded = "true";
+      const width = Math.max(300, Math.min(680, Math.floor(target.clientWidth || target.parentElement?.clientWidth || window.innerWidth - 36)));
+      new window.PartnersCoupang.G({
+        ...COUPANG_WIDGET_CONFIG,
+        width: String(width),
+        height: "140",
+        container: target
+      });
+    });
+  } catch (error) {
+    console.warn("Coupang widget could not be loaded.", error);
+    targets.forEach((target) => {
+      target.dataset.coupangLoaded = "error";
+      target.innerHTML = "";
+    });
+  }
+}
+
 async function loadCoupangProducts() {
   try {
     const payload = await fetchCoupangProducts(state.coupang.keyword, 6);
@@ -1478,6 +1540,7 @@ function adRotationOffset(seed = "") {
 function buildNewsFeedMarkup(feedItems, seed = "main") {
   const blocks = [];
   let hasInsertedMrt = false;
+  let hasInsertedCoupang = false;
 
   feedItems.forEach((item, index) => {
     const articleNumber = index + 1;
@@ -1486,6 +1549,11 @@ function buildNewsFeedMarkup(feedItems, seed = "main") {
     if (!hasInsertedMrt && articleNumber === MRT_FEED_INTERVAL && articleNumber < feedItems.length) {
       blocks.push(renderMrtFeedModuleV2(seed, 1, item));
       hasInsertedMrt = true;
+    }
+
+    if (!hasInsertedCoupang && articleNumber === 12 && articleNumber < feedItems.length) {
+      blocks.push(coupangWidgetMarkup(`feed-${seed}`));
+      hasInsertedCoupang = true;
     }
   });
 
@@ -2647,6 +2715,7 @@ function renderJulyFestivals() {
   featured.innerHTML = newsFeaturedCard(items[0]);
   recommended.innerHTML = items.slice(1, 5).map((item) => newsRecommendCard(item)).join("");
   feed.innerHTML = buildNewsFeedMarkup(items.slice(5, 65));
+  hydrateCoupangWidgets();
 }
 
 function renderSeoulArticleState() {

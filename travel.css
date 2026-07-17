@@ -1164,6 +1164,44 @@ main {
   background: #fff;
 }
 
+.coupang-widget-ad {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  max-width: 768px;
+  margin: 18px auto;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+
+.coupang-widget-label {
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.coupang-widget-frame {
+  width: 100%;
+  min-height: 140px;
+  overflow: hidden;
+}
+
+.coupang-widget-frame ins,
+.coupang-widget-frame iframe {
+  max-width: 100% !important;
+}
+
+.coupang-widget-disclosure {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .mrt-feed-module-head {
   display: flex;
   align-items: end;

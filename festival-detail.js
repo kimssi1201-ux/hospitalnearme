@@ -38,10 +38,20 @@ const fallbackTarget = params.get("target");
 const fallbackIsFree = params.get("isFree");
 const fallbackUpdatedAt = params.get("updatedAt");
 const supportedLanguages = ["ko", "en", "ja", "zh"];
+const COUPANG_WIDGET_SCRIPT = "https://ads-partners.coupang.com/g.js";
+const COUPANG_WIDGET_CONFIG = {
+  id: 1003200,
+  trackingCode: "AF1488183",
+  subId: null,
+  template: "carousel",
+  width: "680",
+  height: "140"
+};
 const state = {
   language: getStoredLanguage(),
   article: null
 };
+let coupangWidgetScriptPromise = null;
 
 const DETAIL_I18N = {
   ko: {
@@ -1671,6 +1681,7 @@ function renderArticle(article) {
     </div>
   `;
   hydrateNearbyParking(article);
+  hydrateCoupangWidgets();
 }
 
 function applyStaticLanguage() {
@@ -2484,6 +2495,58 @@ function BookingCheckSection(article) {
   `;
 }
 
+function CoupangWidgetAd(slot = "detail") {
+  const safeSlot = String(slot).replace(/[^a-z0-9_-]/gi, "-").toLowerCase();
+  return `
+    <aside class="coupang-widget-ad coupang-widget-ad--detail" aria-label="쿠팡 파트너스 광고">
+      <div class="coupang-widget-label">Advertisement</div>
+      <div class="coupang-widget-frame" id="detailCoupangWidget-${escapeHtml(safeSlot)}" data-coupang-widget></div>
+      <p class="coupang-widget-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+    </aside>
+  `;
+}
+
+function loadCoupangWidgetScript() {
+  if (window.PartnersCoupang?.G) return Promise.resolve();
+  if (coupangWidgetScriptPromise) return coupangWidgetScriptPromise;
+
+  coupangWidgetScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = COUPANG_WIDGET_SCRIPT;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Coupang widget script failed to load."));
+    document.head.appendChild(script);
+  });
+
+  return coupangWidgetScriptPromise;
+}
+
+async function hydrateCoupangWidgets() {
+  const targets = [...document.querySelectorAll("[data-coupang-widget]:not([data-coupang-loaded])")];
+  if (!targets.length) return;
+
+  try {
+    await loadCoupangWidgetScript();
+    targets.forEach((target) => {
+      target.dataset.coupangLoaded = "true";
+      const width = Math.max(300, Math.min(680, Math.floor(target.clientWidth || target.parentElement?.clientWidth || window.innerWidth - 36)));
+      new window.PartnersCoupang.G({
+        ...COUPANG_WIDGET_CONFIG,
+        width: String(width),
+        height: "140",
+        container: target
+      });
+    });
+  } catch (error) {
+    console.warn("Coupang widget could not be loaded.", error);
+    targets.forEach((target) => {
+      target.dataset.coupangLoaded = "error";
+      target.innerHTML = "";
+    });
+  }
+}
+
 function renderTravelDetailBody(article, sections) {
   return `
     ${CleanIntroSection(article)}
@@ -2494,6 +2557,7 @@ function renderTravelDetailBody(article, sections) {
     ${NearbyParkingSection(article)}
     ${CleanVisitTipSection(article)}
     ${BookingCheckSection(article)}
+    ${CoupangWidgetAd(`detail-${article.id || "article"}`)}
     ${CleanClosingSection(article)}
   `;
 }

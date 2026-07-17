@@ -1908,6 +1908,25 @@
   display: none;
 }
 
+.blog-body .coupang-widget-ad {
+  margin: 0 0 34px;
+  padding: 28px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.blog-body .coupang-widget-frame {
+  width: 100%;
+  min-height: 140px;
+}
+
+.blog-body .coupang-widget-disclosure {
+  max-width: 680px;
+}
+
 .booking-check-section {
   display: grid;
   gap: 16px;
