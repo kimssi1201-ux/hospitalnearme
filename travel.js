@@ -2649,6 +2649,45 @@ function renderJulyFestivals() {
   feed.innerHTML = buildNewsFeedMarkup(items.slice(5, 65));
 }
 
+function renderSeoulArticleState() {
+  renderPlaces();
+  renderCuration();
+  renderEditorialPosts();
+  renderJulyFestivals();
+  renderCategoryNewsSections();
+}
+
+function applySeoulCultureArticles(seoulArticles, statusMessage) {
+  state.apiArticles = seoulArticles;
+  state.apiLoaded = true;
+  state.apiError = false;
+
+  if (statusMessage) {
+    updatePlacesStatus(statusMessage);
+  } else if (seoulArticles.length) {
+    updatePlacesStatus(`서울 문화행사 ${seoulArticles.length}개를 불러왔습니다.`);
+  } else {
+    updatePlacesStatus("서울 문화행사 정보가 아직 등록되어 있지 않습니다.");
+  }
+
+  renderSeoulArticleState();
+}
+
+function buildGeneratedSeoulEventsUrl() {
+  return `generated/seoul-events.json?v=${currentSeoulMonth().key}`;
+}
+
+async function loadGeneratedSeoulCultureArticles() {
+  const response = await fetch(buildGeneratedSeoulEventsUrl(), {
+    headers: { Accept: "application/json" }
+  });
+  if (!response.ok) throw new Error(`Generated Seoul events HTTP ${response.status}`);
+
+  const payload = await response.json();
+  if (!Array.isArray(payload?.items)) return [];
+  return normalizeSeoulCultureItems(payload.items);
+}
+
 async function loadSeoulCultureEvents() {
   if (!data.seoulCultureApi?.endpoint) {
     loadTourApiPlaces();
@@ -2657,6 +2696,19 @@ async function loadSeoulCultureEvents() {
 
   state.apiError = false;
   updatePlacesStatus("서울 문화행사 정보를 불러오는 중입니다.");
+  let generatedArticles = [];
+
+  try {
+    generatedArticles = await loadGeneratedSeoulCultureArticles();
+    if (generatedArticles.length) {
+      applySeoulCultureArticles(
+        generatedArticles,
+        `${currentSeoulMonth().label} 서울 여행 정보 ${generatedArticles.length}개를 준비했습니다.`
+      );
+    }
+  } catch (error) {
+    console.warn("Generated Seoul events could not be loaded. Live API will be used.", error);
+  }
 
   try {
     const response = await fetch(buildSeoulCultureUrl(), {
@@ -2668,23 +2720,12 @@ async function loadSeoulCultureEvents() {
     }
 
     const seoulArticles = normalizeSeoulCultureItems(payload.items);
-    state.apiArticles = seoulArticles;
-    state.apiLoaded = true;
-    state.apiError = false;
-
-    if (seoulArticles.length) {
-      updatePlacesStatus(`서울 문화행사 ${seoulArticles.length}개를 불러왔습니다.`);
-    } else {
-      updatePlacesStatus("서울 문화행사 정보가 아직 등록되어 있지 않습니다.");
-    }
-
-    renderPlaces();
-    renderCuration();
-    renderEditorialPosts();
-    renderJulyFestivals();
-    renderCategoryNewsSections();
+    applySeoulCultureArticles(seoulArticles);
   } catch (error) {
     console.warn("Seoul cultural events could not be loaded. TourAPI fallback is requested.", error);
+    if (generatedArticles.length) {
+      return;
+    }
     state.apiArticles = [];
     state.apiLoaded = false;
     state.apiError = true;
