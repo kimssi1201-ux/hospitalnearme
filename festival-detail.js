@@ -2685,27 +2685,7 @@ function NearbyTravelSection(article) {
   `;
 }
 
-function coupangTravelKeyword(article = {}) {
-  const text = [
-    article.title,
-    article.category,
-    article.rawCategory,
-    article.subCategory,
-    article.summary
-  ].filter(Boolean).join(" ");
-
-  if (/공연|무대|콘서트|뮤지컬|오페라|연극|국악|클래식|발레|독주/.test(text)) {
-    return "공연 관람 준비물";
-  }
-  if (/전시|미술|박물관|미술관|갤러리|아트|일러스트/.test(text)) {
-    return "전시 관람 준비물";
-  }
-  if (/어린이|키즈|가족|체험|교육/.test(text)) {
-    return "아이와 여행 준비물";
-  }
-  if (/야외|축제|한강|공원|거리|마켓|페스티벌/.test(text)) {
-    return "나들이 준비물";
-  }
+function coupangTravelKeyword() {
   return "여행용품";
 }
 
@@ -2890,7 +2870,7 @@ function CleanClosingSection(article) {
   const copy = detailCopy();
   const eventName = localizedEventReference(article);
   const destination = detailDestinationKeyword(article);
-  const category = displayArticleCategory(article);
+  const category = usefulValue(article.category) || displayArticleCategory(article);
   const schedule = usefulValue(article.date) || copy.fallbacks.date;
 
   if (state.language !== "ko") {
