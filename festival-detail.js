@@ -7,7 +7,7 @@ const fallbackData = {
       summary: "목록에서 축제를 선택하면 일정, 장소, 사진, 방문 전 체크사항을 자세히 볼 수 있습니다.",
       date: "일정 확인 필요",
       readTime: "축제 상세",
-      image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80"
+      image: ""
     }
   ]
 };
@@ -48,7 +48,8 @@ const state = {
     landingUrl: ""
   }
 };
-const DEFAULT_DETAIL_IMAGE = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80";
+const DEFAULT_DETAIL_IMAGE = "";
+const API_IMAGE_HOSTS = new Set(["culture.seoul.go.kr", "tong.visitkorea.or.kr"]);
 const IMAGE_FIELD_NAMES = [
   "image",
   "MAIN_IMG",
@@ -378,11 +379,22 @@ function collectImageCandidates(value, bucket = [], depth = 0) {
 function imageListForArticle(article = {}) {
   const candidates = [];
   collectImageCandidates(article, candidates);
-  return [...new Set(candidates.map(normalizeImageUrl).filter(Boolean))];
+  return [...new Set(candidates.map(normalizeImageUrl).filter(isApiImageUrl))];
+}
+
+function isApiImageUrl(value) {
+  const image = normalizeImageUrl(value);
+  if (!image) return false;
+
+  try {
+    return API_IMAGE_HOSTS.has(new URL(image).hostname);
+  } catch {
+    return false;
+  }
 }
 
 function imageUrlForArticle(article = {}, fallback = DEFAULT_DETAIL_IMAGE) {
-  return imageListForArticle(article)[0] || fallback;
+  return imageListForArticle(article)[0] || (isApiImageUrl(fallback) ? normalizeImageUrl(fallback) : "");
 }
 
 function normalizeExternalUrl(value) {
@@ -494,7 +506,7 @@ async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId 
   const end = compactDate(introItem?.eventenddate);
   const period = start && end ? `${start} - ${end}` : start || "일정 확인 필요";
   const galleryImages = collectGalleryImages(commonItem, imagePayload);
-  const firstImage = galleryImages[0] || normalizeImageUrl(commonItem.firstimage || commonItem.firstimage2 || data.articles[0].image);
+  const firstImage = galleryImages[0] || normalizeImageUrl(commonItem.firstimage || commonItem.firstimage2);
   const overview = stripHtml(commonItem.overview);
   const address = [commonItem.addr1, commonItem.addr2].filter(Boolean).join(" ") || fallbackAddress || extractAddressFromOverview(overview);
   const place = introItem?.eventplace || address || "장소 확인 필요";
@@ -602,7 +614,7 @@ function enrichLocalArticle(article = {}) {
   const address = article.address || "서울 전역";
   const time = article.time || "행사별 운영 시간이 다릅니다";
   const fee = article.fee || "행사별 상이";
-  const image = imageUrlForArticle(article, article.image || DEFAULT_DETAIL_IMAGE);
+  const image = imageUrlForArticle(article, "");
   const galleryImages = imageListForArticle(article);
   return {
     ...article,
@@ -633,7 +645,7 @@ function findLocalArticle() {
 
 function fallbackArticleFromParams() {
   const title = fallbackTitle || "축제 상세 정보";
-  const image = imageUrlForArticle({ image: fallbackImage }, data.articles[0].image || DEFAULT_DETAIL_IMAGE);
+  const image = imageUrlForArticle({ image: fallbackImage }, "");
   const address = fallbackAddress || "";
   const summary = fallbackSummary || `${title} 방문 전 확인하면 좋은 일정, 장소, 교통, 준비 정보를 정리했습니다.`;
 
