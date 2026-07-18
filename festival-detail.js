@@ -2043,7 +2043,7 @@ function renderArticle(article) {
     </header>
     ${heroImage ? `
       <div class="detail-hero-image">
-        <img src="${escapeHtml(heroImage)}" alt="${escapeHtml(displayTitle)}" onerror="this.closest('.detail-hero-image').remove()" />
+        <img src="${escapeHtml(heroImage)}" alt="${escapeHtml(displayTitle)}" onload="this.closest('.detail-hero-image').classList.toggle('is-portrait', this.naturalHeight > this.naturalWidth)" onerror="this.closest('.detail-hero-image').remove()" />
       </div>
     ` : ""}
     <div class="blog-body">
