@@ -680,11 +680,15 @@ function newsFeaturedCard(item) {
 
 function newsRecommendCard(item) {
   const title = displayArticleTitle(item);
+  const category = displayCategoryLabel(item);
   return `
     <article class="news-recommend-card">
       <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "recommend")}
-        <strong>${escapeHtml(title)}</strong>
+        <div class="news-recommend-body">
+          <span class="category-label">${escapeHtml(category)}</span>
+          <strong>${escapeHtml(title)}</strong>
+        </div>
       </a>
     </article>
   `;
