@@ -401,6 +401,13 @@ main {
   transform: scale(1.06);
 }
 
+/* Small landing cards should fill their fixed frame; the lead poster keeps its full artwork. */
+.news-recommend-card .image-frame--api img,
+.news-list-card .image-frame--api img {
+  object-fit: cover;
+  background: transparent;
+}
+
 .image-frame--hero {
   aspect-ratio: 16 / 11;
 }
