@@ -10,6 +10,27 @@ const COUPANG_WIDGET_CONFIG = {
   width: "680",
   height: "140"
 };
+const DEFAULT_EVENT_IMAGE = "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80";
+const DEFAULT_FESTIVAL_IMAGE = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80";
+const IMAGE_FIELD_NAMES = [
+  "image",
+  "MAIN_IMG",
+  "mainImg",
+  "mainImage",
+  "mainImageUrl",
+  "imageUrl",
+  "imageURL",
+  "thumbnail",
+  "thumbnailUrl",
+  "thumbnailURL",
+  "representativeImageUrl",
+  "firstimage",
+  "firstimage2",
+  "productImage",
+  "originimgurl",
+  "smallimageurl",
+  "url"
+];
 const state = {
   apiArticles: [],
   julyArticles: [],
@@ -287,11 +308,79 @@ function safeExternalUrl(value) {
   }
 }
 
+function normalizeImageUrl(value) {
+  if (value === null || value === undefined) return "";
+
+  let text = String(value).trim();
+  if (!text) return "";
+
+  const embeddedUrl = text.match(/(?:src|href)=["']([^"']+)["']/i)?.[1];
+  if (embeddedUrl) text = embeddedUrl.trim();
+
+  text = text
+    .replaceAll("&amp;", "&")
+    .replaceAll("\\u0026", "&")
+    .replace(/^http:/i, "https:");
+
+  if (text.startsWith("//")) text = `https:${text}`;
+  if (!/^https:\/\//i.test(text)) return "";
+
+  try {
+    return new URL(text).href;
+  } catch {
+    return "";
+  }
+}
+
+function collectImageCandidates(value, bucket = [], depth = 0) {
+  if (!value || depth > 3) return bucket;
+
+  if (typeof value === "string" || typeof value === "number") {
+    bucket.push(value);
+    return bucket;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectImageCandidates(item, bucket, depth + 1));
+    return bucket;
+  }
+
+  if (typeof value === "object") {
+    IMAGE_FIELD_NAMES.forEach((key) => collectImageCandidates(value[key], bucket, depth + 1));
+    ["images", "galleryImages", "photos", "pictures", "media", "items", "item"].forEach((key) => {
+      collectImageCandidates(value[key], bucket, depth + 1);
+    });
+  }
+
+  return bucket;
+}
+
+function imageListForItem(item = {}) {
+  const candidates = [];
+  collectImageCandidates(item, candidates);
+  return [...new Set(candidates.map(normalizeImageUrl).filter(Boolean))];
+}
+
+function imageUrlForItem(item = {}, fallback = DEFAULT_EVENT_IMAGE) {
+  return imageListForItem(item)[0] || fallback;
+}
+
+function hasApiImage(item = {}) {
+  const image = imageUrlForItem(item, "");
+  return Boolean(image && !image.includes("images.unsplash.com"));
+}
+
 function imageMarkup(item, size = "card") {
   const title = displayArticleTitle(item);
+  const image = imageUrlForItem(item);
+  const isApi = hasApiImage(item);
+  const fallback = image === DEFAULT_EVENT_IMAGE ? "" : DEFAULT_EVENT_IMAGE;
+  const onError = fallback
+    ? ` onerror="this.onerror=null;this.src='${escapeHtml(fallback)}'"`
+    : ` onerror="this.closest('.image-frame').classList.add('is-empty');this.remove()"`;
   return `
-    <div class="image-frame image-frame--${size}">
-      <img src="${escapeHtml(item.image)}" alt="${escapeHtml(title)}" loading="lazy" />
+    <div class="image-frame image-frame--${size}${isApi ? " image-frame--api" : ""}">
+      <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"${onError} />
     </div>
   `;
 }
@@ -325,7 +414,7 @@ function articleDateValue(item = {}) {
 
 function articleQualityScore(item = {}) {
   let score = 0;
-  if (item.image && !String(item.image).includes("unsplash.com")) score += 4;
+  if (hasApiImage(item)) score += 4;
   if (item.address || item.place) score += 4;
   if (item.date) score += 3;
   if (item.fee || item.isFree) score += 2;
@@ -466,6 +555,7 @@ function articleMeta(item) {
 }
 
 function detailUrl(item) {
+  const image = imageUrlForItem(item, "");
   if (item.source === "seoul") {
     const params = new URLSearchParams({
       source: "seoul",
@@ -476,7 +566,7 @@ function detailUrl(item) {
       subCategory: item.subCategory || item.rawCategory || "",
       categorySlug: item.categorySlug || "",
       date: item.date || "",
-      image: item.image || "",
+      image,
       address: item.address || item.place || "",
       summary: displaySummary(item) || "",
       tel: item.tel || "",
@@ -504,7 +594,7 @@ function detailUrl(item) {
       subCategory: item.subCategory || item.rawCategory || "",
       categorySlug: item.categorySlug || "",
       date: item.date || "",
-      image: item.image || "",
+      image,
       address: item.address || item.summaryParams?.address || "",
       mapx: item.mapx || "",
       mapy: item.mapy || "",
@@ -547,7 +637,8 @@ function normalizeSeoulCultureItems(items) {
         summary: item.summary || `${item.address || "서울"}에서 진행되는 문화행사입니다.`,
         date: item.date || "일정 확인 필요",
         readTime: item.readTime || "서울 행사 정보",
-        image: String(item.image || "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80").replace(/^http:/, "https:"),
+        image: imageUrlForItem(item, DEFAULT_EVENT_IMAGE),
+        galleryImages: imageListForItem(item),
         address: item.address || item.place || "",
         place: item.place || "",
         tel: item.tel || "",
@@ -691,7 +782,16 @@ function firstArrayFrom(value) {
 
 function normalizeMrtProductItem(item = {}, kind = "tour") {
   const title = item.itemName || item.title || item.name || item.productName || item.accommodationName || item.hotelName || "";
-  const imageUrl = item.imageUrl || item.thumbnailUrl || item.thumbnail || item.mainImageUrl || item.image || item.representativeImageUrl || "";
+  const imageUrl = normalizeImageUrl(
+    item.imageUrl ||
+    item.thumbnailUrl ||
+    item.thumbnail ||
+    item.mainImageUrl ||
+    item.image ||
+    item.representativeImageUrl ||
+    item.productImage ||
+    ""
+  );
   const productUrl = safeExternalUrl(item.productUrl || item.url || item.webUrl || item.deepLink || item.link || "");
   const salePrice = item.salePrice || item.price || item.priceAmount || item.minPrice || item.discountedPrice || item.lowestPrice || 0;
 
@@ -758,7 +858,7 @@ function normalizeCoupangProducts(payload = {}) {
       return {
         id: item.productId || item.itemId || title,
         title,
-        image: item.productImage || item.imageUrl || item.image || "",
+        image: normalizeImageUrl(item.productImage || item.imageUrl || item.thumbnailUrl || item.image || ""),
         url,
         price: item.productPrice || item.price || item.salePrice || 0,
         category: item.categoryName || item.category || "여행 준비물",
@@ -2466,12 +2566,11 @@ function selectRegion(regionId) {
 
 function normalizeTourItems(items, regionOverride = activeRegion()) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
-  const fallbackImage = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80";
 
   return list
     .filter((item) => item && item.title)
     .map((item, index) => {
-      const image = item.firstimage || item.firstimage2 || fallbackImage;
+      const image = imageUrlForItem(item, DEFAULT_EVENT_IMAGE);
       const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
       const region = regionOverride || activeRegion();
       const category = data.tourApi?.mode === "festival" ? `${region.label} 축제` : contentTypeName(item.contenttypeid);
@@ -2490,7 +2589,7 @@ function normalizeTourItems(items, regionOverride = activeRegion()) {
         summaryParams: { address },
         date: period,
         readTimeKey: "read.festival",
-        image: String(image).replace(/^http:/, "https:"),
+        image,
         address,
         mapx: item.mapx || "",
         mapy: item.mapy || "",
@@ -2580,13 +2679,12 @@ function regionLabelFromAddress(address) {
 
 function normalizeJulyFestivalItems(items) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
-  const fallbackImage = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80";
 
   return list
     .filter((item) => item && item.title && overlapsJulyFestival(item))
     .sort((a, b) => String(a.eventstartdate || "").localeCompare(String(b.eventstartdate || "")))
     .map((item, index) => {
-      const image = item.firstimage || item.firstimage2 || fallbackImage;
+      const image = imageUrlForItem(item, DEFAULT_FESTIVAL_IMAGE);
       const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
       const startDate = compactDate(item.eventstartdate);
       const endDate = compactDate(item.eventenddate);
@@ -2604,7 +2702,7 @@ function normalizeJulyFestivalItems(items) {
         summaryParams: { address },
         date: period,
         readTimeKey: "read.detail",
-        image: String(image).replace(/^http:/, "https:"),
+        image,
         address,
         mapx: item.mapx || "",
         mapy: item.mapy || ""

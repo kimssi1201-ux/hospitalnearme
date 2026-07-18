@@ -375,6 +375,11 @@ main {
   transition: transform 180ms ease;
 }
 
+.image-frame--api img {
+  object-fit: contain;
+  background: #f7f3ec;
+}
+
 .image-frame--hero {
   aspect-ratio: 16 / 11;
 }

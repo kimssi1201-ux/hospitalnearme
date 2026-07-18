@@ -48,6 +48,26 @@ const state = {
     landingUrl: ""
   }
 };
+const DEFAULT_DETAIL_IMAGE = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80";
+const IMAGE_FIELD_NAMES = [
+  "image",
+  "MAIN_IMG",
+  "mainImg",
+  "mainImage",
+  "mainImageUrl",
+  "imageUrl",
+  "imageURL",
+  "thumbnail",
+  "thumbnailUrl",
+  "thumbnailURL",
+  "representativeImageUrl",
+  "firstimage",
+  "firstimage2",
+  "productImage",
+  "originimgurl",
+  "smallimageurl",
+  "url"
+];
 
 const DETAIL_I18N = {
   ko: {
@@ -309,7 +329,60 @@ function commonParams(extra = {}) {
 }
 
 function normalizeImageUrl(value) {
-  return String(value || "").trim().replace(/^http:/, "https:");
+  if (value === null || value === undefined) return "";
+
+  let text = String(value).trim();
+  if (!text) return "";
+
+  const embeddedUrl = text.match(/(?:src|href)=["']([^"']+)["']/i)?.[1];
+  if (embeddedUrl) text = embeddedUrl.trim();
+
+  text = text
+    .replaceAll("&amp;", "&")
+    .replaceAll("\\u0026", "&")
+    .replace(/^http:/i, "https:");
+
+  if (text.startsWith("//")) text = `https:${text}`;
+  if (!/^https:\/\//i.test(text)) return "";
+
+  try {
+    return new URL(text).href;
+  } catch {
+    return "";
+  }
+}
+
+function collectImageCandidates(value, bucket = [], depth = 0) {
+  if (!value || depth > 3) return bucket;
+
+  if (typeof value === "string" || typeof value === "number") {
+    bucket.push(value);
+    return bucket;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectImageCandidates(item, bucket, depth + 1));
+    return bucket;
+  }
+
+  if (typeof value === "object") {
+    IMAGE_FIELD_NAMES.forEach((key) => collectImageCandidates(value[key], bucket, depth + 1));
+    ["images", "galleryImages", "photos", "pictures", "media", "items", "item"].forEach((key) => {
+      collectImageCandidates(value[key], bucket, depth + 1);
+    });
+  }
+
+  return bucket;
+}
+
+function imageListForArticle(article = {}) {
+  const candidates = [];
+  collectImageCandidates(article, candidates);
+  return [...new Set(candidates.map(normalizeImageUrl).filter(Boolean))];
+}
+
+function imageUrlForArticle(article = {}, fallback = DEFAULT_DETAIL_IMAGE) {
+  return imageListForArticle(article)[0] || fallback;
 }
 
 function normalizeExternalUrl(value) {
@@ -529,13 +602,16 @@ function enrichLocalArticle(article = {}) {
   const address = article.address || "서울 전역";
   const time = article.time || "행사별 운영 시간이 다릅니다";
   const fee = article.fee || "행사별 상이";
+  const image = imageUrlForArticle(article, article.image || DEFAULT_DETAIL_IMAGE);
+  const galleryImages = imageListForArticle(article);
   return {
     ...article,
     source: article.source || "editorial",
     address,
     time,
     fee,
-    galleryImages: article.galleryImages || (article.image ? [article.image] : []),
+    image,
+    galleryImages: galleryImages.length ? galleryImages : image ? [image] : [],
     facts: article.facts || [
       ["일정", article.date || textFor("date.needCheck")],
       ["장소", address],
@@ -557,7 +633,7 @@ function findLocalArticle() {
 
 function fallbackArticleFromParams() {
   const title = fallbackTitle || "축제 상세 정보";
-  const image = fallbackImage || data.articles[0].image;
+  const image = imageUrlForArticle({ image: fallbackImage }, data.articles[0].image || DEFAULT_DETAIL_IMAGE);
   const address = fallbackAddress || "";
   const summary = fallbackSummary || `${title} 방문 전 확인하면 좋은 일정, 장소, 교통, 준비 정보를 정리했습니다.`;
 
@@ -949,7 +1025,7 @@ function renderFactGrid(facts) {
 }
 
 function renderImageGallery(article) {
-  const images = (article.galleryImages || [])
+  const images = imageListForArticle(article)
     .filter((image) => image && image !== article.image)
     .slice(0, 24);
 
@@ -1935,6 +2011,7 @@ function renderTravelDetailBody(article, sections) {
 function renderArticle(article) {
   updateDocumentMeta(article);
   const displayTitle = localizedArticleTitle(article);
+  const heroImage = imageUrlForArticle(article, "");
   const sections = article.overview && state.language === "ko"
     ? [
         {
@@ -1958,9 +2035,11 @@ function renderArticle(article) {
         <span>${escapeHtml(article.readTime)}</span>
       </div>
     </header>
-    <div class="detail-hero-image">
-      <img src="${escapeHtml(article.image)}" alt="${escapeHtml(displayTitle)}" />
-    </div>
+    ${heroImage ? `
+      <div class="detail-hero-image">
+        <img src="${escapeHtml(heroImage)}" alt="${escapeHtml(displayTitle)}" onerror="this.closest('.detail-hero-image').remove()" />
+      </div>
+    ` : ""}
     <div class="blog-body">
       ${renderTravelDetailBody(article, sections)}
     </div>
@@ -2823,7 +2902,7 @@ function normalizeDetailCoupangProducts(payload = {}) {
       return {
         id: item.productId || item.itemId || title,
         title,
-        image: normalizeImageUrl(item.productImage || item.imageUrl || item.image || ""),
+        image: normalizeImageUrl(item.productImage || item.imageUrl || item.thumbnailUrl || item.image || ""),
         url,
         price: item.productPrice || item.price || item.salePrice || 0,
         category: item.categoryName || item.category || "여행용품",
