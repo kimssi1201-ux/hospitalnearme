@@ -401,10 +401,10 @@ main {
   transform: scale(1.06);
 }
 
-/* Small landing cards should fill their fixed frame; the lead poster keeps its full artwork. */
+/* Keep recommendation cards aligned while showing the complete API poster. */
 .news-recommend-card .image-frame--api img,
 .news-list-card .image-frame--api img {
-  object-fit: cover;
+  object-fit: contain !important;
   background: transparent;
 }
 
