@@ -1429,6 +1429,35 @@ const SEOUL_NEARBY_TRAVEL_BY_LANDMARK = {
   ]
 };
 
+const NEARBY_TRAVEL_IMAGES = {
+  nature: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=640&q=75",
+  city: "https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?auto=format&fit=crop&w=640&q=75",
+  culture: "https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?auto=format&fit=crop&w=640&q=75",
+  cafe: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=640&q=75",
+  history: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=640&q=75",
+  default: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=640&q=75"
+};
+
+function nearbyTravelImage(name = "", type = "") {
+  const text = `${name} ${type}`;
+  if (/산|숲|공원|수목원|정원|한강|계곡|호수|천|둘레길|자락길|폭포|자연|산책/.test(text)) {
+    return NEARBY_TRAVEL_IMAGES.nature;
+  }
+  if (/카페|맛집|거리|시장|먹거리|골목|마을|식사|동네|문래|성수|홍대|인사동|샤로수길|서래/.test(text)) {
+    return NEARBY_TRAVEL_IMAGES.cafe;
+  }
+  if (/전시|미술|박물관|도서관|문화|공간|과학관|극장|DDP|예술|공장/.test(text)) {
+    return NEARBY_TRAVEL_IMAGES.culture;
+  }
+  if (/궁|궁궐|고궁|한옥|역사|전통|사찰|묘지|릉|성곽|흥인지문|덕수궁|경복궁|창덕궁|창경궁/.test(text)) {
+    return NEARBY_TRAVEL_IMAGES.history;
+  }
+  if (/도심|전망|야경|타워|광장|명소|빌딩|서울광장/.test(text)) {
+    return NEARBY_TRAVEL_IMAGES.city;
+  }
+  return NEARBY_TRAVEL_IMAGES.default;
+}
+
 function nearbyTravelCopy() {
   const table = {
     ko: {
@@ -2671,12 +2700,18 @@ function NearbyTravelSection(article) {
       <div class="nearby-travel-list">
         ${picks.map(([name, type, body]) => {
           const query = `${keyword} ${name}`;
+          const image = nearbyTravelImage(name, type);
           return `
             <article class="nearby-travel-card">
-              <span>${escapeHtml(type)}</span>
-              <h3>${escapeHtml(name)}</h3>
-              <p>${escapeHtml(body)}</p>
-              <a href="${escapeHtml(naverMapSearchUrl(query))}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.map)}</a>
+              <figure class="nearby-travel-image">
+                <img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.parentElement.classList.add('is-fallback');this.remove()" />
+              </figure>
+              <div class="nearby-travel-content">
+                <span>${escapeHtml(type)}</span>
+                <h3>${escapeHtml(name)}</h3>
+                <p>${escapeHtml(body)}</p>
+                <a href="${escapeHtml(naverMapSearchUrl(query))}" target="_blank" rel="noopener noreferrer">${escapeHtml(copy.map)}</a>
+              </div>
             </article>
           `;
         }).join("")}
