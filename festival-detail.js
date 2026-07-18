@@ -1505,16 +1505,38 @@ const SEOUL_NEARBY_TRAVEL_BY_LANDMARK = {
   ]
 };
 
+// Nearby recommendations are editorial place suggestions, not event records.
+// Keep their imagery location-specific so a cafe, mountain, or museum card is
+// never filled with an unrelated stock photo.
 const NEARBY_TRAVEL_IMAGES = {
-  nature: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=640&q=75",
-  city: "https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?auto=format&fit=crop&w=640&q=75",
-  culture: "https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?auto=format&fit=crop&w=640&q=75",
-  cafe: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=640&q=75",
-  history: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=640&q=75",
-  default: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=640&q=75"
+  nature: "https://tong.visitkorea.or.kr/cms/resource/74/3589374_image2_1.jpg",
+  city: "https://tong.visitkorea.or.kr/cms/resource/02/4080502_image2_1.jpg",
+  culture: "https://tong.visitkorea.or.kr/cms/resource/85/3540185_image2_1.jpg",
+  cafe: "https://tong.visitkorea.or.kr/cms/resource/16/3540916_image2_1.jpg",
+  history: "https://tong.visitkorea.or.kr/cms/resource/98/3487598_image2_1.jpg",
+  default: "https://tong.visitkorea.or.kr/cms/resource_photo/34/3538134_image2_1.jpg"
+};
+
+const NEARBY_TRAVEL_IMAGE_BY_NAME = {
+  "관악산 둘레길": NEARBY_TRAVEL_IMAGES.nature,
+  "관악산": NEARBY_TRAVEL_IMAGES.nature,
+  "청계천": "https://tong.visitkorea.or.kr/cms/resource_photo/34/3538134_image2_1.jpg",
+  "경복궁": "https://tong.visitkorea.or.kr/cms/resource/98/3487598_image2_1.jpg",
+  "덕수궁": "https://tong.visitkorea.or.kr/cms/resource/98/3487598_image2_1.jpg",
+  "서울시립미술관": NEARBY_TRAVEL_IMAGES.culture,
+  "서울대학교 미술관": NEARBY_TRAVEL_IMAGES.culture,
+  "DDP": "https://tong.visitkorea.or.kr/cms/resource/06/3539606_image2_1.jpg",
+  "동대문디자인플라자": "https://tong.visitkorea.or.kr/cms/resource/06/3539606_image2_1.jpg",
+  "광화문광장": NEARBY_TRAVEL_IMAGES.city,
+  "남산서울타워": NEARBY_TRAVEL_IMAGES.city,
+  "서울대학교 관악캠퍼스": NEARBY_TRAVEL_IMAGES.culture,
+  "서울대학교 규장각": NEARBY_TRAVEL_IMAGES.culture
 };
 
 function nearbyTravelImage(name = "", type = "") {
+  const exactImage = Object.keys(NEARBY_TRAVEL_IMAGE_BY_NAME).find((key) => name.includes(key));
+  if (exactImage) return NEARBY_TRAVEL_IMAGE_BY_NAME[exactImage];
+
   const text = `${name} ${type}`;
   if (/산|숲|공원|수목원|정원|한강|계곡|호수|천|둘레길|자락길|폭포|자연|산책/.test(text)) {
     return NEARBY_TRAVEL_IMAGES.nature;
