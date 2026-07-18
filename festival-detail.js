@@ -1518,54 +1518,26 @@ const SEOUL_NEARBY_TRAVEL_BY_LANDMARK = {
 };
 
 // Nearby recommendations are editorial place suggestions, not event records.
-// Keep their imagery location-specific so a cafe, mountain, or museum card is
-// never filled with an unrelated stock photo.
-const NEARBY_TRAVEL_IMAGES = {
-  nature: "https://tong.visitkorea.or.kr/cms/resource/74/3589374_image2_1.jpg",
-  city: "https://tong.visitkorea.or.kr/cms/resource/02/4080502_image2_1.jpg",
-  culture: "https://tong.visitkorea.or.kr/cms/resource/85/3540185_image2_1.jpg",
-  cafe: "https://tong.visitkorea.or.kr/cms/resource/16/3540916_image2_1.jpg",
-  history: "https://tong.visitkorea.or.kr/cms/resource/98/3487598_image2_1.jpg",
-  default: "https://tong.visitkorea.or.kr/cms/resource_photo/34/3538134_image2_1.jpg"
-};
-
+// Only use an image when the Tourism API search returned that place. Never
+// substitute a generic nature, city, or culture image for an unmatched place.
 const NEARBY_TRAVEL_IMAGE_BY_NAME = {
-  "관악산 둘레길": NEARBY_TRAVEL_IMAGES.nature,
-  "관악산": NEARBY_TRAVEL_IMAGES.nature,
-  "청계천": "https://tong.visitkorea.or.kr/cms/resource_photo/34/3538134_image2_1.jpg",
-  "경복궁": "https://tong.visitkorea.or.kr/cms/resource/98/3487598_image2_1.jpg",
-  "덕수궁": "https://tong.visitkorea.or.kr/cms/resource/98/3487598_image2_1.jpg",
-  "서울시립미술관": NEARBY_TRAVEL_IMAGES.culture,
-  "서울대학교 미술관": NEARBY_TRAVEL_IMAGES.culture,
+  "고척스카이돔": "https://tong.visitkorea.or.kr/cms/resource/29/3082829_image2_1.jpg",
+  "푸른수목원": "https://tong.visitkorea.or.kr/cms/resource/46/3545146_image2_1.jpg",
+  "안양천 산책로": "https://tong.visitkorea.or.kr/cms/resource/44/3540444_image2_1.jpg",
+  "안양천 생태공원": "https://tong.visitkorea.or.kr/cms/resource/44/3540444_image2_1.jpg",
+  "안양천": "https://tong.visitkorea.or.kr/cms/resource/44/3540444_image2_1.jpg",
+  "청계천": "https://tong.visitkorea.or.kr/cms/resource/64/2794864_image2_1.jpg",
+  "경복궁": "https://tong.visitkorea.or.kr/cms/resource/81/1075281_image2_1.jpg",
+  "덕수궁": "https://tong.visitkorea.or.kr/cms/resource/91/3384991_image2_1.JPG",
+  "어린이대공원": "https://tong.visitkorea.or.kr/cms/resource/61/3355161_image2_1.JPG",
+  "국립중앙박물관": "https://tong.visitkorea.or.kr/cms/resource/52/3505552_image2_1.jpg",
   "DDP": "https://tong.visitkorea.or.kr/cms/resource/06/3539606_image2_1.jpg",
-  "동대문디자인플라자": "https://tong.visitkorea.or.kr/cms/resource/06/3539606_image2_1.jpg",
-  "광화문광장": NEARBY_TRAVEL_IMAGES.city,
-  "남산서울타워": NEARBY_TRAVEL_IMAGES.city,
-  "서울대학교 관악캠퍼스": NEARBY_TRAVEL_IMAGES.culture,
-  "서울대학교 규장각": NEARBY_TRAVEL_IMAGES.culture
+  "동대문디자인플라자": "https://tong.visitkorea.or.kr/cms/resource/06/3539606_image2_1.jpg"
 };
 
-function nearbyTravelImage(name = "", type = "") {
+function nearbyTravelImage(name = "") {
   const exactImage = Object.keys(NEARBY_TRAVEL_IMAGE_BY_NAME).find((key) => name.includes(key));
-  if (exactImage) return NEARBY_TRAVEL_IMAGE_BY_NAME[exactImage];
-
-  const text = `${name} ${type}`;
-  if (/산|숲|공원|수목원|정원|한강|계곡|호수|천|둘레길|자락길|폭포|자연|산책/.test(text)) {
-    return NEARBY_TRAVEL_IMAGES.nature;
-  }
-  if (/카페|맛집|거리|시장|먹거리|골목|마을|식사|동네|문래|성수|홍대|인사동|샤로수길|서래/.test(text)) {
-    return NEARBY_TRAVEL_IMAGES.cafe;
-  }
-  if (/전시|미술|박물관|도서관|문화|공간|과학관|극장|DDP|예술|공장/.test(text)) {
-    return NEARBY_TRAVEL_IMAGES.culture;
-  }
-  if (/궁|궁궐|고궁|한옥|역사|전통|사찰|묘지|릉|성곽|흥인지문|덕수궁|경복궁|창덕궁|창경궁/.test(text)) {
-    return NEARBY_TRAVEL_IMAGES.history;
-  }
-  if (/도심|전망|야경|타워|광장|명소|빌딩|서울광장/.test(text)) {
-    return NEARBY_TRAVEL_IMAGES.city;
-  }
-  return NEARBY_TRAVEL_IMAGES.default;
+  return exactImage ? NEARBY_TRAVEL_IMAGE_BY_NAME[exactImage] : "";
 }
 
 function nearbyTravelCopy() {
@@ -2813,12 +2785,15 @@ function NearbyTravelSection(article) {
       <div class="nearby-travel-list">
         ${picks.map(([name, type, body]) => {
           const query = `${keyword} ${name}`;
-          const image = nearbyTravelImage(name, type);
+          const image = nearbyTravelImage(name);
+          const imageMarkup = image ? `
+            <figure class="nearby-travel-image">
+              <img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.parentElement.remove()" />
+            </figure>
+          ` : "";
           return `
-            <article class="nearby-travel-card">
-              <figure class="nearby-travel-image">
-                <img src="${escapeHtml(image)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.parentElement.classList.add('is-fallback');this.remove()" />
-              </figure>
+            <article class="nearby-travel-card${image ? "" : " no-image"}">
+              ${imageMarkup}
               <div class="nearby-travel-content">
                 <span>${escapeHtml(type)}</span>
                 <h3>${escapeHtml(name)}</h3>
