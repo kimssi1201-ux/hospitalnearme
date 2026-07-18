@@ -38,20 +38,16 @@ const fallbackTarget = params.get("target");
 const fallbackIsFree = params.get("isFree");
 const fallbackUpdatedAt = params.get("updatedAt");
 const supportedLanguages = ["ko", "en", "ja", "zh"];
-const COUPANG_WIDGET_SCRIPT = "https://ads-partners.coupang.com/g.js";
-const COUPANG_WIDGET_CONFIG = {
-  id: 1003200,
-  trackingCode: "AF1488183",
-  subId: null,
-  template: "carousel",
-  width: "680",
-  height: "140"
-};
 const state = {
   language: getStoredLanguage(),
-  article: null
+  article: null,
+  coupang: {
+    items: [],
+    loaded: false,
+    error: false,
+    landingUrl: ""
+  }
 };
-let coupangWidgetScriptPromise = null;
 
 const DETAIL_I18N = {
   ko: {
@@ -335,6 +331,29 @@ function normalizeExternalUrl(value) {
   } catch {
     return "";
   }
+}
+
+function firstArrayFrom(value) {
+  if (Array.isArray(value)) return value;
+  if (!value || typeof value !== "object") return [];
+
+  for (const key of ["items", "item", "data", "list", "result", "results", "content", "productData"]) {
+    const found = firstArrayFrom(value[key]);
+    if (found.length) return found;
+  }
+
+  for (const child of Object.values(value)) {
+    const found = firstArrayFrom(child);
+    if (found.length) return found;
+  }
+
+  return [];
+}
+
+function formatWon(value) {
+  const number = Number(String(value || "").replace(/[^0-9.-]/g, ""));
+  if (!Number.isFinite(number) || number <= 0) return "가격 확인";
+  return `${number.toLocaleString("ko-KR")}원`;
 }
 
 async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId || "15") {
@@ -1918,7 +1937,7 @@ function renderArticle(article) {
     </div>
   `;
   hydrateNearbyParking(article);
-  hydrateCoupangWidgets();
+  hydrateDetailCoupangProducts(article);
 }
 
 function applyStaticLanguage() {
@@ -2666,12 +2685,236 @@ function NearbyTravelSection(article) {
   `;
 }
 
+function coupangTravelKeyword(article = {}) {
+  const text = [
+    article.title,
+    article.category,
+    article.rawCategory,
+    article.subCategory,
+    article.summary
+  ].filter(Boolean).join(" ");
+
+  if (/공연|무대|콘서트|뮤지컬|오페라|연극|국악|클래식|발레|독주/.test(text)) {
+    return "공연 관람 준비물";
+  }
+  if (/전시|미술|박물관|미술관|갤러리|아트|일러스트/.test(text)) {
+    return "전시 관람 준비물";
+  }
+  if (/어린이|키즈|가족|체험|교육/.test(text)) {
+    return "아이와 여행 준비물";
+  }
+  if (/야외|축제|한강|공원|거리|마켓|페스티벌/.test(text)) {
+    return "나들이 준비물";
+  }
+  return "여행용품";
+}
+
+function coupangTravelCopy(article = {}) {
+  const keyword = coupangTravelKeyword(article);
+  const table = {
+    ko: {
+      eyebrow: "TRAVEL ESSENTIALS",
+      title: "방문 전 챙기면 좋은 여행 준비물",
+      desc: `${localizedEventReference(article)} 일정에 맞춰 함께 챙기기 좋은 상품을 골라볼 수 있습니다. 오래 걷는 일정이라면 가벼운 가방, 보조배터리, 휴대용 정리용품처럼 현장에서 바로 도움이 되는 물건부터 확인해 보세요.`,
+      loading: `${keyword} 상품을 불러오는 중입니다.`,
+      empty: "표시할 여행 준비물 상품을 찾지 못했습니다.",
+      more: "관련 상품 더보기",
+      badgeRocket: "로켓",
+      badgeShipping: "무료배송",
+      disclosure: "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
+    },
+    en: {
+      eyebrow: "TRAVEL ESSENTIALS",
+      title: "Useful Items Before You Go",
+      desc: "Browse practical travel items that can help with a smoother day out, such as compact bags, battery packs, and small organizers.",
+      loading: `Loading ${keyword} products.`,
+      empty: "No related travel products are available right now.",
+      more: "See more products",
+      badgeRocket: "Rocket",
+      badgeShipping: "Free shipping",
+      disclosure: "As a Coupang Partners participant, this site may earn a commission from qualifying purchases."
+    },
+    ja: {
+      eyebrow: "TRAVEL ESSENTIALS",
+      title: "訪問前に準備したい持ち物",
+      desc: "移動や観覧が少し楽になるバッグ、補助バッテリー、小物整理用品などを確認できます。",
+      loading: `${keyword}商品を読み込んでいます。`,
+      empty: "関連する旅行用品を表示できませんでした。",
+      more: "関連商品をもっと見る",
+      badgeRocket: "ロケット",
+      badgeShipping: "送料無料",
+      disclosure: "この投稿はCoupang Partners活動の一環であり、一定額の手数料を受け取る場合があります。"
+    },
+    zh: {
+      eyebrow: "TRAVEL ESSENTIALS",
+      title: "出发前可准备的旅行用品",
+      desc: "可查看背包、充电宝、小物收纳等有助于当天行程的实用商品。",
+      loading: `正在加载${keyword}商品。`,
+      empty: "暂时无法显示相关旅行用品。",
+      more: "查看更多相关商品",
+      badgeRocket: "Rocket",
+      badgeShipping: "包邮",
+      disclosure: "本文包含Coupang Partners推广链接，可能会获得一定佣金。"
+    }
+  };
+
+  return table[state.language] || table.ko;
+}
+
+function CoupangTravelProductsSection(article) {
+  const copy = coupangTravelCopy(article);
+  const keyword = coupangTravelKeyword(article);
+
+  return `
+    <section class="clean-article-section coupang-products-section" data-coupang-products data-coupang-keyword="${escapeHtml(keyword)}" aria-labelledby="coupangProductsTitle">
+      <div class="coupang-products-head">
+        <p class="eyebrow">${escapeHtml(copy.eyebrow)}</p>
+        <h2 id="coupangProductsTitle">${escapeHtml(copy.title)}</h2>
+        <p>${escapeHtml(copy.desc)}</p>
+      </div>
+      <div class="coupang-products-grid" data-coupang-products-grid>
+        <article class="coupang-product-card coupang-product-card--loading">${escapeHtml(copy.loading)}</article>
+      </div>
+      <a class="coupang-products-more" data-coupang-products-more href="https://www.coupang.com/np/search?q=${encodeURIComponent(keyword)}" target="_blank" rel="sponsored noopener noreferrer">${escapeHtml(copy.more)}</a>
+      <p class="coupang-products-disclosure">${escapeHtml(copy.disclosure)}</p>
+    </section>
+  `;
+}
+
+async function fetchDetailCoupangProducts(keyword = "여행용품", limit = 4) {
+  const query = new URLSearchParams({
+    keyword,
+    limit: String(limit)
+  });
+  const response = await fetch(`/api/coupang?${query.toString()}`, {
+    headers: { Accept: "application/json" }
+  });
+  const payload = await response.json();
+  if (!response.ok || payload?.ok === false) {
+    throw new Error(payload?.message || `Coupang request failed ${response.status}`);
+  }
+  return payload;
+}
+
+function normalizeDetailCoupangProducts(payload = {}) {
+  const data = payload.data || payload;
+  const productData = Array.isArray(data.productData) ? data.productData : [];
+  const items = productData.length ? productData : firstArrayFrom(data);
+
+  return items
+    .map((item = {}) => {
+      const title = item.productName || item.title || item.name || "";
+      const url = normalizeExternalUrl(item.productUrl || item.url || item.link || "");
+      return {
+        id: item.productId || item.itemId || title,
+        title,
+        image: normalizeImageUrl(item.productImage || item.imageUrl || item.image || ""),
+        url,
+        price: item.productPrice || item.price || item.salePrice || 0,
+        category: item.categoryName || item.category || "여행용품",
+        isRocket: Boolean(item.isRocket),
+        isFreeShipping: Boolean(item.isFreeShipping)
+      };
+    })
+    .filter((item) => item.title && item.url)
+    .slice(0, 4);
+}
+
+function renderDetailCoupangProducts(items, payload = {}) {
+  const section = document.querySelector("[data-coupang-products]");
+  const grid = section?.querySelector("[data-coupang-products-grid]");
+  const moreLink = section?.querySelector("[data-coupang-products-more]");
+  if (!section || !grid) return;
+
+  const copy = coupangTravelCopy(state.article || {});
+  if (!items.length) {
+    section.hidden = true;
+    grid.innerHTML = "";
+    return;
+  }
+
+  section.hidden = false;
+  const landingUrl = normalizeExternalUrl(payload?.data?.landingUrl || payload?.landingUrl || "");
+  if (moreLink && landingUrl) moreLink.href = landingUrl;
+
+  grid.innerHTML = items.map((item) => {
+    const badges = [
+      item.isRocket ? copy.badgeRocket : "",
+      item.isFreeShipping ? copy.badgeShipping : ""
+    ].filter(Boolean);
+
+    return `
+      <article class="coupang-product-card">
+        <a href="${escapeHtml(item.url)}" target="_blank" rel="sponsored noopener noreferrer" aria-label="${escapeHtml(`${item.title} 상품 보기`)}">
+          ${item.image
+            ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" />`
+            : `<div class="coupang-product-placeholder" aria-hidden="true">CP</div>`}
+          <span>${escapeHtml(item.category)}</span>
+          <strong>${escapeHtml(item.title)}</strong>
+          <small>${escapeHtml(formatWon(item.price))}${badges.length ? ` · ${escapeHtml(badges.join(" · "))}` : ""}</small>
+        </a>
+      </article>
+    `;
+  }).join("");
+}
+
+async function hydrateDetailCoupangProducts(article = state.article) {
+  const section = document.querySelector("[data-coupang-products]");
+  if (!section) return;
+
+  const keyword = section.dataset.coupangKeyword || coupangTravelKeyword(article);
+
+  try {
+    const payload = await fetchDetailCoupangProducts(keyword, 4);
+    const items = normalizeDetailCoupangProducts(payload);
+    state.coupang = {
+      items,
+      loaded: true,
+      error: false,
+      landingUrl: normalizeExternalUrl(payload?.data?.landingUrl || payload?.landingUrl || "")
+    };
+    renderDetailCoupangProducts(items, payload);
+  } catch (error) {
+    console.warn("Coupang travel products could not be loaded.", error);
+    state.coupang = {
+      items: [],
+      loaded: true,
+      error: true,
+      landingUrl: ""
+    };
+    section.hidden = true;
+  }
+}
+
 function CleanClosingSection(article) {
   const copy = detailCopy();
+  const eventName = localizedEventReference(article);
+  const destination = detailDestinationKeyword(article);
+  const category = displayArticleCategory(article);
+  const schedule = usefulValue(article.date) || copy.fallbacks.date;
+
+  if (state.language !== "ko") {
+    return `
+      <section class="clean-article-section clean-closing-section">
+        <h2>${escapeHtml(copy.closingTitle)}</h2>
+        <p>${escapeHtml(copy.closing(eventName))}</p>
+      </section>
+    `;
+  }
+
   return `
     <section class="clean-article-section clean-closing-section">
-      <h2>${escapeHtml(copy.closingTitle)}</h2>
-      <p>${escapeHtml(copy.closing(localizedEventReference(article)))}</p>
+      <h2>방문을 마치며</h2>
+      <p>${escapeHtml(eventName)}은 ${destination} 일대에서 일정과 동선을 함께 보고 계획하면 만족도가 높아지는 ${category} 콘텐츠입니다. 단순히 행사 하나만 보고 이동하기보다, 근처 여행지와 식사·카페 시간을 같이 묶으면 하루 코스가 훨씬 자연스럽습니다.</p>
+      <p>${escapeHtml(schedule)} 일정 기준으로 안내되지만, 현장 운영 시간과 예약 방식은 변경될 수 있습니다. 출발 전 공식 안내, 지도 앱의 이동 시간, 주변 주차 가능 여부를 한 번 더 확인해 주세요.</p>
+      <div class="closing-check-list" aria-label="마지막 체크 포인트">
+        <strong>마지막 체크 포인트</strong>
+        <ul>
+          <li>운영 시간과 입장 마감 시간을 확인하기</li>
+          <li>대중교통 막차 시간이나 주차장 위치를 미리 저장하기</li>
+          <li>걷는 시간이 길다면 보조배터리, 물, 가벼운 가방을 챙기기</li>
+        </ul>
+      </div>
     </section>
   `;
 }
@@ -2760,58 +3003,6 @@ function BookingCheckSection(article) {
   `;
 }
 
-function CoupangWidgetAd(slot = "detail") {
-  const safeSlot = String(slot).replace(/[^a-z0-9_-]/gi, "-").toLowerCase();
-  return `
-    <aside class="coupang-widget-ad coupang-widget-ad--detail" aria-label="쿠팡 파트너스 광고">
-      <div class="coupang-widget-label">Advertisement</div>
-      <div class="coupang-widget-frame" id="detailCoupangWidget-${escapeHtml(safeSlot)}" data-coupang-widget></div>
-      <p class="coupang-widget-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
-    </aside>
-  `;
-}
-
-function loadCoupangWidgetScript() {
-  if (window.PartnersCoupang?.G) return Promise.resolve();
-  if (coupangWidgetScriptPromise) return coupangWidgetScriptPromise;
-
-  coupangWidgetScriptPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = COUPANG_WIDGET_SCRIPT;
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Coupang widget script failed to load."));
-    document.head.appendChild(script);
-  });
-
-  return coupangWidgetScriptPromise;
-}
-
-async function hydrateCoupangWidgets() {
-  const targets = [...document.querySelectorAll("[data-coupang-widget]:not([data-coupang-loaded])")];
-  if (!targets.length) return;
-
-  try {
-    await loadCoupangWidgetScript();
-    targets.forEach((target) => {
-      target.dataset.coupangLoaded = "true";
-      const width = Math.max(300, Math.min(680, Math.floor(target.clientWidth || target.parentElement?.clientWidth || window.innerWidth - 36)));
-      new window.PartnersCoupang.G({
-        ...COUPANG_WIDGET_CONFIG,
-        width: String(width),
-        height: "140",
-        container: target
-      });
-    });
-  } catch (error) {
-    console.warn("Coupang widget could not be loaded.", error);
-    targets.forEach((target) => {
-      target.dataset.coupangLoaded = "error";
-      target.innerHTML = "";
-    });
-  }
-}
-
 function renderTravelDetailBody(article, sections) {
   return `
     ${CleanIntroSection(article)}
@@ -2823,7 +3014,7 @@ function renderTravelDetailBody(article, sections) {
     ${NearbyTravelSection(article)}
     ${CleanVisitTipSection(article)}
     ${BookingCheckSection(article)}
-    ${CoupangWidgetAd(`detail-${article.id || "article"}`)}
+    ${CoupangTravelProductsSection(article)}
     ${CleanClosingSection(article)}
   `;
 }
