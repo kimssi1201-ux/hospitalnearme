@@ -376,8 +376,29 @@ main {
 }
 
 .image-frame--api img {
+  position: relative;
+  z-index: 1;
   object-fit: contain;
+  background: transparent;
+}
+
+.image-frame--api {
+  position: relative;
+  isolation: isolate;
   background: #f7f3ec;
+}
+
+.image-frame--api::before {
+  position: absolute;
+  inset: -16px;
+  z-index: 0;
+  content: "";
+  background-image: var(--api-image);
+  background-position: center;
+  background-size: cover;
+  filter: blur(18px) saturate(0.78);
+  opacity: 0.28;
+  transform: scale(1.06);
 }
 
 .image-frame--hero {

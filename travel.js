@@ -378,8 +378,11 @@ function imageMarkup(item, size = "card") {
   const onError = fallback
     ? ` onerror="this.onerror=null;this.src='${escapeHtml(fallback)}'"`
     : ` onerror="this.closest('.image-frame').classList.add('is-empty');this.remove()"`;
+  const apiBackground = isApi
+    ? ` style="--api-image: url(&quot;${escapeHtml(image)}&quot;)"`
+    : "";
   return `
-    <div class="image-frame image-frame--${size}${isApi ? " image-frame--api" : ""}">
+    <div class="image-frame image-frame--${size}${isApi ? " image-frame--api" : ""}"${apiBackground}>
       <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"${onError} />
     </div>
   `;
