@@ -1531,6 +1531,8 @@ const NEARBY_TRAVEL_IMAGE_BY_NAME = {
   "덕수궁": "https://tong.visitkorea.or.kr/cms/resource/91/3384991_image2_1.JPG",
   "어린이대공원": "https://tong.visitkorea.or.kr/cms/resource/61/3355161_image2_1.JPG",
   "국립중앙박물관": "https://tong.visitkorea.or.kr/cms/resource/52/3505552_image2_1.jpg",
+  "서울숲": "https://tong.visitkorea.or.kr/cms/resource/17/3442117_image2_1.JPG",
+  "성수 카페거리": "https://tong.visitkorea.or.kr/cms/resource/24/3564924_image2_1.jpg",
   "DDP": "https://tong.visitkorea.or.kr/cms/resource/06/3539606_image2_1.jpg",
   "동대문디자인플라자": "https://tong.visitkorea.or.kr/cms/resource/06/3539606_image2_1.jpg"
 };
