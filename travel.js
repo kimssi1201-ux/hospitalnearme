@@ -660,24 +660,6 @@ function normalizeSeoulCultureItems(items) {
   return uniqueArticles(normalized);
 }
 
-function newsFeaturedCard(item) {
-  const title = displayArticleTitle(item);
-  const category = displayCategoryLabel(item);
-  return `
-    <article class="news-feature-card">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
-        ${imageMarkup(item, "hero")}
-        <div class="news-feature-body">
-          <span class="category-label">${escapeHtml(category)}</span>
-          <h2>${escapeHtml(title)}</h2>
-          <p>${escapeHtml(displaySummary(item))}</p>
-          <div class="article-meta">${articleMeta(item)}</div>
-        </div>
-      </a>
-    </article>
-  `;
-}
-
 function newsRecommendCard(item) {
   const title = displayArticleTitle(item);
   const category = displayCategoryLabel(item);
@@ -1691,12 +1673,8 @@ function loadingCardMarkup(type = "list") {
 }
 
 function renderNewsLoadingSkeleton() {
-  const featured = $("#featuredArticle");
   const recommended = $("#recommendedArticles");
   const feed = $("#newsFeedList");
-  if (featured) {
-    featured.innerHTML = loadingCardMarkup("feature");
-  }
   if (recommended) {
     recommended.innerHTML = Array.from({ length: 3 }, () => loadingCardMarkup("recommend")).join("");
   }
@@ -2778,11 +2756,10 @@ async function loadTourApiPlaces() {
 
 function renderJulyFestivals() {
   const status = $("#julyStatus");
-  const featured = $("#featuredArticle");
   const recommended = $("#recommendedArticles");
   const feed = $("#newsFeedList");
   const countTarget = $("#allArticleCount");
-  if (!status || !featured || !recommended || !feed) return;
+  if (!status || !recommended || !feed) return;
 
   const month = currentSeoulMonth();
   const allItems = primaryNewsItems();
@@ -2797,7 +2774,6 @@ function renderJulyFestivals() {
     if (state.newsLoading && !state.apiLoaded && !state.apiError) {
       status.textContent = "";
       status.hidden = true;
-      featured.innerHTML = "";
       renderNewsLoadingSkeleton();
       return;
     }
@@ -2807,7 +2783,6 @@ function renderJulyFestivals() {
       ? `${month.label}에 표시할 서울 여행 정보를 불러오는 중입니다.`
       : "선택한 분류에 표시할 서울 여행 정보가 없습니다.";
     status.hidden = false;
-    featured.innerHTML = "";
     recommended.innerHTML = "";
     feed.innerHTML = "";
     return;
@@ -2817,7 +2792,6 @@ function renderJulyFestivals() {
   status.textContent = "";
   status.hidden = true;
 
-  featured.innerHTML = newsFeaturedCard(items[0]);
   recommended.innerHTML = items.slice(1, 5).map((item) => newsRecommendCard(item)).join("");
   feed.innerHTML = buildNewsFeedMarkup(items.slice(5, 65));
   hydrateCoupangWidgets();
