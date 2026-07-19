@@ -3790,3 +3790,29 @@ body.booking-search-open {
     display: none;
   }
 }
+
+/* Keep the landing feed structure consistent across desktop and mobile.
+   Only the available width changes; the article content remains in the same flow. */
+@media (min-width: 861px) {
+  .landing-news-feed .news-feature-card a {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .landing-news-feed .news-feature-card .image-frame--hero {
+    aspect-ratio: 16 / 8;
+    min-height: 0;
+    border-radius: 27px 27px 0 0;
+  }
+
+  .landing-news-feed .news-feature-card .news-feature-body {
+    position: static;
+    padding: 30px 40px 36px;
+  }
+
+  .landing-news-feed .news-feature-card .news-feature-body h2 {
+    max-width: 860px;
+    font-size: clamp(32px, 3vw, 48px);
+    line-height: 1.2;
+  }
+}
