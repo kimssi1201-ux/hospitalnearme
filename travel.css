@@ -1197,6 +1197,13 @@ main {
   background: #fff;
 }
 
+.mrt-feed-disclosure {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 .coupang-widget-ad {
   display: grid;
   gap: 8px;
@@ -2313,6 +2320,527 @@ body.booking-search-open {
   }
 }
 
+/* 2026-08 editorial magazine refresh: inspired by travel publishing layouts,
+   adapted for Seoul event data and the existing booking tools. */
+:root {
+  --bg: #ffffff;
+  --surface: #f3f8f9;
+  --card: #ffffff;
+  --ink: #17252b;
+  --muted: #62737b;
+  --line: #d8e4e8;
+  --accent: #1da6c2;
+  --accent-deep: #08758b;
+  --accent-soft: #e9f7fa;
+  --gold: #df6b59;
+  --shadow: none;
+  --radius: 4px;
+}
+
+.image-frame {
+  border-radius: 0;
+  background: #f1f5f5;
+}
+
+.image-frame--api::before {
+  display: none;
+}
+
+.image-frame--api img {
+  object-fit: contain;
+  background: #f1f5f5;
+}
+
+.image-frame.is-empty {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+  background: #edf3f4;
+}
+
+.image-frame.is-empty span {
+  color: #809198;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.topic-nav {
+  width: 100%;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.topic-nav .category-tab-list {
+  width: min(var(--max), calc(100% - 32px));
+  margin: 0 auto;
+  padding: 0;
+}
+
+.topic-nav .category-tab {
+  min-height: 42px;
+  padding: 0 17px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.topic-nav .category-tab strong {
+  color: #8a9ba2;
+  font-size: 11px;
+}
+
+.topic-nav .category-tab:hover,
+.topic-nav .category-tab.is-active {
+  border-color: var(--accent);
+  background: transparent;
+  box-shadow: none;
+  color: var(--accent-deep);
+}
+
+.topic-nav .category-tab:hover strong,
+.topic-nav .category-tab.is-active strong {
+  color: var(--accent-deep);
+}
+
+.magazine-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.magazine-section-heading > div {
+  display: grid;
+  gap: 8px;
+}
+
+.magazine-section-heading h1,
+.magazine-section-heading p {
+  margin: 0;
+}
+
+.magazine-section-heading h1 {
+  max-width: 940px;
+  color: var(--ink);
+  font-size: clamp(38px, 4.8vw, 58px);
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+.magazine-section-heading p {
+  max-width: 680px;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.magazine-section-heading > a {
+  flex: 0 0 auto;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--accent);
+  color: var(--accent-deep);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.magazine-cover {
+  gap: 28px;
+  padding: 34px 0 72px;
+}
+
+.magazine-cover .editorial-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(250px, 1fr));
+  gap: 18px;
+}
+
+.magazine-cover .editorial-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: #fff;
+}
+
+.magazine-cover .editorial-card--lead {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.magazine-cover .editorial-card a {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
+}
+
+.magazine-cover .editorial-card .image-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 145px;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+.magazine-cover .editorial-card--lead .image-frame {
+  min-height: 390px;
+}
+
+.magazine-cover .editorial-card span {
+  align-content: start;
+  padding: 14px 2px 2px;
+}
+
+.magazine-cover .editorial-card--lead span {
+  padding: 20px 4px 4px;
+}
+
+.magazine-cover .editorial-card em {
+  color: var(--gold);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.magazine-cover .editorial-card strong,
+.magazine-cover .editorial-card--lead strong {
+  min-height: 0;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.38;
+}
+
+.magazine-cover .editorial-card--lead strong {
+  max-width: 760px;
+  font-size: clamp(30px, 3.4vw, 48px);
+  line-height: 1.16;
+}
+
+.magazine-cover .editorial-card small,
+.magazine-cover .editorial-card b {
+  display: none;
+}
+
+.magazine-cover .editorial-card--lead small,
+.magazine-cover .editorial-card--lead b {
+  display: -webkit-box;
+}
+
+.magazine-cover .editorial-card--lead small {
+  max-width: 720px;
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-line-clamp: 2;
+}
+
+.landing-news-feed {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-areas: none !important;
+  gap: 24px !important;
+  padding: 64px 0 !important;
+  border-bottom: 1px solid var(--line);
+}
+
+.landing-news-feed > * {
+  grid-area: auto !important;
+}
+
+.landing-news-feed .recommend-news-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.landing-news-feed .news-recommend-card,
+.landing-news-feed .news-list-card,
+.news-loading-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.landing-news-feed .news-recommend-card {
+  border-bottom: 1px solid var(--line);
+}
+
+.landing-news-feed .news-recommend-card .image-frame--recommend {
+  aspect-ratio: 4 / 3;
+  border-radius: 0;
+}
+
+.landing-news-feed .news-recommend-body {
+  display: grid;
+  gap: 7px;
+  padding: 13px 0 16px;
+}
+
+.landing-news-feed .news-recommend-body strong {
+  min-height: 0;
+  padding: 0;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.landing-news-feed .news-list-feed {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 32px;
+  row-gap: 0;
+}
+
+.landing-news-feed .news-list-card {
+  border-top: 1px solid var(--line);
+}
+
+.landing-news-feed .news-list-card a {
+  display: grid;
+  grid-template-columns: 142px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  min-height: 136px;
+  padding: 14px 0;
+}
+
+.landing-news-feed .news-list-card .image-frame--feed {
+  width: 142px;
+  aspect-ratio: 4 / 3;
+  border-radius: 0;
+}
+
+.category-news-wrapper {
+  padding: 64px 0 20px;
+}
+
+.category-news-block {
+  gap: 22px;
+  padding-bottom: 54px;
+}
+
+.category-news-heading h2 {
+  font-size: clamp(30px, 4vw, 44px);
+}
+
+.category-magazine-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 26px 18px;
+}
+
+.category-magazine-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.category-magazine-card .image-frame--magazine {
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+}
+
+.category-magazine-card strong {
+  font-size: 19px;
+}
+
+.faq-section {
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 861px) {
+  .site-header {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: "nav brand language";
+    min-height: 104px;
+    padding: 0 max(24px, calc((100vw - var(--max)) / 2));
+    background: #fff;
+    backdrop-filter: none;
+  }
+
+  .site-header .brand {
+    grid-area: brand;
+    justify-self: center;
+  }
+
+  .site-header .brand strong {
+    font-size: 28px;
+  }
+
+  .site-header .brand small {
+    display: block;
+    color: #7b8b91;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .site-header .primary-nav {
+    grid-area: nav;
+    justify-self: start;
+  }
+
+  .site-header .language-switch {
+    grid-area: language;
+    justify-self: end;
+  }
+
+  main {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 860px) {
+  .site-header {
+    min-height: 58px;
+  }
+
+  .topic-nav .category-tab-list {
+    width: 100%;
+    padding: 0 12px;
+  }
+
+  main {
+    width: min(100% - 28px, var(--max));
+    padding-top: 0;
+  }
+
+  .magazine-cover {
+    padding: 34px 0 50px;
+  }
+
+  .magazine-section-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .magazine-section-heading h1 {
+    font-size: 34px;
+    line-height: 1.12;
+  }
+
+  .magazine-section-heading p {
+    font-size: 15px;
+  }
+
+  .magazine-cover .editorial-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+    gap: 22px 12px;
+  }
+
+  .magazine-cover .editorial-card,
+  .magazine-cover .editorial-card--lead {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .magazine-cover .editorial-card--lead {
+    grid-column: 1 / -1;
+  }
+
+  .magazine-cover .editorial-card .image-frame,
+  .magazine-cover .editorial-card--lead .image-frame {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .magazine-cover .editorial-card--lead strong {
+    font-size: 27px;
+  }
+
+  .magazine-cover .editorial-card strong {
+    font-size: 15px;
+  }
+
+  .magazine-cover .editorial-card span,
+  .magazine-cover .editorial-card--lead span {
+    padding: 12px 0 2px;
+  }
+
+  .landing-news-feed {
+    gap: 18px !important;
+    padding: 48px 0 !important;
+  }
+
+  .tripview-section-title {
+    align-items: start;
+  }
+
+  .tripview-section-title h2 {
+    font-size: 29px;
+  }
+
+  .landing-news-feed .recommend-news-row {
+    display: flex;
+    gap: 12px;
+    margin-right: -14px;
+    overflow-x: auto;
+    padding-right: 14px;
+    scroll-snap-type: x proximity;
+  }
+
+  .landing-news-feed .news-recommend-card {
+    flex: 0 0 min(72vw, 250px);
+    scroll-snap-align: start;
+  }
+
+  .landing-news-feed .news-list-feed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .landing-news-feed .news-list-card a {
+    grid-template-columns: 112px minmax(0, 1fr);
+    min-height: 112px;
+  }
+
+  .landing-news-feed .news-list-card .image-frame--feed {
+    width: 112px;
+  }
+
+  .category-news-wrapper {
+    padding-top: 48px;
+  }
+
+  .category-magazine-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+  }
+
+  .category-magazine-card p {
+    -webkit-line-clamp: 2;
+  }
+}
+
+@media (max-width: 420px) {
+  .magazine-cover .editorial-grid {
+    gap: 20px 10px;
+  }
+
+  .magazine-cover .editorial-card strong {
+    font-size: 14px;
+    line-height: 1.42;
+  }
+
+  .magazine-cover .editorial-card--lead strong {
+    font-size: 25px;
+  }
+
+  .landing-news-feed .news-list-card a {
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .landing-news-feed .news-list-card .image-frame--feed {
+    width: 104px;
+  }
+}
+
 .category-feature-card,
 .category-mini-card {
   overflow: hidden;
@@ -2669,6 +3197,27 @@ body.booking-search-open {
 .footer-grid a {
   color: rgba(255, 255, 255, 0.72);
   font-size: 14px;
+}
+
+.footer-policy-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.footer-policy-links a {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+}
+
+.footer-policy-links a:hover,
+.footer-policy-links a:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .copyright {
@@ -3813,5 +4362,101 @@ body.booking-search-open {
     max-width: 860px;
     font-size: clamp(32px, 3vw, 48px);
     line-height: 1.2;
+  }
+}
+
+/* Final editorial cover rules: keep the Travie-inspired lead/support hierarchy
+   from being overridden by legacy mobile card styles later in this file. */
+.magazine-cover .editorial-card a,
+.magazine-cover .editorial-card--lead a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+}
+
+.magazine-cover .editorial-card .image-frame,
+.magazine-cover .editorial-card--lead .image-frame {
+  width: 100%;
+  max-width: none;
+  min-height: 145px;
+}
+
+.magazine-cover .editorial-card .image-frame img,
+.magazine-cover .editorial-card--lead .image-frame img {
+  min-height: 0;
+}
+
+@media (max-width: 860px) {
+  .magazine-cover {
+    gap: 22px;
+    padding: 34px 0 50px;
+  }
+
+  .magazine-cover .editorial-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 12px;
+  }
+
+  .magazine-cover .editorial-card,
+  .magazine-cover .editorial-card--lead {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .magazine-cover .editorial-card--lead {
+    grid-column: 1 / -1;
+  }
+
+  .magazine-cover .editorial-card a,
+  .magazine-cover .editorial-card--lead a {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    min-height: 0;
+  }
+
+  .magazine-cover .editorial-card .image-frame,
+  .magazine-cover .editorial-card--lead .image-frame {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .magazine-cover .editorial-card span,
+  .magazine-cover .editorial-card--lead span {
+    padding: 12px 0 2px;
+  }
+
+  .magazine-cover .editorial-card strong {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .magazine-cover .editorial-card--lead strong {
+    font-size: 27px;
+    line-height: 1.18;
+    -webkit-line-clamp: 3;
+  }
+
+  .magazine-cover .editorial-card--lead small,
+  .magazine-cover .editorial-card--lead b {
+    display: -webkit-box;
+  }
+}
+
+@media (max-width: 420px) {
+  .magazine-cover .editorial-grid {
+    gap: 20px 10px;
+  }
+
+  .magazine-cover .editorial-card strong {
+    font-size: 14px;
+  }
+
+  .magazine-cover .editorial-card--lead strong {
+    font-size: 25px;
   }
 }

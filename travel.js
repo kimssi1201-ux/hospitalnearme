@@ -10,7 +10,7 @@ const COUPANG_WIDGET_CONFIG = {
   width: "680",
   height: "140"
 };
-const DEFAULT_EVENT_IMAGE = "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=900&q=80";
+const DEFAULT_EVENT_IMAGE = "";
 const DEFAULT_FESTIVAL_IMAGE = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80";
 const IMAGE_FIELD_NAMES = [
   "image",
@@ -31,6 +31,19 @@ const IMAGE_FIELD_NAMES = [
   "smallimageurl",
   "url"
 ];
+
+function seasonalTravelProductKeyword(date = new Date()) {
+  const month = Number(new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    month: "numeric"
+  }).format(date));
+
+  if (month >= 3 && month <= 5) return "봄 여행 필수품";
+  if (month >= 6 && month <= 8) return "여름 여행 필수품";
+  if (month >= 9 && month <= 11) return "가을 여행 필수품";
+  return "겨울 여행 필수품";
+}
+
 const state = {
   apiArticles: [],
   julyArticles: [],
@@ -45,7 +58,7 @@ const state = {
     items: [],
     loaded: false,
     error: false,
-    keyword: "여행 준비물"
+    keyword: seasonalTravelProductKeyword()
   },
   activeMrtTab: "stay",
   apiLoaded: false,
@@ -86,7 +99,7 @@ const I18N = {
     "nav.booking": "여행검색",
     "july.title": "오늘 볼 만한 서울 여행 뉴스",
     "july.description": "서울 축제, 계절 행사, 산책 코스와 방문 전 체크 정보를 뉴스 피드 형식으로 정리했습니다.",
-    "july.loading": "서울 축제 정보를 불러오는 중입니다.",
+    "july.loading": "이번 달 서울 축제 정보를 불러오는 중입니다.",
     "july.count": "총 {count}개의 서울 여행 기사를 불러왔습니다.",
     "july.error": "서울 축제 정보를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
     "places.title": "서울 축제 찾기",
@@ -107,8 +120,8 @@ const I18N = {
     "read.detail": "상세 보기",
     "summary.festival": "{address}에서 열리는 서울 축제입니다. 방문 전 운영 시간, 교통 통제, 주차와 우천 운영 여부를 확인해 보세요.",
     "summary.festivalFallback": "방문 전 행사 시간, 장소, 교통과 우천 운영 여부를 확인하면 더 편하게 즐길 수 있는 서울 축제 정보입니다.",
-    "summary.july": "{address}에서 열리는 서울 7월 축제입니다. 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인해 보세요.",
-    "summary.julyFallback": "7월 일정이 포함된 서울 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요."
+    "summary.july": "{address}에서 열리는 이번 달 서울 축제입니다. 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인해 보세요.",
+    "summary.julyFallback": "이번 달 일정이 포함된 서울 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요."
   },
   en: {
     "meta.title": "Seoul Travel News | Seoul Travel Information",
@@ -123,9 +136,9 @@ const I18N = {
     "nav.booking": "Search",
     "july.title": "Festival News to Read Today",
     "july.description": "Browse Seoul festival and travel information in a mobile news feed with one featured story, recommended cards, and the latest list.",
-    "july.loading": "Loading July festivals.",
+    "july.loading": "Loading this month's Seoul festivals.",
     "july.count": "{count} festival stories loaded.",
-    "july.error": "Could not load July festivals. Please try again later.",
+    "july.error": "Could not load this month's festivals. Please try again later.",
     "places.title": "Find Festivals by Region",
     "places.title.all": "Find Festivals by Region",
     "places.title.region": "{region} Festival Guide",
@@ -144,8 +157,8 @@ const I18N = {
     "read.detail": "Details",
     "summary.festival": "A festival held at {address}. Before visiting, check operating hours, transport restrictions, parking, and rain policy.",
     "summary.festivalFallback": "Festival information to review before visiting, including time, location, transport, and rain policy.",
-    "summary.july": "A July festival held at {address}. Check operating hours, entry method, transport, and rain policy before visiting.",
-    "summary.julyFallback": "A festival that includes July dates. Check schedule, location, fees, and transport before visiting."
+    "summary.july": "A festival held at {address} this month. Check operating hours, entry method, transport, and rain policy before visiting.",
+    "summary.julyFallback": "A festival scheduled for this month. Check schedule, location, fees, and transport before visiting."
   },
   ja: {
     "meta.title": "ソウル旅行ニュース | ソウル旅行情報",
@@ -160,9 +173,9 @@ const I18N = {
     "nav.booking": "検索",
     "july.title": "今日読みたいフェスニュース",
     "july.description": "注目記事、推薦カード、最新リストの順に韓国フェス情報を確認できます。",
-    "july.loading": "7月のフェス一覧を読み込んでいます。",
+    "july.loading": "今月のソウルのフェス一覧を読み込んでいます。",
     "july.count": "{count}件のフェス記事を読み込みました。",
-    "july.error": "7月のフェス一覧を読み込めませんでした。時間をおいてもう一度確認してください。",
+    "july.error": "今月のフェス一覧を読み込めませんでした。時間をおいてもう一度確認してください。",
     "places.title": "地域別フェスを探す",
     "places.title.all": "地域別フェスを探す",
     "places.title.region": "{region}のフェス情報",
@@ -181,8 +194,8 @@ const I18N = {
     "read.detail": "詳細",
     "summary.festival": "{address}で開催されるフェスです。訪問前に運営時間、交通規制、駐車、雨天時の案内を確認しましょう。",
     "summary.festivalFallback": "訪問前に時間、場所、交通、雨天時の案内を確認したいフェス情報です。",
-    "summary.july": "{address}で開催される7月のフェスです。運営時間、入場方法、交通、雨天時の案内を確認しましょう。",
-    "summary.julyFallback": "7月の日程を含むフェスです。訪問前に日程、場所、料金、交通情報を確認しましょう。"
+    "summary.july": "{address}で今月開催されるフェスです。運営時間、入場方法、交通、雨天時の案内を確認しましょう。",
+    "summary.julyFallback": "今月の日程を含むフェスです。訪問前に日程、場所、料金、交通情報を確認しましょう。"
   },
   zh: {
     "meta.title": "首尔旅行新闻 | 首尔旅行信息",
@@ -197,9 +210,9 @@ const I18N = {
     "nav.booking": "搜索",
     "july.title": "今日值得关注的庆典新闻",
     "july.description": "按重点报道、推荐卡片和最新列表的顺序浏览韩国庆典信息。",
-    "july.loading": "正在加载7月庆典列表。",
+    "july.loading": "正在加载本月首尔庆典列表。",
     "july.count": "已加载{count}篇庆典文章。",
-    "july.error": "无法加载7月庆典列表，请稍后再试。",
+    "july.error": "无法加载本月庆典列表，请稍后再试。",
     "places.title": "按地区查找庆典",
     "places.title.all": "按地区查找庆典",
     "places.title.region": "{region}庆典信息",
@@ -218,8 +231,131 @@ const I18N = {
     "read.detail": "详情",
     "summary.festival": "这是在{address}举行的庆典。出发前请确认开放时间、交通管制、停车和雨天安排。",
     "summary.festivalFallback": "出发前建议确认时间、地点、交通和雨天安排的庆典信息。",
-    "summary.july": "这是在{address}举行的7月庆典。请提前确认开放时间、入场方式、交通和雨天安排。",
-    "summary.julyFallback": "这是日程包含7月的庆典。出发前请确认日程、地点、费用和交通信息。"
+    "summary.july": "这是本月在{address}举行的庆典。请提前确认开放时间、入场方式、交通和雨天安排。",
+    "summary.julyFallback": "这是本月举行的庆典。出发前请确认日程、地点、费用和交通信息。"
+  }
+};
+
+const EDITORIAL_I18N = {
+  ko: {
+    "nav.editorial": "서울 기획",
+    "editorial.title": "서울을 더 잘 여행하는 방법",
+    "editorial.description": "전시와 공연, 동네 산책과 교통 정보를 직접 읽고 고른 서울 여행 기획입니다.",
+    "editorial.link": "최신 행사 보기",
+    "latest.title": "지금 서울에서 열리는 행사",
+    "latest.description": "서울시 문화행사 정보를 바탕으로 일정·장소·요금·문의처를 확인하고, 방문 동선과 주변 교통까지 함께 정리합니다.",
+    "latest.list": "최신 서울 행사"
+  },
+  en: {
+    "nav.editorial": "Seoul Guides",
+    "editorial.title": "A better way to explore Seoul",
+    "editorial.description": "Editor-selected Seoul itineraries covering exhibitions, performances, neighborhood walks, and practical transport tips.",
+    "editorial.link": "See the latest events",
+    "latest.title": "What is on in Seoul now",
+    "latest.description": "Check official Seoul event schedules, venues, prices, contacts, nearby routes, and transport information in one place.",
+    "latest.list": "Latest Seoul events"
+  },
+  ja: {
+    "nav.editorial": "ソウル特集",
+    "editorial.title": "ソウルをもっと楽しむ旅の方法",
+    "editorial.description": "展示、公演、街歩き、交通情報を編集部が選び、旅の流れに合わせて紹介します。",
+    "editorial.link": "最新イベントを見る",
+    "latest.title": "今ソウルで開催中のイベント",
+    "latest.description": "ソウル市の文化イベント情報をもとに、日程、会場、料金、問い合わせ先、周辺交通をまとめました。",
+    "latest.list": "ソウル最新イベント"
+  },
+  zh: {
+    "nav.editorial": "首尔专题",
+    "editorial.title": "用更好的方式探索首尔",
+    "editorial.description": "精选展览、演出、街区漫步和交通信息，帮助你轻松规划首尔行程。",
+    "editorial.link": "查看最新活动",
+    "latest.title": "首尔正在举行的活动",
+    "latest.description": "根据首尔市文化活动信息，整理日程、地点、票价、联系方式、游览动线和交通。",
+    "latest.list": "首尔最新活动"
+  }
+};
+
+const EDITORIAL_POST_I18N = {
+  en: {
+    "seoul-weekend-exhibition-guide": {
+      category: "Seoul Exhibitions",
+      title: "This week's Seoul exhibitions: museums and indoor culture in one route",
+      summary: "A weather-friendly itinerary with practical notes on routes, reservations, and viewing times."
+    },
+    "seoul-family-free-events": {
+      category: "Family Travel",
+      title: "Free and affordable Seoul cultural events for families",
+      summary: "Compare age limits, operating hours, and reservation rules before visiting with children."
+    },
+    "jongno-junggu-culture-route": {
+      category: "Seoul Route",
+      title: "A one-day Jongno and Jung-gu route for exhibitions and performances",
+      summary: "Plan central Seoul venues as one practical route with enough time for meals and transfers."
+    },
+    "seoul-night-event-safety-route": {
+      category: "Night Events",
+      title: "Check your return route before Seoul night performances and festivals",
+      summary: "Review the last train, taxi points, lighting, and exit routes before an evening visit."
+    },
+    "seoul-rainy-day-culture-course": {
+      category: "Indoor Seoul",
+      title: "How to choose Seoul exhibitions, performances, and experiences on a rainy day",
+      summary: "Compare cancellation policies, travel distance, and waiting time for a reliable indoor itinerary."
+    }
+  },
+  ja: {
+    "seoul-weekend-exhibition-guide": {
+      category: "ソウル展示",
+      title: "今週のソウル展示おすすめ、美術館と屋内文化施設を巡るコース",
+      summary: "天候に左右されにくい展示を中心に、移動、予約、観覧時間をまとめました。"
+    },
+    "seoul-family-free-events": {
+      category: "家族旅行",
+      title: "子どもと楽しむソウルの無料・低料金文化イベント",
+      summary: "対象年齢、運営時間、予約条件を比べてから家族の予定を組みましょう。"
+    },
+    "jongno-junggu-culture-route": {
+      category: "ソウルコース",
+      title: "鍾路・中区の展示と公演を一日で巡る文化コース",
+      summary: "都心の会場を食事時間と移動時間まで含めて効率よくつなぎます。"
+    },
+    "seoul-night-event-safety-route": {
+      category: "夜イベント",
+      title: "ソウルの夜公演・祭りは帰宅ルートから確認",
+      summary: "終電、タクシー乗り場、照明、会場出口を訪問前に確認しましょう。"
+    },
+    "seoul-rainy-day-culture-course": {
+      category: "室内旅行",
+      title: "雨の日のソウル、展示・公演・体験の選び方",
+      summary: "取消条件、移動距離、待ち時間を比べて安定した室内コースを選びます。"
+    }
+  },
+  zh: {
+    "seoul-weekend-exhibition-guide": {
+      category: "首尔展览",
+      title: "本周首尔展览推荐：美术馆与室内文化空间路线",
+      summary: "以不受天气影响的场馆为主，整理交通、预约和参观时间。"
+    },
+    "seoul-family-free-events": {
+      category: "亲子旅行",
+      title: "适合亲子的首尔免费及平价文化活动",
+      summary: "带孩子出发前，先比较年龄限制、开放时间和预约规则。"
+    },
+    "jongno-junggu-culture-route": {
+      category: "首尔路线",
+      title: "钟路与中区展览、演出一日文化路线",
+      summary: "把市中心场馆、用餐和换乘时间整理成顺畅的一日行程。"
+    },
+    "seoul-night-event-safety-route": {
+      category: "夜间活动",
+      title: "参加首尔夜间演出和庆典前先确认返程路线",
+      summary: "提前查看末班车、出租车点、照明和会场出口。"
+    },
+    "seoul-rainy-day-culture-course": {
+      category: "室内旅行",
+      title: "雨天首尔：展览、演出和体验项目的选择方法",
+      summary: "比较取消规则、移动距离和等候时间，安排更稳妥的室内行程。"
+    }
   }
 };
 
@@ -236,7 +372,8 @@ function getStoredLanguage() {
 
 function textFor(key, params = {}) {
   const table = I18N[state.language] || I18N.ko;
-  const template = table[key] || I18N.ko[key] || key;
+  const editorialTable = EDITORIAL_I18N[state.language] || EDITORIAL_I18N.ko;
+  const template = editorialTable[key] || table[key] || EDITORIAL_I18N.ko[key] || I18N.ko[key] || key;
   return template.replace(/\{(\w+)\}/g, (_, name) => params[name] ?? "");
 }
 
@@ -358,7 +495,7 @@ function collectImageCandidates(value, bucket = [], depth = 0) {
 function imageListForItem(item = {}) {
   const candidates = [];
   collectImageCandidates(item, candidates);
-  return [...new Set(candidates.map(normalizeImageUrl).filter(Boolean))];
+  return [...new Set(candidates.map(normalizeImageUrl).filter((url) => url && !url.includes("images.unsplash.com")))];
 }
 
 function imageUrlForItem(item = {}, fallback = DEFAULT_EVENT_IMAGE) {
@@ -373,6 +510,13 @@ function hasApiImage(item = {}) {
 function imageMarkup(item, size = "card") {
   const title = displayArticleTitle(item);
   const image = imageUrlForItem(item);
+  if (!image) {
+    return `
+      <div class="image-frame image-frame--${escapeHtml(size)} is-empty" aria-label="${escapeHtml(`${title} 이미지 준비 중`)}">
+        <span>SEOUL TRAVEL NEWS</span>
+      </div>
+    `;
+  }
   const isApi = hasApiImage(item);
   const fallback = image === DEFAULT_EVENT_IMAGE ? "" : DEFAULT_EVENT_IMAGE;
   const onError = fallback
@@ -415,6 +559,23 @@ function articleDateValue(item = {}) {
   return Number(compact) || 0;
 }
 
+function articleDateRange(item = {}) {
+  const tokens = String(item.date || "").match(/\d{4}[-.]\d{1,2}[-.]\d{1,2}|\d{8}/g) || [];
+  const values = tokens
+    .map((token) => Number(String(token).replace(/\D/g, "")))
+    .filter((value) => Number.isFinite(value) && value > 0);
+  const start = values[0] || 0;
+  return { start, end: values[values.length - 1] || start };
+}
+
+function articleTimingGroup(item, today) {
+  const { start, end } = articleDateRange(item);
+  if (!start) return 3;
+  if (start <= today && end >= today) return 0;
+  if (start > today) return 1;
+  return 2;
+}
+
 function articleQualityScore(item = {}) {
   let score = 0;
   if (hasApiImage(item)) score += 4;
@@ -430,9 +591,21 @@ function articleQualityScore(item = {}) {
 }
 
 function sortByQualityAndDate(items = []) {
+  const today = Number(todayCompact());
   return [...items].sort((a, b) => {
+    const aTiming = articleTimingGroup(a, today);
+    const bTiming = articleTimingGroup(b, today);
+    if (aTiming !== bTiming) return aTiming - bTiming;
+
+    const aRange = articleDateRange(a);
+    const bRange = articleDateRange(b);
+    if (aTiming === 1 && aRange.start !== bRange.start) return aRange.start - bRange.start;
+
     const qualityDiff = articleQualityScore(b) - articleQualityScore(a);
     if (qualityDiff) return qualityDiff;
+
+    if (aTiming === 0 && aRange.end !== bRange.end) return aRange.end - bRange.end;
+    if (aTiming === 2 && aRange.end !== bRange.end) return bRange.end - aRange.end;
     return articleDateValue(b) - articleDateValue(a);
   });
 }
@@ -558,30 +731,10 @@ function articleMeta(item) {
 }
 
 function detailUrl(item) {
-  const image = imageUrlForItem(item, "");
   if (item.source === "seoul") {
     const params = new URLSearchParams({
       source: "seoul",
-      id: item.id || "",
-      title: item.title || "",
-      category: item.category || "",
-      rawCategory: item.rawCategory || item.subCategory || "",
-      subCategory: item.subCategory || item.rawCategory || "",
-      categorySlug: item.categorySlug || "",
-      date: item.date || "",
-      image,
-      address: item.address || item.place || "",
-      summary: displaySummary(item) || "",
-      tel: item.tel || "",
-      homepage: item.homepage || "",
-      fee: item.fee || "",
-      time: item.time || "",
-      org: item.org || "",
-      target: item.target || "",
-      isFree: item.isFree || "",
-      updatedAt: item.updatedAt || "",
-      lat: item.lat || "",
-      lng: item.lng || ""
+      id: item.id || ""
     });
     return `festival-detail?${params.toString()}`;
   }
@@ -590,18 +743,7 @@ function detailUrl(item) {
     const params = new URLSearchParams({
       source: "tour",
       id: item.contentId,
-      contentTypeId: item.contentTypeId || "",
-      title: item.title || "",
-      category: item.category || "",
-      rawCategory: item.rawCategory || item.subCategory || "",
-      subCategory: item.subCategory || item.rawCategory || "",
-      categorySlug: item.categorySlug || "",
-      date: item.date || "",
-      image,
-      address: item.address || item.summaryParams?.address || "",
-      mapx: item.mapx || "",
-      mapy: item.mapy || "",
-      summary: displaySummary(item) || ""
+      contentTypeId: item.contentTypeId || ""
     });
     return `festival-detail?${params.toString()}`;
   }
@@ -1379,16 +1521,29 @@ function mrtContextFromArticle(article = {}) {
   const isExhibition = /전시|미술|박물관|미술관|갤러리|아트/.test(text);
   const isPalace = /궁|궁궐|고궁|전통|역사|덕수궁|경복궁|창덕궁|창경궁/.test(text);
   const isFamily = /어린이|키즈|가족|체험|교육/.test(text);
+  const isFestival = /축제|페스티벌|야시장|마켓/.test(text);
+  const isNight = /야간|밤|나이트|저녁|심야/.test(text);
+  const isFlightRelated = /항공|공항|비행|출국|입국|제주|부산|해외|도쿄|오사카|방콕|다낭/.test(text);
   const tourSuffix = isPerformance ? "공연"
     : isExhibition ? "전시"
     : isPalace ? "궁궐 투어"
     : isFamily ? "키즈 체험"
+    : isFestival ? "축제 체험"
     : "입장권";
+  const primaryFilter = isNight && !isExhibition ? "stay" : "tour";
+  const enabledFilters = [
+    "tour",
+    ...(isNight || isFestival || isPerformance || keyword !== "서울" ? ["stay"] : []),
+    ...(isFlightRelated ? ["flight"] : [])
+  ];
 
   return {
     keyword,
     stayKeyword: keyword,
     tourKeyword: `${keyword} ${tourSuffix}`,
+    tourSuffix,
+    primaryFilter,
+    enabledFilters: [...new Set(enabledFilters)],
     flightDepCity: "ICN",
     flightArrCities: "CJU,BKK,NRT,TYO"
   };
@@ -1396,7 +1551,10 @@ function mrtContextFromArticle(article = {}) {
 
 function rankMrtItemsByContext(items = [], context = {}) {
   const keyword = compactDestinationText(context.keyword || "서울");
-  if (!keyword || keyword === "서울") return items;
+  const intentTokens = compactDestinationText(context.tourKeyword || "")
+    .split(" ")
+    .filter((token) => token.length >= 2 && token !== "서울" && token !== keyword);
+  if ((!keyword || keyword === "서울") && !intentTokens.length) return items;
 
   return [...items].sort((a, b) => {
     const score = (item) => {
@@ -1409,7 +1567,11 @@ function rankMrtItemsByContext(items = [], context = {}) {
         item.address,
         item.location
       ].filter(Boolean).join(" "));
-      return haystack.includes(keyword) ? 2 : SEOUL_DESTINATION_HINTS.some((hint) => haystack.includes(hint) && keyword.includes(hint)) ? 1 : 0;
+      const destinationScore = keyword && keyword !== "서울" && haystack.includes(keyword)
+        ? 4
+        : SEOUL_DESTINATION_HINTS.some((hint) => haystack.includes(hint) && keyword.includes(hint)) ? 2 : 0;
+      const intentScore = intentTokens.reduce((total, token) => total + (haystack.includes(token) ? 1 : 0), 0);
+      return destinationScore + intentScore;
     };
     return score(b) - score(a);
   });
@@ -1541,9 +1703,14 @@ function myRealTripFeedRailItemsV2(context = {}) {
   if (!state.myrealtrip.loaded) return [];
 
   const items = [];
-  const tours = rankMrtItemsByContext(state.myrealtrip.tours, context).slice(0, 9);
-  const stays = rankMrtItemsByContext(state.myrealtrip.stays, context).slice(0, 9);
-  const flights = state.myrealtrip.flights.slice(0, 9);
+  const enabledFilters = context.enabledFilters?.length ? context.enabledFilters : ["tour"];
+  const tours = enabledFilters.includes("tour")
+    ? rankMrtItemsByContext(state.myrealtrip.tours, context).slice(0, 9)
+    : [];
+  const stays = enabledFilters.includes("stay")
+    ? rankMrtItemsByContext(state.myrealtrip.stays, context).slice(0, 9)
+    : [];
+  const flights = enabledFilters.includes("flight") ? state.myrealtrip.flights.slice(0, 9) : [];
   const maxLength = Math.max(tours.length, stays.length, flights.length);
 
   for (let index = 0; index < maxLength; index += 1) {
@@ -1552,11 +1719,7 @@ function myRealTripFeedRailItemsV2(context = {}) {
     if (flights[index]) items.push(renderMrtRailFlightCardV2(flights[index], context));
   }
 
-  items.push(
-    renderMrtRailSearchCardV2("tour", context),
-    renderMrtRailSearchCardV2("stay", context),
-    renderMrtRailSearchCardV2("flight", context)
-  );
+  enabledFilters.forEach((kind) => items.push(renderMrtRailSearchCardV2(kind, context)));
 
   return items.filter(Boolean);
 }
@@ -1566,41 +1729,54 @@ function renderMrtFeedModuleV2(seed = "main", position = 0, article = null) {
   const items = myRealTripFeedRailItemsV2(context);
   if (!items.length) return "";
 
-  const variants = [
-    {
+  const variants = {
+    tour: {
       filter: "tour",
-      title: `${context.keyword} 입장권과 체험 상품`,
+      title: `${context.keyword} ${context.tourSuffix || "입장권"}과 체험`,
       linkTab: "tour",
       linkText: "입장권 검색",
       keyword: context.tourKeyword
     },
-    {
+    stay: {
       filter: "stay",
-      title: `${context.keyword} 근처 숙소`,
+      title: `${context.keyword} 일정 전후 근처 숙소`,
       linkTab: "stay",
       linkText: "숙소 검색",
       keyword: context.stayKeyword
     },
-    {
+    flight: {
       filter: "flight",
-      title: "서울 출발 항공권 흐름",
+      title: "서울 출발 연계 항공권",
       linkTab: "flight",
       linkText: "항공권 검색",
       keyword: "",
       depCity: context.flightDepCity,
       arrCities: context.flightArrCities
     }
-  ];
-  const variant = variants[Math.abs(position - 1) % variants.length];
+  };
+  const enabledFilters = context.enabledFilters?.length ? context.enabledFilters : ["tour"];
+  const primaryFilter = enabledFilters.includes(context.primaryFilter) ? context.primaryFilter : enabledFilters[0];
+  const variant = variants[primaryFilter] || variants.tour;
   const offset = (adRotationOffset(seed) + position) % items.length;
   const rotated = [...items.slice(offset), ...items.slice(0, offset)];
   const keywordAttr = variant.keyword ? ` data-mrt-keyword="${escapeHtml(variant.keyword)}"` : "";
   const flightAttrs = variant.filter === "flight"
     ? ` data-mrt-dep-city="${escapeHtml(variant.depCity || "ICN")}" data-mrt-arr-cities="${escapeHtml(variant.arrCities || "CJU,BKK,NRT,TYO")}"`
     : "";
+  const disclosure = {
+    ko: "기사의 장소와 방문 목적을 기준으로 연결한 여행 예약 제휴 상품이며, 예약 시 수수료를 받을 수 있습니다.",
+    en: "These affiliate booking suggestions are matched to the article location and visit type; the site may earn a commission.",
+    ja: "記事の場所と訪問目的に合わせた旅行予約のアフィリエイト商品で、予約時に手数料を受け取る場合があります。",
+    zh: "这些旅行预订推广商品根据文章地点和出行目的匹配，预订后本站可能获得佣金。"
+  }[state.language] || "";
+  const tabLabels = {
+    tour: "입장권·체험",
+    stay: "근처 숙소",
+    flight: "항공권"
+  };
 
   return `
-    <section class="mrt-feed-module" data-active-filter="${escapeHtml(variant.filter)}" aria-label="마이리얼트립 추천 상품">
+    <section class="mrt-feed-module" data-active-filter="${escapeHtml(variant.filter)}" aria-label="기사 맞춤 여행 상품">
       <div class="mrt-feed-module-head">
         <div>
           <p class="eyebrow">Travel Pick</p>
@@ -1609,13 +1785,14 @@ function renderMrtFeedModuleV2(seed = "main", position = 0, article = null) {
         <a href="#bookingSearch" data-mrt-open="${escapeHtml(variant.linkTab)}"${keywordAttr}${flightAttrs}>${escapeHtml(variant.linkText)}</a>
       </div>
       <div class="mrt-feed-tabs" aria-label="상품 종류">
-        <button class="${variant.filter === "tour" ? "is-active" : ""}" type="button" data-mrt-rail-filter="tour" aria-pressed="${variant.filter === "tour" ? "true" : "false"}">입장권</button>
-        <button class="${variant.filter === "stay" ? "is-active" : ""}" type="button" data-mrt-rail-filter="stay" aria-pressed="${variant.filter === "stay" ? "true" : "false"}">숙소</button>
-        <button class="${variant.filter === "flight" ? "is-active" : ""}" type="button" data-mrt-rail-filter="flight" aria-pressed="${variant.filter === "flight" ? "true" : "false"}">항공권</button>
+        ${enabledFilters.map((filter) => `
+          <button class="${variant.filter === filter ? "is-active" : ""}" type="button" data-mrt-rail-filter="${escapeHtml(filter)}" aria-pressed="${variant.filter === filter ? "true" : "false"}">${escapeHtml(tabLabels[filter] || filter)}</button>
+        `).join("")}
       </div>
       <div class="mrt-rail">
         ${rotated.join("")}
       </div>
+      <p class="mrt-feed-disclosure">${escapeHtml(disclosure)}</p>
     </section>
   `;
 }
@@ -1629,7 +1806,6 @@ function adRotationOffset(seed = "") {
 function buildNewsFeedMarkup(feedItems, seed = "main") {
   const blocks = [];
   let hasInsertedMrt = false;
-  let hasInsertedCoupang = false;
 
   feedItems.forEach((item, index) => {
     const articleNumber = index + 1;
@@ -1638,11 +1814,6 @@ function buildNewsFeedMarkup(feedItems, seed = "main") {
     if (!hasInsertedMrt && articleNumber === MRT_FEED_INTERVAL && articleNumber < feedItems.length) {
       blocks.push(renderMrtFeedModuleV2(seed, 1, item));
       hasInsertedMrt = true;
-    }
-
-    if (!hasInsertedCoupang && articleNumber === 12 && articleNumber < feedItems.length) {
-      blocks.push(coupangWidgetMarkup(`feed-${seed}`));
-      hasInsertedCoupang = true;
     }
   });
 
@@ -2244,10 +2415,17 @@ function renderTopCategoryTabs(groups = buildCategoryNewsGroups()) {
 
   const items = primaryNewsItems();
   const counts = categoryCountMap(items);
-  const tabs = groups.map((group) => ({
-    ...group,
-    count: counts.get(group.id) || 0
-  }));
+  const tabs = [
+    {
+      id: "all",
+      title: state.language === "ko" ? "전체" : state.language === "ja" ? "すべて" : state.language === "zh" ? "全部" : "All",
+      count: items.length
+    },
+    ...groups.map((group) => ({
+      ...group,
+      count: counts.get(group.id) || 0
+    }))
+  ];
 
   target.innerHTML = tabs.map((group) => {
     const isActive = state.activeCategoryFilter === group.id;
@@ -2320,7 +2498,7 @@ function takeMagazineItems(candidates, usedKeys, limit = 6) {
 }
 
 function buildMagazineNewsSections() {
-  const items = primaryNewsItems();
+  const items = primaryNewsItems().slice(29);
   const used = new Set();
   const latest = [...items].sort((a, b) => articleDateValue(b) - articleDateValue(a));
   const byCategory = (keys) => items.filter((item) => keys.includes(categoryKeyFor(item)));
@@ -2664,6 +2842,7 @@ function regionLabelFromAddress(address) {
 
 function normalizeJulyFestivalItems(items) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
+  const month = currentSeoulMonth();
 
   return list
     .filter((item) => item && item.title && overlapsJulyFestival(item))
@@ -2673,7 +2852,7 @@ function normalizeJulyFestivalItems(items) {
       const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
       const startDate = compactDate(item.eventstartdate);
       const endDate = compactDate(item.eventenddate);
-      const period = startDate && endDate ? `${startDate} - ${endDate}` : startDate || "7월 진행";
+      const period = startDate && endDate ? `${startDate} - ${endDate}` : startDate || `${month.label} 진행`;
       const region = regionLabelFromAddress(item.addr1);
 
       return {
@@ -2681,7 +2860,7 @@ function normalizeJulyFestivalItems(items) {
         source: "tour",
         contentId: item.contentid,
         contentTypeId: item.contenttypeid || 15,
-        category: `${region} 7월 축제`,
+        category: `${region} ${month.label} 축제`,
         title: item.title,
         summaryKey: address ? "summary.july" : "summary.julyFallback",
         summaryParams: { address },
@@ -2793,7 +2972,7 @@ function renderJulyFestivals() {
   status.hidden = true;
 
   recommended.innerHTML = items.slice(1, 5).map((item) => newsRecommendCard(item)).join("");
-  feed.innerHTML = buildNewsFeedMarkup(items.slice(5, 65));
+  feed.innerHTML = buildNewsFeedMarkup(items.slice(5, 29));
   hydrateCoupangWidgets();
 }
 
@@ -2927,7 +3106,7 @@ async function loadJulyFestivalPosts() {
   try {
     for (let pageNo = 1; pageNo <= 6; pageNo += 1) {
       const response = await fetch(buildJulyFestivalUrl(pageNo, numOfRows));
-      if (!response.ok) throw new Error(`July festival HTTP ${response.status}`);
+      if (!response.ok) throw new Error(`Monthly festival HTTP ${response.status}`);
 
       const payload = await response.json();
       const body = payload?.response?.body || {};
@@ -2950,7 +3129,7 @@ async function loadJulyFestivalPosts() {
     renderEditorialPosts();
     renderCategoryNewsSections();
   } catch (error) {
-    console.warn("July festival posts could not be loaded.", error);
+    console.warn("Monthly festival posts could not be loaded.", error);
     const status = $("#julyStatus");
     if (status) {
       status.textContent = textFor("july.error");
@@ -3092,6 +3271,47 @@ function renderCuration() {
     .join("");
 }
 
+function editorialCategoryKey(item = {}) {
+  const text = `${item.category || ""} ${item.title || ""}`;
+  if (/전시|미술|박물관|갤러리/.test(text)) return "exhibition";
+  if (/공연|야간|데이트|콘서트|무대/.test(text)) return "performance";
+  if (/가족|아이|체험|교육|도서관/.test(text)) return "experience";
+  if (/축제|전통|궁궐/.test(text)) return "festival";
+  return "event";
+}
+
+function editorialPostsWithApiImages(posts = []) {
+  const pool = primaryNewsItems().filter(hasApiImage);
+  const used = new Set();
+
+  return posts.map((post) => {
+    const wanted = editorialCategoryKey(post);
+    const match = pool.find((item) => !used.has(item.id) && categoryKeyFor(item) === wanted)
+      || pool.find((item) => !used.has(item.id));
+    if (!match) return { ...post, image: "" };
+    used.add(match.id);
+    return { ...post, image: imageUrlForItem(match, "") };
+  });
+}
+
+function localizedEditorialPost(item = {}) {
+  if (state.language === "ko") return item;
+
+  const copy = EDITORIAL_POST_I18N[state.language]?.[item.id];
+  if (!copy) return item;
+
+  const minutes = String(item.readTime || "").match(/\d+/)?.[0] || "";
+  const readTime = minutes
+    ? {
+        en: `${minutes} min read`,
+        ja: `${minutes}分で読めます`,
+        zh: `${minutes}分钟阅读`
+      }[state.language]
+    : item.readTime;
+
+  return { ...item, ...copy, readTime };
+}
+
 function renderEditorialPosts() {
   const target = $("#editorialList");
   if (!target) return;
@@ -3100,17 +3320,28 @@ function renderEditorialPosts() {
     ? data.editorialPosts
     : data.articles || [];
 
-  target.innerHTML = posts.slice(0, 20).map((item, index) => {
-    const href = item.href || detailUrl(item);
+  if (!primaryNewsItems().some(hasApiImage) && state.newsLoading) {
+    target.innerHTML = [
+      loadingCardMarkup("feature"),
+      ...Array.from({ length: 4 }, () => loadingCardMarkup("recommend"))
+    ].join("");
+    return;
+  }
+
+  const displayPosts = editorialPostsWithApiImages(posts).slice(0, 5);
+
+  target.innerHTML = displayPosts.map((item, index) => {
+    const localizedItem = localizedEditorialPost(item);
+    const href = localizedItem.href || detailUrl(localizedItem);
     return `
       <article class="editorial-card ${index === 0 ? "editorial-card--lead" : ""}">
-        <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${item.title} 자세히 보기`)}">
-          ${imageMarkup(item, index === 0 ? "hero" : "thumb")}
+        <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${localizedItem.title} ${textFor("card.detail")}`)}">
+          ${imageMarkup(localizedItem, index === 0 ? "hero" : "thumb")}
           <span>
-            <em>${escapeHtml(item.category || "서울 여행")}</em>
-            <strong>${escapeHtml(item.title)}</strong>
-            <small>${escapeHtml(item.summary || "")}</small>
-            <b>${escapeHtml(item.date || "")} · ${escapeHtml(item.readTime || "정보 글")}</b>
+            <em>${escapeHtml(localizedItem.category || displayCategoryLabel(localizedItem))}</em>
+            <strong>${escapeHtml(localizedItem.title)}</strong>
+            <small>${escapeHtml(localizedItem.summary || "")}</small>
+            <b>${escapeHtml(localizedItem.date || "")} · ${escapeHtml(localizedItem.readTime || textFor("read.detail"))}</b>
           </span>
         </a>
       </article>

@@ -1,0 +1,14 @@
+{
+  "name": "hospitalnearme-publish",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "refresh": "node scripts/update-seoul-content.mjs",
+    "test": "node --test test/*.test.mjs",
+    "syntax": "node scripts/check-javascript.mjs",
+    "lint": "node scripts/check-project.mjs",
+    "build": "npm run lint && npm run syntax",
+    "check": "npm run lint && npm run syntax && npm test"
+  }
+}

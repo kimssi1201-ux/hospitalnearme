@@ -6,10 +6,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const outputPath = path.join(rootDir, "generated", "seoul-events.json");
 const sitemapPath = path.join(rootDir, "sitemap.xml");
+const editorialDataPath = path.join(rootDir, "travel-data.js");
 
 const siteOrigin = normalizeOrigin(process.env.SITE_ORIGIN || "https://view1.kr");
 const publicSiteUrl = normalizeOrigin(process.env.PUBLIC_SITE_URL || siteOrigin);
-const maxSitemapEvents = Number(process.env.MAX_SITEMAP_EVENTS || 160);
 
 function normalizeOrigin(value) {
   return String(value || "https://view1.kr").replace(/\/+$/, "");
@@ -105,33 +105,6 @@ function normalizeItems(items) {
     });
 }
 
-function detailUrlForItem(item) {
-  const params = new URLSearchParams({
-    source: "seoul",
-    id: item.id || "",
-    title: item.title || "",
-    category: item.category || "",
-    rawCategory: item.category || "",
-    subCategory: item.category || "",
-    date: item.date || "",
-    image: item.image || "",
-    address: item.address || item.place || "",
-    summary: item.summary || "",
-    tel: item.tel || "",
-    homepage: item.homepage || "",
-    fee: item.fee || "",
-    time: item.time || "",
-    org: item.org || "",
-    target: item.target || "",
-    isFree: item.isFree || "",
-    updatedAt: item.updatedAt || "",
-    lat: item.lat || "",
-    lng: item.lng || ""
-  });
-
-  return `${publicSiteUrl}/festival-detail?${params.toString()}`;
-}
-
 function escapeXml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -141,13 +114,11 @@ function escapeXml(value) {
     .replaceAll("'", "&apos;");
 }
 
-async function readExistingSitemapUrls() {
-  try {
-    const sitemap = await readFile(sitemapPath, "utf8");
-    return [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
-  } catch {
-    return [];
-  }
+async function editorialArticleUrls() {
+  const source = await readFile(editorialDataPath, "utf8");
+  const paths = [...source.matchAll(/href:\s*["'](festival-detail\?id=[^"']+)["']/g)]
+    .map((match) => match[1]);
+  return [...new Set(paths)].map((pathname) => `${publicSiteUrl}/${pathname}`);
 }
 
 function sitemapXml(urls, lastmod) {
@@ -191,18 +162,21 @@ async function main() {
     "utf8"
   );
 
-  const existingUrls = await readExistingSitemapUrls();
-  const generatedUrls = items.slice(0, maxSitemapEvents).map(detailUrlForItem);
+  const editorialUrls = await editorialArticleUrls();
   const urls = [
     `${publicSiteUrl}/`,
-    ...existingUrls,
-    `${publicSiteUrl}/generated/seoul-events.json`,
-    ...generatedUrls
+    `${publicSiteUrl}/about`,
+    `${publicSiteUrl}/editorial-policy`,
+    `${publicSiteUrl}/contact`,
+    `${publicSiteUrl}/privacy`,
+    `${publicSiteUrl}/terms`,
+    `${publicSiteUrl}/disclaimer`,
+    ...editorialUrls
   ];
   await writeFile(sitemapPath, sitemapXml(urls, todayKstIso()), "utf8");
 
   console.log(`Updated ${path.relative(rootDir, outputPath)} with ${items.length} items for ${month}.`);
-  console.log(`Updated ${path.relative(rootDir, sitemapPath)} with ${generatedUrls.length} generated article URLs.`);
+  console.log(`Updated ${path.relative(rootDir, sitemapPath)} with ${urls.length} stable public URLs.`);
 }
 
 main().catch((error) => {

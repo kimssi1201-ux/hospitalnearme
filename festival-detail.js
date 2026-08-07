@@ -650,8 +650,8 @@ function fallbackArticleFromParams() {
   const summary = fallbackSummary || `${title} 방문 전 확인하면 좋은 일정, 장소, 교통, 준비 정보를 정리했습니다.`;
 
   return {
-    id: id ? `tour-fallback-${id}` : "tour-fallback",
-    source: "tour",
+    id: id || "detail-fallback",
+    source: source === "seoul" ? "seoul" : "tour",
     contentId: id || "",
     contentTypeId: fallbackContentTypeId,
     category: fallbackCategory || textFor("category.festival"),
@@ -686,6 +686,58 @@ function fallbackArticleFromParams() {
       ["운영 시간", fallbackTime || textFor("official.check")],
       ["이용 요금", fallbackFee || textFor("official.check")],
       ["문의", fallbackTel || ""]
+    ]
+  };
+}
+
+async function fetchGeneratedSeoulArticle(articleId) {
+  const response = await fetch("generated/seoul-events.json", {
+    headers: { Accept: "application/json" }
+  });
+  if (!response.ok) throw new Error(`Seoul event data ${response.status}`);
+
+  const payload = await response.json();
+  const items = Array.isArray(payload?.items) ? payload.items : [];
+  const item = items.find((candidate) => String(candidate?.id || "") === String(articleId || ""));
+  if (!item) throw new Error("Seoul event was not found in the current feed.");
+
+  const image = normalizeImageUrl(item.image || "");
+  const address = item.address || item.place || "";
+  const summary = item.summary || `${item.title} 일정과 장소, 방문 전 확인 정보를 정리했습니다.`;
+  const detailInfo = [
+    { label: "운영 시간", value: item.time || "" },
+    { label: "이용 요금", value: item.fee || "" },
+    { label: "주최 기관", value: item.org || "" },
+    { label: "이용 대상", value: item.target || "" },
+    { label: "유무료", value: item.isFree || "" },
+    { label: "정보 기준일", value: item.updatedAt || payload.updatedAt || "" }
+  ].filter((entry) => entry.value);
+
+  return {
+    ...item,
+    id: String(item.id),
+    source: "seoul",
+    contentId: String(item.id),
+    category: item.category || textFor("category.festival"),
+    title: item.title,
+    summary,
+    overview: summary,
+    date: item.date || textFor("date.needCheck"),
+    readTime: item.readTime || textFor("read.detail"),
+    image,
+    galleryImages: image ? [image] : [],
+    address,
+    lat: item.lat || "",
+    lng: item.lng || "",
+    tel: item.tel || "",
+    homepage: normalizeExternalUrl(item.homepage),
+    detailInfo,
+    facts: [
+      ["일정", item.date || textFor("date.needCheck")],
+      ["장소", address || textFor("place.needCheck")],
+      ["운영 시간", item.time || textFor("official.check")],
+      ["이용 요금", item.fee || textFor("official.check")],
+      ["문의", item.tel || ""]
     ]
   };
 }
@@ -1194,11 +1246,61 @@ function renderRichInfoSection(article) {
 
 function updateDocumentMeta(article) {
   const title = localizedArticleTitle(article);
+  const metaDescription = textFor("meta.description", { title }).slice(0, 150);
   document.title = `${title} | ${textFor("meta.suffix")}`;
   const description = document.querySelector('meta[name="description"]');
-  if (description) {
-    description.setAttribute("content", textFor("meta.description", { title }).slice(0, 150));
+  if (description) description.setAttribute("content", metaDescription);
+
+  const canonicalParams = new URLSearchParams();
+  if (article.source === "seoul") {
+    canonicalParams.set("source", "seoul");
+    canonicalParams.set("id", article.id || article.contentId || "");
+  } else if (article.source === "tour") {
+    canonicalParams.set("source", "tour");
+    canonicalParams.set("id", article.contentId || id || "");
+    if (article.contentTypeId) canonicalParams.set("contentTypeId", article.contentTypeId);
+  } else {
+    canonicalParams.set("id", article.id || id || "");
   }
+
+  const canonicalUrl = new URL("festival-detail", "https://view1.kr/");
+  canonicalUrl.search = canonicalParams.toString();
+  document.querySelector("#canonicalLink")?.setAttribute("href", canonicalUrl.href);
+  document.querySelector("#openGraphUrl")?.setAttribute("content", canonicalUrl.href);
+
+  const openGraphTitle = document.querySelector('meta[property="og:title"]');
+  const openGraphDescription = document.querySelector('meta[property="og:description"]');
+  const openGraphImage = document.querySelector("#openGraphImage");
+  if (openGraphTitle) openGraphTitle.setAttribute("content", `${title} | ${textFor("meta.suffix")}`);
+  if (openGraphDescription) openGraphDescription.setAttribute("content", metaDescription);
+  const heroImage = imageUrlForArticle(article, "");
+  if (openGraphImage) {
+    if (heroImage) openGraphImage.setAttribute("content", heroImage);
+    else openGraphImage.removeAttribute("content");
+  }
+
+  const isEditorial = article.source !== "seoul" && article.source !== "tour";
+  document.querySelector("#robotsMeta")?.setAttribute(
+    "content",
+    isEditorial ? "index,follow,max-image-preview:large" : "noindex,follow,max-image-preview:large"
+  );
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": isEditorial ? "BlogPosting" : "Article",
+    headline: title,
+    description: metaDescription,
+    inLanguage: document.documentElement.lang || "ko",
+    mainEntityOfPage: canonicalUrl.href,
+    publisher: {
+      "@type": "Organization",
+      name: "서울여행뉴스",
+      url: "https://view1.kr/"
+    },
+    ...(heroImage ? { image: [heroImage] } : {})
+  };
+  const structuredDataNode = document.querySelector("#articleStructuredData");
+  if (structuredDataNode) structuredDataNode.textContent = JSON.stringify(structuredData);
 }
 
 async function hydrateAiGuide(article) {
@@ -1614,7 +1716,7 @@ function factValueByLabels(article, labels, fallback = "") {
   return match ? stripHtml(match[1]) : fallback;
 }
 
-function TravelSummaryBox(article) {
+function LegacyTravelSummaryBox(article) {
   const region = travelRegionName(article);
   const schedule = factValueByLabels(article, "일정", article.date || textFor("date.needCheck"));
   const place = factValueByLabels(article, "장소", article.address || textFor("place.needCheck"));
@@ -1633,7 +1735,7 @@ function TravelSummaryBox(article) {
   `;
 }
 
-function CourseTimeline(article) {
+function LegacyCourseTimeline(article) {
   const place = factValueByLabels(article, "장소", article.address || textFor("place.needCheck"));
   const schedule = factValueByLabels(article, "일정", article.date || textFor("date.needCheck"));
   const time = factValueByLabels(article, "운영", textFor("official.check"));
@@ -1713,7 +1815,7 @@ function CourseTimeline(article) {
   `;
 }
 
-function SpotInfoCard(article) {
+function LegacySpotInfoCard(article) {
   const schedule = factValueByLabels(article, "일정", article.date || textFor("date.needCheck"));
   const place = factValueByLabels(article, "장소", article.address || textFor("place.needCheck"));
   const time = factValueByLabels(article, "운영", textFor("official.check"));
@@ -1947,7 +2049,7 @@ function renderSpotDetailSections(article, sections) {
   `;
 }
 
-function renderClosingNote(article) {
+function LegacyRenderClosingNote(article) {
   const region = travelRegionName(article);
 
   return `
@@ -2002,7 +2104,7 @@ function SpotInfoCard(article) {
   `;
 }
 
-function renderTravelDetailBody(article, sections) {
+function LegacyRenderTravelDetailBody(article, sections) {
   return `
     ${TravelSummaryBox(article)}
     ${CourseTimeline(article)}
@@ -2810,8 +2912,32 @@ function NearbyTravelSection(article) {
   `;
 }
 
-function coupangTravelKeyword() {
-  return "여행용품";
+function coupangTravelKeyword(article = {}) {
+  const text = [
+    article.title,
+    article.category,
+    article.rawCategory,
+    article.subCategory,
+    article.summary,
+    article.place,
+    article.address
+  ].filter(Boolean).join(" ");
+
+  if (/비|우천|장마/.test(text)) return "휴대용 우산";
+  if (/어린이|키즈|가족|유아/.test(text)) return "아이와 여행 준비물";
+  if (/산책|공원|야외|등산|수목원|체육|한강/.test(text)) return "피크닉 매트";
+  if (/야간|밤|나이트|콘서트/.test(text)) return "여행용 보조배터리";
+  if (/축제|페스티벌|야시장/.test(text)) return "축제 준비물";
+  if (/전시|미술|공연|뮤지컬|연극|박물관|미술관/.test(text)) return "공연 관람 보조배터리";
+
+  const month = Number(new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Seoul",
+    month: "numeric"
+  }).format(new Date()));
+  if (month >= 6 && month <= 8) return "여름 여행 필수품";
+  if (month >= 9 && month <= 11) return "가을 여행 필수품";
+  if (month >= 3 && month <= 5) return "봄 여행 필수품";
+  return "겨울 여행 필수품";
 }
 
 function coupangTravelCopy(article = {}) {
@@ -2820,7 +2946,7 @@ function coupangTravelCopy(article = {}) {
     ko: {
       eyebrow: "TRAVEL ESSENTIALS",
       title: "방문 전 챙기면 좋은 여행 준비물",
-      desc: `${localizedEventReference(article)} 일정에 맞춰 함께 챙기기 좋은 상품을 골라볼 수 있습니다. 오래 걷는 일정이라면 가벼운 가방, 보조배터리, 휴대용 정리용품처럼 현장에서 바로 도움이 되는 물건부터 확인해 보세요.`,
+      desc: `${localizedEventReference(article)}의 장소·시간·관람 방식에 맞춘 ${keyword} 상품입니다. 실제 일정에 필요한지 먼저 확인한 뒤 준비해 보세요.`,
       loading: `${keyword} 상품을 불러오는 중입니다.`,
       empty: "표시할 여행 준비물 상품을 찾지 못했습니다.",
       more: "관련 상품 더보기",
@@ -2867,6 +2993,8 @@ function coupangTravelCopy(article = {}) {
 }
 
 function CoupangTravelProductsSection(article) {
+  if (article.source === "seoul" || article.source === "tour") return "";
+
   const copy = coupangTravelCopy(article);
   const keyword = coupangTravelKeyword(article);
 
@@ -3038,6 +3166,23 @@ function bookingSearchUrl(kind, article) {
   return `index.html?${params.toString()}#bookingSearch`;
 }
 
+function detailAffiliateKinds(article = {}) {
+  const text = [
+    article.title,
+    article.category,
+    article.rawCategory,
+    article.subCategory,
+    article.summary,
+    article.place,
+    article.address
+  ].filter(Boolean).join(" ");
+  const kinds = ["tour", "stay"];
+  if (/항공|공항|비행|출국|입국|제주|부산|해외|도쿄|오사카|방콕|다낭/.test(text)) {
+    kinds.push("flight");
+  }
+  return kinds;
+}
+
 function bookingCheckCopy(article) {
   const eventName = localizedEventReference(article);
   const region = travelRegionName(article) || "서울";
@@ -3089,13 +3234,15 @@ function bookingCheckCopy(article) {
 
 function BookingCheckSection(article) {
   const copy = bookingCheckCopy(article);
+  const affiliateKinds = detailAffiliateKinds(article);
+  const cards = copy.cards.filter(([kind]) => affiliateKinds.includes(kind));
   return `
     <section class="booking-check-section" aria-labelledby="bookingCheckTitle">
       <p class="eyebrow">${escapeHtml(copy.eyebrow)}</p>
       <h2 id="bookingCheckTitle">${escapeHtml(copy.title)}</h2>
       <p>${escapeHtml(copy.desc)}</p>
       <div class="booking-check-grid">
-        ${copy.cards.map(([kind, title, body, cta]) => `
+        ${cards.map(([kind, title, body, cta]) => `
           <a class="booking-check-card" href="${escapeHtml(bookingSearchUrl(kind, article))}">
             <span>${escapeHtml(kind === "stay" ? "STAY" : kind === "tour" ? "TICKET" : "AIR")}</span>
             <strong>${escapeHtml(title)}</strong>
@@ -3118,8 +3265,8 @@ function renderTravelDetailBody(article, sections) {
     ${NearbyParkingSection(article)}
     ${NearbyTravelSection(article)}
     ${CleanVisitTipSection(article)}
-    ${BookingCheckSection(article)}
     ${CoupangTravelProductsSection(article)}
+    ${BookingCheckSection(article)}
     ${CleanClosingSection(article)}
   `;
 }
@@ -3131,7 +3278,7 @@ async function init() {
 
   try {
     if (source === "seoul" && id) {
-      const article = fallbackArticleFromParams();
+      const article = await fetchGeneratedSeoulArticle(id);
       state.article = article;
       renderArticle(article);
       renderRelated(article.id);
@@ -3152,7 +3299,9 @@ async function init() {
     renderRelated(article.id);
   } catch (error) {
     console.warn("Detail load failed. Fallback article is displayed.", error);
-    const article = source === "tour" && id ? fallbackArticleFromParams() : findLocalArticle();
+    const article = (source === "tour" || source === "seoul") && id
+      ? fallbackArticleFromParams()
+      : findLocalArticle();
     state.article = article;
     renderArticle(article);
     renderRelated(article.id);
