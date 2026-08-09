@@ -3,7 +3,7 @@
   "source": "서울 열린데이터광장 문화행사 정보",
   "fetchedFrom": "https://view1.kr/api/seoul-events?limit=300&month=202608",
   "month": "202608",
-  "updatedAt": "2026-08-09T14:17:38.129Z",
+  "updatedAt": "2026-08-09T20:40:43.892Z",
   "count": 248,
   "items": [
     {
