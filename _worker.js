@@ -688,7 +688,7 @@ async function handleTourDetailApi(request, env) {
 
     const upstreamUrl = `https://apis.data.go.kr/B551011/KorService2/${endpoint}?${upstreamParams}`;
     const cacheRequest = new Request(
-      `${url.origin}/api/tour-detail/cache?endpoint=${endpoint}&contentId=${contentId}&contentTypeId=${contentTypeId}`,
+      `${url.origin}/api/tour-detail/cache-v2?endpoint=${endpoint}&contentId=${contentId}&contentTypeId=${contentTypeId}`,
       { method: "GET" }
     );
     const cached = await readCache(cacheRequest);
