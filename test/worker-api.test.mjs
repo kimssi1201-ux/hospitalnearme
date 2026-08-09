@@ -164,7 +164,15 @@ test("worker validates and proxies TourAPI detail requests", async (t) => {
     assert.equal(upstream.searchParams.get("serviceKey"), "server-only-key");
     assert.equal(upstream.searchParams.get("contentId"), "123");
     assert.equal(upstream.searchParams.has("contentTypeId"), false);
-    assert.equal(upstream.searchParams.get("overviewYN"), "Y");
+    [
+      "defaultYN",
+      "firstImageYN",
+      "areacodeYN",
+      "catcodeYN",
+      "addrinfoYN",
+      "mapinfoYN",
+      "overviewYN"
+    ].forEach((parameter) => assert.equal(upstream.searchParams.has(parameter), false));
   });
 
   await t.test("sends contentTypeId only to endpoints that require it", async () => {
@@ -208,6 +216,30 @@ test("worker validates and proxies TourAPI detail requests", async (t) => {
     assert.equal(response.status, 502);
     assert.equal(body.code, "tour_detail_request_failed");
     assert.equal(body.message, "INVALID_REQUEST_PARAMETER_ERROR");
+  });
+
+  await t.test("maps platform quota errors to 429", async () => {
+    globalThis.fetch = async () => new Response(JSON.stringify({
+      OpenAPI_ServiceResponse: {
+        cmmMsgHeader: {
+          errMsg: "LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR",
+          returnAuthMsg: "Daily request limit exceeded",
+          returnReasonCode: "22"
+        }
+      }
+    }), {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    });
+
+    const response = await worker.fetch(
+      new Request("https://view1.kr/api/tour-detail?endpoint=detailCommon2&contentId=123"),
+      { TOUR_API_KEY: "server-only-key" }
+    );
+    const body = await bodyOf(response);
+    assert.equal(response.status, 429);
+    assert.equal(body.providerCode, "22");
+    assert.equal(body.message, "Daily request limit exceeded");
   });
 });
 

@@ -575,16 +575,17 @@ async function handleTourFestivalsApi(request, env) {
     const payload = contentType.includes("application/json")
       ? await response.json()
       : { message: (await response.text()).slice(0, 300) };
-    const resultCode = String(payload?.response?.header?.resultCode || "");
+    const tourFailure = readTourApiFailure(payload);
 
-    if (!response.ok || (resultCode && resultCode !== "0000")) {
+    if (!response.ok || tourFailure) {
       return jsonResponse(
         {
           ok: false,
           code: "tour_request_failed",
-          message: payload?.response?.header?.resultMsg || payload?.message || "TourAPI 요청에 실패했습니다."
+          providerCode: tourFailure?.code || String(response.status),
+          message: tourFailure?.message || payload?.message || "TourAPI 요청에 실패했습니다."
         },
-        response.ok ? 502 : response.status,
+        response.ok ? tourFailure?.status || 502 : response.status,
         request
       );
     }
@@ -673,13 +674,8 @@ async function handleTourDetailApi(request, env) {
     if (endpoint === "detailIntro2" || endpoint === "detailInfo2") {
       upstreamParams.set("contentTypeId", contentTypeId);
     }
-    if (endpoint === "detailCommon2") {
-      ["defaultYN", "firstImageYN", "areacodeYN", "catcodeYN", "addrinfoYN", "mapinfoYN", "overviewYN"]
-        .forEach((key) => upstreamParams.set(key, "Y"));
-    }
     if (endpoint === "detailImage2") {
       upstreamParams.set("imageYN", "Y");
-      upstreamParams.set("subImageYN", "Y");
     }
     if (endpoint === "detailImage2" || endpoint === "detailInfo2") {
       upstreamParams.set("numOfRows", String(clampNumber(url.searchParams.get("numOfRows"), 1, 100, 30)));
@@ -699,20 +695,17 @@ async function handleTourDetailApi(request, env) {
     const payload = contentType.includes("application/json")
       ? await response.json()
       : { message: (await response.text()).slice(0, 300) };
-    const resultCode = String(payload?.response?.header?.resultCode || payload?.resultCode || "");
+    const tourFailure = readTourApiFailure(payload);
 
-    if (!response.ok || (resultCode && resultCode !== "0000")) {
+    if (!response.ok || tourFailure) {
       return jsonResponse(
         {
           ok: false,
           code: "tour_detail_request_failed",
-          message:
-            payload?.response?.header?.resultMsg ||
-            payload?.resultMsg ||
-            payload?.message ||
-            "TourAPI 상세 요청에 실패했습니다."
+          providerCode: tourFailure?.code || String(response.status),
+          message: tourFailure?.message || payload?.message || "TourAPI 상세 요청에 실패했습니다."
         },
-        response.ok ? 502 : response.status,
+        response.ok ? tourFailure?.status || 502 : response.status,
         request
       );
     }
@@ -733,6 +726,29 @@ async function handleTourDetailApi(request, env) {
       request
     );
   }
+}
+
+function readTourApiFailure(payload) {
+  const platformHeader = payload?.OpenAPI_ServiceResponse?.cmmMsgHeader;
+  const code = String(
+    payload?.response?.header?.resultCode ||
+    payload?.resultCode ||
+    platformHeader?.returnReasonCode ||
+    ""
+  );
+
+  if (!code || code === "0000") return null;
+
+  return {
+    code,
+    status: code === "22" || code === "23" ? 429 : 502,
+    message:
+      payload?.response?.header?.resultMsg ||
+      payload?.resultMsg ||
+      platformHeader?.returnAuthMsg ||
+      platformHeader?.errMsg ||
+      "TourAPI 요청에 실패했습니다."
+  };
 }
 
 async function handleSeoulEventsApi(request, env) {
