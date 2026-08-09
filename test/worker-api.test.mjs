@@ -163,7 +163,51 @@ test("worker validates and proxies TourAPI detail requests", async (t) => {
     assert.match(upstream.pathname, /\/detailCommon2$/);
     assert.equal(upstream.searchParams.get("serviceKey"), "server-only-key");
     assert.equal(upstream.searchParams.get("contentId"), "123");
+    assert.equal(upstream.searchParams.has("contentTypeId"), false);
     assert.equal(upstream.searchParams.get("overviewYN"), "Y");
+  });
+
+  await t.test("sends contentTypeId only to endpoints that require it", async () => {
+    let calledUrl = "";
+    globalThis.fetch = async (url) => {
+      calledUrl = String(url);
+      return new Response(JSON.stringify({
+        response: {
+          header: { resultCode: "0000", resultMsg: "OK" },
+          body: { items: { item: [] } }
+        }
+      }), {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      });
+    };
+
+    const response = await worker.fetch(
+      new Request("https://view1.kr/api/tour-detail?endpoint=detailIntro2&contentId=123&contentTypeId=15"),
+      { TOUR_API_KEY: "server-only-key" }
+    );
+    const upstream = new URL(calledUrl);
+    assert.equal(response.status, 200);
+    assert.equal(upstream.searchParams.get("contentTypeId"), "15");
+  });
+
+  await t.test("rejects TourAPI flat error payloads", async () => {
+    globalThis.fetch = async () => new Response(JSON.stringify({
+      resultCode: "10",
+      resultMsg: "INVALID_REQUEST_PARAMETER_ERROR"
+    }), {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    });
+
+    const response = await worker.fetch(
+      new Request("https://view1.kr/api/tour-detail?endpoint=detailCommon2&contentId=123"),
+      { TOUR_API_KEY: "server-only-key" }
+    );
+    const body = await bodyOf(response);
+    assert.equal(response.status, 502);
+    assert.equal(body.code, "tour_detail_request_failed");
+    assert.equal(body.message, "INVALID_REQUEST_PARAMETER_ERROR");
   });
 });
 

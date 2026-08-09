@@ -668,7 +668,11 @@ async function handleTourDetailApi(request, env) {
       contentId
     });
 
-    if (endpoint !== "detailImage2") upstreamParams.set("contentTypeId", contentTypeId);
+    // TourAPI detailCommon2/detailImage2 reject contentTypeId. It is required
+    // only by the intro and repeating-information endpoints.
+    if (endpoint === "detailIntro2" || endpoint === "detailInfo2") {
+      upstreamParams.set("contentTypeId", contentTypeId);
+    }
     if (endpoint === "detailCommon2") {
       ["defaultYN", "firstImageYN", "areacodeYN", "catcodeYN", "addrinfoYN", "mapinfoYN", "overviewYN"]
         .forEach((key) => upstreamParams.set(key, "Y"));
@@ -695,14 +699,18 @@ async function handleTourDetailApi(request, env) {
     const payload = contentType.includes("application/json")
       ? await response.json()
       : { message: (await response.text()).slice(0, 300) };
-    const resultCode = String(payload?.response?.header?.resultCode || "");
+    const resultCode = String(payload?.response?.header?.resultCode || payload?.resultCode || "");
 
     if (!response.ok || (resultCode && resultCode !== "0000")) {
       return jsonResponse(
         {
           ok: false,
           code: "tour_detail_request_failed",
-          message: payload?.response?.header?.resultMsg || payload?.message || "TourAPI 상세 요청에 실패했습니다."
+          message:
+            payload?.response?.header?.resultMsg ||
+            payload?.resultMsg ||
+            payload?.message ||
+            "TourAPI 상세 요청에 실패했습니다."
         },
         response.ok ? 502 : response.status,
         request
