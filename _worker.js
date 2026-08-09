@@ -50,6 +50,14 @@ export default {
       return handleSeoulEventsApi(request, env);
     }
 
+    if (url.pathname === "/api/tour-festivals") {
+      return handleTourFestivalsApi(request, env);
+    }
+
+    if (url.pathname === "/api/tour-detail") {
+      return handleTourDetailApi(request, env);
+    }
+
     if (url.pathname === "/api/seoul-parking") {
       return handleSeoulParkingApi(request, env);
     }
@@ -495,6 +503,228 @@ function normalizeAirportCodes(value, fallback) {
   const list = Array.isArray(value) ? value : String(value || "").split(",");
   const codes = list.map((code) => normalizeAirportCode(code, "")).filter(Boolean);
   return codes.length ? codes.slice(0, 50) : fallback;
+}
+
+async function handleTourFestivalsApi(request, env) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: apiHeaders(request)
+    });
+  }
+
+  if (request.method !== "GET") {
+    return jsonResponse({ ok: false, message: "GET method required." }, 405, request);
+  }
+
+  if (!isSameOriginRequest(request)) {
+    return jsonResponse({ ok: false, message: "Forbidden origin." }, 403, request);
+  }
+
+  const apiKey = String(
+    env.TOUR_API_KEY || env.TOUR_SERVICE_KEY || env.DATA_GO_KR_SERVICE_KEY || ""
+  ).trim();
+  if (!apiKey) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "missing_tour_key",
+        message: "TOUR_API_KEY 환경변수가 설정되지 않았습니다."
+      },
+      500,
+      request
+    );
+  }
+
+  try {
+    const url = new URL(request.url);
+    const pageNo = clampNumber(url.searchParams.get("pageNo"), 1, 10, 1);
+    const numOfRows = clampNumber(url.searchParams.get("numOfRows"), 1, 100, 30);
+    const month = normalizeYearMonth(url.searchParams.get("month"));
+    const range = monthRange(month);
+    const requestedStart = String(url.searchParams.get("eventStartDate") || "").trim();
+    const requestedEnd = String(url.searchParams.get("eventEndDate") || "").trim();
+    const eventStartDate = /^\d{8}$/.test(requestedStart) ? requestedStart : range.start;
+    const eventEndDate = /^\d{8}$/.test(requestedEnd) ? requestedEnd : range.end;
+    const requestedAreaCode = String(url.searchParams.get("areaCode") || "1").trim();
+    const areaCode = /^\d{1,3}$/.test(requestedAreaCode) ? requestedAreaCode : "1";
+    const requestedArrange = String(url.searchParams.get("arrange") || "O").toUpperCase();
+    const arrange = /^[ACDOQR]$/.test(requestedArrange) ? requestedArrange : "O";
+    const upstreamParams = new URLSearchParams({
+      serviceKey: apiKey,
+      numOfRows: String(numOfRows),
+      pageNo: String(pageNo),
+      MobileOS: "ETC",
+      MobileApp: "SeoulTravelNews",
+      _type: "json",
+      arrange,
+      eventStartDate,
+      eventEndDate,
+      areaCode
+    });
+    const endpoint = `https://apis.data.go.kr/B551011/KorService2/searchFestival2?${upstreamParams}`;
+    const cacheRequest = new Request(
+      `${url.origin}/api/tour-festivals/cache?month=${month}&pageNo=${pageNo}&numOfRows=${numOfRows}&areaCode=${areaCode}&arrange=${arrange}`,
+      { method: "GET" }
+    );
+    const cached = await readCache(cacheRequest);
+    if (cached) return cached;
+
+    const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
+    const contentType = response.headers.get("content-type") || "";
+    const payload = contentType.includes("application/json")
+      ? await response.json()
+      : { message: (await response.text()).slice(0, 300) };
+    const resultCode = String(payload?.response?.header?.resultCode || "");
+
+    if (!response.ok || (resultCode && resultCode !== "0000")) {
+      return jsonResponse(
+        {
+          ok: false,
+          code: "tour_request_failed",
+          message: payload?.response?.header?.resultMsg || payload?.message || "TourAPI 요청에 실패했습니다."
+        },
+        response.ok ? 502 : response.status,
+        request
+      );
+    }
+
+    const finalResponse = jsonResponse(payload, 200, request, {
+      "cache-control": "public, max-age=1800"
+    });
+    await writeCache(cacheRequest, finalResponse.clone());
+    return finalResponse;
+  } catch (error) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "tour_festivals_error",
+        message: error && error.message ? error.message : String(error)
+      },
+      500,
+      request
+    );
+  }
+}
+
+async function handleTourDetailApi(request, env) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: apiHeaders(request)
+    });
+  }
+
+  if (request.method !== "GET") {
+    return jsonResponse({ ok: false, message: "GET method required." }, 405, request);
+  }
+
+  if (!isSameOriginRequest(request)) {
+    return jsonResponse({ ok: false, message: "Forbidden origin." }, 403, request);
+  }
+
+  const apiKey = String(
+    env.TOUR_API_KEY || env.TOUR_SERVICE_KEY || env.DATA_GO_KR_SERVICE_KEY || ""
+  ).trim();
+  if (!apiKey) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "missing_tour_key",
+        message: "TOUR_API_KEY 환경변수가 설정되지 않았습니다."
+      },
+      500,
+      request
+    );
+  }
+
+  const url = new URL(request.url);
+  const endpoint = String(url.searchParams.get("endpoint") || "");
+  const allowedEndpoints = new Set(["detailCommon2", "detailIntro2", "detailImage2", "detailInfo2"]);
+  if (!allowedEndpoints.has(endpoint)) {
+    return jsonResponse(
+      { ok: false, code: "invalid_tour_endpoint", message: "Unsupported TourAPI detail endpoint." },
+      400,
+      request
+    );
+  }
+
+  const contentId = String(url.searchParams.get("contentId") || "").trim();
+  const contentTypeId = String(url.searchParams.get("contentTypeId") || "15").trim();
+  if (!/^\d{1,20}$/.test(contentId) || !/^\d{1,3}$/.test(contentTypeId)) {
+    return jsonResponse(
+      { ok: false, code: "invalid_tour_parameters", message: "Invalid TourAPI content parameters." },
+      400,
+      request
+    );
+  }
+
+  try {
+    const upstreamParams = new URLSearchParams({
+      serviceKey: apiKey,
+      MobileOS: "ETC",
+      MobileApp: "SeoulTravelNews",
+      _type: "json",
+      contentId
+    });
+
+    if (endpoint !== "detailImage2") upstreamParams.set("contentTypeId", contentTypeId);
+    if (endpoint === "detailCommon2") {
+      ["defaultYN", "firstImageYN", "areacodeYN", "catcodeYN", "addrinfoYN", "mapinfoYN", "overviewYN"]
+        .forEach((key) => upstreamParams.set(key, "Y"));
+    }
+    if (endpoint === "detailImage2") {
+      upstreamParams.set("imageYN", "Y");
+      upstreamParams.set("subImageYN", "Y");
+    }
+    if (endpoint === "detailImage2" || endpoint === "detailInfo2") {
+      upstreamParams.set("numOfRows", String(clampNumber(url.searchParams.get("numOfRows"), 1, 100, 30)));
+      upstreamParams.set("pageNo", String(clampNumber(url.searchParams.get("pageNo"), 1, 10, 1)));
+    }
+
+    const upstreamUrl = `https://apis.data.go.kr/B551011/KorService2/${endpoint}?${upstreamParams}`;
+    const cacheRequest = new Request(
+      `${url.origin}/api/tour-detail/cache?endpoint=${endpoint}&contentId=${contentId}&contentTypeId=${contentTypeId}`,
+      { method: "GET" }
+    );
+    const cached = await readCache(cacheRequest);
+    if (cached) return cached;
+
+    const response = await fetch(upstreamUrl, { headers: { Accept: "application/json" } });
+    const contentType = response.headers.get("content-type") || "";
+    const payload = contentType.includes("application/json")
+      ? await response.json()
+      : { message: (await response.text()).slice(0, 300) };
+    const resultCode = String(payload?.response?.header?.resultCode || "");
+
+    if (!response.ok || (resultCode && resultCode !== "0000")) {
+      return jsonResponse(
+        {
+          ok: false,
+          code: "tour_detail_request_failed",
+          message: payload?.response?.header?.resultMsg || payload?.message || "TourAPI 상세 요청에 실패했습니다."
+        },
+        response.ok ? 502 : response.status,
+        request
+      );
+    }
+
+    const finalResponse = jsonResponse(payload, 200, request, {
+      "cache-control": "public, max-age=3600"
+    });
+    await writeCache(cacheRequest, finalResponse.clone());
+    return finalResponse;
+  } catch (error) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "tour_detail_error",
+        message: error && error.message ? error.message : String(error)
+      },
+      500,
+      request
+    );
+  }
 }
 
 async function handleSeoulEventsApi(request, env) {

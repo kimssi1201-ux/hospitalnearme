@@ -320,13 +320,7 @@ function compactDate(value) {
 }
 
 function commonParams(extra = {}) {
-  return new URLSearchParams({
-    serviceKey: data.tourApi.serviceKey,
-    MobileOS: data.tourApi.mobileOS || "ETC",
-    MobileApp: data.tourApi.mobileApp || "FestivalNoteHub",
-    _type: "json",
-    ...extra
-  });
+  return new URLSearchParams(extra);
 }
 
 function normalizeImageUrl(value) {
@@ -442,10 +436,11 @@ function formatWon(value) {
 }
 
 async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId || "15") {
-  const base = "https://apis.data.go.kr/B551011/KorService2";
+  const base = "/api/tour-detail";
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), 6500);
-  const commonUrl = `${base}/detailCommon2?${commonParams({
+  const commonUrl = `${base}?${commonParams({
+    endpoint: "detailCommon2",
     contentId,
     contentTypeId,
     defaultYN: "Y",
@@ -456,18 +451,21 @@ async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId 
     mapinfoYN: "Y",
     overviewYN: "Y"
   })}`;
-  const introUrl = `${base}/detailIntro2?${commonParams({
+  const introUrl = `${base}?${commonParams({
+    endpoint: "detailIntro2",
     contentId,
     contentTypeId
   })}`;
-  const imageUrl = `${base}/detailImage2?${commonParams({
+  const imageUrl = `${base}?${commonParams({
+    endpoint: "detailImage2",
     contentId,
     imageYN: "Y",
     subImageYN: "Y",
     numOfRows: "50",
     pageNo: "1"
   })}`;
-  const infoUrl = `${base}/detailInfo2?${commonParams({
+  const infoUrl = `${base}?${commonParams({
+    endpoint: "detailInfo2",
     contentId,
     contentTypeId,
     numOfRows: "30",

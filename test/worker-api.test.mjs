@@ -49,6 +49,13 @@ test("worker protects proxy routes from wrong origins and missing keys", async (
     assert.equal(response.status, 500);
     assert.equal(body.code, "missing_coupang_key");
   });
+
+  await t.test("missing TourAPI key", async () => {
+    const response = await worker.fetch(new Request("https://view1.kr/api/tour-festivals"), {});
+    const body = await bodyOf(response);
+    assert.equal(response.status, 500);
+    assert.equal(body.code, "missing_tour_key");
+  });
 });
 
 test("worker rejects unsupported MyRealTrip endpoints", async () => {
@@ -87,6 +94,77 @@ test("worker proxies an allowed MyRealTrip request with a mocked upstream", asyn
   assert.equal(calledInit.method, "POST");
   assert.equal(calledInit.headers.Authorization, "Bearer test-key");
   assert.equal(JSON.parse(calledInit.body).city, "Seoul");
+});
+
+test("worker proxies a validated TourAPI request without exposing the key to the client", async () => {
+  let calledUrl = "";
+  globalThis.fetch = async (url) => {
+    calledUrl = String(url);
+    return new Response(JSON.stringify({
+      response: {
+        header: { resultCode: "0000", resultMsg: "OK" },
+        body: { totalCount: 1, items: { item: [{ contentid: "1", title: "서울 행사" }] } }
+      }
+    }), {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    });
+  };
+
+  const request = new Request(
+    "https://view1.kr/api/tour-festivals?month=202608&pageNo=1&numOfRows=25&areaCode=1",
+    { headers: { origin: "https://view1.kr" } }
+  );
+  const response = await worker.fetch(request, { TOUR_API_KEY: "server-only-key" });
+  const body = await bodyOf(response);
+  const upstream = new URL(calledUrl);
+
+  assert.equal(response.status, 200);
+  assert.equal(body.response.body.totalCount, 1);
+  assert.equal(upstream.origin, "https://apis.data.go.kr");
+  assert.equal(upstream.searchParams.get("serviceKey"), "server-only-key");
+  assert.equal(upstream.searchParams.get("eventStartDate"), "20260801");
+  assert.equal(upstream.searchParams.get("eventEndDate"), "20260831");
+  assert.equal(upstream.searchParams.get("numOfRows"), "25");
+});
+
+test("worker validates and proxies TourAPI detail requests", async (t) => {
+  await t.test("rejects unsupported detail endpoints", async () => {
+    const response = await worker.fetch(
+      new Request("https://view1.kr/api/tour-detail?endpoint=https://evil.example&contentId=123"),
+      { TOUR_API_KEY: "server-only-key" }
+    );
+    const body = await bodyOf(response);
+    assert.equal(response.status, 400);
+    assert.equal(body.code, "invalid_tour_endpoint");
+  });
+
+  await t.test("proxies an allowlisted detail endpoint", async () => {
+    let calledUrl = "";
+    globalThis.fetch = async (url) => {
+      calledUrl = String(url);
+      return new Response(JSON.stringify({
+        response: {
+          header: { resultCode: "0000", resultMsg: "OK" },
+          body: { items: { item: [{ contentid: "123", title: "상세 행사" }] } }
+        }
+      }), {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      });
+    };
+
+    const response = await worker.fetch(
+      new Request("https://view1.kr/api/tour-detail?endpoint=detailCommon2&contentId=123&contentTypeId=15"),
+      { TOUR_API_KEY: "server-only-key" }
+    );
+    const upstream = new URL(calledUrl);
+    assert.equal(response.status, 200);
+    assert.match(upstream.pathname, /\/detailCommon2$/);
+    assert.equal(upstream.searchParams.get("serviceKey"), "server-only-key");
+    assert.equal(upstream.searchParams.get("contentId"), "123");
+    assert.equal(upstream.searchParams.get("overviewYN"), "Y");
+  });
 });
 
 test("worker handles preflight without calling an external API", async () => {

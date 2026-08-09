@@ -11,7 +11,7 @@ const COUPANG_WIDGET_CONFIG = {
   height: "140"
 };
 const DEFAULT_EVENT_IMAGE = "";
-const DEFAULT_FESTIVAL_IMAGE = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80";
+const DEFAULT_FESTIVAL_IMAGE = "";
 const IMAGE_FIELD_NAMES = [
   "image",
   "MAIN_IMG",
@@ -65,10 +65,13 @@ const state = {
   apiError: false,
   activeRegionId: "seoul",
   activeCategoryFilter: "all",
+  visibleFeedCount: 12,
   newsLoading: true,
   language: getStoredLanguage()
 };
 let coupangWidgetScriptPromise = null;
+let affiliateLoadPromise = null;
+const FEED_PAGE_SIZE = 12;
 
 const MRT_SEARCH_COPY = {
   stay: {
@@ -518,16 +521,14 @@ function imageMarkup(item, size = "card") {
     `;
   }
   const isApi = hasApiImage(item);
-  const fallback = image === DEFAULT_EVENT_IMAGE ? "" : DEFAULT_EVENT_IMAGE;
-  const onError = fallback
-    ? ` onerror="this.onerror=null;this.src='${escapeHtml(fallback)}'"`
-    : ` onerror="this.closest('.image-frame').classList.add('is-empty');this.remove()"`;
+  const onError = ` onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"`;
   const apiBackground = isApi
     ? ` style="--api-image: url(&quot;${escapeHtml(image)}&quot;)"`
     : "";
   return `
     <div class="image-frame image-frame--${size}${isApi ? " image-frame--api" : ""}"${apiBackground}>
-      <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy"${onError} />
+      <span class="image-fallback-text" aria-hidden="true">SEOUL TRAVEL NEWS</span>
+      <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy" width="640" height="480"${onError} />
     </div>
   `;
 }
@@ -962,6 +963,16 @@ function normalizeMrtFlights(payload) {
   return firstArrayFrom(payload).map(normalizeMrtFlightItem);
 }
 
+async function readApiPayload(response) {
+  const text = await response.text();
+  if (!text.trim()) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { message: `Invalid API response (${response.status})` };
+  }
+}
+
 async function fetchCoupangProducts(keyword = "여행 준비물", limit = 6) {
   const query = new URLSearchParams({
     keyword,
@@ -970,7 +981,7 @@ async function fetchCoupangProducts(keyword = "여행 준비물", limit = 6) {
   const response = await fetch(`/api/coupang?${query.toString()}`, {
     headers: { Accept: "application/json" }
   });
-  const payload = await response.json();
+  const payload = await readApiPayload(response);
   if (!response.ok || payload?.ok === false) {
     throw new Error(payload?.message || `Coupang request failed ${response.status}`);
   }
@@ -2028,6 +2039,7 @@ function setBookingResultsVisible(show) {
 function openBookingSearch(tab = state.activeMrtTab || "stay", options = {}) {
   const panel = $("#bookingSearch");
   if (!panel) return;
+  loadAffiliateDataOnce();
   setActiveMrtTab(tab);
   setCouponPanelVisible(Boolean(options.showCoupon));
   setBookingResultsVisible(Boolean(options.showResults));
@@ -2235,6 +2247,41 @@ async function loadMyRealTripProducts() {
   renderMyRealTripProducts();
   renderJulyFestivals();
   renderCategoryNewsSections();
+}
+
+function loadAffiliateDataOnce() {
+  if (affiliateLoadPromise) return affiliateLoadPromise;
+  affiliateLoadPromise = Promise.allSettled([
+    loadMyRealTripProducts(),
+    loadCoupangProducts()
+  ]);
+  return affiliateLoadPromise;
+}
+
+function deferAffiliateData() {
+  const target = $("#allArticles");
+  let fallbackId = 0;
+
+  const start = () => {
+    if (fallbackId) window.clearTimeout(fallbackId);
+    loadAffiliateDataOnce();
+  };
+
+  if (target && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      start();
+    }, { rootMargin: "600px 0px" });
+    observer.observe(target);
+    fallbackId = window.setTimeout(() => {
+      observer.disconnect();
+      start();
+    }, 8000);
+    return;
+  }
+
+  fallbackId = window.setTimeout(start, 2500);
 }
 
 function categoryFeaturedCard(item) {
@@ -2446,6 +2493,7 @@ function bindTopCategoryTabs() {
     const button = event.target.closest("[data-category-filter]");
     if (!button) return;
     state.activeCategoryFilter = button.getAttribute("data-category-filter") || "all";
+    state.visibleFeedCount = FEED_PAGE_SIZE;
     target.querySelectorAll(".category-tab").forEach((item) => {
       const isActive = item === button;
       item.classList.toggle("is-active", isActive);
@@ -2460,6 +2508,7 @@ function bindCategoryResetLinks() {
     const link = event.target.closest("[data-category-reset]");
     if (!link) return;
     state.activeCategoryFilter = "all";
+    state.visibleFeedCount = FEED_PAGE_SIZE;
     renderJulyFestivals();
   });
 }
@@ -2764,12 +2813,8 @@ function normalizeTourItems(items, regionOverride = activeRegion()) {
 function buildTourApiUrl(areaCode = activeRegion().areaCode) {
   const config = data.tourApi;
   const params = new URLSearchParams({
-    serviceKey: config.serviceKey,
     numOfRows: String(config.numOfRows || 8),
     pageNo: String(config.pageNo || 1),
-    MobileOS: config.mobileOS || "ETC",
-    MobileApp: config.mobileApp || "SeoulTravelNote",
-    _type: "json",
     arrange: config.arrange || "O"
   });
 
@@ -2797,14 +2842,12 @@ function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
   const config = data.tourApi;
   const month = currentSeoulMonth();
   const params = new URLSearchParams({
-    serviceKey: config.serviceKey,
     numOfRows: String(numOfRows),
     pageNo: String(pageNo),
-    MobileOS: config.mobileOS || "ETC",
-    MobileApp: config.mobileApp || "SeoulTravelNote",
-    _type: "json",
     arrange: config.arrange || "O",
     eventStartDate: month.start,
+    eventEndDate: month.end,
+    month: month.key,
     areaCode: config.areaCode || "1"
   });
 
@@ -2875,7 +2918,7 @@ function normalizeJulyFestivalItems(items) {
 }
 
 async function loadTourApiPlaces() {
-  if (!data.tourApi?.serviceKey || !data.tourApi?.endpoint) return;
+  if (!data.tourApi?.endpoint) return;
 
   const requestRegionId = state.activeRegionId;
   const region = activeRegion();
@@ -2937,6 +2980,7 @@ function renderJulyFestivals() {
   const status = $("#julyStatus");
   const recommended = $("#recommendedArticles");
   const feed = $("#newsFeedList");
+  const loadMore = $("#loadMoreArticles");
   const countTarget = $("#allArticleCount");
   if (!status || !recommended || !feed) return;
 
@@ -2964,6 +3008,7 @@ function renderJulyFestivals() {
     status.hidden = false;
     recommended.innerHTML = "";
     feed.innerHTML = "";
+    if (loadMore) loadMore.hidden = true;
     return;
   }
 
@@ -2972,8 +3017,30 @@ function renderJulyFestivals() {
   status.hidden = true;
 
   recommended.innerHTML = items.slice(1, 5).map((item) => newsRecommendCard(item)).join("");
-  feed.innerHTML = buildNewsFeedMarkup(items.slice(5, 29));
+  const feedItems = items.slice(5);
+  const visibleCount = Math.min(state.visibleFeedCount, feedItems.length);
+  feed.innerHTML = buildNewsFeedMarkup(feedItems.slice(0, visibleCount));
+  if (loadMore) {
+    const remaining = Math.max(0, feedItems.length - visibleCount);
+    const labels = {
+      ko: `기사 더보기 (${remaining.toLocaleString("ko-KR")}개 남음)`,
+      en: `Load more (${remaining} left)`,
+      ja: `記事をもっと見る（残り${remaining}件）`,
+      zh: `加载更多（剩余${remaining}篇）`
+    };
+    loadMore.textContent = labels[state.language] || labels.ko;
+    loadMore.hidden = remaining === 0;
+  }
   hydrateCoupangWidgets();
+}
+
+function bindLoadMoreArticles() {
+  const button = $("#loadMoreArticles");
+  if (!button) return;
+  button.addEventListener("click", () => {
+    state.visibleFeedCount += FEED_PAGE_SIZE;
+    renderJulyFestivals();
+  });
 }
 
 function renderSeoulArticleState() {
@@ -3010,7 +3077,7 @@ async function loadGeneratedSeoulCultureArticles() {
   });
   if (!response.ok) throw new Error(`Generated Seoul events HTTP ${response.status}`);
 
-  const payload = await response.json();
+  const payload = await readApiPayload(response);
   if (!Array.isArray(payload?.items)) return [];
   return normalizeSeoulCultureItems(payload.items);
 }
@@ -3032,6 +3099,7 @@ async function loadSeoulCultureEvents() {
         generatedArticles,
         `${currentSeoulMonth().label} 서울 여행 정보 ${generatedArticles.length}개를 준비했습니다.`
       );
+      return;
     }
   } catch (error) {
     console.warn("Generated Seoul events could not be loaded. Live API will be used.", error);
@@ -3041,7 +3109,7 @@ async function loadSeoulCultureEvents() {
     const response = await fetch(buildSeoulCultureUrl(), {
       headers: { Accept: "application/json" }
     });
-    const payload = await response.json();
+    const payload = await readApiPayload(response);
     if (!response.ok || payload?.ok === false) {
       throw new Error(payload?.message || `Seoul events HTTP ${response.status}`);
     }
@@ -3057,7 +3125,7 @@ async function loadSeoulCultureEvents() {
     state.apiLoaded = false;
     state.apiError = true;
     updatePlacesStatus("서울 문화행사 정보를 불러오지 못했습니다. 관광공사 축제 정보로 다시 확인합니다.");
-    loadTourApiPlaces();
+    loadJulyFestivalPosts();
   }
 }
 
@@ -3088,7 +3156,7 @@ function writeJulyFestivalCache(items) {
 }
 
 async function loadJulyFestivalPosts() {
-  if (!data.tourApi?.serviceKey || !data.tourApi?.endpoint) return;
+  if (!data.tourApi?.endpoint) return;
 
   const cached = readJulyFestivalCache();
   if (cached.length) {
@@ -3108,7 +3176,7 @@ async function loadJulyFestivalPosts() {
       const response = await fetch(buildJulyFestivalUrl(pageNo, numOfRows));
       if (!response.ok) throw new Error(`Monthly festival HTTP ${response.status}`);
 
-      const payload = await response.json();
+      const payload = await readApiPayload(response);
       const body = payload?.response?.body || {};
       const items = body?.items?.item;
       const totalCount = Number(body.totalCount || body.total_count || 0);
@@ -3556,13 +3624,12 @@ function init() {
   bindMrtQuickSearch();
   bindTopCategoryTabs();
   bindCategoryResetLinks();
+  bindLoadMoreArticles();
   bindLanguageSwitch();
   applyLanguage();
   applyBookingSearchQuery();
   loadSeoulCultureEvents();
-  loadJulyFestivalPosts();
-  loadMyRealTripProducts();
-  loadCoupangProducts();
+  deferAffiliateData();
 }
 
 document.addEventListener("DOMContentLoaded", init);

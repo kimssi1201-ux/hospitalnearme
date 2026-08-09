@@ -1,11 +1,13 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const outputPath = path.join(rootDir, "generated", "seoul-events.json");
 const sitemapPath = path.join(rootDir, "sitemap.xml");
+const indexPath = path.join(rootDir, "index.html");
 const editorialDataPath = path.join(rootDir, "travel-data.js");
 
 const siteOrigin = normalizeOrigin(process.env.SITE_ORIGIN || "https://view1.kr");
@@ -52,7 +54,10 @@ async function fetchJson(url) {
       },
       signal: controller.signal
     });
-    const payload = await response.json();
+    const contentType = response.headers.get("content-type") || "";
+    const payload = contentType.includes("application/json")
+      ? await response.json()
+      : { message: (await response.text()).slice(0, 200) };
 
     if (!response.ok || payload?.ok === false) {
       throw new Error(payload?.message || `HTTP ${response.status}`);
@@ -105,20 +110,139 @@ function normalizeItems(items) {
     });
 }
 
-function escapeXml(value) {
-  return String(value)
+function escapeHtml(value) {
+  return String(value || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
-    .replaceAll("'", "&apos;");
+    .replaceAll("'", "&#39;");
+}
+
+function escapeXml(value) {
+  return escapeHtml(value).replaceAll("&#39;", "&apos;");
+}
+
+function eventDetailUrl(item) {
+  const params = new URLSearchParams({ source: "seoul", id: item.id });
+  return `festival-detail?${params.toString()}`;
+}
+
+function staticImageMarkup(item, size) {
+  if (!item.image) {
+    return `<div class="image-frame image-frame--${size} is-empty"><span>SEOUL TRAVEL NEWS</span></div>`;
+  }
+
+  return `<div class="image-frame image-frame--${size} image-frame--api"><span class="image-fallback-text" aria-hidden="true">SEOUL TRAVEL NEWS</span><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>`;
+}
+
+function editorialCategoryKey(item = {}) {
+  const text = `${item.category || ""} ${item.title || ""}`;
+  if (/전시|미술|박물관|갤러리/.test(text)) return "exhibition";
+  if (/공연|야간|데이트|콘서트|무대/.test(text)) return "performance";
+  if (/가족|아이|체험|교육|도서관/.test(text)) return "experience";
+  if (/축제|전통|궁궐/.test(text)) return "festival";
+  return "event";
+}
+
+function eventCategoryKey(item = {}) {
+  const text = `${item.category || ""} ${item.title || ""}`;
+  if (/전시|미술|박물관|갤러리/.test(text)) return "exhibition";
+  if (/공연|클래식|연극|콘서트|무용|국악|뮤지컬|오페라/.test(text)) return "performance";
+  if (/교육|체험|어린이|가족/.test(text)) return "experience";
+  if (/축제|전통|궁궐/.test(text)) return "festival";
+  return "event";
+}
+
+function mapEditorialImages(posts, items) {
+  const imagePool = items.filter((item) => item.image);
+  const used = new Set();
+
+  return posts.map((post) => {
+    const wanted = editorialCategoryKey(post);
+    const match = imagePool.find((item) => !used.has(item.id) && eventCategoryKey(item) === wanted)
+      || imagePool.find((item) => !used.has(item.id));
+    if (!match) return { ...post, image: "" };
+    used.add(match.id);
+    return { ...post, image: match.image };
+  });
+}
+
+function editorialCardMarkup(item, index) {
+  return `
+          <article class="editorial-card ${index === 0 ? "editorial-card--lead" : ""}">
+            <a href="${escapeHtml(item.href)}" aria-label="${escapeHtml(`${item.title} 자세히 보기`)}">
+              ${staticImageMarkup(item, index === 0 ? "hero" : "thumb")}
+              <span>
+                <em>${escapeHtml(item.category || "서울 여행")}</em>
+                <strong>${escapeHtml(item.title)}</strong>
+                <small>${escapeHtml(item.summary)}</small>
+                <b>${escapeHtml(item.date)} · ${escapeHtml(item.readTime || "자세히 읽기")}</b>
+              </span>
+            </a>
+          </article>`;
+}
+
+function recommendCardMarkup(item) {
+  const href = eventDetailUrl(item);
+  return `
+          <article class="news-recommend-card">
+            <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${item.title} 자세히 보기`)}">
+              ${staticImageMarkup(item, "recommend")}
+              <div class="news-recommend-body">
+                <span class="category-label">${escapeHtml(item.category)}</span>
+                <strong>${escapeHtml(item.title)}</strong>
+              </div>
+            </a>
+          </article>`;
+}
+
+function feedCardMarkup(item) {
+  const href = eventDetailUrl(item);
+  return `
+          <article class="news-list-card">
+            <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${item.title} 자세히 보기`)}">
+              ${staticImageMarkup(item, "feed")}
+              <span>
+                <em>${escapeHtml(item.category)}</em>
+                <strong>${escapeHtml(item.title)}</strong>
+                <small>${escapeHtml(item.date)} · ${escapeHtml(item.readTime)}</small>
+              </span>
+            </a>
+          </article>`;
+}
+
+function replaceStaticBlock(source, name, markup) {
+  const start = `<!-- STATIC_${name}_START -->`;
+  const end = `<!-- STATIC_${name}_END -->`;
+  const pattern = new RegExp(`${start}[\\s\\S]*?${end}`);
+  if (!pattern.test(source)) throw new Error(`Static HTML marker not found: ${name}`);
+  return source.replace(pattern, `${start}\n${markup}\n          ${end}`);
+}
+
+async function readEditorialPosts() {
+  const source = await readFile(editorialDataPath, "utf8");
+  const sandbox = { window: {} };
+  vm.runInNewContext(source, sandbox, { filename: editorialDataPath, timeout: 1000 });
+  const data = sandbox.window.TRAVEL_PORTAL_DATA || {};
+  const posts = Array.isArray(data.editorialPosts) ? data.editorialPosts : [];
+  return posts.filter((item) => item?.title && item?.href);
+}
+
+async function updateStaticLanding(items) {
+  const posts = mapEditorialImages((await readEditorialPosts()).slice(0, 5), items);
+  if (!posts.length) throw new Error("No editorial posts are available for the static landing page.");
+
+  let source = await readFile(indexPath, "utf8");
+  source = replaceStaticBlock(source, "EDITORIAL", posts.map(editorialCardMarkup).join(""));
+  source = replaceStaticBlock(source, "RECOMMENDED", items.slice(1, 5).map(recommendCardMarkup).join(""));
+  source = replaceStaticBlock(source, "FEED", items.slice(5, 17).map(feedCardMarkup).join(""));
+  await writeFile(indexPath, source, "utf8");
 }
 
 async function editorialArticleUrls() {
-  const source = await readFile(editorialDataPath, "utf8");
-  const paths = [...source.matchAll(/href:\s*["'](festival-detail\?id=[^"']+)["']/g)]
-    .map((match) => match[1]);
-  return [...new Set(paths)].map((pathname) => `${publicSiteUrl}/${pathname}`);
+  const posts = await readEditorialPosts();
+  return [...new Set(posts.map((item) => item.href))].map((pathname) => `${publicSiteUrl}/${pathname}`);
 }
 
 function sitemapXml(urls, lastmod) {
@@ -162,6 +286,8 @@ async function main() {
     "utf8"
   );
 
+  await updateStaticLanding(items);
+
   const editorialUrls = await editorialArticleUrls();
   const urls = [
     `${publicSiteUrl}/`,
@@ -176,6 +302,7 @@ async function main() {
   await writeFile(sitemapPath, sitemapXml(urls, todayKstIso()), "utf8");
 
   console.log(`Updated ${path.relative(rootDir, outputPath)} with ${items.length} items for ${month}.`);
+  console.log(`Updated ${path.relative(rootDir, indexPath)} with crawlable article cards.`);
   console.log(`Updated ${path.relative(rootDir, sitemapPath)} with ${urls.length} stable public URLs.`);
 }
 

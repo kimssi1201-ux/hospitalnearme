@@ -1,7 +1,6 @@
 window.TRAVEL_PORTAL_DATA = {
   tourApi: {
-    serviceKey: "f1ff302f1ae1553621d3c4208ee420449f700dbbaffef44a6bef09502ce92f59",
-    endpoint: "https://apis.data.go.kr/B551011/KorService2/searchFestival2",
+    endpoint: "/api/tour-festivals",
     mobileOS: "ETC",
     mobileApp: "SeoulTravelNote",
     numOfRows: 30,

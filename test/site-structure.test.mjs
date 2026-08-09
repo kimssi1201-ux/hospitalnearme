@@ -28,7 +28,22 @@ test("landing page exposes the feed mounts without a hero mount", async () => {
   const source = await readFile(path.join(root, "index.html"), "utf8");
   assert.match(source, /id="recommendedArticles"/);
   assert.match(source, /id="newsFeedList"/);
+  assert.match(source, /id="loadMoreArticles"/);
   assert.doesNotMatch(source, /id="featuredArticle"/);
+});
+
+test("landing page includes crawlable article cards before JavaScript runs", async () => {
+  const source = await readFile(path.join(root, "index.html"), "utf8");
+  const sections = ["EDITORIAL", "RECOMMENDED", "FEED"];
+
+  for (const name of sections) {
+    const block = source.match(new RegExp(`<!-- STATIC_${name}_START -->([\\s\\S]*?)<!-- STATIC_${name}_END -->`))?.[1] || "";
+    assert.match(block, /<article\b/, `${name} static cards`);
+    assert.match(block, /href="festival-detail\?/, `${name} static article links`);
+  }
+
+  const articleLinks = [...source.matchAll(/href="(festival-detail\?[^"#]+)"/g)].map((match) => match[1]);
+  assert.ok(articleLinks.length >= 15, `expected at least 15 crawlable article links, received ${articleLinks.length}`);
 });
 
 test("local script and stylesheet references resolve", async () => {
@@ -90,6 +105,34 @@ test("API detail links are stable and raw feed pages are not indexed", async () 
   assert.match(detailSource, /fetchGeneratedSeoulArticle/);
   assert.match(detailSource, /noindex,follow,max-image-preview:large/);
   assert.match(detailSource, /articleStructuredData/);
+});
+
+test("TourAPI credentials stay server-side and affiliate APIs are deferred", async () => {
+  const dataSource = await readFile(path.join(root, "travel-data.js"), "utf8");
+  const travelSource = await readFile(path.join(root, "travel.js"), "utf8");
+  const detailSource = await readFile(path.join(root, "festival-detail.js"), "utf8");
+  const workerSource = await readFile(path.join(root, "_worker.js"), "utf8");
+  const initBody = travelSource.match(/function init\(\)[\s\S]*?\r?\n}\r?\n/)?.[0] || "";
+
+  assert.match(dataSource, /endpoint:\s*["']\/api\/tour-festivals["']/);
+  assert.doesNotMatch(dataSource, /serviceKey\s*:|f1ff302f1ae1553621d3c4208ee420449f700dbbaffef44a6bef09502ce92f59/);
+  assert.doesNotMatch(detailSource, /serviceKey\s*:|apis\.data\.go\.kr\/B551011/);
+  assert.match(detailSource, /const base = ["']\/api\/tour-detail["']/);
+  assert.match(workerSource, /env\.TOUR_API_KEY/);
+  assert.match(workerSource, /url\.pathname === ["']\/api\/tour-festivals["']/);
+  assert.match(workerSource, /url\.pathname === ["']\/api\/tour-detail["']/);
+  assert.match(initBody, /deferAffiliateData\(\)/);
+  assert.doesNotMatch(initBody, /loadMyRealTripProducts\(\)|loadCoupangProducts\(\)/);
+});
+
+test("article image rendering uses API images or an explicit empty state", async () => {
+  const travelSource = await readFile(path.join(root, "travel.js"), "utf8");
+  const imageBody = travelSource.match(/function imageMarkup\(item, size = "card"\)[\s\S]*?\r?\n}\r?\n/)?.[0] || "";
+
+  assert.match(imageBody, /image-fallback-text/);
+  assert.match(imageBody, /classList\.add\('is-empty'\)/);
+  assert.doesNotMatch(imageBody, /images\.unsplash\.com/);
+  assert.match(travelSource, /const DEFAULT_FESTIVAL_IMAGE = ""/);
 });
 
 test("generated Seoul content matches the current KST month", async () => {
