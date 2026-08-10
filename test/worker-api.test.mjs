@@ -243,6 +243,24 @@ test("worker validates and proxies TourAPI detail requests", async (t) => {
   });
 });
 
+test("worker permanently redirects legacy article query URLs", async (t) => {
+  await t.test("curated article", async () => {
+    const response = await worker.fetch(new Request("https://view1.kr/festival-detail?id=seoul-weekend-exhibition-guide"), {
+      ASSETS: { fetch: async () => new Response("not expected") }
+    });
+    assert.equal(response.status, 301);
+    assert.equal(response.headers.get("location"), "https://view1.kr/articles/seoul-weekend-exhibition-guide/");
+  });
+
+  await t.test("current Seoul event", async () => {
+    const response = await worker.fetch(new Request("https://view1.kr/festival-detail?source=seoul&id=seoul-event-123"), {
+      ASSETS: { fetch: async () => new Response("not expected") }
+    });
+    assert.equal(response.status, 301);
+    assert.equal(response.headers.get("location"), "https://view1.kr/seoul-events/seoul-event-123/");
+  });
+});
+
 test("worker handles preflight without calling an external API", async () => {
   globalThis.fetch = async () => {
     throw new Error("external fetch should not run for OPTIONS");

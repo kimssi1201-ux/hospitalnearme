@@ -733,11 +733,8 @@ function articleMeta(item) {
 
 function detailUrl(item) {
   if (item.source === "seoul") {
-    const params = new URLSearchParams({
-      source: "seoul",
-      id: item.id || ""
-    });
-    return `festival-detail?${params.toString()}`;
+    const id = String(item.id || "").replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-");
+    return `/seoul-events/${encodeURIComponent(id)}/`;
   }
 
   if (item.source === "tour" && item.contentId) {
@@ -749,7 +746,7 @@ function detailUrl(item) {
     return `festival-detail?${params.toString()}`;
   }
 
-  return `festival-detail?id=${encodeURIComponent(item.id)}`;
+  return `/articles/${encodeURIComponent(item.id)}/`;
 }
 
 function articleCard(item, variant = "") {
@@ -2258,32 +2255,6 @@ function loadAffiliateDataOnce() {
   return affiliateLoadPromise;
 }
 
-function deferAffiliateData() {
-  const target = $("#allArticles");
-  let fallbackId = 0;
-
-  const start = () => {
-    if (fallbackId) window.clearTimeout(fallbackId);
-    loadAffiliateDataOnce();
-  };
-
-  if (target && "IntersectionObserver" in window) {
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      start();
-    }, { rootMargin: "600px 0px" });
-    observer.observe(target);
-    fallbackId = window.setTimeout(() => {
-      observer.disconnect();
-      start();
-    }, 8000);
-    return;
-  }
-
-  fallbackId = window.setTimeout(start, 2500);
-}
-
 function categoryFeaturedCard(item) {
   const title = displayArticleTitle(item);
   return `
@@ -3396,11 +3367,11 @@ function renderEditorialPosts() {
     return;
   }
 
-  const displayPosts = editorialPostsWithApiImages(posts).slice(0, 5);
+  const displayPosts = posts.slice(0, 5).map((post) => ({ ...post, image: "" }));
 
   target.innerHTML = displayPosts.map((item, index) => {
     const localizedItem = localizedEditorialPost(item);
-    const href = localizedItem.href || detailUrl(localizedItem);
+    const href = detailUrl(localizedItem);
     return `
       <article class="editorial-card ${index === 0 ? "editorial-card--lead" : ""}">
         <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${localizedItem.title} ${textFor("card.detail")}`)}">
@@ -3629,7 +3600,6 @@ function init() {
   applyLanguage();
   applyBookingSearchQuery();
   loadSeoulCultureEvents();
-  deferAffiliateData();
 }
 
 document.addEventListener("DOMContentLoaded", init);

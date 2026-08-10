@@ -4637,3 +4637,37 @@ body * {
     font-size: 20px;
   }
 }
+
+/* Editorial guides are text-led unless an exact public-data image exists. */
+.magazine-cover .editorial-card .image-frame.is-empty {
+  display: none !important;
+}
+
+.magazine-cover .editorial-card a:has(.image-frame.is-empty) {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto !important;
+}
+
+.magazine-cover .editorial-card--lead a:has(.image-frame.is-empty) {
+  min-height: 100%;
+  align-content: center;
+  padding: clamp(30px, 5vw, 64px);
+  border: 1px solid var(--line);
+  background: var(--accent-soft);
+}
+
+.magazine-cover .editorial-card--lead a:has(.image-frame.is-empty) span {
+  max-width: 680px;
+  padding: 0;
+}
+
+.magazine-cover .editorial-card:not(.editorial-card--lead) a:has(.image-frame.is-empty) {
+  padding-left: 4px;
+}
+
+@media (max-width: 860px) {
+  .magazine-cover .editorial-card--lead a:has(.image-frame.is-empty) {
+    min-height: 0;
+    padding: 28px 24px;
+  }
+}

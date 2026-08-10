@@ -1,4 +1,4 @@
-# Hospital Near Me Publish
+# Seoul Travel News
 
 ## Project
 
@@ -15,6 +15,7 @@ There is no bundler or application database. API keys must remain in Cloudflare 
 ## Test And Checks
 
 - Refresh current Seoul event content: `npm.cmd run refresh`
+- Regenerate static editorial and current-event pages from saved data: `npm.cmd run generate:articles`
 - Unit and integration tests: `npm.cmd test`
 - JavaScript syntax check: `npm.cmd run syntax`
 - Static project checks: `npm.cmd run lint`
@@ -29,7 +30,7 @@ There is no bundler or application database. API keys must remain in Cloudflare 
 
 ## Required Verification After Code Changes
 
-Run `npm.cmd run check` before committing. For UI changes, also open the site at desktop and mobile widths and verify navigation, article links, API loading states, and empty/error states manually.
+Run `npm.cmd run check` before committing. Content updates must also run `npm.cmd run refresh`, which refreshes the current-month feed, regenerates static pages, updates crawlable landing links, and rebuilds `sitemap.xml`. For UI changes, also open the site at desktop and mobile widths and verify navigation, article links, image aspect ratios, API loading states, and empty/error states manually.
 
 ## Test Scope
 

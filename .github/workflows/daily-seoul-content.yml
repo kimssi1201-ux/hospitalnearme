@@ -31,10 +31,10 @@ jobs:
 
       - name: Commit refreshed data
         run: |
-          if [ -n "$(git status --porcelain generated/seoul-events.json sitemap.xml index.html)" ]; then
+          if [ -n "$(git status --porcelain generated/seoul-events.json sitemap.xml index.html articles seoul-events)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add generated/seoul-events.json sitemap.xml index.html
+            git add generated/seoul-events.json sitemap.xml index.html articles seoul-events
             git commit -m "Refresh Seoul event data"
             git push
           else

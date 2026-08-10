@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import vm from "node:vm";
 import { fileURLToPath } from "node:url";
+import { generateStaticArticles } from "./generate-static-articles.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
@@ -124,8 +125,7 @@ function escapeXml(value) {
 }
 
 function eventDetailUrl(item) {
-  const params = new URLSearchParams({ source: "seoul", id: item.id });
-  return `festival-detail?${params.toString()}`;
+  return `/seoul-events/${encodeURIComponent(String(item.id || "").replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-"))}/`;
 }
 
 function staticImageMarkup(item, size) {
@@ -134,38 +134,6 @@ function staticImageMarkup(item, size) {
   }
 
   return `<div class="image-frame image-frame--${size} image-frame--api"><span class="image-fallback-text" aria-hidden="true">SEOUL TRAVEL NEWS</span><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>`;
-}
-
-function editorialCategoryKey(item = {}) {
-  const text = `${item.category || ""} ${item.title || ""}`;
-  if (/전시|미술|박물관|갤러리/.test(text)) return "exhibition";
-  if (/공연|야간|데이트|콘서트|무대/.test(text)) return "performance";
-  if (/가족|아이|체험|교육|도서관/.test(text)) return "experience";
-  if (/축제|전통|궁궐/.test(text)) return "festival";
-  return "event";
-}
-
-function eventCategoryKey(item = {}) {
-  const text = `${item.category || ""} ${item.title || ""}`;
-  if (/전시|미술|박물관|갤러리/.test(text)) return "exhibition";
-  if (/공연|클래식|연극|콘서트|무용|국악|뮤지컬|오페라/.test(text)) return "performance";
-  if (/교육|체험|어린이|가족/.test(text)) return "experience";
-  if (/축제|전통|궁궐/.test(text)) return "festival";
-  return "event";
-}
-
-function mapEditorialImages(posts, items) {
-  const imagePool = items.filter((item) => item.image);
-  const used = new Set();
-
-  return posts.map((post) => {
-    const wanted = editorialCategoryKey(post);
-    const match = imagePool.find((item) => !used.has(item.id) && eventCategoryKey(item) === wanted)
-      || imagePool.find((item) => !used.has(item.id));
-    if (!match) return { ...post, image: "" };
-    used.add(match.id);
-    return { ...post, image: match.image };
-  });
 }
 
 function editorialCardMarkup(item, index) {
@@ -230,7 +198,11 @@ async function readEditorialPosts() {
 }
 
 async function updateStaticLanding(items) {
-  const posts = mapEditorialImages((await readEditorialPosts()).slice(0, 5), items);
+  const posts = (await readEditorialPosts()).slice(0, 5).map((post) => ({
+    ...post,
+    image: "",
+    href: `/articles/${encodeURIComponent(post.id)}/`
+  }));
   if (!posts.length) throw new Error("No editorial posts are available for the static landing page.");
 
   let source = await readFile(indexPath, "utf8");
@@ -242,14 +214,14 @@ async function updateStaticLanding(items) {
 
 async function editorialArticleUrls() {
   const posts = await readEditorialPosts();
-  return [...new Set(posts.map((item) => item.href))].map((pathname) => `${publicSiteUrl}/${pathname}`);
+  return [...new Set(posts.map((item) => item.id))].map((id) => `${publicSiteUrl}/articles/${encodeURIComponent(id)}/`);
 }
 
 function sitemapXml(urls, lastmod) {
   const uniqueUrls = [...new Set(urls.filter(Boolean))];
   const entries = uniqueUrls
     .map((url, index) => {
-      const priority = index === 0 ? "1.0" : url.includes("festival-detail") ? "0.8" : "0.7";
+      const priority = index === 0 ? "1.0" : url.includes("/articles/") ? "0.8" : "0.7";
       return `  <url><loc>${escapeXml(url)}</loc><lastmod>${lastmod}</lastmod><priority>${priority}</priority></url>`;
     })
     .join("\n");
@@ -287,6 +259,7 @@ async function main() {
   );
 
   await updateStaticLanding(items);
+  await generateStaticArticles();
 
   const editorialUrls = await editorialArticleUrls();
   const urls = [

@@ -22,7 +22,11 @@ for (const fileName of htmlFiles) {
 
   if (!head) fail(`${fileName}: missing head element`);
   if (!/<meta\s+name=["']viewport["']/i.test(head)) fail(`${fileName}: missing viewport meta`);
-  if (!head.includes(`adsbygoogle.js?client=${publisherId}`)) fail(`${fileName}: missing current AdSense code in head`);
+  const isNoindexFallback = fileName === "festival-detail.html" && /name=["']robots["'][^>]+noindex/i.test(head);
+  if (!isNoindexFallback && !head.includes(`adsbygoogle.js?client=${publisherId}`)) {
+    fail(`${fileName}: missing current AdSense code in head`);
+  }
+  if (isNoindexFallback && head.includes("adsbygoogle.js")) fail(`${fileName}: noindex fallback must not load ads`);
   if (source.includes(oldPublisherId)) fail(`${fileName}: old AdSense publisher ID remains`);
 
   for (const match of source.matchAll(/<(?:script|link)\b[^>]+(?:src|href)=["']([^"']+)["']/gi)) {

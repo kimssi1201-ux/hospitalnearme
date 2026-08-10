@@ -42,6 +42,11 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    const legacyArticleRedirect = legacyDetailRedirect(url);
+    if (legacyArticleRedirect) {
+      return Response.redirect(legacyArticleRedirect, 301);
+    }
+
     if (url.pathname === "/api/festival-ai") {
       return handleFestivalAiApi(request, env);
     }
@@ -73,6 +78,17 @@ export default {
     return env.ASSETS.fetch(request);
   }
 };
+
+function legacyDetailRedirect(url) {
+  if (url.pathname !== "/festival-detail" && url.pathname !== "/festival-detail.html") return "";
+  const id = String(url.searchParams.get("id") || "").trim();
+  if (!id) return "";
+  const slug = id.replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-").slice(0, 120);
+  if (!slug) return "";
+  if (url.searchParams.get("source") === "seoul") return `${url.origin}/seoul-events/${encodeURIComponent(slug)}/`;
+  if (!url.searchParams.get("source")) return `${url.origin}/articles/${encodeURIComponent(slug)}/`;
+  return "";
+}
 
 async function handleCoupangApi(request, env) {
   if (request.method === "OPTIONS") {
