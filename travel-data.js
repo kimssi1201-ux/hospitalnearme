@@ -110,6 +110,36 @@ window.TRAVEL_PORTAL_DATA = {
   ],
   editorialPosts: [
     {
+      id: "seoul-august-indoor-exhibition-course",
+      category: "8월 실내 코스",
+      title: "8월 서울 실내 전시 코스, 더운 날 이동을 줄이는 문화여행 계획",
+      summary: "한낮 더위가 강한 8월에는 실내 전시와 냉방이 되는 문화공간을 중심으로 잡는 편이 좋습니다. 전시 관람 시간, 지하철 출구, 근처 휴식 장소를 함께 보는 방법을 정리했습니다.",
+      date: "2026.08.15",
+      readTime: "7분 읽기",
+      image: "https://images.unsplash.com/photo-1564399579883-451a5d44ec08?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-august-indoor-exhibition-course"
+    },
+    {
+      id: "seoul-after-work-performance-route",
+      category: "퇴근 후 공연",
+      title: "퇴근 후 서울 공연 보러 갈 때, 저녁 시간표와 귀가 동선 맞추는 법",
+      summary: "평일 저녁 공연은 도착 시간과 티켓 수령, 식사 시간을 잘 계산해야 여유가 생깁니다. 공연장 주변 이동, 입장 마감, 귀가 교통을 기준으로 일정을 짜는 방법입니다.",
+      date: "2026.08.15",
+      readTime: "6분 읽기",
+      image: "https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-after-work-performance-route"
+    },
+    {
+      id: "seoul-public-transport-culture-day",
+      category: "대중교통 코스",
+      title: "차 없이 즐기는 서울 문화행사, 지하철과 버스로 하루 동선 짜기",
+      summary: "서울 문화행사는 대중교통으로 연결하기 좋은 곳이 많지만 출구와 환승 구간에 따라 체감 이동 시간이 달라집니다. 차량 없이 전시, 공연, 산책을 묶는 기준을 안내합니다.",
+      date: "2026.08.15",
+      readTime: "7분 읽기",
+      image: "https://images.unsplash.com/photo-1518391846015-55a9cc003b25?auto=format&fit=crop&w=1200&q=80",
+      href: "festival-detail?id=seoul-public-transport-culture-day"
+    },
+    {
       id: "seoul-weekend-exhibition-guide",
       category: "서울 전시",
       title: "이번 주 서울 전시 추천, 미술관과 실내 문화공간을 함께 보는 코스",

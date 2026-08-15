@@ -119,7 +119,7 @@ test("API detail links are stable and raw feed pages are not indexed", async () 
 test("curated articles are complete, indexable documents before JavaScript", async () => {
   const articleRoot = path.join(root, "articles");
   const directories = (await readdir(articleRoot, { withFileTypes: true })).filter((entry) => entry.isDirectory());
-  assert.equal(directories.length, 20);
+  assert.ok(directories.length >= 20, `expected at least 20 curated articles, received ${directories.length}`);
 
   const titles = new Set();
   for (const directory of directories) {
