@@ -75,12 +75,12 @@ test("ads.txt matches the active publisher ID", async () => {
   assert.doesNotMatch(source, /pub-8468106244002167/);
 });
 
-test("public trust pages use the current Seoul travel brand", async () => {
+test("public trust pages use the current festival news brand", async () => {
   const files = ["about.html", "contact.html", "privacy.html", "terms.html", "editorial-policy.html", "disclaimer.html"];
   for (const file of files) {
     const source = await readFile(path.join(root, file), "utf8");
-    assert.match(source, /서울여행뉴스/, file);
-    assert.doesNotMatch(source, /틴클라임 액션|오늘의 레시피 키친/, file);
+    assert.match(source, /대한축제뉴스/, file);
+    assert.doesNotMatch(source, /틴클라임 액션|오늘의 레시피 키친|서울여행뉴스/, file);
   }
 
   const landing = await readFile(path.join(root, "index.html"), "utf8");
@@ -136,7 +136,7 @@ test("curated articles are complete, indexable documents before JavaScript", asy
     titles.add(title);
     assert.match(source, new RegExp(`https://view1\\.kr/articles/${directory.name}/`));
     assert.match(source, /<h1>[^<]+<\/h1>/);
-    assert.match(source, /서울여행뉴스 편집부/);
+    assert.match(source, /대한축제뉴스 편집부/);
     assert.match(source, /href="\/editorial-policy"/);
     assert.match(source, new RegExp(`adsbygoogle\\.js\\?client=${publisherId}`));
     assert.doesNotMatch(source, /name="robots" content="noindex/);

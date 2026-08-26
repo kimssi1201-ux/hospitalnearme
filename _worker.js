@@ -571,7 +571,7 @@ async function handleTourFestivalsApi(request, env) {
       numOfRows: String(numOfRows),
       pageNo: String(pageNo),
       MobileOS: "ETC",
-      MobileApp: "SeoulTravelNews",
+      MobileApp: "DaehanFestivalNews",
       _type: "json",
       arrange,
       eventStartDate,
@@ -680,7 +680,7 @@ async function handleTourDetailApi(request, env) {
     const upstreamParams = new URLSearchParams({
       serviceKey: apiKey,
       MobileOS: "ETC",
-      MobileApp: "SeoulTravelNews",
+      MobileApp: "DaehanFestivalNews",
       _type: "json",
       contentId
     });

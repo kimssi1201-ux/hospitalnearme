@@ -14,6 +14,28 @@ const editorialDataPath = path.join(rootDir, "travel-data.js");
 const siteOrigin = normalizeOrigin(process.env.SITE_ORIGIN || "https://view1.kr");
 const publicSiteUrl = normalizeOrigin(process.env.PUBLIC_SITE_URL || siteOrigin);
 
+// Korea Tourism Organization TourAPI area codes, nationwide. Kept in sync
+// with the `regions` list in travel-data.js.
+const REGIONS = [
+  { id: "seoul", label: "서울", areaCode: "1" },
+  { id: "incheon", label: "인천", areaCode: "2" },
+  { id: "daejeon", label: "대전", areaCode: "3" },
+  { id: "daegu", label: "대구", areaCode: "4" },
+  { id: "gwangju", label: "광주", areaCode: "5" },
+  { id: "busan", label: "부산", areaCode: "6" },
+  { id: "ulsan", label: "울산", areaCode: "7" },
+  { id: "sejong", label: "세종", areaCode: "8" },
+  { id: "gyeonggi", label: "경기", areaCode: "31" },
+  { id: "gangwon", label: "강원", areaCode: "32" },
+  { id: "chungbuk", label: "충북", areaCode: "33" },
+  { id: "chungnam", label: "충남", areaCode: "34" },
+  { id: "gyeongbuk", label: "경북", areaCode: "35" },
+  { id: "gyeongnam", label: "경남", areaCode: "36" },
+  { id: "jeonbuk", label: "전북", areaCode: "37" },
+  { id: "jeonnam", label: "전남", areaCode: "38" },
+  { id: "jeju", label: "제주", areaCode: "39" }
+];
+
 function normalizeOrigin(value) {
   return String(value || "https://view1.kr").replace(/\/+$/, "");
 }
@@ -51,7 +73,7 @@ async function fetchJson(url) {
     const response = await fetch(url, {
       headers: {
         Accept: "application/json",
-        "User-Agent": "seoul-travel-news-daily-refresh/1.0"
+        "User-Agent": "daehan-festival-news-daily-refresh/1.0"
       },
       signal: controller.signal
     });
@@ -71,44 +93,103 @@ async function fetchJson(url) {
 }
 
 function eventId(item, index) {
-  return String(item?.id || item?.contentId || item?.title || `seoul-event-${index}`).trim();
+  return String(item?.id || item?.contentId || item?.title || `festival-event-${index}`).trim();
 }
 
-function normalizeItems(items) {
-  const list = Array.isArray(items) ? items : items ? [items] : [];
-  const seen = new Set();
+function compactDate(value) {
+  const text = String(value || "").replace(/[^\d]/g, "");
+  if (text.length < 8) return "";
+  return `${text.slice(0, 4)}-${text.slice(4, 6)}-${text.slice(6, 8)}`;
+}
 
+function formatEventPeriod(start, end) {
+  const startText = compactDate(start);
+  const endText = compactDate(end);
+  if (startText && endText && startText !== endText) return `${startText}~${endText}`;
+  return startText || endText || "일정 확인 필요";
+}
+
+function normalizeUrl(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const url = text.startsWith("//") ? `https:${text}` : text;
+  if (!/^https?:\/\//i.test(url)) return "";
+  return url.replace(/^http:/i, "https:");
+}
+
+// Normalizes a raw TourAPI searchFestival2 item into the shape the site's
+// static generator and client-side rendering already expect (previously
+// filled in from the Seoul Open Data culture-event API).
+function normalizeTourFestivalItem(item, region, index) {
+  const title = String(item?.title || "").trim();
+  const address = [item?.addr1, item?.addr2].filter(Boolean).join(" ").trim();
+  const image = normalizeUrl(item?.firstimage || item?.firstimage2);
+  const date = formatEventPeriod(item?.eventstartdate, item?.eventenddate);
+
+  return {
+    id: `tour-${item?.contentid || eventId(item, index)}`,
+    source: "seoul",
+    category: `${region.label} 축제`,
+    categorySlug: "festival",
+    title,
+    summary: address
+      ? `${address}에서 진행되는 ${region.label} 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.`
+      : `${region.label}에서 진행되는 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.`,
+    date,
+    readTime: `${region.label} 축제 정보`,
+    image,
+    address,
+    place: String(item?.addr1 || "").trim(),
+    gu: "",
+    tel: String(item?.tel || "").trim(),
+    homepage: "",
+    fee: "",
+    time: "",
+    org: "",
+    target: "",
+    isFree: "",
+    updatedAt: String(item?.modifiedtime || item?.createdtime || "").trim(),
+    lat: String(item?.mapy || "").trim(),
+    lng: String(item?.mapx || "").trim(),
+    areaCode: region.areaCode
+  };
+}
+
+async function fetchRegionFestivals(region) {
+  const endpoint = `${siteOrigin}/api/tour-festivals?areaCode=${encodeURIComponent(region.areaCode)}&numOfRows=100&pageNo=1`;
+  const payload = await fetchJson(endpoint);
+  const rawItems = payload?.response?.body?.items?.item;
+  const list = Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
   return list
     .filter((item) => item && item.title)
-    .map((item, index) => ({
-      id: eventId(item, index),
-      source: "seoul",
-      category: String(item.category || "서울 문화행사"),
-      title: String(item.title || "").trim(),
-      summary: String(item.summary || "").trim(),
-      date: String(item.date || "").trim(),
-      readTime: String(item.readTime || "서울 행사 정보").trim(),
-      image: String(item.image || "").replace(/^http:/, "https:"),
-      address: String(item.address || item.place || "").trim(),
-      place: String(item.place || "").trim(),
-      gu: String(item.gu || "").trim(),
-      tel: String(item.tel || "").trim(),
-      homepage: String(item.homepage || "").trim(),
-      fee: String(item.fee || "").trim(),
-      time: String(item.time || "").trim(),
-      org: String(item.org || "").trim(),
-      target: String(item.target || "").trim(),
-      isFree: String(item.isFree || "").trim(),
-      updatedAt: String(item.updatedAt || "").trim(),
-      lat: String(item.lat || "").trim(),
-      lng: String(item.lng || "").trim()
-    }))
-    .filter((item) => {
-      const key = `${item.id}::${item.title}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    .map((item, index) => normalizeTourFestivalItem(item, region, index));
+}
+
+async function fetchNationwideFestivals() {
+  const settled = await Promise.allSettled(REGIONS.map((region) => fetchRegionFestivals(region)));
+  const items = [];
+  const failedRegions = [];
+
+  settled.forEach((result, index) => {
+    if (result.status === "fulfilled") {
+      items.push(...result.value);
+    } else {
+      failedRegions.push(REGIONS[index].label);
+      console.warn(`${REGIONS[index].label} 축제 데이터를 불러오지 못했습니다.`, result.reason);
+    }
+  });
+
+  if (failedRegions.length) {
+    console.warn(`다음 지역은 이번 새로고침에서 제외되었습니다: ${failedRegions.join(", ")}`);
+  }
+
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = `${item.id}::${item.title}`;
+    if (!item.title || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function escapeHtml(value) {
@@ -130,10 +211,10 @@ function eventDetailUrl(item) {
 
 function staticImageMarkup(item, size) {
   if (!item.image) {
-    return `<div class="image-frame image-frame--${size} is-empty"><span>SEOUL TRAVEL NEWS</span></div>`;
+    return `<div class="image-frame image-frame--${size} is-empty"><span>대한축제뉴스</span></div>`;
   }
 
-  return `<div class="image-frame image-frame--${size} image-frame--api"><span class="image-fallback-text" aria-hidden="true">SEOUL TRAVEL NEWS</span><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>`;
+  return `<div class="image-frame image-frame--${size} image-frame--api"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>`;
 }
 
 function editorialCardMarkup(item, index) {
@@ -231,13 +312,14 @@ function sitemapXml(urls, lastmod) {
 
 async function main() {
   const month = currentKstMonth();
-  const endpoint = `${siteOrigin}/api/seoul-events?limit=300&month=${month}`;
-  const payload = await fetchJson(endpoint);
-  const items = normalizeItems(payload.items);
+  const items = await fetchNationwideFestivals();
 
   if (!items.length) {
-    throw new Error("서울 문화행사 데이터가 비어 있어 정적 파일을 갱신하지 않았습니다.");
+    throw new Error("전국 축제 데이터가 비어 있어 정적 파일을 갱신하지 않았습니다.");
   }
+
+  // Sort so the freshest/soonest-starting festivals lead the feed.
+  items.sort((a, b) => a.date.localeCompare(b.date));
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(
@@ -245,8 +327,8 @@ async function main() {
     `${JSON.stringify(
       {
         ok: true,
-        source: payload.source || "서울 열린데이터광장 문화행사 정보",
-        fetchedFrom: endpoint,
+        source: "한국관광공사 TourAPI 축제 정보",
+        fetchedFrom: `${siteOrigin}/api/tour-festivals`,
         month,
         updatedAt: new Date().toISOString(),
         count: items.length,
@@ -274,7 +356,7 @@ async function main() {
   ];
   await writeFile(sitemapPath, sitemapXml(urls, todayKstIso()), "utf8");
 
-  console.log(`Updated ${path.relative(rootDir, outputPath)} with ${items.length} items for ${month}.`);
+  console.log(`Updated ${path.relative(rootDir, outputPath)} with ${items.length} items across ${REGIONS.length} regions for ${month}.`);
   console.log(`Updated ${path.relative(rootDir, indexPath)} with crawlable article cards.`);
   console.log(`Updated ${path.relative(rootDir, sitemapPath)} with ${urls.length} stable public URLs.`);
 }

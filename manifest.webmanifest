@@ -1,6 +1,6 @@
 {
-  "name": "페스티벌 노트",
-  "short_name": "페스티벌노트",
+  "name": "대한축제뉴스",
+  "short_name": "대한축제뉴스",
   "description": "전국 축제 일정과 축제 여행 체크 정보를 모아보는 매거진형 정보 포털입니다.",
   "start_url": "./index.html",
   "display": "standalone",
