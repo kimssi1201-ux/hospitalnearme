@@ -38,6 +38,16 @@ const fallbackTarget = params.get("target");
 const fallbackIsFree = params.get("isFree");
 const fallbackUpdatedAt = params.get("updatedAt");
 const supportedLanguages = ["ko", "en", "ja", "zh"];
+const COUPANG_WIDGET_SCRIPT = "https://ads-partners.coupang.com/g.js";
+const COUPANG_WIDGET_CONFIG = {
+  id: 1003200,
+  trackingCode: "AF1488183",
+  subId: null,
+  template: "carousel",
+  width: "680",
+  height: "140"
+};
+let coupangWidgetScriptPromise = null;
 const state = {
   language: getStoredLanguage(),
   article: null,
@@ -2159,6 +2169,7 @@ function renderArticle(article) {
   `;
   hydrateNearbyParking(article);
   hydrateDetailCoupangProducts(article);
+  hydrateCoupangWidgets();
 }
 
 function applyStaticLanguage() {
@@ -3017,6 +3028,63 @@ function CoupangTravelProductsSection(article) {
   `;
 }
 
+// CoupangTravelProductsSection (the product-search grid) only renders for
+// editorial guide articles, not real festival/event pages. Event pages
+// (source "seoul" or "tour") get this lighter widget carousel instead, so
+// every detail page carries some Coupang Partners placement.
+function CoupangWidgetCarouselSection(article) {
+  if (!(article.source === "seoul" || article.source === "tour")) return "";
+
+  return `
+    <section class="clean-article-section coupang-widget-section" aria-label="쿠팡 파트너스 광고">
+      <div class="coupang-widget-label">Advertisement</div>
+      <div class="coupang-widget-frame" id="coupangDetailWidget" data-coupang-widget></div>
+      <p class="coupang-products-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+    </section>
+  `;
+}
+
+function loadCoupangWidgetScript() {
+  if (window.PartnersCoupang?.G) return Promise.resolve();
+  if (coupangWidgetScriptPromise) return coupangWidgetScriptPromise;
+
+  coupangWidgetScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = COUPANG_WIDGET_SCRIPT;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Coupang widget script failed to load."));
+    document.head.appendChild(script);
+  });
+
+  return coupangWidgetScriptPromise;
+}
+
+async function hydrateCoupangWidgets() {
+  const targets = [...document.querySelectorAll("[data-coupang-widget]:not([data-coupang-loaded])")];
+  if (!targets.length) return;
+
+  try {
+    await loadCoupangWidgetScript();
+    targets.forEach((target) => {
+      target.dataset.coupangLoaded = "true";
+      const width = Math.max(300, Math.min(680, Math.floor(target.clientWidth || target.parentElement?.clientWidth || window.innerWidth - 36)));
+      new window.PartnersCoupang.G({
+        ...COUPANG_WIDGET_CONFIG,
+        width: String(width),
+        height: "140",
+        container: target
+      });
+    });
+  } catch (error) {
+    console.warn("Coupang widget could not be loaded.", error);
+    targets.forEach((target) => {
+      target.dataset.coupangLoaded = "error";
+      target.innerHTML = "";
+    });
+  }
+}
+
 async function fetchDetailCoupangProducts(keyword = "여행용품", limit = 4) {
   const query = new URLSearchParams({
     keyword,
@@ -3269,6 +3337,7 @@ function renderTravelDetailBody(article, sections) {
     ${NearbyTravelSection(article)}
     ${CleanVisitTipSection(article)}
     ${CoupangTravelProductsSection(article)}
+    ${CoupangWidgetCarouselSection(article)}
     ${BookingCheckSection(article)}
     ${CleanClosingSection(article)}
   `;
