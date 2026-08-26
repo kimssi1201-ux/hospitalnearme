@@ -2,7 +2,7 @@
 
 ## Project
 
-This is a framework-free HTML, CSS, and browser JavaScript site deployed on Cloudflare Pages. The Cloudflare Worker proxy lives in `_worker.js`; Pages Functions live in `functions/`.
+This is a framework-free HTML, CSS, and browser JavaScript site deployed on Cloudflare Pages. The Cloudflare Worker proxy lives in `_worker.js` and handles every `/api/*` route directly. There is no `functions/` (Pages Functions) directory — `_worker.js` fully supersedes it, so all API logic belongs in `_worker.js`, not in `functions/`.
 
 There is no bundler or application database. API keys must remain in Cloudflare Pages environment variables and must not be committed to the repository.
 
@@ -34,4 +34,8 @@ Run `npm.cmd run check` before committing. Content updates must also run `npm.cm
 
 ## Test Scope
 
-Tests use Node's built-in `node:test` runner. External food, Seoul, MyRealTrip, Coupang, and OpenAI calls are mocked; tests never call production APIs.
+Tests use Node's built-in `node:test` runner. External Seoul, TourAPI, MyRealTrip, Coupang, and OpenAI calls are mocked; tests never call production APIs.
+
+## Dead Code
+
+Before adding a new root-level `.js`/`.css` file, confirm it is actually loaded by an HTML page (`grep` the filename across `*.html`). This repo previously accumulated unreferenced files from earlier, unrelated project iterations (a recipe search feature, a climate-education app) — keep new work wired into real pages so it doesn't happen again.
