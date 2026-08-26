@@ -105,10 +105,10 @@ const I18N = {
     "july.loading": "이번 달 서울 축제 정보를 불러오는 중입니다.",
     "july.count": "총 {count}개의 서울 여행 기사를 불러왔습니다.",
     "july.error": "서울 축제 정보를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
-    "places.title": "서울 축제 찾기",
-    "places.title.all": "서울 축제 찾기",
-    "places.title.region": "서울 축제 정보",
-    "places.description": "서울에서 열리는 축제와 여행 정보를 일정·장소·요금·교통 정보와 함께 살펴보세요.",
+    "places.title": "지역별 축제 찾기",
+    "places.title.all": "지역별 축제 찾기",
+    "places.title.region": "{region} 축제 정보",
+    "places.description": "서울부터 부산, 제주까지 지역별로 열리는 축제와 여행 정보를 일정·장소·요금·교통 정보와 함께 살펴보세요.",
     "booking.title": "가기 전에 확인하면 좋은 것들",
     "booking.description": "축제장은 날짜와 시간에 따라 혼잡도와 이동 동선이 달라집니다. 숙소, 교통, 입장권, 우천 운영 기준을 미리 확인해 두세요.",
     "booking.link": "체크하기",
@@ -2921,9 +2921,9 @@ async function loadTourApiPlaces() {
     state.apiError = false;
 
     if (apiArticles.length) {
-      updatePlacesStatus(`서울 축제 ${apiArticles.length}개를 불러왔습니다.`);
+      updatePlacesStatus(`${region.label} 축제 ${apiArticles.length}개를 불러왔습니다.`);
     } else {
-      updatePlacesStatus("서울에 표시할 축제 정보가 아직 등록되어 있지 않습니다.");
+      updatePlacesStatus(`${region.label}에 표시할 축제 정보가 아직 등록되어 있지 않습니다.`);
     }
 
     renderPlaces();
@@ -2936,7 +2936,7 @@ async function loadTourApiPlaces() {
     state.apiArticles = [];
     state.apiLoaded = true;
     state.apiError = true;
-    updatePlacesStatus("서울 축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    updatePlacesStatus(`${region.label} 축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.`);
     renderPlaces();
     renderCuration();
     renderEditorialPosts();

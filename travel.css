@@ -504,6 +504,22 @@ main {
   padding: 0 0 44px;
 }
 
+.places-section {
+  display: grid;
+  gap: 16px;
+  padding: 8px 0 44px;
+  border-bottom: 1px solid var(--line);
+}
+
+.places-section .section-heading {
+  margin: 0;
+  padding: 0;
+}
+
+.places-section .region-chip-list {
+  margin: 0;
+}
+
 .coupang-section {
   display: grid;
   gap: 16px;

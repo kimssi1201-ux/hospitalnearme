@@ -14,7 +14,23 @@ window.TRAVEL_PORTAL_DATA = {
     limit: 300
   },
   regions: [
-    { id: "seoul", label: "서울", areaCode: "1" }
+    { id: "seoul", label: "서울", areaCode: "1" },
+    { id: "incheon", label: "인천", areaCode: "2" },
+    { id: "daejeon", label: "대전", areaCode: "3" },
+    { id: "daegu", label: "대구", areaCode: "4" },
+    { id: "gwangju", label: "광주", areaCode: "5" },
+    { id: "busan", label: "부산", areaCode: "6" },
+    { id: "ulsan", label: "울산", areaCode: "7" },
+    { id: "sejong", label: "세종", areaCode: "8" },
+    { id: "gyeonggi", label: "경기", areaCode: "31" },
+    { id: "gangwon", label: "강원", areaCode: "32" },
+    { id: "chungbuk", label: "충북", areaCode: "33" },
+    { id: "chungnam", label: "충남", areaCode: "34" },
+    { id: "gyeongbuk", label: "경북", areaCode: "35" },
+    { id: "gyeongnam", label: "경남", areaCode: "36" },
+    { id: "jeonbuk", label: "전북", areaCode: "37" },
+    { id: "jeonnam", label: "전남", areaCode: "38" },
+    { id: "jeju", label: "제주", areaCode: "39" }
   ],
   todayKeywords: [
     "서울 축제",

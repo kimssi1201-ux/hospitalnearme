@@ -42,6 +42,7 @@
       <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴">
         <a href="#editorial" data-i18n="nav.editorial">서울 기획</a>
         <a href="#july" data-i18n="nav.july">최신 행사</a>
+        <a href="#placesSection" data-i18n="nav.places">가볼만한 곳</a>
         <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권" data-i18n="nav.booking">여행검색</a>
       </nav>
       <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
@@ -309,6 +310,17 @@
           <!-- STATIC_FEED_END -->
         </div>
         <button class="load-more-articles" id="loadMoreArticles" type="button" hidden>기사 더보기</button>
+      </section>
+
+      <section class="places-section" id="placesSection" aria-labelledby="placesTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Nationwide Festivals</p>
+          <h2 id="placesTitle" data-i18n="places.title">지역별 축제 찾기</h2>
+          <p data-i18n="places.description">서울부터 부산, 제주까지 지역별로 열리는 축제와 여행 정보를 일정·장소·요금·교통 정보와 함께 살펴보세요.</p>
+        </div>
+        <div class="region-chip-list" id="regionList" role="group" aria-label="지역 선택"></div>
+        <div class="section-status" id="placesStatus"></div>
+        <div class="card-grid" id="placesGrid"></div>
       </section>
 
       <section class="category-news-wrapper" id="categoryNews" aria-label="분야별 서울 여행 뉴스" hidden>
