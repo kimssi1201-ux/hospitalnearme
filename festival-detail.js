@@ -517,9 +517,9 @@ async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId 
     source: "tour",
     contentId,
     contentTypeId,
-    category: "서울 축제",
+    category: address ? `${travelRegionName({ address })} 축제` : "축제 소식",
     title: commonItem.title,
-    summary: overview || "방문 전 확인하면 좋은 서울 축제 상세 정보입니다.",
+    summary: overview || "방문 전 확인하면 좋은 축제 상세 정보입니다.",
     date: period,
     readTime: "축제 상세",
     image: firstImage,
@@ -609,7 +609,7 @@ function extractAddressFromOverview(value) {
 }
 
 function enrichLocalArticle(article = {}) {
-  const address = article.address || "서울 전역";
+  const address = article.address || "장소 확인 필요";
   const time = article.time || "행사별 운영 시간이 다릅니다";
   const fee = article.fee || "행사별 상이";
   const image = imageUrlForArticle(article, "");
@@ -1040,7 +1040,7 @@ function localizedCategoryLabel(category = "") {
       experience: "교육/체험",
       movie: "영화",
       festival: "축제",
-      event: value || "서울 행사"
+      event: value || "축제 소식"
     },
     en: {
       exhibition: "Exhibitions",
@@ -1693,9 +1693,14 @@ function nearbyTravelPicks(article = {}) {
   const text = nearbyTravelSearchText(article);
   const landmark = Object.keys(SEOUL_NEARBY_TRAVEL_BY_LANDMARK).find((key) => text.includes(key));
   const district = nearbyTravelDistrict(article);
+  // SEOUL_NEARBY_TRAVEL_DEFAULTS is a curated list of Seoul landmarks, so it
+  // should only fill in when nothing more specific matched AND the article
+  // itself is actually in Seoul - otherwise a nationwide (TourAPI) festival
+  // in, say, Busan would show Gyeongbokgung as a "nearby place to visit."
+  const isSeoulArticle = travelRegionName(article) === "서울";
   const picks = SEOUL_NEARBY_TRAVEL_BY_LANDMARK[landmark]
     || SEOUL_NEARBY_TRAVEL_BY_DISTRICT[district]
-    || SEOUL_NEARBY_TRAVEL_DEFAULTS;
+    || (isSeoulArticle ? SEOUL_NEARBY_TRAVEL_DEFAULTS : []);
   const title = String(article.title || "");
 
   return picks
@@ -2237,7 +2242,7 @@ function cleanCopy() {
         time: "프로그램별 시간이 다를 수 있습니다.",
         fee: "무료 행사도 일부 체험은 유료일 수 있습니다.",
         target: "동행자 연령 제한 여부를 확인하세요.",
-        subCategory: "서울 문화행사 원본 분류 기준입니다.",
+        subCategory: "원본 분류 기준입니다.",
         contact: "변경 사항은 공식 문의처가 가장 정확합니다."
       },
       labels: {
@@ -2249,10 +2254,10 @@ function cleanCopy() {
         subCategory: "세부 분류",
         contact: "문의"
       },
-      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 서울 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
-      intro: (title, category, place) => `${title}은 ${category || "서울 행사"} 분야의 행사로, ${place ? `${place}에서 진행됩니다` : "서울 지역에서 진행됩니다"}. 방문자는 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
+      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
+      intro: (title, category, place) => `${title}은 ${category || "축제 소식"} 분야의 행사로, ${place ? `${place}에서 진행됩니다` : "현지에서 진행됩니다"}. 방문자는 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
       highlights: (article, context, feeText, targetText, scheduleText) => [
-        ["무엇을 볼 수 있나요?", `${article.title}은 ${context.category || "서울 행사"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
+        ["무엇을 볼 수 있나요?", `${article.title}은 ${context.category || "축제 소식"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
         ["언제 방문하면 좋나요?", `${scheduleText} 일정에 맞춰 운영됩니다. 주말이나 저녁 시간대에는 방문객이 몰릴 수 있어, 사진 촬영이나 여유로운 관람을 원한다면 비교적 이른 시간에 도착하는 편이 좋습니다.`],
         ["누구에게 잘 맞나요?", `${targetText}에게 참고하기 좋은 행사입니다. 입장료는 ${feeText} 기준으로 확인되며, 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`]
       ],
@@ -2410,7 +2415,7 @@ function detailCopy() {
         time: "방문 전 공식 운영시간을 확인하세요",
         fee: "방문 전 공식 안내에서 확인하세요",
         target: "방문 전 대상 연령을 확인하세요",
-        category: "서울 문화행사"
+        category: "축제 소식"
       },
       rowNotes: {
         date: "시작일과 종료일을 함께 확인하세요.",
@@ -2418,7 +2423,7 @@ function detailCopy() {
         time: "프로그램별 시간이 다를 수 있습니다.",
         fee: "무료 행사도 일부 체험은 유료일 수 있습니다.",
         target: "동행자 연령 제한 여부를 확인하세요.",
-        subCategory: "서울 문화행사 분류 기준입니다.",
+        subCategory: "분류 기준입니다.",
         contact: "변경 사항은 공식 문의처가 가장 정확합니다."
       },
       labels: {
@@ -2430,10 +2435,10 @@ function detailCopy() {
         subCategory: "분류",
         contact: "문의"
       },
-      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 서울 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
-      intro: (title, category, place) => `${title}은 ${category || "서울 행사"} 분야의 행사입니다. ${place ? `${place}에서 진행되며,` : "서울 지역에서 진행되며,"} 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
+      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
+      intro: (title, category, place) => `${title}은 ${category || "축제 소식"} 분야의 행사입니다. ${place ? `${place}에서 진행되며,` : "현지에서 진행되며,"} 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
       highlights: (article, context, feeText, targetText, scheduleText) => [
-        ["무엇을 볼 수 있나요?", `${context.eventName}은 ${context.category || "서울 행사"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
+        ["무엇을 볼 수 있나요?", `${context.eventName}은 ${context.category || "축제 소식"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
         ["언제 방문하면 좋나요?", `${scheduleText} 일정에 맞춰 운영됩니다. 주말이나 저녁 시간대에는 방문객이 몰릴 수 있어, 사진 촬영이나 여유로운 관람을 원한다면 비교적 이른 시간에 도착하는 편이 좋습니다.`],
         ["누구에게 잘 맞나요?", `${targetText}에게 참고하기 좋은 행사입니다. 입장료와 예약 방식은 ${feeText}. 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`]
       ],
