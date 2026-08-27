@@ -103,6 +103,27 @@ test("sitemap contains only stable editorial and trust URLs", async () => {
   assert.ok(urls.every((url) => !url.includes("generated/seoul-events.json")));
 });
 
+test("RSS feed lists the curated editorial articles as valid, stable items", async () => {
+  const source = await readFile(path.join(root, "feed.xml"), "utf8");
+
+  assert.match(source, /<rss version="2\.0">/);
+  assert.match(source, /<title>대한축제뉴스<\/title>/);
+  assert.match(source, /<link>https:\/\/view1\.kr\/<\/link>/);
+
+  const links = [...source.matchAll(/<link>(https:\/\/view1\.kr\/articles\/[^<]+)<\/link>/g)].map((match) => match[1]);
+  assert.ok(links.length >= 20, `expected at least 20 feed items, received ${links.length}`);
+  assert.equal(links.length, new Set(links).size);
+
+  const guids = [...source.matchAll(/<guid isPermaLink="true">([^<]+)<\/guid>/g)].map((match) => match[1]);
+  assert.equal(guids.length, links.length);
+
+  const pubDates = [...source.matchAll(/<pubDate>([^<]+)<\/pubDate>/g)].map((match) => match[1]);
+  assert.ok(pubDates.every((value) => !Number.isNaN(Date.parse(value))), "every pubDate parses as a valid date");
+
+  const index = await readFile(path.join(root, "index.html"), "utf8");
+  assert.match(index, /<link rel="alternate" type="application\/rss\+xml"[^>]+href="\/feed\.xml"/);
+});
+
 test("API detail links are stable and raw feed pages are not indexed", async () => {
   const travelSource = await readFile(path.join(root, "travel.js"), "utf8");
   const detailSource = await readFile(path.join(root, "festival-detail.js"), "utf8");

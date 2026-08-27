@@ -63,6 +63,10 @@ export default {
       return handleTourDetailApi(request, env);
     }
 
+    if (url.pathname === "/api/tour-photo-gallery") {
+      return handlePhotoGalleryApi(request, env);
+    }
+
     if (url.pathname === "/api/seoul-parking") {
       return handleSeoulParkingApi(request, env);
     }
@@ -736,6 +740,110 @@ async function handleTourDetailApi(request, env) {
       {
         ok: false,
         code: "tour_detail_error",
+        message: error && error.message ? error.message : String(error)
+      },
+      500,
+      request
+    );
+  }
+}
+
+// 한국관광공사 PhotoGalleryService1 (포토갤러리 서비스) — TourAPI의
+// detailImage2와는 별개의 데이터.go.kr 서비스/키로, 콘텐츠ID가 아니라
+// 키워드로 사진을 검색합니다. detailImage2만으로는 사진이 부족한 축제가
+// 많아 보조 소스로 사용합니다.
+async function handlePhotoGalleryApi(request, env) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: apiHeaders(request)
+    });
+  }
+
+  if (request.method !== "GET") {
+    return jsonResponse({ ok: false, message: "GET method required." }, 405, request);
+  }
+
+  if (!isSameOriginRequest(request)) {
+    return jsonResponse({ ok: false, message: "Forbidden origin." }, 403, request);
+  }
+
+  const apiKey = String(env.PHOTO_GALLERY_API_KEY || "").trim();
+  if (!apiKey) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "missing_photo_gallery_key",
+        message: "PHOTO_GALLERY_API_KEY 환경변수가 설정되지 않았습니다."
+      },
+      500,
+      request
+    );
+  }
+
+  const url = new URL(request.url);
+  const keyword = String(url.searchParams.get("keyword") || "").trim().slice(0, 80);
+  if (!keyword) {
+    return jsonResponse(
+      { ok: false, code: "missing_photo_gallery_keyword", message: "keyword 파라미터가 필요합니다." },
+      400,
+      request
+    );
+  }
+
+  const numOfRows = clampNumber(url.searchParams.get("numOfRows"), 1, 20, 10);
+
+  try {
+    const upstreamParams = new URLSearchParams({
+      serviceKey: apiKey,
+      MobileOS: "ETC",
+      MobileApp: "DaehanFestivalNews",
+      _type: "json",
+      keyword,
+      numOfRows: String(numOfRows),
+      pageNo: "1"
+    });
+
+    const upstreamUrl = `https://apis.data.go.kr/B551011/PhotoGalleryService1/gallerySearchList1?${upstreamParams}`;
+    const cacheRequest = new Request(
+      `${url.origin}/api/tour-photo-gallery/cache?keyword=${encodeURIComponent(keyword)}&numOfRows=${numOfRows}`,
+      { method: "GET" }
+    );
+    const cached = await readCache(cacheRequest);
+    if (cached) return cached;
+
+    const response = await fetch(upstreamUrl, { headers: { Accept: "application/json" } });
+    const contentType = response.headers.get("content-type") || "";
+    const payload = contentType.includes("application/json")
+      ? await response.json()
+      : { message: (await response.text()).slice(0, 300) };
+    const tourFailure = readTourApiFailure(payload);
+
+    if (!response.ok || tourFailure) {
+      return jsonResponse(
+        {
+          ok: false,
+          code: "photo_gallery_request_failed",
+          providerCode: tourFailure?.code || String(response.status),
+          message: tourFailure?.message || payload?.message || "포토갤러리 요청에 실패했습니다."
+        },
+        response.ok ? tourFailure?.status || 502 : response.status,
+        request
+      );
+    }
+
+    // Gallery search results change rarely for a given keyword, so cache
+    // longer than the per-festival detail lookups.
+    const finalResponse = jsonResponse(payload, 200, request, {
+      "cache-control": "public, max-age=86400"
+    });
+    await writeCache(cacheRequest, finalResponse.clone());
+    return finalResponse;
+  } catch (error) {
+    return jsonResponse(
+      {
+        ok: false,
+        code: "photo_gallery_error",
         message: error && error.message ? error.message : String(error)
       },
       500,

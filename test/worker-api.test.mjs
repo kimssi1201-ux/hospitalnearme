@@ -56,6 +56,55 @@ test("worker protects proxy routes from wrong origins and missing keys", async (
     assert.equal(response.status, 500);
     assert.equal(body.code, "missing_tour_key");
   });
+
+  await t.test("missing PhotoGallery key", async () => {
+    const response = await worker.fetch(new Request("https://view1.kr/api/tour-photo-gallery?keyword=서울아트위크"), {});
+    const body = await bodyOf(response);
+    assert.equal(response.status, 500);
+    assert.equal(body.code, "missing_photo_gallery_key");
+  });
+});
+
+test("worker proxies a validated PhotoGallery request and requires a keyword", async (t) => {
+  await t.test("rejects missing keyword", async () => {
+    const response = await worker.fetch(
+      new Request("https://view1.kr/api/tour-photo-gallery"),
+      { PHOTO_GALLERY_API_KEY: "server-only-key" }
+    );
+    const body = await bodyOf(response);
+    assert.equal(response.status, 400);
+    assert.equal(body.code, "missing_photo_gallery_keyword");
+  });
+
+  await t.test("proxies an allowed request without exposing the key to the client", async () => {
+    let calledUrl = "";
+    globalThis.fetch = async (url) => {
+      calledUrl = String(url);
+      return new Response(JSON.stringify({
+        response: {
+          header: { resultCode: "0000", resultMsg: "OK" },
+          body: { items: { item: [{ galTitle: "서울아트위크", galWebImageUrl: "https://tong.visitkorea.or.kr/example.jpg" }] } }
+        }
+      }), {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      });
+    };
+
+    const response = await worker.fetch(
+      new Request("https://view1.kr/api/tour-photo-gallery?keyword=서울아트위크"),
+      { PHOTO_GALLERY_API_KEY: "server-only-key" }
+    );
+    const body = await bodyOf(response);
+    const upstream = new URL(calledUrl);
+
+    assert.equal(response.status, 200);
+    assert.equal(body.response.body.items.item[0].galTitle, "서울아트위크");
+    assert.equal(upstream.origin, "https://apis.data.go.kr");
+    assert.equal(upstream.pathname, "/B551011/PhotoGalleryService1/gallerySearchList1");
+    assert.equal(upstream.searchParams.get("serviceKey"), "server-only-key");
+    assert.equal(upstream.searchParams.get("keyword"), "서울아트위크");
+  });
 });
 
 test("worker rejects unsupported MyRealTrip endpoints", async () => {
