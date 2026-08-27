@@ -126,9 +126,13 @@ function normalizeTourFestivalItem(item, region, index) {
   const image = normalizeUrl(item?.firstimage || item?.firstimage2);
   const date = formatEventPeriod(item?.eventstartdate, item?.eventenddate);
 
+  const contentId = String(item?.contentid || "").trim();
+
   return {
-    id: `tour-${item?.contentid || eventId(item, index)}`,
+    id: `tour-${contentId || eventId(item, index)}`,
     source: "seoul",
+    contentId,
+    contentTypeId: String(item?.contenttypeid || "15").trim(),
     category: `${region.label} 축제`,
     categorySlug: "festival",
     title,
@@ -138,6 +142,7 @@ function normalizeTourFestivalItem(item, region, index) {
     date,
     readTime: `${region.label} 축제 정보`,
     image,
+    galleryImages: [],
     address,
     place: String(item?.addr1 || "").trim(),
     gu: "",
@@ -190,6 +195,51 @@ async function fetchNationwideFestivals() {
     seen.add(key);
     return true;
   });
+}
+
+const GALLERY_FETCH_CONCURRENCY = 8;
+const GALLERY_IMAGE_LIMIT = 12;
+// TourAPI has a per-key daily call quota, and fetching a photo gallery is
+// one extra request per festival. Cap how many festivals get a gallery per
+// run instead of fetching for every item - the soonest-starting festivals
+// (items are already date-sorted before this runs) get priority.
+const GALLERY_FETCH_LIMIT = Number(process.env.GALLERY_FETCH_LIMIT) || 200;
+
+async function fetchFestivalGallery(item) {
+  if (!item.contentId) return [];
+
+  const endpoint = `${siteOrigin}/api/tour-detail?endpoint=detailImage2&contentId=${encodeURIComponent(item.contentId)}&contentTypeId=${encodeURIComponent(item.contentTypeId)}`;
+
+  try {
+    const payload = await fetchJson(endpoint);
+    const rawItems = payload?.response?.body?.items?.item;
+    const list = Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
+    const urls = list
+      .map((image) => normalizeUrl(image?.originimgurl || image?.smallimageurl))
+      .filter(Boolean);
+    return [...new Set(urls)].slice(0, GALLERY_IMAGE_LIMIT);
+  } catch (error) {
+    console.warn(`${item.title || item.id} 사진 정보를 불러오지 못했습니다.`, error?.message || error);
+    return [];
+  }
+}
+
+// Runs gallery lookups with limited concurrency so a run with hundreds of
+// festivals doesn't fire hundreds of simultaneous requests at once.
+async function attachGalleryImages(items) {
+  const targets = items.slice(0, GALLERY_FETCH_LIMIT);
+  const queue = [...targets];
+
+  async function worker() {
+    while (queue.length) {
+      const item = queue.shift();
+      item.galleryImages = await fetchFestivalGallery(item);
+    }
+  }
+
+  await Promise.all(Array.from({ length: GALLERY_FETCH_CONCURRENCY }, worker));
+  const withPhotos = targets.filter((item) => item.galleryImages.length).length;
+  console.log(`${targets.length}개 축제의 사진 정보를 확인했고, ${withPhotos}개에서 추가 사진을 찾았습니다.`);
 }
 
 function escapeHtml(value) {
@@ -320,6 +370,8 @@ async function main() {
 
   // Sort so the freshest/soonest-starting festivals lead the feed.
   items.sort((a, b) => a.date.localeCompare(b.date));
+
+  await attachGalleryImages(items);
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(
