@@ -68,6 +68,7 @@ const state = {
   apiError: false,
   activeRegionId: "seoul",
   activeCategoryFilter: "all",
+  searchQuery: "",
   visibleFeedCount: 12,
   newsLoading: true,
   language: getStoredLanguage()
@@ -104,15 +105,32 @@ const I18N = {
     "nav.places": "가볼만한 곳",
     "nav.booking": "여행검색",
     "nav.group.explore": "둘러보기",
+    "nav.group.find": "축제 찾기",
     "nav.group.booking": "예약",
     "nav.group.reading": "읽을거리",
+    "nav.group.info": "여행 정보",
+    "nav.allFestivals": "전체 축제",
+    "nav.regionFestivals": "지역별 축제",
     "nav.categoryNews": "분야별 축제",
+    "nav.search": "축제 검색",
     "nav.stay": "숙소 검색",
     "nav.tour": "투어·입장권",
     "nav.flight": "항공권",
+    "nav.essentials": "여행 준비물",
     "nav.latest": "최신 뉴스",
     "nav.rss": "RSS 피드",
     "nav.about": "사이트 소개",
+    "nav.free": "무료 축제",
+    "nav.family": "가족 나들이",
+    "nav.night": "야간 행사",
+    "nav.transport": "교통·주차",
+    "search.placeholder": "축제명, 지역, 주제 검색",
+    "search.submit": "검색",
+    "search.ready": "지역명이나 축제명을 입력하면 최신 목록에서 바로 찾아드립니다.",
+    "search.loaded": "지금 불러온 {count}개 축제에서 바로 검색할 수 있습니다.",
+    "search.count": "\"{query}\" 검색 결과 {count}개",
+    "search.empty": "\"{query}\" 검색 결과가 없습니다. 지역명이나 축제명을 바꿔보세요.",
+    "search.clear": "검색 해제",
     "july.title": "오늘 볼 만한 전국 축제 뉴스",
     "july.description": "전국 축제, 계절 행사, 방문 코스와 방문 전 체크 정보를 뉴스 피드 형식으로 정리했습니다.",
     "july.loading": "이번 달 전국 축제 정보를 불러오는 중입니다.",
@@ -153,15 +171,32 @@ const I18N = {
     "nav.places": "Places",
     "nav.booking": "Search",
     "nav.group.explore": "Explore",
+    "nav.group.find": "Find Festivals",
     "nav.group.booking": "Book",
     "nav.group.reading": "Read",
+    "nav.group.info": "Travel Info",
+    "nav.allFestivals": "All Festivals",
+    "nav.regionFestivals": "By Region",
     "nav.categoryNews": "By Category",
+    "nav.search": "Festival Search",
     "nav.stay": "Stays",
     "nav.tour": "Tours & Tickets",
     "nav.flight": "Flights",
+    "nav.essentials": "Trip Essentials",
     "nav.latest": "Latest News",
     "nav.rss": "RSS Feed",
     "nav.about": "About",
+    "nav.free": "Free Events",
+    "nav.family": "Family Trips",
+    "nav.night": "Night Events",
+    "nav.transport": "Transport",
+    "search.placeholder": "Search festival, region, or topic",
+    "search.submit": "Search",
+    "search.ready": "Type a region or festival name to filter the latest list.",
+    "search.loaded": "Search across {count} loaded festival stories.",
+    "search.count": "{count} results for \"{query}\"",
+    "search.empty": "No results for \"{query}\". Try another region or festival name.",
+    "search.clear": "Clear search",
     "july.title": "Festival News to Read Today",
     "july.description": "Browse festival and travel information from across Korea in a mobile news feed with one featured story, recommended cards, and the latest list.",
     "july.loading": "Loading this month's festivals nationwide.",
@@ -202,15 +237,32 @@ const I18N = {
     "nav.places": "見どころ",
     "nav.booking": "検索",
     "nav.group.explore": "見どころ",
+    "nav.group.find": "フェス検索",
     "nav.group.booking": "予約",
     "nav.group.reading": "読み物",
+    "nav.group.info": "旅行情報",
+    "nav.allFestivals": "すべてのフェス",
+    "nav.regionFestivals": "地域別フェス",
     "nav.categoryNews": "分野別フェス",
+    "nav.search": "フェス検索",
     "nav.stay": "宿泊施設",
     "nav.tour": "ツアー・チケット",
     "nav.flight": "航空券",
+    "nav.essentials": "旅行準備品",
     "nav.latest": "最新ニュース",
     "nav.rss": "RSSフィード",
     "nav.about": "サイト概要",
+    "nav.free": "無料フェス",
+    "nav.family": "家族向け",
+    "nav.night": "夜イベント",
+    "nav.transport": "交通・駐車",
+    "search.placeholder": "フェス名、地域、テーマで検索",
+    "search.submit": "検索",
+    "search.ready": "地域名やフェス名を入力すると最新リストを絞り込めます。",
+    "search.loaded": "{count}件のフェス記事から検索できます。",
+    "search.count": "「{query}」の検索結果 {count}件",
+    "search.empty": "「{query}」の検索結果はありません。地域名やフェス名を変えてみてください。",
+    "search.clear": "検索を解除",
     "july.title": "今日読みたいフェスニュース",
     "july.description": "注目記事、推薦カード、最新リストの順に韓国全国のフェス情報を確認できます。",
     "july.loading": "今月の全国フェス一覧を読み込んでいます。",
@@ -251,15 +303,32 @@ const I18N = {
     "nav.places": "推荐地点",
     "nav.booking": "搜索",
     "nav.group.explore": "探索",
+    "nav.group.find": "查找庆典",
     "nav.group.booking": "预订",
     "nav.group.reading": "阅读",
+    "nav.group.info": "旅行信息",
+    "nav.allFestivals": "全部庆典",
+    "nav.regionFestivals": "按地区",
     "nav.categoryNews": "分类庆典",
+    "nav.search": "庆典搜索",
     "nav.stay": "住宿",
     "nav.tour": "旅游·门票",
     "nav.flight": "机票",
+    "nav.essentials": "旅行用品",
     "nav.latest": "最新新闻",
     "nav.rss": "RSS订阅",
     "nav.about": "关于我们",
+    "nav.free": "免费庆典",
+    "nav.family": "亲子出行",
+    "nav.night": "夜间活动",
+    "nav.transport": "交通停车",
+    "search.placeholder": "搜索庆典名、地区或主题",
+    "search.submit": "搜索",
+    "search.ready": "输入地区或庆典名称，即可筛选最新列表。",
+    "search.loaded": "可在 {count} 篇庆典文章中搜索。",
+    "search.count": "“{query}” 的搜索结果 {count} 个",
+    "search.empty": "没有找到 “{query}” 的结果。请尝试其他地区或庆典名称。",
+    "search.clear": "清除搜索",
     "july.title": "今日值得关注的庆典新闻",
     "july.description": "按重点报道、推荐卡片和最新列表的顺序浏览韩国全国庆典信息。",
     "july.loading": "正在加载本月全国庆典列表。",
@@ -293,8 +362,8 @@ const I18N = {
 const EDITORIAL_I18N = {
   ko: {
     "nav.editorial": "서울 기획",
-    "editorial.title": "서울을 더 잘 여행하는 방법",
-    "editorial.description": "전시와 공연, 동네 산책과 교통 정보를 직접 읽고 고른 서울 여행 기획입니다.",
+    "editorial.title": "전국 축제 뉴스와 여행 준비",
+    "editorial.description": "오늘 볼 만한 전국 축제, 지역별 행사, 예약 전 체크 정보를 한 화면에서 찾을 수 있게 정리합니다.",
     "editorial.link": "최신 행사 보기",
     "latest.title": "지금 전국에서 열리는 축제",
     "latest.description": "전국 축제·문화행사 정보를 바탕으로 일정·장소·요금·문의처를 확인하고, 방문 동선과 주변 교통까지 함께 정리합니다.",
@@ -302,8 +371,8 @@ const EDITORIAL_I18N = {
   },
   en: {
     "nav.editorial": "Seoul Guides",
-    "editorial.title": "A better way to explore Seoul",
-    "editorial.description": "Editor-selected Seoul itineraries covering exhibitions, performances, neighborhood walks, and practical transport tips.",
+    "editorial.title": "Festival news and trip prep across Korea",
+    "editorial.description": "Find nationwide festivals, regional events, and pre-booking checks from one practical travel news screen.",
     "editorial.link": "See the latest events",
     "latest.title": "What is on across Korea now",
     "latest.description": "Check official festival schedules, venues, prices, contacts, nearby routes, and transport information from across Korea in one place.",
@@ -311,8 +380,8 @@ const EDITORIAL_I18N = {
   },
   ja: {
     "nav.editorial": "ソウル特集",
-    "editorial.title": "ソウルをもっと楽しむ旅の方法",
-    "editorial.description": "展示、公演、街歩き、交通情報を編集部が選び、旅の流れに合わせて紹介します。",
+    "editorial.title": "韓国全国のフェスニュースと旅の準備",
+    "editorial.description": "今日見たい全国フェス、地域別イベント、予約前チェックを一つの画面で探せるよう整理します。",
     "editorial.link": "最新イベントを見る",
     "latest.title": "今全国で開催中のフェス",
     "latest.description": "全国のフェス・文化イベント情報をもとに、日程、会場、料金、問い合わせ先、周辺交通をまとめました。",
@@ -320,8 +389,8 @@ const EDITORIAL_I18N = {
   },
   zh: {
     "nav.editorial": "首尔专题",
-    "editorial.title": "用更好的方式探索首尔",
-    "editorial.description": "精选展览、演出、街区漫步和交通信息，帮助你轻松规划首尔行程。",
+    "editorial.title": "韩国全国庆典新闻与出行准备",
+    "editorial.description": "在一个页面查找今日可看的全国庆典、地区活动和预订前确认事项。",
     "editorial.link": "查看最新活动",
     "latest.title": "全国正在举行的庆典",
     "latest.description": "根据全国庆典/文化活动信息，整理日程、地点、票价、联系方式、游览动线和交通。",
@@ -437,6 +506,10 @@ function applyLanguage() {
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     element.textContent = textFor(element.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    element.setAttribute("placeholder", textFor(element.dataset.i18nPlaceholder));
   });
 
   document.querySelectorAll("[data-lang]").forEach((button) => {
@@ -675,10 +748,44 @@ function primaryNewsItems() {
   return sortByQualityAndDate(uniqueArticles((source || []).map(withGroupedCategory)));
 }
 
+function normalizeSearchQuery(value = "") {
+  return String(value || "").trim().toLocaleLowerCase();
+}
+
+function articleSearchText(item = {}) {
+  return [
+    item.title,
+    displayArticleTitle(item),
+    item.category,
+    item.rawCategory,
+    item.subCategory,
+    item.summary,
+    item.address,
+    item.place,
+    item.org,
+    item.target,
+    item.fee,
+    item.time
+  ].filter(Boolean).join(" ").toLocaleLowerCase();
+}
+
+function searchFilteredItems(items = primaryNewsItems()) {
+  const query = normalizeSearchQuery(state.searchQuery);
+  if (!query) return items;
+
+  const tokens = query.split(/\s+/).filter(Boolean);
+  return items.filter((item) => {
+    const haystack = articleSearchText(item);
+    return tokens.every((token) => haystack.includes(token));
+  });
+}
+
 function filteredNewsItems(items = primaryNewsItems()) {
   const filter = state.activeCategoryFilter || "all";
-  if (filter === "all") return items;
-  return items.filter((item) => categoryKeyFor(item) === filter);
+  const categoryItems = filter === "all"
+    ? items
+    : items.filter((item) => categoryKeyFor(item) === filter);
+  return searchFilteredItems(categoryItems);
 }
 
 function categoryCountMap(items = primaryNewsItems()) {
@@ -2562,8 +2669,65 @@ function bindCategoryResetLinks() {
     const link = event.target.closest("[data-category-reset]");
     if (!link) return;
     state.activeCategoryFilter = "all";
+    state.searchQuery = "";
     state.visibleFeedCount = FEED_PAGE_SIZE;
     renderJulyFestivals();
+  });
+}
+
+function setFestivalSearchQuery(value = "", options = {}) {
+  state.searchQuery = String(value || "").trim();
+  state.visibleFeedCount = FEED_PAGE_SIZE;
+  renderJulyFestivals();
+
+  if (options.focus) {
+    $("#festivalSearchInput")?.focus();
+  }
+
+  if (options.scroll) {
+    $("#allArticles")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function bindFestivalSearch() {
+  const form = $("#festivalSearchForm");
+  const input = $("#festivalSearchInput");
+  const clearButton = $("#festivalSearchClear");
+
+  if (form && input) {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const query = input.value.trim();
+      if (!query) {
+        setFestivalSearchQuery("", { scroll: true });
+        return;
+      }
+      window.location.href = `/search?q=${encodeURIComponent(query)}`;
+    });
+
+    input.addEventListener("input", () => {
+      setFestivalSearchQuery(input.value);
+    });
+  }
+
+  clearButton?.addEventListener("click", () => {
+    setFestivalSearchQuery("", { focus: true });
+  });
+
+  document.addEventListener("click", (event) => {
+    const focusLink = event.target.closest("[data-search-focus]");
+    if (focusLink) {
+      event.preventDefault();
+      $("#festivalSearchInput")?.focus();
+      return;
+    }
+
+    const chip = event.target.closest("[data-search-chip]");
+    if (!chip) return;
+
+    event.preventDefault();
+    const query = chip.getAttribute("data-search-chip") || chip.textContent || "";
+    setFestivalSearchQuery(query, { scroll: true, focus: true });
   });
 }
 
@@ -2689,8 +2853,60 @@ function currentSeoulMonth() {
   };
 }
 
+function currentFestivalDateWindows() {
+  const month = currentSeoulMonth();
+  const previousYear = String(Number(month.year) - 1);
+  const previousMonth = `${previousYear}${month.month}`;
+  const previousDay = String(
+    Math.min(Number(todayCompact().slice(6)), Number(new Date(Number(previousYear), Number(month.month), 0).getDate()))
+  ).padStart(2, "0");
+  const ranges = [
+    {
+      id: "current-month",
+      month: month.key,
+      start: month.start,
+      end: month.end,
+      label: month.label
+    },
+    {
+      id: "current-year-remainder",
+      month: month.key,
+      start: todayCompact(),
+      end: `${month.year}1231`,
+      label: "남은 시즌"
+    },
+    {
+      id: "previous-year-same-season",
+      month: previousMonth,
+      start: `${previousMonth}${previousDay}`,
+      end: `${previousYear}1231`,
+      label: "최근 시즌"
+    },
+    {
+      id: "previous-year",
+      month: `${previousYear}01`,
+      start: `${previousYear}0101`,
+      end: `${previousYear}1231`,
+      label: "최근 확보"
+    }
+  ];
+  const seen = new Set();
+  return ranges.filter((range) => {
+    const key = `${range.start}:${range.end}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function festivalSearchStartCompact() {
-  return currentSeoulMonth().start;
+  return currentFestivalDateWindows()[0].start;
+}
+
+function overlapsDateWindow(item, dateWindow) {
+  const start = String(item.eventstartdate || "");
+  const end = String(item.eventenddate || start);
+  return start <= dateWindow.end && end >= dateWindow.start;
 }
 
 function monthFromDateRange(value) {
@@ -2860,16 +3076,20 @@ function normalizeTourItems(items, regionOverride = activeRegion()) {
     });
 }
 
-function buildTourApiUrl(areaCode = activeRegion().areaCode) {
+function buildTourApiUrl(areaCode = activeRegion().areaCode, dateWindow = currentFestivalDateWindows()[0]) {
   const config = data.tourApi;
   const params = new URLSearchParams({
     numOfRows: String(config.numOfRows || 8),
     pageNo: String(config.pageNo || 1),
-    arrange: config.arrange || "O"
+    arrange: config.arrange || "O",
+    month: dateWindow.month
   });
 
   if (config.mode === "festival") {
-    params.set("eventStartDate", config.eventStartDate || festivalSearchStartCompact());
+    params.set("eventStartDate", config.eventStartDate || dateWindow.start || festivalSearchStartCompact());
+    if (dateWindow.end) {
+      params.set("eventEndDate", dateWindow.end);
+    }
   }
 
   if (config.contentTypeId) {
@@ -2888,16 +3108,15 @@ function regionAreaCodes(region) {
   return region.areaCode ? [region.areaCode] : [""];
 }
 
-function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
+function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100, dateWindow = currentFestivalDateWindows()[0]) {
   const config = data.tourApi;
-  const month = currentSeoulMonth();
   const params = new URLSearchParams({
     numOfRows: String(numOfRows),
     pageNo: String(pageNo),
     arrange: config.arrange || "O",
-    eventStartDate: month.start,
-    eventEndDate: month.end,
-    month: month.key,
+    eventStartDate: dateWindow.start,
+    eventEndDate: dateWindow.end,
+    month: dateWindow.month,
     areaCode: config.areaCode || "1"
   });
 
@@ -2914,11 +3133,8 @@ function buildSeoulCultureUrl() {
   return `${config.endpoint || "/api/seoul-events"}?${params.toString()}`;
 }
 
-function overlapsJulyFestival(item) {
-  const month = currentSeoulMonth();
-  const start = String(item.eventstartdate || "");
-  const end = String(item.eventenddate || start);
-  return start <= month.end && end >= month.start;
+function overlapsJulyFestival(item, dateWindow = currentFestivalDateWindows()[0]) {
+  return overlapsDateWindow(item, dateWindow);
 }
 
 function regionLabelFromAddress(address) {
@@ -2933,19 +3149,19 @@ function regionLabelFromAddress(address) {
     .replace("남", "남");
 }
 
-function normalizeJulyFestivalItems(items) {
+function normalizeJulyFestivalItems(items, dateWindow = currentFestivalDateWindows()[0]) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
-  const month = currentSeoulMonth();
+  const label = dateWindow.label || currentSeoulMonth().label;
 
   return list
-    .filter((item) => item && item.title && overlapsJulyFestival(item))
+    .filter((item) => item && item.title && overlapsJulyFestival(item, dateWindow))
     .sort((a, b) => String(a.eventstartdate || "").localeCompare(String(b.eventstartdate || "")))
     .map((item, index) => {
       const image = imageUrlForItem(item, DEFAULT_FESTIVAL_IMAGE);
       const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
       const startDate = compactDate(item.eventstartdate);
       const endDate = compactDate(item.eventenddate);
-      const period = startDate && endDate ? `${startDate} - ${endDate}` : startDate || `${month.label} 진행`;
+      const period = startDate && endDate ? `${startDate} - ${endDate}` : startDate || `${label} 진행`;
       const region = regionLabelFromAddress(item.addr1);
 
       return {
@@ -2953,7 +3169,7 @@ function normalizeJulyFestivalItems(items) {
         source: "tour",
         contentId: item.contentid,
         contentTypeId: item.contenttypeid || 15,
-        category: `${region} ${month.label} 축제`,
+        category: `${region} ${label} 축제`,
         title: item.title,
         summaryKey: address ? "summary.july" : "summary.julyFallback",
         summaryParams: { address },
@@ -2978,20 +3194,24 @@ async function loadTourApiPlaces() {
   state.placesError = false;
 
   try {
-    const responses = await Promise.all(
-      areaCodes.map(async (areaCode) => {
-        const response = await fetch(buildTourApiUrl(areaCode), { signal: controller.signal });
-        if (!response.ok) throw new Error(`TourAPI HTTP ${response.status}`);
-        return response.json();
-      })
-    );
+    let placesArticles = [];
+    for (const dateWindow of currentFestivalDateWindows()) {
+      const responses = await Promise.all(
+        areaCodes.map(async (areaCode) => {
+          const response = await fetch(buildTourApiUrl(areaCode, dateWindow), { signal: controller.signal });
+          if (!response.ok) throw new Error(`TourAPI HTTP ${response.status}`);
+          return response.json();
+        })
+      );
 
-    const items = responses.flatMap((payload) => {
-      const rawItems = payload?.response?.body?.items?.item;
-      return Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
-    });
-    const dedupedItems = [...new Map(items.map((item, index) => [item.contentid || `${item.title}-${index}`, item])).values()];
-    const placesArticles = normalizeTourItems(dedupedItems, region);
+      const items = responses.flatMap((payload) => {
+        const rawItems = payload?.response?.body?.items?.item;
+        return Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
+      });
+      const dedupedItems = [...new Map(items.map((item, index) => [item.contentid || `${item.title}-${index}`, item])).values()];
+      placesArticles = normalizeTourItems(dedupedItems, region);
+      if (placesArticles.length) break;
+    }
 
     if (requestRegionId !== state.activeRegionId) return;
 
@@ -3018,6 +3238,34 @@ async function loadTourApiPlaces() {
   }
 }
 
+function renderFestivalSearchStatus(totalCount = 0, matchCount = 0) {
+  const target = $("#festivalSearchStatus");
+  const clearButton = $("#festivalSearchClear");
+  const input = $("#festivalSearchInput");
+  const query = String(state.searchQuery || "").trim();
+
+  if (input && input.value !== state.searchQuery) {
+    input.value = state.searchQuery;
+  }
+
+  if (clearButton) {
+    clearButton.hidden = !query;
+  }
+
+  if (!target) return;
+
+  if (!query) {
+    target.textContent = totalCount
+      ? textFor("search.loaded", { count: totalCount.toLocaleString("ko-KR") })
+      : textFor("search.ready");
+    return;
+  }
+
+  target.textContent = matchCount
+    ? textFor("search.count", { query, count: matchCount.toLocaleString("ko-KR") })
+    : textFor("search.empty", { query });
+}
+
 function renderJulyFestivals() {
   const status = $("#julyStatus");
   const recommended = $("#recommendedArticles");
@@ -3030,7 +3278,9 @@ function renderJulyFestivals() {
   const month = currentSeoulMonth();
   const allItems = primaryNewsItems();
   const items = filteredNewsItems(allItems);
+  const hasSearchQuery = Boolean(normalizeSearchQuery(state.searchQuery));
   renderTopCategoryTabs();
+  renderFestivalSearchStatus(allItems.length, items.length);
 
   if (countTarget) {
     countTarget.textContent = `${items.length.toLocaleString("ko-KR")}개`;
@@ -3060,9 +3310,11 @@ function renderJulyFestivals() {
     }
 
     setNewsLoading(false);
-    status.textContent = state.activeCategoryFilter === "all"
-      ? `${month.label}에 표시할 축제 정보를 불러오는 중입니다.`
-      : "선택한 분류에 표시할 축제 정보가 없습니다.";
+    status.textContent = hasSearchQuery
+      ? textFor("search.empty", { query: normalizeSearchQuery(state.searchQuery) })
+      : state.activeCategoryFilter === "all"
+        ? `${month.label}에 표시할 축제 정보를 불러오는 중입니다.`
+        : "선택한 분류에 표시할 축제 정보가 없습니다.";
     status.hidden = false;
     recommended.innerHTML = "";
     feed.innerHTML = "";
@@ -3074,8 +3326,10 @@ function renderJulyFestivals() {
   status.textContent = "";
   status.hidden = true;
 
-  recommended.innerHTML = items.slice(1, 5).map((item) => newsRecommendCard(item)).join("");
-  const feedItems = items.slice(5);
+  recommended.innerHTML = hasSearchQuery
+    ? ""
+    : items.slice(1, 5).map((item) => newsRecommendCard(item)).join("");
+  const feedItems = hasSearchQuery ? items : items.slice(5);
   const visibleCount = Math.min(state.visibleFeedCount, feedItems.length);
   feed.innerHTML = buildNewsFeedMarkup(feedItems.slice(0, visibleCount));
   if (loadMore) {
@@ -3214,33 +3468,45 @@ async function loadJulyFestivalPosts() {
   }
 
   const numOfRows = 100;
-  const collected = [];
+  let lastError = null;
 
   try {
-    for (let pageNo = 1; pageNo <= 6; pageNo += 1) {
-      const response = await fetch(buildJulyFestivalUrl(pageNo, numOfRows));
-      if (!response.ok) throw new Error(`Monthly festival HTTP ${response.status}`);
+    for (const dateWindow of currentFestivalDateWindows()) {
+      const collected = [];
+      try {
+        for (let pageNo = 1; pageNo <= 6; pageNo += 1) {
+          const response = await fetch(buildJulyFestivalUrl(pageNo, numOfRows, dateWindow));
+          if (!response.ok) throw new Error(`Monthly festival HTTP ${response.status}`);
 
-      const payload = await readApiPayload(response);
-      const body = payload?.response?.body || {};
-      const items = body?.items?.item;
-      const totalCount = Number(body.totalCount || body.total_count || 0);
-      const list = Array.isArray(items) ? items : items ? [items] : [];
-      collected.push(...list);
+          const payload = await readApiPayload(response);
+          const body = payload?.response?.body || {};
+          const items = body?.items?.item;
+          const totalCount = Number(body.totalCount || body.total_count || 0);
+          const list = Array.isArray(items) ? items : items ? [items] : [];
+          collected.push(...list);
 
-      if (!list.length || pageNo * numOfRows >= totalCount) break;
+          if (!list.length || pageNo * numOfRows >= totalCount) break;
+        }
+
+        const deduped = [...new Map(
+          normalizeJulyFestivalItems(collected, dateWindow).map((item) => [item.contentId || item.id, item])
+        ).values()];
+
+        if (!deduped.length) continue;
+
+        state.julyArticles = deduped;
+        writeJulyFestivalCache(deduped);
+        renderJulyFestivals();
+        renderCuration();
+        renderEditorialPosts();
+        renderCategoryNewsSections();
+        return;
+      } catch (error) {
+        lastError = error;
+      }
     }
 
-    const deduped = [...new Map(
-      normalizeJulyFestivalItems(collected).map((item) => [item.contentId || item.id, item])
-    ).values()];
-
-    state.julyArticles = deduped;
-    writeJulyFestivalCache(deduped);
-    renderJulyFestivals();
-    renderCuration();
-    renderEditorialPosts();
-    renderCategoryNewsSections();
+    throw lastError || new Error("No festival posts returned for the configured date windows.");
   } catch (error) {
     console.warn("Monthly festival posts could not be loaded.", error);
     const status = $("#julyStatus");
@@ -3618,9 +3884,17 @@ function bindMenu() {
   const nav = $("#primaryNav");
   if (!button || !nav) return;
 
+  const closePanels = () => {
+    nav.querySelectorAll(".nav-menu.is-active").forEach((menu) => {
+      menu.classList.remove("is-active");
+      menu.querySelector(".nav-trigger")?.setAttribute("aria-expanded", "false");
+    });
+  };
+
   const closeMenu = () => {
     button.setAttribute("aria-expanded", "false");
     nav.classList.remove("is-open");
+    closePanels();
   };
 
   button.addEventListener("click", (event) => {
@@ -3631,13 +3905,29 @@ function bindMenu() {
   });
 
   nav.addEventListener("click", (event) => {
+    const trigger = event.target.closest(".nav-trigger");
+    if (trigger) {
+      event.preventDefault();
+      const menu = trigger.closest(".nav-menu");
+      const isOpen = menu?.classList.contains("is-active");
+      closePanels();
+      if (menu && !isOpen) {
+        menu.classList.add("is-active");
+        trigger.setAttribute("aria-expanded", "true");
+      }
+      return;
+    }
+
     if (event.target.closest("a")) closeMenu();
   });
 
   document.addEventListener("click", (event) => {
-    if (!nav.classList.contains("is-open")) return;
     if (button.contains(event.target) || nav.contains(event.target)) return;
-    closeMenu();
+    if (nav.classList.contains("is-open")) {
+      closeMenu();
+      return;
+    }
+    closePanels();
   });
 
   document.addEventListener("keydown", (event) => {
@@ -3670,6 +3960,7 @@ function init() {
   bindMrtQuickSearch();
   bindTopCategoryTabs();
   bindCategoryResetLinks();
+  bindFestivalSearch();
   bindLoadMoreArticles();
   bindLanguageSwitch();
   applyLanguage();

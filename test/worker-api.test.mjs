@@ -28,6 +28,24 @@ test("worker delegates non-API requests to Pages assets", async () => {
   assert.equal(await response.text(), "asset");
 });
 
+test("worker delegates the clean search URL to Pages assets", async () => {
+  let requestedUrl = "";
+  const response = await worker.fetch(new Request("https://view1.kr/search?q=서울"), {
+    ASSETS: {
+      fetch: async (request) => {
+        requestedUrl = request.url;
+        return new Response("search asset", { status: 200 });
+      }
+    }
+  });
+
+  const assetUrl = new URL(requestedUrl);
+  assert.equal(response.status, 200);
+  assert.equal(assetUrl.pathname, "/search");
+  assert.equal(assetUrl.searchParams.get("q"), "서울");
+  assert.equal(await response.text(), "search asset");
+});
+
 test("worker protects proxy routes from wrong origins and missing keys", async (t) => {
   await t.test("wrong origin", async () => {
     const response = await worker.fetch(new Request("https://view1.kr/api/myrealtrip", {

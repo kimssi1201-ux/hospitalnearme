@@ -13,6 +13,7 @@ const editorialDataPath = path.join(rootDir, "travel-data.js");
 
 const siteOrigin = normalizeOrigin(process.env.SITE_ORIGIN || "https://view1.kr");
 const publicSiteUrl = normalizeOrigin(process.env.PUBLIC_SITE_URL || siteOrigin);
+const MIN_REFRESH_ITEMS = Number(process.env.MIN_REFRESH_ITEMS) || 24;
 
 // Korea Tourism Organization TourAPI area codes, nationwide. Kept in sync
 // with the `regions` list in travel-data.js.
@@ -60,9 +61,69 @@ function currentKstMonth() {
   return `${parts.year}${parts.month}`;
 }
 
+function monthEndDate(month) {
+  const year = Number(month.slice(0, 4));
+  const monthNumber = Number(month.slice(4, 6));
+  const lastDay = String(new Date(year, monthNumber, 0).getDate()).padStart(2, "0");
+  return `${month}${lastDay}`;
+}
+
+function currentKstCompactDate() {
+  const parts = kstParts();
+  return `${parts.year}${parts.month}${parts.day}`;
+}
+
 function todayKstIso() {
   const parts = kstParts();
   return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+function refreshDateRanges() {
+  const parts = kstParts();
+  const year = Number(parts.year);
+  const currentMonth = `${parts.year}${parts.month}`;
+  const previousYear = String(year - 1);
+  const previousMonth = `${previousYear}${parts.month}`;
+  const previousDay = String(
+    Math.min(Number(parts.day), Number(monthEndDate(previousMonth).slice(6)))
+  ).padStart(2, "0");
+  const ranges = [
+    {
+      id: "current-month",
+      month: currentMonth,
+      start: `${currentMonth}01`,
+      end: monthEndDate(currentMonth),
+      label: `${currentMonth} current month`
+    },
+    {
+      id: "current-year-remainder",
+      month: currentMonth,
+      start: currentKstCompactDate(),
+      end: `${parts.year}1231`,
+      label: `${parts.year} remaining season`
+    },
+    {
+      id: "previous-year-same-season",
+      month: previousMonth,
+      start: `${previousMonth}${previousDay}`,
+      end: `${previousYear}1231`,
+      label: `${previousYear} same-season fallback`
+    },
+    {
+      id: "previous-year",
+      month: `${previousYear}01`,
+      start: `${previousYear}0101`,
+      end: `${previousYear}1231`,
+      label: `${previousYear} full-year fallback`
+    }
+  ];
+  const seen = new Set();
+  return ranges.filter((range) => {
+    const key = `${range.start}:${range.end}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 async function fetchJson(url) {
@@ -160,8 +221,19 @@ function normalizeTourFestivalItem(item, region, index) {
   };
 }
 
-async function fetchRegionFestivals(region) {
-  const endpoint = `${siteOrigin}/api/tour-festivals?areaCode=${encodeURIComponent(region.areaCode)}&numOfRows=100&pageNo=1`;
+async function fetchRegionFestivals(region, range) {
+  const query = new URLSearchParams({
+    areaCode: region.areaCode,
+    numOfRows: "100",
+    pageNo: "1"
+  });
+  if (range) {
+    query.set("month", range.month);
+    query.set("eventStartDate", range.start);
+    query.set("eventEndDate", range.end);
+  }
+
+  const endpoint = `${siteOrigin}/api/tour-festivals?${query.toString()}`;
   const payload = await fetchJson(endpoint);
   const rawItems = payload?.response?.body?.items?.item;
   const list = Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
@@ -170,8 +242,8 @@ async function fetchRegionFestivals(region) {
     .map((item, index) => normalizeTourFestivalItem(item, region, index));
 }
 
-async function fetchNationwideFestivals() {
-  const settled = await Promise.allSettled(REGIONS.map((region) => fetchRegionFestivals(region)));
+async function fetchNationwideFestivalsForRange(range) {
+  const settled = await Promise.allSettled(REGIONS.map((region) => fetchRegionFestivals(region, range)));
   const items = [];
   const failedRegions = [];
 
@@ -195,6 +267,41 @@ async function fetchNationwideFestivals() {
     seen.add(key);
     return true;
   });
+}
+
+async function fetchNationwideFestivals() {
+  const ranges = refreshDateRanges();
+  const attempts = [];
+  let bestFallback = null;
+
+  for (const range of ranges) {
+    const items = await fetchNationwideFestivalsForRange(range);
+    attempts.push({ id: range.id, start: range.start, end: range.end, count: items.length });
+    if (items.length >= MIN_REFRESH_ITEMS) {
+      if (attempts.length > 1) {
+        const previousHadItems = attempts.slice(0, -1).some((attempt) => attempt.count > 0);
+        const reason = previousHadItems
+          ? `이전 후보 기간의 TourAPI 축제 목록이 최소 ${MIN_REFRESH_ITEMS}건에 못 미쳐`
+          : "현재 날짜 범위에 TourAPI 축제 목록이 없어";
+        console.warn(
+          `${reason} ${range.label} (${range.start}-${range.end}) 데이터로 갱신합니다.`
+        );
+      }
+      return { items, range, attempts };
+    }
+    if (items.length && (!bestFallback || items.length > bestFallback.items.length)) {
+      bestFallback = { items, range };
+      console.warn(
+        `${range.label} (${range.start}-${range.end}) 데이터가 ${items.length}건뿐이라 최소 ${MIN_REFRESH_ITEMS}건 이상인 다음 후보 기간을 확인합니다.`
+      );
+    }
+  }
+
+  if (bestFallback) {
+    return { ...bestFallback, attempts };
+  }
+
+  return { items: [], range: ranges[0], attempts };
 }
 
 const GALLERY_FETCH_CONCURRENCY = 8;
@@ -467,11 +574,13 @@ function sitemapXml(urls, lastmod) {
 }
 
 async function main() {
-  const month = currentKstMonth();
-  const items = await fetchNationwideFestivals();
+  const requestedMonth = currentKstMonth();
+  const { items, range, attempts } = await fetchNationwideFestivals();
+  const month = range.month;
 
   if (!items.length) {
-    throw new Error("전국 축제 데이터가 비어 있어 정적 파일을 갱신하지 않았습니다.");
+    const attemptText = attempts.map((attempt) => `${attempt.start}-${attempt.end}: ${attempt.count}`).join(", ");
+    throw new Error(`전국 축제 데이터가 비어 있어 정적 파일을 갱신하지 않았습니다. (${attemptText})`);
   }
 
   // Sort so the freshest/soonest-starting festivals lead the feed.
@@ -488,6 +597,14 @@ async function main() {
         source: "한국관광공사 TourAPI 축제 정보",
         fetchedFrom: `${siteOrigin}/api/tour-festivals`,
         month,
+        requestedMonth,
+        queryRange: {
+          start: range.start,
+          end: range.end,
+          label: range.label,
+          fallback: range.month !== requestedMonth || range.start !== `${requestedMonth}01`
+        },
+        refreshAttempts: attempts,
         updatedAt: new Date().toISOString(),
         count: items.length,
         items
@@ -514,7 +631,10 @@ async function main() {
   ];
   await writeFile(sitemapPath, sitemapXml(urls, todayKstIso()), "utf8");
 
-  console.log(`Updated ${path.relative(rootDir, outputPath)} with ${items.length} items across ${REGIONS.length} regions for ${month}.`);
+  console.log(`Updated ${path.relative(rootDir, outputPath)} with ${items.length} items across ${REGIONS.length} regions for ${range.start}-${range.end}.`);
+  if (range.month !== requestedMonth || range.start !== `${requestedMonth}01`) {
+    console.log(`Requested ${requestedMonth}; used ${range.label} because earlier date ranges did not meet the ${MIN_REFRESH_ITEMS}-item minimum.`);
+  }
   console.log(`Updated ${path.relative(rootDir, indexPath)} with crawlable article cards.`);
   console.log(`Updated ${path.relative(rootDir, sitemapPath)} with ${urls.length} stable public URLs.`);
 }

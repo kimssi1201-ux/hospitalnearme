@@ -584,7 +584,7 @@ async function handleTourFestivalsApi(request, env) {
     });
     const endpoint = `https://apis.data.go.kr/B551011/KorService2/searchFestival2?${upstreamParams}`;
     const cacheRequest = new Request(
-      `${url.origin}/api/tour-festivals/cache?month=${month}&pageNo=${pageNo}&numOfRows=${numOfRows}&areaCode=${areaCode}&arrange=${arrange}`,
+      `${url.origin}/api/tour-festivals/cache?month=${month}&eventStartDate=${eventStartDate}&eventEndDate=${eventEndDate}&pageNo=${pageNo}&numOfRows=${numOfRows}&areaCode=${areaCode}&arrange=${arrange}`,
       { method: "GET" }
     );
     const cached = await readCache(cacheRequest);
