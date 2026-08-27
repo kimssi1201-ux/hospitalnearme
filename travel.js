@@ -3692,6 +3692,9 @@ function localizedEditorialPost(item = {}) {
   return { ...item, ...copy, readTime };
 }
 
+// Kept intentionally text-light: no image, no summary, no date/readTime —
+// just enough for a crawlable link list. The full-card treatment (image,
+// summary, date) felt text-heavy sitting right at the top of the page.
 function renderEditorialPosts() {
   const target = $("#editorialList");
   if (!target) return;
@@ -3700,29 +3703,16 @@ function renderEditorialPosts() {
     ? data.editorialPosts
     : data.articles || [];
 
-  if (!primaryNewsItems().some(hasApiImage) && state.newsLoading) {
-    target.innerHTML = [
-      loadingCardMarkup("feature"),
-      ...Array.from({ length: 4 }, () => loadingCardMarkup("recommend"))
-    ].join("");
-    return;
-  }
+  const displayPosts = posts.slice(0, 5);
 
-  const displayPosts = posts.slice(0, 5).map((post) => ({ ...post, image: "" }));
-
-  target.innerHTML = displayPosts.map((item, index) => {
+  target.innerHTML = displayPosts.map((item) => {
     const localizedItem = localizedEditorialPost(item);
     const href = detailUrl(localizedItem);
     return `
-      <article class="editorial-card ${index === 0 ? "editorial-card--lead" : ""}">
+      <article class="editorial-link-card">
         <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${localizedItem.title} ${textFor("card.detail")}`)}">
-          ${imageMarkup(localizedItem, index === 0 ? "hero" : "thumb")}
-          <span>
-            <em>${escapeHtml(localizedItem.category || displayCategoryLabel(localizedItem))}</em>
-            <strong>${escapeHtml(localizedItem.title)}</strong>
-            <small>${escapeHtml(localizedItem.summary || "")}</small>
-            <b>${escapeHtml(localizedItem.date || "")} · ${escapeHtml(localizedItem.readTime || textFor("read.detail"))}</b>
-          </span>
+          <em>${escapeHtml(localizedItem.category || displayCategoryLabel(localizedItem))}</em>
+          <strong>${escapeHtml(localizedItem.title)}</strong>
         </a>
       </article>
     `;
