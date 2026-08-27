@@ -199,41 +199,147 @@ async function fetchNationwideFestivals() {
 
 const GALLERY_FETCH_CONCURRENCY = 8;
 const GALLERY_IMAGE_LIMIT = 12;
+// A festival's detailImage2 result alone is often thin (or empty), so a
+// second, separate API - PhotoGalleryService1 (a keyword-search photo
+// service, not tied to a contentId) - fills in the gap. It's a different
+// data.go.kr application/key from TourAPI, so it's entirely optional: if
+// PHOTO_GALLERY_API_KEY isn't configured on the worker, this is skipped
+// after the first failed attempt instead of retrying on every item.
+const PHOTO_GALLERY_MIN_IMAGES = 3;
+let photoGalleryAvailable = true;
+
 // TourAPI has a per-key daily call quota, and fetching a photo gallery is
 // one extra request per festival. Cap how many festivals get a gallery per
 // run instead of fetching for every item - the soonest-starting festivals
 // (items are already date-sorted before this runs) get priority.
 const GALLERY_FETCH_LIMIT = Number(process.env.GALLERY_FETCH_LIMIT) || 200;
 
-async function fetchFestivalGallery(item) {
-  if (!item.contentId) return [];
+// Strips the resolution/size suffix off a TourAPI-family image URL so two
+// URLs pointing at the same underlying photo (different sizes) dedupe as
+// one, e.g. https://tong.visitkorea.or.kr/cms/resource/17/3442117_image2_1.JPG
+function imageFamilyKey(src) {
+  const clean = String(src || "").split("?")[0];
+  const resource = clean.match(/\/resource\/\d+\/([^/_]+)_image\d+_\d+/i);
+  return resource ? resource[1].toLowerCase() : clean.toLowerCase();
+}
 
-  const endpoint = `${siteOrigin}/api/tour-detail?endpoint=detailImage2&contentId=${encodeURIComponent(item.contentId)}&contentTypeId=${encodeURIComponent(item.contentTypeId)}`;
-
-  try {
-    const payload = await fetchJson(endpoint);
-    const rawItems = payload?.response?.body?.items?.item;
-    const list = Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
-    const urls = list
-      .map((image) => normalizeUrl(image?.originimgurl || image?.smallimageurl))
-      .filter(Boolean);
-    return [...new Set(urls)].slice(0, GALLERY_IMAGE_LIMIT);
-  } catch (error) {
-    console.warn(`${item.title || item.id} 사진 정보를 불러오지 못했습니다.`, error?.message || error);
-    return [];
+function mergeGalleryImages(existing, extra, limit) {
+  const seenFamilies = new Set(existing.map(imageFamilyKey));
+  const merged = [...existing];
+  for (const url of extra) {
+    if (merged.length >= limit) break;
+    const key = imageFamilyKey(url);
+    if (!key || seenFamilies.has(key)) continue;
+    seenFamilies.add(key);
+    merged.push(url);
   }
+  return merged;
+}
+
+function photoGalleryImageUrl(item) {
+  return normalizeUrl(item?.galWebImageUrl || item?.galWebImageURL || item?.galwebimageurl || item?.galWebImgUrl);
+}
+
+function festivalGalleryKeywords(item, regionLabel) {
+  const title = String(item.title || "")
+    .replace(/\[[^\]]+\]/g, " ")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const keywords = [title];
+  if (regionLabel && title && !title.includes(regionLabel)) keywords.push(`${regionLabel} ${title}`);
+  return [...new Set(keywords.filter(Boolean))].slice(0, 2);
+}
+
+// PhotoGalleryService1 matches by keyword, not contentId, so results can
+// include photos of unrelated places that merely share a word. Require the
+// gallery item's own title/location text to actually reference this
+// festival's region or a distinctive word from its title.
+function isRelevantGalleryItem(item, regionLabel, galleryItem) {
+  const haystack = String(
+    [galleryItem?.galTitle, galleryItem?.galPhotographyLocation, galleryItem?.galSearchKeyword]
+      .filter(Boolean)
+      .join(" ")
+  ).trim();
+  if (!haystack || !photoGalleryImageUrl(galleryItem)) return false;
+  if (regionLabel && haystack.includes(regionLabel)) return true;
+
+  const titleTokens = String(item.title || "")
+    .replace(/[()[\]{}"'“”‘’·:|/\\_-]/g, " ")
+    .split(/\s+/)
+    .filter((token) => token.length >= 3);
+  return titleTokens.some((token) => haystack.includes(token));
+}
+
+async function fetchPhotoGalleryImages(item, regionLabel) {
+  if (!photoGalleryAvailable) return [];
+
+  const seen = new Set();
+  const urls = [];
+
+  for (const keyword of festivalGalleryKeywords(item, regionLabel)) {
+    try {
+      const endpoint = `${siteOrigin}/api/tour-photo-gallery?keyword=${encodeURIComponent(keyword)}&numOfRows=10`;
+      const payload = await fetchJson(endpoint);
+      const rawItems = payload?.response?.body?.items?.item;
+      const list = Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
+
+      for (const galleryItem of list) {
+        if (!isRelevantGalleryItem(item, regionLabel, galleryItem)) continue;
+        const url = photoGalleryImageUrl(galleryItem);
+        if (!url || seen.has(url)) continue;
+        seen.add(url);
+        urls.push(url);
+      }
+    } catch (error) {
+      if (String(error?.message || "").includes("PHOTO_GALLERY_API_KEY")) {
+        photoGalleryAvailable = false;
+        console.warn("PHOTO_GALLERY_API_KEY가 설정되지 않아 이번 실행에서는 포토갤러리 보조 사진을 건너뜁니다.");
+      } else {
+        console.warn(`${item.title || item.id} 포토갤러리 조회에 실패했습니다.`, error?.message || error);
+      }
+      break;
+    }
+  }
+
+  return urls;
+}
+
+async function fetchFestivalGallery(item, regionLabel) {
+  let detailImages = [];
+
+  if (item.contentId) {
+    try {
+      const endpoint = `${siteOrigin}/api/tour-detail?endpoint=detailImage2&contentId=${encodeURIComponent(item.contentId)}&contentTypeId=${encodeURIComponent(item.contentTypeId)}`;
+      const payload = await fetchJson(endpoint);
+      const rawItems = payload?.response?.body?.items?.item;
+      const list = Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
+      detailImages = list.map((image) => normalizeUrl(image?.originimgurl || image?.smallimageurl)).filter(Boolean);
+    } catch (error) {
+      console.warn(`${item.title || item.id} 사진 정보를 불러오지 못했습니다.`, error?.message || error);
+    }
+  }
+
+  let images = mergeGalleryImages([], detailImages, GALLERY_IMAGE_LIMIT);
+  if (images.length < PHOTO_GALLERY_MIN_IMAGES) {
+    const extra = await fetchPhotoGalleryImages(item, regionLabel);
+    images = mergeGalleryImages(images, extra, GALLERY_IMAGE_LIMIT);
+  }
+
+  return images;
 }
 
 // Runs gallery lookups with limited concurrency so a run with hundreds of
 // festivals doesn't fire hundreds of simultaneous requests at once.
 async function attachGalleryImages(items) {
   const targets = items.slice(0, GALLERY_FETCH_LIMIT);
+  const regionLabelByCode = new Map(REGIONS.map((region) => [region.areaCode, region.label]));
   const queue = [...targets];
 
   async function worker() {
     while (queue.length) {
       const item = queue.shift();
-      item.galleryImages = await fetchFestivalGallery(item);
+      item.galleryImages = await fetchFestivalGallery(item, regionLabelByCode.get(item.areaCode) || "");
     }
   }
 

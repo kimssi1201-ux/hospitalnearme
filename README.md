@@ -29,6 +29,7 @@
 정적 자산 서빙 앞단에서 다음 API를 프록시합니다 (API 키는 Cloudflare Pages 환경변수에만 저장, 저장소에 커밋 금지):
 
 - `/api/tour-festivals`, `/api/tour-detail`: 한국관광공사 TourAPI — 전국 축제 데이터의 주 소스
+- `/api/tour-photo-gallery`: 한국관광공사 PhotoGalleryService1(포토갤러리, TourAPI와 별도 키) — `detailImage2`만으로 사진이 부족한 축제의 보조 사진 소스, 키가 없으면 자동으로 건너뜀
 - `/api/seoul-events`: 서울 열린데이터광장 문화행사 정보 (현재 사이트에서 직접 호출하지는 않지만, 서울 특화 데이터가 필요할 때를 위해 유지)
 - `/api/seoul-parking`: 서울 공영주차장 안내 (좌표 기반 거리 정렬)
 - `/api/festival-ai`: OpenAI로 축제 상세 보조 콘텐츠 생성 (KO/EN/JA/ZH)
