@@ -226,7 +226,7 @@ test("article image rendering uses API images or an explicit empty state", async
   assert.match(travelSource, /const DEFAULT_FESTIVAL_IMAGE = ""/);
 });
 
-test("generated Seoul content matches the current KST month", async () => {
+test("generated festival content records the requested KST month and refresh window", async () => {
   const payload = JSON.parse(await readFile(path.join(root, "generated", "seoul-events.json"), "utf8"));
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Seoul",
@@ -236,9 +236,17 @@ test("generated Seoul content matches the current KST month", async () => {
   const year = parts.find((part) => part.type === "year")?.value;
   const month = parts.find((part) => part.type === "month")?.value;
 
-  assert.equal(payload.month, `${year}${month}`);
+  assert.equal(payload.requestedMonth || payload.month, `${year}${month}`);
+  assert.match(payload.month, /^\d{6}$/);
   assert.equal(payload.count, payload.items.length);
   assert.ok(payload.items.length > 0);
+  if (payload.queryRange) {
+    assert.match(payload.queryRange.start, /^\d{8}$/);
+    assert.match(payload.queryRange.end, /^\d{8}$/);
+    assert.ok(payload.queryRange.start <= payload.queryRange.end);
+    assert.match(payload.queryRange.label, /\S/);
+  }
+
   payload.items.forEach((item) => {
     assert.ok(String(item.title || "").trim(), "generated item title");
     assert.ok(String(item.date || "").trim(), item.title);

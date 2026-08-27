@@ -2689,8 +2689,60 @@ function currentSeoulMonth() {
   };
 }
 
+function currentFestivalDateWindows() {
+  const month = currentSeoulMonth();
+  const previousYear = String(Number(month.year) - 1);
+  const previousMonth = `${previousYear}${month.month}`;
+  const previousDay = String(
+    Math.min(Number(todayCompact().slice(6)), Number(new Date(Number(previousYear), Number(month.month), 0).getDate()))
+  ).padStart(2, "0");
+  const ranges = [
+    {
+      id: "current-month",
+      month: month.key,
+      start: month.start,
+      end: month.end,
+      label: month.label
+    },
+    {
+      id: "current-year-remainder",
+      month: month.key,
+      start: todayCompact(),
+      end: `${month.year}1231`,
+      label: "남은 시즌"
+    },
+    {
+      id: "previous-year-same-season",
+      month: previousMonth,
+      start: `${previousMonth}${previousDay}`,
+      end: `${previousYear}1231`,
+      label: "최근 시즌"
+    },
+    {
+      id: "previous-year",
+      month: `${previousYear}01`,
+      start: `${previousYear}0101`,
+      end: `${previousYear}1231`,
+      label: "최근 확보"
+    }
+  ];
+  const seen = new Set();
+  return ranges.filter((range) => {
+    const key = `${range.start}:${range.end}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function festivalSearchStartCompact() {
-  return currentSeoulMonth().start;
+  return currentFestivalDateWindows()[0].start;
+}
+
+function overlapsDateWindow(item, dateWindow) {
+  const start = String(item.eventstartdate || "");
+  const end = String(item.eventenddate || start);
+  return start <= dateWindow.end && end >= dateWindow.start;
 }
 
 function monthFromDateRange(value) {
@@ -2861,16 +2913,20 @@ function normalizeTourItems(items, regionOverride = activeRegion()) {
     });
 }
 
-function buildTourApiUrl(areaCode = activeRegion().areaCode) {
+function buildTourApiUrl(areaCode = activeRegion().areaCode, dateWindow = currentFestivalDateWindows()[0]) {
   const config = data.tourApi;
   const params = new URLSearchParams({
     numOfRows: String(config.numOfRows || 8),
     pageNo: String(config.pageNo || 1),
-    arrange: config.arrange || "O"
+    arrange: config.arrange || "O",
+    month: dateWindow.month
   });
 
   if (config.mode === "festival") {
-    params.set("eventStartDate", config.eventStartDate || festivalSearchStartCompact());
+    params.set("eventStartDate", config.eventStartDate || dateWindow.start || festivalSearchStartCompact());
+    if (dateWindow.end) {
+      params.set("eventEndDate", dateWindow.end);
+    }
   }
 
   if (config.contentTypeId) {
@@ -2889,16 +2945,15 @@ function regionAreaCodes(region) {
   return region.areaCode ? [region.areaCode] : [""];
 }
 
-function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100) {
+function buildJulyFestivalUrl(pageNo = 1, numOfRows = 100, dateWindow = currentFestivalDateWindows()[0]) {
   const config = data.tourApi;
-  const month = currentSeoulMonth();
   const params = new URLSearchParams({
     numOfRows: String(numOfRows),
     pageNo: String(pageNo),
     arrange: config.arrange || "O",
-    eventStartDate: month.start,
-    eventEndDate: month.end,
-    month: month.key,
+    eventStartDate: dateWindow.start,
+    eventEndDate: dateWindow.end,
+    month: dateWindow.month,
     areaCode: config.areaCode || "1"
   });
 
@@ -2915,11 +2970,8 @@ function buildSeoulCultureUrl() {
   return `${config.endpoint || "/api/seoul-events"}?${params.toString()}`;
 }
 
-function overlapsJulyFestival(item) {
-  const month = currentSeoulMonth();
-  const start = String(item.eventstartdate || "");
-  const end = String(item.eventenddate || start);
-  return start <= month.end && end >= month.start;
+function overlapsJulyFestival(item, dateWindow = currentFestivalDateWindows()[0]) {
+  return overlapsDateWindow(item, dateWindow);
 }
 
 function regionLabelFromAddress(address) {
@@ -2934,19 +2986,19 @@ function regionLabelFromAddress(address) {
     .replace("남", "남");
 }
 
-function normalizeJulyFestivalItems(items) {
+function normalizeJulyFestivalItems(items, dateWindow = currentFestivalDateWindows()[0]) {
   const list = Array.isArray(items) ? items : items ? [items] : [];
-  const month = currentSeoulMonth();
+  const label = dateWindow.label || currentSeoulMonth().label;
 
   return list
-    .filter((item) => item && item.title && overlapsJulyFestival(item))
+    .filter((item) => item && item.title && overlapsJulyFestival(item, dateWindow))
     .sort((a, b) => String(a.eventstartdate || "").localeCompare(String(b.eventstartdate || "")))
     .map((item, index) => {
       const image = imageUrlForItem(item, DEFAULT_FESTIVAL_IMAGE);
       const address = [item.addr1, item.addr2].filter(Boolean).join(" ");
       const startDate = compactDate(item.eventstartdate);
       const endDate = compactDate(item.eventenddate);
-      const period = startDate && endDate ? `${startDate} - ${endDate}` : startDate || `${month.label} 진행`;
+      const period = startDate && endDate ? `${startDate} - ${endDate}` : startDate || `${label} 진행`;
       const region = regionLabelFromAddress(item.addr1);
 
       return {
@@ -2954,7 +3006,7 @@ function normalizeJulyFestivalItems(items) {
         source: "tour",
         contentId: item.contentid,
         contentTypeId: item.contenttypeid || 15,
-        category: `${region} ${month.label} 축제`,
+        category: `${region} ${label} 축제`,
         title: item.title,
         summaryKey: address ? "summary.july" : "summary.julyFallback",
         summaryParams: { address },
@@ -2979,20 +3031,24 @@ async function loadTourApiPlaces() {
   state.placesError = false;
 
   try {
-    const responses = await Promise.all(
-      areaCodes.map(async (areaCode) => {
-        const response = await fetch(buildTourApiUrl(areaCode), { signal: controller.signal });
-        if (!response.ok) throw new Error(`TourAPI HTTP ${response.status}`);
-        return response.json();
-      })
-    );
+    let placesArticles = [];
+    for (const dateWindow of currentFestivalDateWindows()) {
+      const responses = await Promise.all(
+        areaCodes.map(async (areaCode) => {
+          const response = await fetch(buildTourApiUrl(areaCode, dateWindow), { signal: controller.signal });
+          if (!response.ok) throw new Error(`TourAPI HTTP ${response.status}`);
+          return response.json();
+        })
+      );
 
-    const items = responses.flatMap((payload) => {
-      const rawItems = payload?.response?.body?.items?.item;
-      return Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
-    });
-    const dedupedItems = [...new Map(items.map((item, index) => [item.contentid || `${item.title}-${index}`, item])).values()];
-    const placesArticles = normalizeTourItems(dedupedItems, region);
+      const items = responses.flatMap((payload) => {
+        const rawItems = payload?.response?.body?.items?.item;
+        return Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
+      });
+      const dedupedItems = [...new Map(items.map((item, index) => [item.contentid || `${item.title}-${index}`, item])).values()];
+      placesArticles = normalizeTourItems(dedupedItems, region);
+      if (placesArticles.length) break;
+    }
 
     if (requestRegionId !== state.activeRegionId) return;
 
@@ -3215,33 +3271,45 @@ async function loadJulyFestivalPosts() {
   }
 
   const numOfRows = 100;
-  const collected = [];
+  let lastError = null;
 
   try {
-    for (let pageNo = 1; pageNo <= 6; pageNo += 1) {
-      const response = await fetch(buildJulyFestivalUrl(pageNo, numOfRows));
-      if (!response.ok) throw new Error(`Monthly festival HTTP ${response.status}`);
+    for (const dateWindow of currentFestivalDateWindows()) {
+      const collected = [];
+      try {
+        for (let pageNo = 1; pageNo <= 6; pageNo += 1) {
+          const response = await fetch(buildJulyFestivalUrl(pageNo, numOfRows, dateWindow));
+          if (!response.ok) throw new Error(`Monthly festival HTTP ${response.status}`);
 
-      const payload = await readApiPayload(response);
-      const body = payload?.response?.body || {};
-      const items = body?.items?.item;
-      const totalCount = Number(body.totalCount || body.total_count || 0);
-      const list = Array.isArray(items) ? items : items ? [items] : [];
-      collected.push(...list);
+          const payload = await readApiPayload(response);
+          const body = payload?.response?.body || {};
+          const items = body?.items?.item;
+          const totalCount = Number(body.totalCount || body.total_count || 0);
+          const list = Array.isArray(items) ? items : items ? [items] : [];
+          collected.push(...list);
 
-      if (!list.length || pageNo * numOfRows >= totalCount) break;
+          if (!list.length || pageNo * numOfRows >= totalCount) break;
+        }
+
+        const deduped = [...new Map(
+          normalizeJulyFestivalItems(collected, dateWindow).map((item) => [item.contentId || item.id, item])
+        ).values()];
+
+        if (!deduped.length) continue;
+
+        state.julyArticles = deduped;
+        writeJulyFestivalCache(deduped);
+        renderJulyFestivals();
+        renderCuration();
+        renderEditorialPosts();
+        renderCategoryNewsSections();
+        return;
+      } catch (error) {
+        lastError = error;
+      }
     }
 
-    const deduped = [...new Map(
-      normalizeJulyFestivalItems(collected).map((item) => [item.contentId || item.id, item])
-    ).values()];
-
-    state.julyArticles = deduped;
-    writeJulyFestivalCache(deduped);
-    renderJulyFestivals();
-    renderCuration();
-    renderEditorialPosts();
-    renderCategoryNewsSections();
+    throw lastError || new Error("No festival posts returned for the configured date windows.");
   } catch (error) {
     console.warn("Monthly festival posts could not be loaded.", error);
     const status = $("#julyStatus");
