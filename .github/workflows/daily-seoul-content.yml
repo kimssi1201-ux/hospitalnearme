@@ -1,4 +1,4 @@
-name: Daily Seoul content refresh
+name: Daily nationwide festival content refresh
 
 on:
   schedule:
@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Refresh Seoul event data
+      - name: Refresh nationwide festival data
         run: node scripts/update-seoul-content.mjs
         env:
           SITE_ORIGIN: https://view1.kr
@@ -35,7 +35,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add generated/seoul-events.json sitemap.xml index.html articles seoul-events
-            git commit -m "Refresh Seoul event data"
+            git commit -m "Refresh nationwide festival data"
             git push
           else
             echo "No content changes."

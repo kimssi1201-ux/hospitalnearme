@@ -75,12 +75,12 @@ test("ads.txt matches the active publisher ID", async () => {
   assert.doesNotMatch(source, /pub-8468106244002167/);
 });
 
-test("public trust pages use the current Seoul travel brand", async () => {
+test("public trust pages use the current festival news brand", async () => {
   const files = ["about.html", "contact.html", "privacy.html", "terms.html", "editorial-policy.html", "disclaimer.html"];
   for (const file of files) {
     const source = await readFile(path.join(root, file), "utf8");
-    assert.match(source, /서울여행뉴스/, file);
-    assert.doesNotMatch(source, /틴클라임 액션|오늘의 레시피 키친/, file);
+    assert.match(source, /대한축제뉴스/, file);
+    assert.doesNotMatch(source, /틴클라임 액션|오늘의 레시피 키친|서울여행뉴스/, file);
   }
 
   const landing = await readFile(path.join(root, "index.html"), "utf8");
@@ -136,7 +136,7 @@ test("curated articles are complete, indexable documents before JavaScript", asy
     titles.add(title);
     assert.match(source, new RegExp(`https://view1\\.kr/articles/${directory.name}/`));
     assert.match(source, /<h1>[^<]+<\/h1>/);
-    assert.match(source, /서울여행뉴스 편집부/);
+    assert.match(source, /대한축제뉴스 편집부/);
     assert.match(source, /href="\/editorial-policy"/);
     assert.match(source, new RegExp(`adsbygoogle\\.js\\?client=${publisherId}`));
     assert.doesNotMatch(source, /name="robots" content="noindex/);
@@ -145,7 +145,7 @@ test("curated articles are complete, indexable documents before JavaScript", asy
   }
 });
 
-test("current event pages use exact public data, noindex, and no advertising", async () => {
+test("current event pages use exact public data, noindex, and the Coupang widget", async () => {
   const payload = JSON.parse(await readFile(path.join(root, "generated", "seoul-events.json"), "utf8"));
   const eventRoot = path.join(root, "seoul-events");
   const directories = (await readdir(eventRoot, { withFileTypes: true })).filter((entry) => entry.isDirectory());
@@ -154,7 +154,12 @@ test("current event pages use exact public data, noindex, and no advertising", a
   for (const directory of directories) {
     const source = await readFile(path.join(eventRoot, directory.name, "index.html"), "utf8");
     assert.match(source, /name="robots" content="noindex,follow,max-image-preview:large"/);
-    assert.doesNotMatch(source, /adsbygoogle\.js|adsbytenping|PartnersCoupang/);
+    assert.doesNotMatch(source, /adsbygoogle\.js|adsbytenping/);
+    assert.match(source, /class="coupang-widget-ad"/);
+    assert.match(source, /data-coupang-widget/);
+    assert.match(source, /ads-partners\.coupang\.com\/g\.js/);
+    assert.match(source, /new window\.PartnersCoupang\.G/);
+    assert.match(source, /쿠팡 파트너스 활동/);
     assert.match(source, /행사 기본 정보/);
     assert.match(source, /비어 있는 운영 정보를 임의로 추정하지 않습니다/);
     assert.match(source, /https:\/\/view1\.kr\/seoul-events\//);

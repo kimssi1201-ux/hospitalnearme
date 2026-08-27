@@ -83,6 +83,11 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
 .source-note p { margin: 10px 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
 .source-note a { color: var(--accent-dark); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
 
+.coupang-widget-ad { margin-top: 28px; padding: 18px; border: 1px solid var(--line); background: #fff; }
+.coupang-widget-label { margin-bottom: 10px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.coupang-widget-frame { display: grid; min-height: 140px; place-items: center; overflow: hidden; background: var(--soft); }
+.coupang-widget-disclosure { margin: 10px 0 0; color: var(--muted); font-size: 13px !important; line-height: 1.6 !important; }
+
 .site-footer { padding: 44px 0; background: #f3f6f6; }
 .site-footer > div { width: min(1120px, calc(100% - 40px)); margin: auto; }
 .site-footer strong { font-size: 22px; }

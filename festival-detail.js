@@ -38,6 +38,16 @@ const fallbackTarget = params.get("target");
 const fallbackIsFree = params.get("isFree");
 const fallbackUpdatedAt = params.get("updatedAt");
 const supportedLanguages = ["ko", "en", "ja", "zh"];
+const COUPANG_WIDGET_SCRIPT = "https://ads-partners.coupang.com/g.js";
+const COUPANG_WIDGET_CONFIG = {
+  id: 1003200,
+  trackingCode: "AF1488183",
+  subId: null,
+  template: "carousel",
+  width: "680",
+  height: "140"
+};
+let coupangWidgetScriptPromise = null;
 const state = {
   language: getStoredLanguage(),
   article: null,
@@ -72,10 +82,10 @@ const IMAGE_FIELD_NAMES = [
 
 const DETAIL_I18N = {
   ko: {
-    "brand.name": "서울여행뉴스",
-    "brand.tagline": "서울 여행 정보 뉴스",
-    "footer.tagline": "서울 여행 선택을 돕는 뉴스 포털",
-    "footer.description": "서울 문화행사, 축제 일정, 방문 준비, 교통과 주변 여행 정보를 뉴스 피드로 정리합니다.",
+    "brand.name": "대한축제뉴스",
+    "brand.tagline": "전국 축제 정보 뉴스",
+    "footer.tagline": "전국 축제 선택을 돕는 뉴스 포털",
+    "footer.description": "전국 축제, 문화행사 일정, 방문 준비, 교통과 주변 여행 정보를 뉴스 피드로 정리합니다.",
     "nav.festivals": "축제 정보",
     "nav.booking": "예약 전 체크",
     "nav.guide": "방문 가이드",
@@ -84,10 +94,10 @@ const DETAIL_I18N = {
     "loading.desc": "잠시 후 일정, 장소, 방문 전 체크사항이 표시됩니다.",
     "related.title": "함께 보면 좋은 축제 글",
     "common.all": "전체 보기",
-    "meta.suffix": "서울여행뉴스",
+    "meta.suffix": "대한축제뉴스",
     "meta.description": "{title} 일정, 장소, 교통, 예약 전 체크사항을 정보성 블로그 형식으로 정리했습니다.",
-    "category.festival": "서울 축제",
-    "summary.fallback": "방문 전 확인하면 좋은 서울 축제 상세 정보입니다.",
+    "category.festival": "전국 축제",
+    "summary.fallback": "방문 전 확인하면 좋은 축제 상세 정보입니다.",
     "summary.localized": "{title} 방문을 계획할 때 확인하면 좋은 일정, 장소, 교통, 예약 전 체크 정보를 정리했습니다.",
     "read.detail": "축제 상세",
     "date.needCheck": "일정 확인 필요",
@@ -124,10 +134,10 @@ const DETAIL_I18N = {
     "related.aria": "{title} 상세 보기"
   },
   en: {
-    "brand.name": "Seoul Travel News",
-    "brand.tagline": "Seoul travel information",
-    "footer.tagline": "A news guide for Seoul trips",
-    "footer.description": "A Seoul travel news feed covering cultural events, festivals, visit preparation, transport, and nearby information.",
+    "brand.name": "Korea Festival News",
+    "brand.tagline": "Nationwide festival information",
+    "footer.tagline": "A news guide for festivals across Korea",
+    "footer.description": "A festival news feed covering cultural events nationwide, visit preparation, transport, and nearby information.",
     "nav.festivals": "Festivals",
     "nav.booking": "Before You Go",
     "nav.guide": "Visit Guide",
@@ -136,9 +146,9 @@ const DETAIL_I18N = {
     "loading.desc": "Schedule, location, and visit checks will appear shortly.",
     "related.title": "More festival reads",
     "common.all": "View all",
-    "meta.suffix": "Seoul Travel News",
+    "meta.suffix": "Korea Festival News",
     "meta.description": "A practical guide to {title}, including schedule, location, transport, and booking checks.",
-    "category.festival": "Seoul Festival",
+    "category.festival": "Korea Festival",
     "summary.fallback": "Festival details to review before planning your visit.",
     "summary.localized": "A practical guide to {title}, covering schedule, location, transport, and pre-visit checks.",
     "read.detail": "Festival guide",
@@ -176,10 +186,10 @@ const DETAIL_I18N = {
     "related.aria": "View {title} details"
   },
   ja: {
-    "brand.name": "ソウル旅行ニュース",
-    "brand.tagline": "ソウル旅行情報ニュース",
-    "footer.tagline": "ソウル旅行選びを助けるニュースポータル",
-    "footer.description": "ソウルの文化行事、祭りの日程、訪問準備、交通情報をニュース形式で整理します。",
+    "brand.name": "韓国フェスニュース",
+    "brand.tagline": "全国フェス情報ニュース",
+    "footer.tagline": "全国のフェス選びを助けるニュースポータル",
+    "footer.description": "全国の文化行事、フェスの日程、訪問準備、交通情報をニュース形式で整理します。",
     "nav.festivals": "祭り情報",
     "nav.booking": "訪問前チェック",
     "nav.guide": "訪問ガイド",
@@ -188,7 +198,7 @@ const DETAIL_I18N = {
     "loading.desc": "日程、場所、訪問前チェックをまもなく表示します。",
     "related.title": "一緒に読みたい祭り記事",
     "common.all": "すべて見る",
-    "meta.suffix": "ソウル旅行ニュース",
+    "meta.suffix": "韓国フェスニュース",
     "meta.description": "{title}の日程、場所、交通、予約前チェックを情報記事として整理しました。",
     "category.festival": "韓国の祭り",
     "summary.fallback": "訪問前に確認したい祭りの詳細情報です。",
@@ -228,10 +238,10 @@ const DETAIL_I18N = {
     "related.aria": "{title} 詳細を見る"
   },
   zh: {
-    "brand.name": "首尔旅行新闻",
-    "brand.tagline": "首尔旅行信息新闻",
-    "footer.tagline": "帮助规划首尔旅行的新闻门户",
-    "footer.description": "以新闻信息流整理首尔文化活动、庆典日程、出行准备、交通和周边信息。",
+    "brand.name": "韩国庆典新闻",
+    "brand.tagline": "全国庆典信息新闻",
+    "footer.tagline": "帮助规划全国庆典行程的新闻门户",
+    "footer.description": "以新闻信息流整理全国文化活动、庆典日程、出行准备、交通和周边信息。",
     "nav.festivals": "节庆信息",
     "nav.booking": "出发前检查",
     "nav.guide": "游览指南",
@@ -240,7 +250,7 @@ const DETAIL_I18N = {
     "loading.desc": "日程、地点和出发前检查信息即将显示。",
     "related.title": "相关推荐节庆文章",
     "common.all": "查看全部",
-    "meta.suffix": "首尔旅行新闻",
+    "meta.suffix": "韩国庆典新闻",
     "meta.description": "整理了 {title} 的日程、地点、交通和预订前检查信息。",
     "category.festival": "韩国节庆",
     "summary.fallback": "出发前值得确认的节庆详细信息。",
@@ -517,9 +527,9 @@ async function fetchTourDetail(contentId, contentTypeId = fallbackContentTypeId 
     source: "tour",
     contentId,
     contentTypeId,
-    category: "서울 축제",
+    category: address ? `${travelRegionName({ address })} 축제` : "축제 소식",
     title: commonItem.title,
-    summary: overview || "방문 전 확인하면 좋은 서울 축제 상세 정보입니다.",
+    summary: overview || "방문 전 확인하면 좋은 축제 상세 정보입니다.",
     date: period,
     readTime: "축제 상세",
     image: firstImage,
@@ -609,7 +619,7 @@ function extractAddressFromOverview(value) {
 }
 
 function enrichLocalArticle(article = {}) {
-  const address = article.address || "서울 전역";
+  const address = article.address || "장소 확인 필요";
   const time = article.time || "행사별 운영 시간이 다릅니다";
   const fee = article.fee || "행사별 상이";
   const image = imageUrlForArticle(article, "");
@@ -1040,7 +1050,7 @@ function localizedCategoryLabel(category = "") {
       experience: "교육/체험",
       movie: "영화",
       festival: "축제",
-      event: value || "서울 행사"
+      event: value || "축제 소식"
     },
     en: {
       exhibition: "Exhibitions",
@@ -1292,7 +1302,7 @@ function updateDocumentMeta(article) {
     mainEntityOfPage: canonicalUrl.href,
     publisher: {
       "@type": "Organization",
-      name: "서울여행뉴스",
+      name: "대한축제뉴스",
       url: "https://view1.kr/"
     },
     ...(heroImage ? { image: [heroImage] } : {})
@@ -1693,9 +1703,14 @@ function nearbyTravelPicks(article = {}) {
   const text = nearbyTravelSearchText(article);
   const landmark = Object.keys(SEOUL_NEARBY_TRAVEL_BY_LANDMARK).find((key) => text.includes(key));
   const district = nearbyTravelDistrict(article);
+  // SEOUL_NEARBY_TRAVEL_DEFAULTS is a curated list of Seoul landmarks, so it
+  // should only fill in when nothing more specific matched AND the article
+  // itself is actually in Seoul - otherwise a nationwide (TourAPI) festival
+  // in, say, Busan would show Gyeongbokgung as a "nearby place to visit."
+  const isSeoulArticle = travelRegionName(article) === "서울";
   const picks = SEOUL_NEARBY_TRAVEL_BY_LANDMARK[landmark]
     || SEOUL_NEARBY_TRAVEL_BY_DISTRICT[district]
-    || SEOUL_NEARBY_TRAVEL_DEFAULTS;
+    || (isSeoulArticle ? SEOUL_NEARBY_TRAVEL_DEFAULTS : []);
   const title = String(article.title || "");
 
   return picks
@@ -2154,6 +2169,7 @@ function renderArticle(article) {
   `;
   hydrateNearbyParking(article);
   hydrateDetailCoupangProducts(article);
+  hydrateCoupangWidgets();
 }
 
 function applyStaticLanguage() {
@@ -2237,7 +2253,7 @@ function cleanCopy() {
         time: "프로그램별 시간이 다를 수 있습니다.",
         fee: "무료 행사도 일부 체험은 유료일 수 있습니다.",
         target: "동행자 연령 제한 여부를 확인하세요.",
-        subCategory: "서울 문화행사 원본 분류 기준입니다.",
+        subCategory: "원본 분류 기준입니다.",
         contact: "변경 사항은 공식 문의처가 가장 정확합니다."
       },
       labels: {
@@ -2249,10 +2265,10 @@ function cleanCopy() {
         subCategory: "세부 분류",
         contact: "문의"
       },
-      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 서울 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
-      intro: (title, category, place) => `${title}은 ${category || "서울 행사"} 분야의 행사로, ${place ? `${place}에서 진행됩니다` : "서울 지역에서 진행됩니다"}. 방문자는 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
+      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
+      intro: (title, category, place) => `${title}은 ${category || "축제 소식"} 분야의 행사로, ${place ? `${place}에서 진행됩니다` : "현지에서 진행됩니다"}. 방문자는 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
       highlights: (article, context, feeText, targetText, scheduleText) => [
-        ["무엇을 볼 수 있나요?", `${article.title}은 ${context.category || "서울 행사"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
+        ["무엇을 볼 수 있나요?", `${article.title}은 ${context.category || "축제 소식"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
         ["언제 방문하면 좋나요?", `${scheduleText} 일정에 맞춰 운영됩니다. 주말이나 저녁 시간대에는 방문객이 몰릴 수 있어, 사진 촬영이나 여유로운 관람을 원한다면 비교적 이른 시간에 도착하는 편이 좋습니다.`],
         ["누구에게 잘 맞나요?", `${targetText}에게 참고하기 좋은 행사입니다. 입장료는 ${feeText} 기준으로 확인되며, 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`]
       ],
@@ -2410,7 +2426,7 @@ function detailCopy() {
         time: "방문 전 공식 운영시간을 확인하세요",
         fee: "방문 전 공식 안내에서 확인하세요",
         target: "방문 전 대상 연령을 확인하세요",
-        category: "서울 문화행사"
+        category: "축제 소식"
       },
       rowNotes: {
         date: "시작일과 종료일을 함께 확인하세요.",
@@ -2418,7 +2434,7 @@ function detailCopy() {
         time: "프로그램별 시간이 다를 수 있습니다.",
         fee: "무료 행사도 일부 체험은 유료일 수 있습니다.",
         target: "동행자 연령 제한 여부를 확인하세요.",
-        subCategory: "서울 문화행사 분류 기준입니다.",
+        subCategory: "분류 기준입니다.",
         contact: "변경 사항은 공식 문의처가 가장 정확합니다."
       },
       labels: {
@@ -2430,10 +2446,10 @@ function detailCopy() {
         subCategory: "분류",
         contact: "문의"
       },
-      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 서울 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
-      intro: (title, category, place) => `${title}은 ${category || "서울 행사"} 분야의 행사입니다. ${place ? `${place}에서 진행되며,` : "서울 지역에서 진행되며,"} 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
+      defaultOverview: (title) => `${title}은 방문 전 일정과 장소, 운영 정보를 함께 확인하면 좋은 여행 콘텐츠입니다. 현장 상황은 날짜와 시간대에 따라 달라질 수 있으니 이동 전 공식 안내를 한 번 더 확인하는 것이 좋습니다.`,
+      intro: (title, category, place) => `${title}은 ${category || "축제 소식"} 분야의 행사입니다. ${place ? `${place}에서 진행되며,` : "현지에서 진행되며,"} 행사 성격과 운영 정보를 먼저 확인한 뒤 이동 동선, 관람 시간, 주변 교통을 함께 계획하면 더 편하게 즐길 수 있습니다.`,
       highlights: (article, context, feeText, targetText, scheduleText) => [
-        ["무엇을 볼 수 있나요?", `${context.eventName}은 ${context.category || "서울 행사"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
+        ["무엇을 볼 수 있나요?", `${context.eventName}은 ${context.category || "축제 소식"} 정보를 찾는 방문자가 일정과 장소를 기준으로 검토하기 좋은 콘텐츠입니다. 행사 성격에 따라 전시, 공연, 체험, 야외 프로그램이 운영될 수 있으므로 현장 안내와 프로그램 시간을 함께 확인하는 것이 좋습니다.`],
         ["언제 방문하면 좋나요?", `${scheduleText} 일정에 맞춰 운영됩니다. 주말이나 저녁 시간대에는 방문객이 몰릴 수 있어, 사진 촬영이나 여유로운 관람을 원한다면 비교적 이른 시간에 도착하는 편이 좋습니다.`],
         ["누구에게 잘 맞나요?", `${targetText}에게 참고하기 좋은 행사입니다. 입장료와 예약 방식은 ${feeText}. 일부 프로그램은 별도 예약이나 현장 접수가 필요할 수 있습니다.`]
       ],
@@ -3012,6 +3028,63 @@ function CoupangTravelProductsSection(article) {
   `;
 }
 
+// CoupangTravelProductsSection (the product-search grid) only renders for
+// editorial guide articles, not real festival/event pages. Event pages
+// (source "seoul" or "tour") get this lighter widget carousel instead, so
+// every detail page carries some Coupang Partners placement.
+function CoupangWidgetCarouselSection(article) {
+  if (!(article.source === "seoul" || article.source === "tour")) return "";
+
+  return `
+    <section class="clean-article-section coupang-widget-section" aria-label="쿠팡 파트너스 광고">
+      <div class="coupang-widget-label">Advertisement</div>
+      <div class="coupang-widget-frame" id="coupangDetailWidget" data-coupang-widget></div>
+      <p class="coupang-products-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+    </section>
+  `;
+}
+
+function loadCoupangWidgetScript() {
+  if (window.PartnersCoupang?.G) return Promise.resolve();
+  if (coupangWidgetScriptPromise) return coupangWidgetScriptPromise;
+
+  coupangWidgetScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = COUPANG_WIDGET_SCRIPT;
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Coupang widget script failed to load."));
+    document.head.appendChild(script);
+  });
+
+  return coupangWidgetScriptPromise;
+}
+
+async function hydrateCoupangWidgets() {
+  const targets = [...document.querySelectorAll("[data-coupang-widget]:not([data-coupang-loaded])")];
+  if (!targets.length) return;
+
+  try {
+    await loadCoupangWidgetScript();
+    targets.forEach((target) => {
+      target.dataset.coupangLoaded = "true";
+      const width = Math.max(300, Math.min(680, Math.floor(target.clientWidth || target.parentElement?.clientWidth || window.innerWidth - 36)));
+      new window.PartnersCoupang.G({
+        ...COUPANG_WIDGET_CONFIG,
+        width: String(width),
+        height: "140",
+        container: target
+      });
+    });
+  } catch (error) {
+    console.warn("Coupang widget could not be loaded.", error);
+    targets.forEach((target) => {
+      target.dataset.coupangLoaded = "error";
+      target.innerHTML = "";
+    });
+  }
+}
+
 async function fetchDetailCoupangProducts(keyword = "여행용품", limit = 4) {
   const query = new URLSearchParams({
     keyword,
@@ -3264,6 +3337,7 @@ function renderTravelDetailBody(article, sections) {
     ${NearbyTravelSection(article)}
     ${CleanVisitTipSection(article)}
     ${CoupangTravelProductsSection(article)}
+    ${CoupangWidgetCarouselSection(article)}
     ${BookingCheckSection(article)}
     ${CleanClosingSection(article)}
   `;

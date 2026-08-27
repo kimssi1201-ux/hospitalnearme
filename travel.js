@@ -46,6 +46,9 @@ function seasonalTravelProductKeyword(date = new Date()) {
 
 const state = {
   apiArticles: [],
+  placesArticles: [],
+  placesLoaded: false,
+  placesError: false,
   julyArticles: [],
   myrealtrip: {
     tours: [],
@@ -90,25 +93,25 @@ const MRT_SEARCH_COPY = {
 
 const I18N = {
   ko: {
-    "meta.title": "서울여행뉴스 | 서울 여행 정보 뉴스",
-    "brand.name": "서울여행뉴스",
-    "brand.tagline": "서울 여행 정보 뉴스",
-    "footer.tagline": "서울 여행 선택을 돕는 뉴스 포털",
-    "footer.description": "서울 문화행사, 축제 일정, 방문 준비, 교통과 주변 여행 정보를 뉴스 피드로 정리합니다.",
+    "meta.title": "대한축제뉴스 | 전국 축제 정보 뉴스",
+    "brand.name": "대한축제뉴스",
+    "brand.tagline": "전국 축제 정보 뉴스",
+    "footer.tagline": "전국 축제 선택을 돕는 뉴스 포털",
+    "footer.description": "전국 축제, 문화행사 일정, 방문 준비, 교통과 주변 여행 정보를 뉴스 피드로 정리합니다.",
     "nav.menu": "메뉴 열기",
     "nav.home": "홈",
     "nav.july": "여행뉴스",
     "nav.places": "가볼만한 곳",
     "nav.booking": "여행검색",
-    "july.title": "오늘 볼 만한 서울 여행 뉴스",
-    "july.description": "서울 축제, 계절 행사, 산책 코스와 방문 전 체크 정보를 뉴스 피드 형식으로 정리했습니다.",
-    "july.loading": "이번 달 서울 축제 정보를 불러오는 중입니다.",
-    "july.count": "총 {count}개의 서울 여행 기사를 불러왔습니다.",
-    "july.error": "서울 축제 정보를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
-    "places.title": "서울 축제 찾기",
-    "places.title.all": "서울 축제 찾기",
-    "places.title.region": "서울 축제 정보",
-    "places.description": "서울에서 열리는 축제와 여행 정보를 일정·장소·요금·교통 정보와 함께 살펴보세요.",
+    "july.title": "오늘 볼 만한 전국 축제 뉴스",
+    "july.description": "전국 축제, 계절 행사, 방문 코스와 방문 전 체크 정보를 뉴스 피드 형식으로 정리했습니다.",
+    "july.loading": "이번 달 전국 축제 정보를 불러오는 중입니다.",
+    "july.count": "총 {count}개의 축제 기사를 불러왔습니다.",
+    "july.error": "축제 정보를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
+    "places.title": "지역별 축제 찾기",
+    "places.title.all": "지역별 축제 찾기",
+    "places.title.region": "{region} 축제 정보",
+    "places.description": "서울부터 부산, 제주까지 지역별로 열리는 축제와 여행 정보를 일정·장소·요금·교통 정보와 함께 살펴보세요.",
     "booking.title": "가기 전에 확인하면 좋은 것들",
     "booking.description": "축제장은 날짜와 시간에 따라 혼잡도와 이동 동선이 달라집니다. 숙소, 교통, 입장권, 우천 운영 기준을 미리 확인해 두세요.",
     "booking.link": "체크하기",
@@ -121,25 +124,25 @@ const I18N = {
     "card.detail": "자세히 보기",
     "read.festival": "축제 정보",
     "read.detail": "상세 보기",
-    "summary.festival": "{address}에서 열리는 서울 축제입니다. 방문 전 운영 시간, 교통 통제, 주차와 우천 운영 여부를 확인해 보세요.",
-    "summary.festivalFallback": "방문 전 행사 시간, 장소, 교통과 우천 운영 여부를 확인하면 더 편하게 즐길 수 있는 서울 축제 정보입니다.",
-    "summary.july": "{address}에서 열리는 이번 달 서울 축제입니다. 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인해 보세요.",
-    "summary.julyFallback": "이번 달 일정이 포함된 서울 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요."
+    "summary.festival": "{address}에서 열리는 축제입니다. 방문 전 운영 시간, 교통 통제, 주차와 우천 운영 여부를 확인해 보세요.",
+    "summary.festivalFallback": "방문 전 행사 시간, 장소, 교통과 우천 운영 여부를 확인하면 더 편하게 즐길 수 있는 축제 정보입니다.",
+    "summary.july": "{address}에서 열리는 이번 달 축제입니다. 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인해 보세요.",
+    "summary.julyFallback": "이번 달 일정이 포함된 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요."
   },
   en: {
-    "meta.title": "Seoul Travel News | Seoul Travel Information",
-    "brand.name": "Seoul Travel News",
-    "brand.tagline": "Seoul travel information",
-    "footer.tagline": "A news guide for Seoul trips",
-    "footer.description": "A Seoul travel news feed covering cultural events, festivals, visit preparation, transport, and nearby information.",
+    "meta.title": "Korea Festival News | Nationwide Festival Information",
+    "brand.name": "Korea Festival News",
+    "brand.tagline": "Nationwide festival information",
+    "footer.tagline": "A news guide for festivals across Korea",
+    "footer.description": "A festival news feed covering cultural events nationwide, visit preparation, transport, and nearby information.",
     "nav.menu": "Open menu",
     "nav.home": "Home",
     "nav.july": "Travel News",
     "nav.places": "Places",
     "nav.booking": "Search",
     "july.title": "Festival News to Read Today",
-    "july.description": "Browse Seoul festival and travel information in a mobile news feed with one featured story, recommended cards, and the latest list.",
-    "july.loading": "Loading this month's Seoul festivals.",
+    "july.description": "Browse festival and travel information from across Korea in a mobile news feed with one featured story, recommended cards, and the latest list.",
+    "july.loading": "Loading this month's festivals nationwide.",
     "july.count": "{count} festival stories loaded.",
     "july.error": "Could not load this month's festivals. Please try again later.",
     "places.title": "Find Festivals by Region",
@@ -164,19 +167,19 @@ const I18N = {
     "summary.julyFallback": "A festival scheduled for this month. Check schedule, location, fees, and transport before visiting."
   },
   ja: {
-    "meta.title": "ソウル旅行ニュース | ソウル旅行情報",
-    "brand.name": "ソウル旅行ニュース",
-    "brand.tagline": "ソウル旅行情報ニュース",
-    "footer.tagline": "ソウル旅行選びを助けるニュースポータル",
-    "footer.description": "ソウルの文化行事、祭りの日程、訪問準備、交通情報をニュース形式で整理します。",
+    "meta.title": "韓国フェスニュース | 全国フェス情報",
+    "brand.name": "韓国フェスニュース",
+    "brand.tagline": "全国フェス情報ニュース",
+    "footer.tagline": "全国のフェス選びを助けるニュースポータル",
+    "footer.description": "全国の文化行事、フェスの日程、訪問準備、交通情報をニュース形式で整理します。",
     "nav.menu": "メニューを開く",
     "nav.home": "ホーム",
     "nav.july": "旅行ニュース",
     "nav.places": "見どころ",
     "nav.booking": "検索",
     "july.title": "今日読みたいフェスニュース",
-    "july.description": "注目記事、推薦カード、最新リストの順に韓国フェス情報を確認できます。",
-    "july.loading": "今月のソウルのフェス一覧を読み込んでいます。",
+    "july.description": "注目記事、推薦カード、最新リストの順に韓国全国のフェス情報を確認できます。",
+    "july.loading": "今月の全国フェス一覧を読み込んでいます。",
     "july.count": "{count}件のフェス記事を読み込みました。",
     "july.error": "今月のフェス一覧を読み込めませんでした。時間をおいてもう一度確認してください。",
     "places.title": "地域別フェスを探す",
@@ -201,19 +204,19 @@ const I18N = {
     "summary.julyFallback": "今月の日程を含むフェスです。訪問前に日程、場所、料金、交通情報を確認しましょう。"
   },
   zh: {
-    "meta.title": "首尔旅行新闻 | 首尔旅行信息",
-    "brand.name": "首尔旅行新闻",
-    "brand.tagline": "首尔旅行信息新闻",
-    "footer.tagline": "帮助规划首尔旅行的新闻门户",
-    "footer.description": "以新闻信息流整理首尔文化活动、庆典日程、出行准备、交通和周边信息。",
+    "meta.title": "韩国庆典新闻 | 全国庆典信息",
+    "brand.name": "韩国庆典新闻",
+    "brand.tagline": "全国庆典信息新闻",
+    "footer.tagline": "帮助规划全国庆典行程的新闻门户",
+    "footer.description": "以新闻信息流整理全国文化活动、庆典日程、出行准备、交通和周边信息。",
     "nav.menu": "打开菜单",
     "nav.home": "首页",
     "nav.july": "旅行新闻",
     "nav.places": "推荐地点",
     "nav.booking": "搜索",
     "july.title": "今日值得关注的庆典新闻",
-    "july.description": "按重点报道、推荐卡片和最新列表的顺序浏览韩国庆典信息。",
-    "july.loading": "正在加载本月首尔庆典列表。",
+    "july.description": "按重点报道、推荐卡片和最新列表的顺序浏览韩国全国庆典信息。",
+    "july.loading": "正在加载本月全国庆典列表。",
     "july.count": "已加载{count}篇庆典文章。",
     "july.error": "无法加载本月庆典列表，请稍后再试。",
     "places.title": "按地区查找庆典",
@@ -245,36 +248,36 @@ const EDITORIAL_I18N = {
     "editorial.title": "서울을 더 잘 여행하는 방법",
     "editorial.description": "전시와 공연, 동네 산책과 교통 정보를 직접 읽고 고른 서울 여행 기획입니다.",
     "editorial.link": "최신 행사 보기",
-    "latest.title": "지금 서울에서 열리는 행사",
-    "latest.description": "서울시 문화행사 정보를 바탕으로 일정·장소·요금·문의처를 확인하고, 방문 동선과 주변 교통까지 함께 정리합니다.",
-    "latest.list": "최신 서울 행사"
+    "latest.title": "지금 전국에서 열리는 축제",
+    "latest.description": "전국 축제·문화행사 정보를 바탕으로 일정·장소·요금·문의처를 확인하고, 방문 동선과 주변 교통까지 함께 정리합니다.",
+    "latest.list": "최신 전국 축제"
   },
   en: {
     "nav.editorial": "Seoul Guides",
     "editorial.title": "A better way to explore Seoul",
     "editorial.description": "Editor-selected Seoul itineraries covering exhibitions, performances, neighborhood walks, and practical transport tips.",
     "editorial.link": "See the latest events",
-    "latest.title": "What is on in Seoul now",
-    "latest.description": "Check official Seoul event schedules, venues, prices, contacts, nearby routes, and transport information in one place.",
-    "latest.list": "Latest Seoul events"
+    "latest.title": "What is on across Korea now",
+    "latest.description": "Check official festival schedules, venues, prices, contacts, nearby routes, and transport information from across Korea in one place.",
+    "latest.list": "Latest festivals nationwide"
   },
   ja: {
     "nav.editorial": "ソウル特集",
     "editorial.title": "ソウルをもっと楽しむ旅の方法",
     "editorial.description": "展示、公演、街歩き、交通情報を編集部が選び、旅の流れに合わせて紹介します。",
     "editorial.link": "最新イベントを見る",
-    "latest.title": "今ソウルで開催中のイベント",
-    "latest.description": "ソウル市の文化イベント情報をもとに、日程、会場、料金、問い合わせ先、周辺交通をまとめました。",
-    "latest.list": "ソウル最新イベント"
+    "latest.title": "今全国で開催中のフェス",
+    "latest.description": "全国のフェス・文化イベント情報をもとに、日程、会場、料金、問い合わせ先、周辺交通をまとめました。",
+    "latest.list": "全国の最新フェス"
   },
   zh: {
     "nav.editorial": "首尔专题",
     "editorial.title": "用更好的方式探索首尔",
     "editorial.description": "精选展览、演出、街区漫步和交通信息，帮助你轻松规划首尔行程。",
     "editorial.link": "查看最新活动",
-    "latest.title": "首尔正在举行的活动",
-    "latest.description": "根据首尔市文化活动信息，整理日程、地点、票价、联系方式、游览动线和交通。",
-    "latest.list": "首尔最新活动"
+    "latest.title": "全国正在举行的庆典",
+    "latest.description": "根据全国庆典/文化活动信息，整理日程、地点、票价、联系方式、游览动线和交通。",
+    "latest.list": "全国最新庆典"
   }
 };
 
@@ -516,7 +519,7 @@ function imageMarkup(item, size = "card") {
   if (!image) {
     return `
       <div class="image-frame image-frame--${escapeHtml(size)} is-empty" aria-label="${escapeHtml(`${title} 이미지 준비 중`)}">
-        <span>SEOUL TRAVEL NEWS</span>
+        <span>대한축제뉴스</span>
       </div>
     `;
   }
@@ -527,7 +530,7 @@ function imageMarkup(item, size = "card") {
     : "";
   return `
     <div class="image-frame image-frame--${size}${isApi ? " image-frame--api" : ""}"${apiBackground}>
-      <span class="image-fallback-text" aria-hidden="true">SEOUL TRAVEL NEWS</span>
+      <span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span>
       <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy" width="640" height="480"${onError} />
     </div>
   `;
@@ -631,7 +634,7 @@ function categoryCountMap(items = primaryNewsItems()) {
 }
 
 function displayCategoryLabel(item = {}) {
-  if (state.language === "ko") return item.category || "서울 행사";
+  if (state.language === "ko") return item.category || "축제 소식";
   const labels = {
     en: {
       exhibition: "Exhibitions",
@@ -639,7 +642,7 @@ function displayCategoryLabel(item = {}) {
       experience: "Classes & Experiences",
       movie: "Film",
       festival: "Festivals",
-      event: "Seoul Events"
+      event: "Festival News"
     },
     ja: {
       exhibition: "展示・美術",
@@ -647,7 +650,7 @@ function displayCategoryLabel(item = {}) {
       experience: "教育・体験",
       movie: "映画",
       festival: "祭り",
-      event: "ソウルイベント"
+      event: "フェスニュース"
     },
     zh: {
       exhibition: "展览/美术",
@@ -655,7 +658,7 @@ function displayCategoryLabel(item = {}) {
       experience: "教育/体验",
       movie: "电影",
       festival: "庆典",
-      event: "首尔活动"
+      event: "庆典新闻"
     }
   };
   return (labels[state.language] || labels.en)[categoryKeyFor(item)];
@@ -686,7 +689,7 @@ function displayArticleTitle(item = {}) {
   const category = displayCategoryLabel(item);
   const date = displayEventDate(item);
   const templates = {
-    en: `${date} Seoul ${category} Guide`,
+    en: `${date} Korea ${category} Guide`,
     ja: `${date}の${category}ガイド`,
     zh: `${date}${category}指南`
   };
@@ -710,17 +713,17 @@ function mapSeoulCategory(category = "") {
     "축제-관광/체육": { category: "축제", categorySlug: "festival" },
     "축제-전통/역사": { category: "축제", categorySlug: "festival" }
   };
-  const mapped = directMap[value] || { category: "서울 행사", categorySlug: "seoul-event" };
+  const mapped = directMap[value] || { category: "축제 소식", categorySlug: "festival" };
   return {
-    rawCategory: value || "서울 문화행사",
-    subCategory: value || "서울 문화행사",
+    rawCategory: value || "축제 소식",
+    subCategory: value || "축제 소식",
     category: mapped.category,
     categorySlug: mapped.categorySlug
   };
 }
 
 function withGroupedCategory(item) {
-  const mapped = mapSeoulCategory(item.rawCategory || item.subCategory || item.category || "서울 문화행사");
+  const mapped = mapSeoulCategory(item.rawCategory || item.subCategory || item.category || "축제 소식");
   return {
     ...item,
     ...mapped
@@ -771,15 +774,22 @@ function normalizeSeoulCultureItems(items) {
     .filter((item) => item && item.title)
     .filter((item) => overlapsCurrentMonthByDateText(item.date))
     .map((item, index) => {
-      const mapped = mapSeoulCategory(item.category || "서울 문화행사");
+      const mapped = item.categorySlug
+        ? {
+            rawCategory: item.rawCategory || item.category,
+            subCategory: item.subCategory || item.category,
+            category: item.category || "축제 소식",
+            categorySlug: item.categorySlug
+          }
+        : mapSeoulCategory(item.category || "축제 소식");
       return {
         id: item.id || `seoul-culture-${index}`,
         source: "seoul",
         ...mapped,
         title: item.title,
-        summary: item.summary || `${item.address || "서울"}에서 진행되는 문화행사입니다.`,
+        summary: item.summary || `${item.address || "현지"}에서 진행되는 문화행사입니다.`,
         date: item.date || "일정 확인 필요",
-        readTime: item.readTime || "서울 행사 정보",
+        readTime: item.readTime || "축제 정보",
         image: imageUrlForItem(item, DEFAULT_EVENT_IMAGE),
         galleryImages: imageListForItem(item),
         address: item.address || item.place || "",
@@ -2377,32 +2387,32 @@ function buildCategoryNewsGroups() {
   const allItems = uniqueArticles([...apiItems, ...localItems]);
   const groupText = {
     ko: [
-      { id: "exhibition", title: "전시/미술", subtitle: "미술관, 갤러리, 전시 공간에서 열리는 서울 문화행사" },
+      { id: "exhibition", title: "전시/미술", subtitle: "미술관, 갤러리, 전시 공간에서 열리는 문화행사" },
       { id: "performance", title: "공연/무대", subtitle: "클래식, 연극, 콘서트, 무용, 국악, 뮤지컬 공연" },
       { id: "experience", title: "교육/체험", subtitle: "어린이, 가족, 성인 대상 체험과 강좌 프로그램" },
       { id: "movie", title: "영화", subtitle: "영화 상영, 영화제, 영상 관련 문화행사" },
-      { id: "festival", title: "축제", subtitle: "문화예술, 관광, 전통, 체육 성격의 서울 축제" }
+      { id: "festival", title: "축제", subtitle: "문화예술, 관광, 전통, 체육 성격의 전국 축제" }
     ],
     en: [
-      { id: "exhibition", title: "Exhibitions", subtitle: "Museums, galleries, and art events in Seoul" },
+      { id: "exhibition", title: "Exhibitions", subtitle: "Museums, galleries, and art events" },
       { id: "performance", title: "Performances", subtitle: "Classical music, theater, concerts, dance, gugak, and musicals" },
       { id: "experience", title: "Classes & Experiences", subtitle: "Hands-on programs for children, families, and adults" },
       { id: "movie", title: "Film", subtitle: "Film screenings, festivals, and media events" },
-      { id: "festival", title: "Festivals", subtitle: "Culture, tourism, tradition, and sports festivals in Seoul" }
+      { id: "festival", title: "Festivals", subtitle: "Culture, tourism, tradition, and sports festivals nationwide" }
     ],
     ja: [
-      { id: "exhibition", title: "展示・美術", subtitle: "美術館、ギャラリー、展示空間で開かれるソウルの文化行事" },
+      { id: "exhibition", title: "展示・美術", subtitle: "美術館、ギャラリー、展示空間で開かれる文化行事" },
       { id: "performance", title: "公演・舞台", subtitle: "クラシック、演劇、コンサート、舞踊、国楽、ミュージカル" },
       { id: "experience", title: "教育・体験", subtitle: "子ども、家族、大人向けの体験プログラム" },
       { id: "movie", title: "映画", subtitle: "映画上映、映画祭、映像関連イベント" },
-      { id: "festival", title: "祭り", subtitle: "文化芸術、観光、伝統、スポーツ系のソウルの祭り" }
+      { id: "festival", title: "祭り", subtitle: "文化芸術、観光、伝統、スポーツ系の全国のフェス" }
     ],
     zh: [
-      { id: "exhibition", title: "展览/美术", subtitle: "首尔美术馆、画廊和展览空间的文化活动" },
+      { id: "exhibition", title: "展览/美术", subtitle: "美术馆、画廊和展览空间的文化活动" },
       { id: "performance", title: "演出/舞台", subtitle: "古典音乐、戏剧、演唱会、舞蹈、国乐和音乐剧" },
       { id: "experience", title: "教育/体验", subtitle: "儿童、家庭和成人可参加的体验项目" },
       { id: "movie", title: "电影", subtitle: "电影放映、电影节和影像相关活动" },
-      { id: "festival", title: "庆典", subtitle: "文化艺术、旅游、传统和体育类首尔庆典" }
+      { id: "festival", title: "庆典", subtitle: "文化艺术、旅游、传统和体育类全国庆典" }
     ]
   };
   const groupMeta = groupText[state.language] || groupText.ko;
@@ -2733,17 +2743,13 @@ function selectRegion(regionId) {
   if (!regionExists) return;
 
   state.activeRegionId = regionId;
-  state.apiArticles = [];
-  state.apiLoaded = false;
-  state.apiError = false;
+  state.placesArticles = [];
+  state.placesLoaded = false;
+  state.placesError = false;
   renderRegionChips();
   updateRegionHeading();
   updatePlacesStatus(`${activeRegion().label} 축제 정보를 불러오는 중입니다.`);
-  renderJulyFestivals();
-  renderCategoryNewsSections();
   renderPlaces();
-  renderCuration();
-  renderEditorialPosts();
   loadTourApiPlaces();
 }
 
@@ -2896,7 +2902,7 @@ async function loadTourApiPlaces() {
   const areaCodes = regionAreaCodes(region);
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), 6500);
-  state.apiError = false;
+  state.placesError = false;
 
   try {
     const responses = await Promise.all(
@@ -2912,36 +2918,28 @@ async function loadTourApiPlaces() {
       return Array.isArray(rawItems) ? rawItems : rawItems ? [rawItems] : [];
     });
     const dedupedItems = [...new Map(items.map((item, index) => [item.contentid || `${item.title}-${index}`, item])).values()];
-    const apiArticles = normalizeTourItems(dedupedItems, region);
+    const placesArticles = normalizeTourItems(dedupedItems, region);
 
     if (requestRegionId !== state.activeRegionId) return;
 
-    state.apiArticles = apiArticles;
-    state.apiLoaded = true;
-    state.apiError = false;
+    state.placesArticles = placesArticles;
+    state.placesLoaded = true;
+    state.placesError = false;
 
-    if (apiArticles.length) {
-      updatePlacesStatus(`서울 축제 ${apiArticles.length}개를 불러왔습니다.`);
+    if (placesArticles.length) {
+      updatePlacesStatus(`${region.label} 축제 ${placesArticles.length}개를 불러왔습니다.`);
     } else {
-      updatePlacesStatus("서울에 표시할 축제 정보가 아직 등록되어 있지 않습니다.");
+      updatePlacesStatus(`${region.label}에 표시할 축제 정보가 아직 등록되어 있지 않습니다.`);
     }
 
     renderPlaces();
-    renderCuration();
-    renderEditorialPosts();
-    renderJulyFestivals();
-    renderCategoryNewsSections();
   } catch (error) {
     console.warn("TourAPI request failed. Fallback content is displayed.", error);
-    state.apiArticles = [];
-    state.apiLoaded = true;
-    state.apiError = true;
-    updatePlacesStatus("서울 축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    state.placesArticles = [];
+    state.placesLoaded = true;
+    state.placesError = true;
+    updatePlacesStatus(`${region.label} 축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.`);
     renderPlaces();
-    renderCuration();
-    renderEditorialPosts();
-    renderJulyFestivals();
-    renderCategoryNewsSections();
   } finally {
     window.clearTimeout(timeoutId);
   }
@@ -2974,8 +2972,8 @@ function renderJulyFestivals() {
 
     setNewsLoading(false);
     status.textContent = state.activeCategoryFilter === "all"
-      ? `${month.label}에 표시할 서울 여행 정보를 불러오는 중입니다.`
-      : "선택한 분류에 표시할 서울 여행 정보가 없습니다.";
+      ? `${month.label}에 표시할 축제 정보를 불러오는 중입니다.`
+      : "선택한 분류에 표시할 축제 정보가 없습니다.";
     status.hidden = false;
     recommended.innerHTML = "";
     feed.innerHTML = "";
@@ -3022,18 +3020,10 @@ function renderSeoulArticleState() {
   renderCategoryNewsSections();
 }
 
-function applySeoulCultureArticles(seoulArticles, statusMessage) {
+function applySeoulCultureArticles(seoulArticles) {
   state.apiArticles = seoulArticles;
   state.apiLoaded = true;
   state.apiError = false;
-
-  if (statusMessage) {
-    updatePlacesStatus(statusMessage);
-  } else if (seoulArticles.length) {
-    updatePlacesStatus(`서울 문화행사 ${seoulArticles.length}개를 불러왔습니다.`);
-  } else {
-    updatePlacesStatus("서울 문화행사 정보가 아직 등록되어 있지 않습니다.");
-  }
 
   renderSeoulArticleState();
 }
@@ -3060,20 +3050,16 @@ async function loadSeoulCultureEvents() {
   }
 
   state.apiError = false;
-  updatePlacesStatus("서울 문화행사 정보를 불러오는 중입니다.");
   let generatedArticles = [];
 
   try {
     generatedArticles = await loadGeneratedSeoulCultureArticles();
     if (generatedArticles.length) {
-      applySeoulCultureArticles(
-        generatedArticles,
-        `${currentSeoulMonth().label} 서울 여행 정보 ${generatedArticles.length}개를 준비했습니다.`
-      );
+      applySeoulCultureArticles(generatedArticles);
       return;
     }
   } catch (error) {
-    console.warn("Generated Seoul events could not be loaded. Live API will be used.", error);
+    console.warn("Generated festival events could not be loaded. Live API will be used.", error);
   }
 
   try {
@@ -3095,7 +3081,6 @@ async function loadSeoulCultureEvents() {
     state.apiArticles = [];
     state.apiLoaded = false;
     state.apiError = true;
-    updatePlacesStatus("서울 문화행사 정보를 불러오지 못했습니다. 관광공사 축제 정보로 다시 확인합니다.");
     loadJulyFestivalPosts();
   }
 }
@@ -3222,19 +3207,19 @@ function renderPlaces() {
   const grid = $("#placesGrid");
   if (!grid) return;
   const region = activeRegion();
-  const items = state.apiArticles.length
-    ? state.apiArticles.slice(0, 12)
+  const items = state.placesArticles.length
+    ? state.placesArticles.slice(0, 12)
     : [];
 
   if (!items.length) {
-    const title = state.apiError
+    const title = state.placesError
       ? "축제 정보를 불러오지 못했습니다"
-      : state.apiLoaded
+      : state.placesLoaded
         ? `${region.label} 축제 정보가 아직 없습니다`
         : "축제 정보를 불러오는 중입니다";
-    const description = state.apiError
+    const description = state.placesError
       ? "네트워크 상태를 확인한 뒤 다시 시도해 주세요. 다른 지역을 선택하면 등록된 축제를 확인할 수 있습니다."
-      : state.apiLoaded
+      : state.placesLoaded
         ? "공공 관광 데이터에 지역 축제가 등록되면 이곳에 표시됩니다."
         : "잠시만 기다려 주세요. 등록된 지역 축제를 확인하고 있습니다.";
 
@@ -3600,6 +3585,7 @@ function init() {
   applyLanguage();
   applyBookingSearchQuery();
   loadSeoulCultureEvents();
+  loadTourApiPlaces();
 }
 
 document.addEventListener("DOMContentLoaded", init);

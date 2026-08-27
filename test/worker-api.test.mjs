@@ -269,3 +269,84 @@ test("worker handles preflight without calling an external API", async () => {
   assert.equal(response.status, 204);
   assert.equal(response.headers.get("access-control-allow-methods"), "GET, POST, OPTIONS");
 });
+
+function festivalAiRequest(body) {
+  return new Request("https://view1.kr/api/festival-ai", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body)
+  });
+}
+
+test("worker festival AI endpoint rejects missing credentials", async () => {
+  const response = await worker.fetch(festivalAiRequest({ title: "Festival" }), {});
+  const body = await bodyOf(response);
+  assert.equal(response.status, 500);
+  assert.equal(body.code, "missing_openai_key");
+});
+
+test("worker festival AI endpoint parses fenced JSON from a mocked upstream response", async () => {
+  let requestInit;
+  globalThis.fetch = async (_url, init) => {
+    requestInit = init;
+    return new Response(JSON.stringify({
+      output_text: "```json\n{\"sections\":[{\"title\":\"Visit\",\"body\":\"Check the schedule.\"}],\"tips\":[\"Bring water.\"]}\n```"
+    }), { status: 200, headers: { "content-type": "application/json" } });
+  };
+
+  const response = await worker.fetch(
+    festivalAiRequest({
+      title: "Summer Festival",
+      category: "Performance",
+      summary: "A short event summary.",
+      facts: ["Fact 1", "Fact 2"]
+    }),
+    { OPENAI_API_KEY: "test-openai-key", OPENAI_MODEL: "test-model" }
+  );
+  const body = await bodyOf(response);
+
+  assert.equal(response.status, 200);
+  assert.equal(body.ok, true);
+  assert.equal(body.sections[0].title, "Visit");
+  assert.deepEqual(body.tips, ["Bring water."]);
+  assert.equal(requestInit.headers.Authorization, "Bearer test-openai-key");
+  assert.match(requestInit.body, /Summer Festival/);
+});
+
+test("worker festival AI endpoint safely falls back for malformed model JSON", async () => {
+  globalThis.fetch = async () => new Response(JSON.stringify({ output_text: "not-json" }), {
+    status: 200,
+    headers: { "content-type": "application/json" }
+  });
+
+  const response = await worker.fetch(festivalAiRequest({}), { OPENAI_API_KEY: "test-key" });
+  const body = await bodyOf(response);
+  assert.equal(response.status, 200);
+  assert.deepEqual(body.sections, []);
+  assert.deepEqual(body.tips, []);
+});
+
+test("worker festival AI endpoint preserves upstream errors and catches invalid request JSON", async (t) => {
+  await t.test("upstream error", async () => {
+    globalThis.fetch = async () => new Response(JSON.stringify({ error: { message: "rate limited" } }), {
+      status: 429,
+      headers: { "content-type": "application/json" }
+    });
+    const response = await worker.fetch(festivalAiRequest({}), { OPENAI_API_KEY: "test-key" });
+    const body = await bodyOf(response);
+    assert.equal(response.status, 429);
+    assert.equal(body.code, "openai_request_failed");
+    assert.match(body.message, /rate limited/);
+  });
+
+  await t.test("invalid request JSON", async () => {
+    const invalid = new Request("https://view1.kr/api/festival-ai", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{"
+    });
+    const response = await worker.fetch(invalid, { OPENAI_API_KEY: "test-key" });
+    assert.equal(response.status, 400);
+    assert.equal((await bodyOf(response)).ok, false);
+  });
+});

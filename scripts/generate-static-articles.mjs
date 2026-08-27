@@ -136,11 +136,11 @@ function sharedHead({ title, description, canonical, robots = "index,follow,max-
 }
 
 function siteHeader() {
-  return `<header class="site-header"><div class="site-header__inner"><a class="brand" href="/" aria-label="서울여행뉴스 홈"><span>SN</span><strong>서울여행뉴스</strong></a><nav aria-label="주요 메뉴"><a href="/#allArticles">서울 행사</a><a href="/#editorialPicks">여행 가이드</a><a href="/about">소개</a></nav></div></header>`;
+  return `<header class="site-header"><div class="site-header__inner"><a class="brand" href="/" aria-label="대한축제뉴스 홈"><span>DF</span><strong>대한축제뉴스</strong></a><nav aria-label="주요 메뉴"><a href="/#allArticles">최신 축제</a><a href="/#editorialPicks">여행 가이드</a><a href="/about">소개</a></nav></div></header>`;
 }
 
 function siteFooter() {
-  return `<footer class="site-footer"><div><strong>서울여행뉴스</strong><p>공개된 서울 문화행사 정보와 직접 확인해야 할 방문 준비 사항을 구분해 전합니다.</p><nav aria-label="사이트 안내"><a href="/about">소개</a><a href="/editorial-policy">편집 원칙</a><a href="/contact">문의</a><a href="/privacy">개인정보처리방침</a><a href="/terms">이용약관</a><a href="/disclaimer">면책 안내</a></nav><small>© 2026 서울여행뉴스</small></div></footer>`;
+  return `<footer class="site-footer"><div><strong>대한축제뉴스</strong><p>공개된 전국 축제·문화행사 정보와 직접 확인해야 할 방문 준비 사항을 구분해 전합니다.</p><nav aria-label="사이트 안내"><a href="/about">소개</a><a href="/editorial-policy">편집 원칙</a><a href="/contact">문의</a><a href="/privacy">개인정보처리방침</a><a href="/terms">이용약관</a><a href="/disclaimer">면책 안내</a></nav><small>© 2026 대한축제뉴스</small></div></footer>`;
 }
 
 function categoryMatches(post, event) {
@@ -163,7 +163,7 @@ function eventCards(events) {
   if (!events.length) return `<p class="notice">이번 달 공개 행사 중 이 주제와 바로 연결되는 항목은 아직 없습니다. 메인 목록에서 최신 일정을 확인해 주세요.</p>`;
   return `<div class="event-cards">${events.map((event) => {
     const image = officialImage(event.image);
-    return `<article><a href="/seoul-events/${encodeURIComponent(safeSlug(event.id))}/">${image ? `<span class="event-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(event.title)} 포스터" loading="lazy" /></span>` : `<span class="event-image event-image--empty">이미지 없음</span>`}<span class="event-card__body"><em>${escapeHtml(event.category || "서울 행사")}</em><strong>${escapeHtml(event.title)}</strong><small>${escapeHtml(event.date || event.place || "일정 확인")}</small></span></a></article>`;
+    return `<article><a href="/seoul-events/${encodeURIComponent(safeSlug(event.id))}/">${image ? `<span class="event-image"><img src="${escapeHtml(image)}" alt="${escapeHtml(event.title)} 포스터" loading="lazy" /></span>` : `<span class="event-image event-image--empty">이미지 없음</span>`}<span class="event-card__body"><em>${escapeHtml(event.category || "축제 소식")}</em><strong>${escapeHtml(event.title)}</strong><small>${escapeHtml(event.date || event.place || "일정 확인")}</small></span></a></article>`;
   }).join("")}</div>`;
 }
 
@@ -188,11 +188,11 @@ function editorialPage(post, allEvents) {
     description: post.summary,
     datePublished: String(post.date || "").replaceAll(".", "-"),
     dateModified: kstDate(),
-    author: { "@type": "Organization", name: "서울여행뉴스", url: `${siteOrigin}/about` },
-    publisher: { "@type": "Organization", name: "서울여행뉴스", url: siteOrigin },
+    author: { "@type": "Organization", name: "대한축제뉴스", url: `${siteOrigin}/about` },
+    publisher: { "@type": "Organization", name: "대한축제뉴스", url: siteOrigin },
     mainEntityOfPage: canonical
   }).replace(/</g, "\\u003c");
-  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${post.title} | 서울여행뉴스`, description: post.summary, canonical })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main"><a class="back-link" href="/#editorialPicks">← 여행 가이드로 돌아가기</a><article class="editorial-article"><header class="article-header"><p class="eyebrow">${escapeHtml(post.category || "서울 여행 가이드")}</p><h1>${escapeHtml(post.title)}</h1><p>${escapeHtml(post.summary)}</p><div class="byline"><span>서울여행뉴스 편집부</span><time datetime="${escapeHtml(String(post.date || "").replaceAll(".", "-"))}">${escapeHtml(post.date)}</time><span>${escapeHtml(post.readTime || "읽기")}</span></div></header>${editorialBody(post, related)}<aside class="source-note"><strong>자료와 편집 기준</strong><p>서울시 공개 문화행사 자료는 일정 후보를 찾는 데 사용하고, 본문은 방문자가 실제로 확인해야 할 기준을 서울여행뉴스 편집부가 재구성했습니다. 행사 내용이 변경될 수 있어 방문 전 공식 안내 확인을 권합니다.</p><a href="/editorial-policy">편집 원칙 보기</a></aside></article></main>${siteFooter()}</body></html>`;
+  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${post.title} | 대한축제뉴스`, description: post.summary, canonical })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main"><a class="back-link" href="/#editorialPicks">← 여행 가이드로 돌아가기</a><article class="editorial-article"><header class="article-header"><p class="eyebrow">${escapeHtml(post.category || "서울 여행 가이드")}</p><h1>${escapeHtml(post.title)}</h1><p>${escapeHtml(post.summary)}</p><div class="byline"><span>대한축제뉴스 편집부</span><time datetime="${escapeHtml(String(post.date || "").replaceAll(".", "-"))}">${escapeHtml(post.date)}</time><span>${escapeHtml(post.readTime || "읽기")}</span></div></header>${editorialBody(post, related)}<aside class="source-note"><strong>자료와 편집 기준</strong><p>서울시 공개 문화행사 자료는 일정 후보를 찾는 데 사용하고, 본문은 방문자가 실제로 확인해야 할 기준을 대한축제뉴스 편집부가 재구성했습니다. 행사 내용이 변경될 수 있어 방문 전 공식 안내 확인을 권합니다.</p><a href="/editorial-policy">편집 원칙 보기</a></aside></article></main>${siteFooter()}</body></html>`;
 }
 
 function infoRow(label, value, note = "") {
@@ -200,15 +200,24 @@ function infoRow(label, value, note = "") {
   return `<tr><th scope="row">${escapeHtml(label)}</th><td><strong>${escapeHtml(cleanText(value))}</strong>${note ? `<small>${escapeHtml(note)}</small>` : ""}</td></tr>`;
 }
 
+function coupangWidgetAd(slot = "event") {
+  const safeSlot = safeSlug(slot) || "event";
+  return `<aside class="coupang-widget-ad" aria-label="쿠팡 파트너스 광고"><div class="coupang-widget-label">Advertisement</div><div class="coupang-widget-frame" id="coupangWidget-${escapeHtml(safeSlot)}" data-coupang-widget></div><p class="coupang-widget-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p></aside>`;
+}
+
+function coupangWidgetScript() {
+  return `<script>(() => { const targets = [...document.querySelectorAll("[data-coupang-widget]:not([data-coupang-loaded])")]; if (!targets.length) return; const config = { id: 1003200, trackingCode: "AF1488183", subId: null, template: "carousel", height: "140" }; const render = () => { if (!window.PartnersCoupang?.G) return; targets.forEach((target) => { if (target.dataset.coupangLoaded) return; target.dataset.coupangLoaded = "true"; const width = Math.max(300, Math.min(680, Math.floor(target.clientWidth || target.parentElement?.clientWidth || window.innerWidth - 36))); new window.PartnersCoupang.G({ ...config, width: String(width), container: target }); }); }; if (window.PartnersCoupang?.G) { render(); return; } const script = document.createElement("script"); script.src = "https://ads-partners.coupang.com/g.js"; script.async = true; script.onload = render; script.onerror = () => { targets.forEach((target) => { target.dataset.coupangLoaded = "error"; }); }; document.head.appendChild(script); })();</script>`;
+}
+
 function eventPage(event, sourceLabel) {
   const id = safeSlug(event.id);
   const canonical = `${siteOrigin}/seoul-events/${id}/`;
-  const title = cleanText(event.title) || "서울 문화행사";
+  const title = cleanText(event.title) || "축제 소식";
   const image = officialImage(event.image);
   const official = safeExternalUrl(event.homepage);
   const place = cleanText(event.place || event.address);
   const mapUrl = place ? `https://map.naver.com/p/search/${encodeURIComponent(place)}` : "";
-  const description = cleanText(event.summary) || `${place || "서울"}에서 열리는 ${title}의 일정과 방문 전 확인 사항입니다.`;
+  const description = cleanText(event.summary) || `${place || "현지"}에서 열리는 ${title}의 일정과 방문 전 확인 사항입니다.`;
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Event",
@@ -219,7 +228,7 @@ function eventPage(event, sourceLabel) {
     organizer: event.org ? { "@type": "Organization", name: cleanText(event.org) } : undefined,
     url: official || canonical
   }).replace(/</g, "\\u003c");
-  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${title} 일정·장소·요금 | 서울여행뉴스`, description, canonical, robots: "noindex,follow,max-image-preview:large", ads: false, image })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main event-main"><a class="back-link" href="/#allArticles">← 이번 달 서울 행사로 돌아가기</a><article class="event-article"><header class="article-header"><p class="eyebrow">${escapeHtml(event.category || "서울 문화행사")}</p><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p><div class="byline"><span>${escapeHtml(sourceLabel || "서울 열린데이터광장")}</span><span>방문 전 공식 안내 확인</span></div></header>${image ? `<figure class="official-poster"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)} 공식 포스터" /><figcaption>공개 행사 정보에 등록된 공식 이미지입니다.</figcaption></figure>` : `<div class="poster-empty" role="img" aria-label="등록된 행사 이미지 없음">등록된 공식 이미지가 없습니다.</div>`}<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">행사 기본 정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section><section aria-labelledby="about-title"><p class="eyebrow">VISIT GUIDE</p><h2 id="about-title">방문 전에 무엇을 확인할까요?</h2><p>${escapeHtml(description)}</p><p>공개 데이터는 행사 탐색을 돕는 자료이며 운영기관의 실시간 공지를 대신하지 않습니다. 회차별 입장 시간, 매진 여부, 현장 발권, 휴관 또는 취소 공지는 공식 안내에서 확인하세요.</p><h3>교통과 주차</h3><p>${place ? `${escapeHtml(place)}을(를) 기준으로 가장 가까운 지하철역과 버스 정류장을 먼저 확인하세요.` : "공식 안내에 표시된 정확한 장소와 출입구를 먼저 확인하세요."} 행사장 주차 정보가 제공되지 않았거나 불명확하면 대중교통을 우선 비교하고, 차량 이용 시에는 인근 공영주차장의 운영 시간과 요금을 별도로 확인하는 편이 안전합니다.</p><h3>입장과 준비물</h3><p>예매 확인서, 신분증, 할인 증빙, 보호자 동반 기준이 필요한지 살펴보세요. 어린이 대상 행사나 체험 프로그램은 참여 연령과 준비물, 보호자 입장 가능 여부가 회차마다 다를 수 있습니다.</p></section><aside class="source-note"><strong>정보 출처</strong><p>${escapeHtml(sourceLabel || "서울 열린데이터광장 문화행사 정보")}에 공개된 항목을 정리했습니다. 서울여행뉴스는 비어 있는 운영 정보를 임의로 추정하지 않습니다.</p>${official ? `<a href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">원문에서 최신 정보 확인</a>` : `<a href="/editorial-policy">편집 원칙 확인</a>`}</aside></article></main>${siteFooter()}</body></html>`;
+  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${title} 일정·장소·요금 | 대한축제뉴스`, description, canonical, robots: "noindex,follow,max-image-preview:large", ads: false, image })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main event-main"><a class="back-link" href="/#allArticles">← 이번 달 축제 소식으로 돌아가기</a><article class="event-article"><header class="article-header"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p><div class="byline"><span>${escapeHtml(sourceLabel || "공공 관광 데이터")}</span><span>방문 전 공식 안내 확인</span></div></header>${image ? `<figure class="official-poster"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)} 공식 포스터" /><figcaption>공개 행사 정보에 등록된 공식 이미지입니다.</figcaption></figure>` : `<div class="poster-empty" role="img" aria-label="등록된 행사 이미지 없음">등록된 공식 이미지가 없습니다.</div>`}<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">행사 기본 정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section><section aria-labelledby="about-title"><p class="eyebrow">VISIT GUIDE</p><h2 id="about-title">방문 전에 무엇을 확인할까요?</h2><p>${escapeHtml(description)}</p><p>공개 데이터는 행사 탐색을 돕는 자료이며 운영기관의 실시간 공지를 대신하지 않습니다. 회차별 입장 시간, 매진 여부, 현장 발권, 휴관 또는 취소 공지는 공식 안내에서 확인하세요.</p><h3>교통과 주차</h3><p>${place ? `${escapeHtml(place)}을(를) 기준으로 가장 가까운 지하철역과 버스 정류장을 먼저 확인하세요.` : "공식 안내에 표시된 정확한 장소와 출입구를 먼저 확인하세요."} 행사장 주차 정보가 제공되지 않았거나 불명확하면 대중교통을 우선 비교하고, 차량 이용 시에는 인근 공영주차장의 운영 시간과 요금을 별도로 확인하는 편이 안전합니다.</p><h3>입장과 준비물</h3><p>예매 확인서, 신분증, 할인 증빙, 보호자 동반 기준이 필요한지 살펴보세요. 어린이 대상 행사나 체험 프로그램은 참여 연령과 준비물, 보호자 입장 가능 여부가 회차마다 다를 수 있습니다.</p></section><aside class="source-note"><strong>정보 출처</strong><p>${escapeHtml(sourceLabel || "공공 관광 데이터")}에 공개된 항목을 정리했습니다. 대한축제뉴스는 비어 있는 운영 정보를 임의로 추정하지 않습니다.</p>${official ? `<a href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">원문에서 최신 정보 확인</a>` : `<a href="/editorial-policy">편집 원칙 확인</a>`}</aside>${coupangWidgetAd(`event-${id}`)}</article></main>${siteFooter()}${coupangWidgetScript()}</body></html>`;
 }
 
 export async function generateStaticArticles() {
@@ -227,10 +236,15 @@ export async function generateStaticArticles() {
   await Promise.all([rm(articleDir, { recursive: true, force: true }), rm(eventDir, { recursive: true, force: true })]);
   await Promise.all([mkdir(articleDir, { recursive: true }), mkdir(eventDir, { recursive: true })]);
 
+  // The curated editorial posts are all Seoul neighborhood guides, so their
+  // "related events" carousel should only ever surface Seoul events even
+  // though eventPayload.items now covers festivals nationwide.
+  const seoulEvents = eventPayload.items.filter((event) => event.areaCode === "1");
+
   for (const post of posts) {
     const target = path.join(articleDir, safeSlug(post.id));
     await mkdir(target, { recursive: true });
-    await writeFile(path.join(target, "index.html"), editorialPage(post, eventPayload.items), "utf8");
+    await writeFile(path.join(target, "index.html"), editorialPage(post, seoulEvents), "utf8");
   }
 
   for (const event of eventPayload.items) {
