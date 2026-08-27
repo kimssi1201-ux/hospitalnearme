@@ -4504,6 +4504,15 @@ body * {
 }
 
 @media (min-width: 861px) {
+  /* Desktop already exposes region browsing via the "가볼만한 곳" nav link and
+     has room for the full category-tab row right below it — stacking the
+     TODAY chip bar as a third full-width strip on top of that reads as
+     cluttered. Keep it for mobile/tablet, where it's the faster path since
+     the header nav collapses into a hamburger there. */
+  .today-keywords {
+    display: none;
+  }
+
   .site-header {
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas: "brand nav language";
