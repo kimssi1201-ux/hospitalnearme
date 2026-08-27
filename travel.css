@@ -3758,8 +3758,7 @@ body.booking-search-open {
     display: none;
   }
 
-  .booking-search-panel .section-heading .eyebrow,
-  .booking-search-panel .section-heading p {
+  .booking-search-panel .section-heading .eyebrow {
     display: none;
   }
 
@@ -3767,6 +3766,12 @@ body.booking-search-open {
     max-width: calc(100% - 60px);
     font-size: 24px;
     line-height: 1.25;
+  }
+
+  .booking-search-panel .section-heading p {
+    max-width: calc(100% - 60px);
+    font-size: 14px;
+    line-height: 1.5;
   }
 
   .booking-search-panel .mrt-search-box,
