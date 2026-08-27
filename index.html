@@ -20,10 +20,10 @@
     <link rel="canonical" href="https://view1.kr/" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="대한축제뉴스 RSS" href="/feed.xml" />
-    <link rel="stylesheet" href="travel.css?v=20260809-feed-1" />
+    <link rel="stylesheet" href="travel.css?v=20260827-portal-search-1" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
     <script src="travel-data.js?v=20260710-category-copy-1" defer></script>
-    <script src="travel.js?v=20260809-feed-1" defer></script>
+    <script src="travel.js?v=20260827-portal-search-1" defer></script>
     <title>대한축제뉴스 | 전국 축제 정보 뉴스</title>
   </head>
   <body class="is-loading-news">
@@ -40,21 +40,43 @@
         <span></span>
         <span class="sr-only" data-i18n="nav.menu">메뉴 열기</span>
       </button>
-      <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴">
-        <span class="nav-group-label" data-i18n="nav.group.explore">둘러보기</span>
-        <a href="#editorial" data-i18n="nav.editorial">서울 기획</a>
-        <a href="#placesSection" data-i18n="nav.places">가볼만한 곳</a>
-        <a href="#categoryNews" data-i18n="nav.categoryNews">분야별 축제</a>
-
-        <span class="nav-group-label" data-i18n="nav.group.booking">예약</span>
-        <a class="nav-optional" href="#bookingSearch" data-mrt-open="stay" data-i18n="nav.stay">숙소 검색</a>
-        <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권" data-i18n="nav.tour">투어·입장권</a>
-        <a class="nav-optional" href="#bookingSearch" data-mrt-open="flight" data-i18n="nav.flight">항공권</a>
-
-        <span class="nav-group-label" data-i18n="nav.group.reading">읽을거리</span>
-        <a href="#allArticles" data-i18n="nav.latest">최신 뉴스</a>
-        <a class="nav-optional" href="/feed.xml" data-i18n="nav.rss">RSS 피드</a>
-        <a class="nav-optional" href="about.html" data-i18n="nav.about">사이트 소개</a>
+      <nav class="primary-nav nav-mega" id="primaryNav" aria-label="주요 메뉴">
+        <div class="nav-menu">
+          <button class="nav-trigger" type="button" aria-expanded="false" data-i18n="nav.group.find">축제 찾기</button>
+          <div class="nav-panel">
+            <a href="#allArticles" data-category-reset data-i18n="nav.allFestivals">전체 축제</a>
+            <a href="#placesSection" data-i18n="nav.regionFestivals">지역별 축제</a>
+            <a href="#categoryNews" data-i18n="nav.categoryNews">분야별 축제</a>
+            <a href="#festivalSearchInput" data-search-focus data-i18n="nav.search">축제 검색</a>
+          </div>
+        </div>
+        <div class="nav-menu">
+          <button class="nav-trigger" type="button" aria-expanded="false" data-i18n="nav.group.booking">예약 준비</button>
+          <div class="nav-panel">
+            <a href="#bookingSearch" data-mrt-open="stay" data-i18n="nav.stay">숙소 검색</a>
+            <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권" data-i18n="nav.tour">투어·입장권</a>
+            <a href="#bookingSearch" data-mrt-open="flight" data-i18n="nav.flight">항공권</a>
+            <a href="#coupangEssentials" data-mrt-open="tour" data-mrt-keyword="여행 준비물" data-mrt-coupon="true" data-i18n="nav.essentials">여행 준비물</a>
+          </div>
+        </div>
+        <div class="nav-menu">
+          <button class="nav-trigger" type="button" aria-expanded="false" data-i18n="nav.group.reading">읽을거리</button>
+          <div class="nav-panel">
+            <a href="#editorial" data-i18n="nav.editorial">서울 기획</a>
+            <a href="#allArticles" data-i18n="nav.latest">최신 뉴스</a>
+            <a href="/feed.xml" data-i18n="nav.rss">RSS 피드</a>
+            <a href="about.html" data-i18n="nav.about">사이트 소개</a>
+          </div>
+        </div>
+        <div class="nav-menu">
+          <button class="nav-trigger" type="button" aria-expanded="false" data-i18n="nav.group.info">여행 정보</button>
+          <div class="nav-panel">
+            <a href="#allArticles" data-search-chip="무료" data-i18n="nav.free">무료 축제</a>
+            <a href="#allArticles" data-search-chip="가족" data-i18n="nav.family">가족 나들이</a>
+            <a href="#allArticles" data-search-chip="야간" data-i18n="nav.night">야간 행사</a>
+            <a href="#allArticles" data-search-chip="교통" data-i18n="nav.transport">교통·주차</a>
+          </div>
+        </div>
       </nav>
       <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
         <button type="button" data-lang="ko">KR</button>
@@ -85,6 +107,34 @@
           </div>
           <a href="#allArticles" data-i18n="editorial.link">최신 행사 보기</a>
         </div>
+        <form class="portal-search" id="festivalSearchForm" role="search" aria-label="전국 축제 검색">
+          <div class="portal-search-row">
+            <label class="sr-only" for="festivalSearchInput">축제 검색</label>
+            <input
+              id="festivalSearchInput"
+              name="q"
+              type="search"
+              autocomplete="off"
+              data-i18n-placeholder="search.placeholder"
+              placeholder="축제명, 지역, 주제 검색"
+            />
+            <button type="submit" data-i18n="search.submit">검색</button>
+          </div>
+          <div class="portal-search-meta">
+            <p id="festivalSearchStatus" data-i18n="search.ready">지역명이나 축제명을 입력하면 최신 목록에서 바로 찾아드립니다.</p>
+            <button class="portal-search-clear" id="festivalSearchClear" type="button" hidden data-i18n="search.clear">검색 해제</button>
+          </div>
+          <div class="portal-search-chips" aria-label="빠른 축제 검색">
+            <button type="button" data-search-chip="서울">서울</button>
+            <button type="button" data-search-chip="부산">부산</button>
+            <button type="button" data-search-chip="제주">제주</button>
+            <button type="button" data-search-chip="야간">야간</button>
+            <button type="button" data-search-chip="가족">가족</button>
+            <button type="button" data-search-chip="무료">무료</button>
+            <button type="button" data-search-chip="입장권">입장권</button>
+            <button type="button" data-search-chip="전시">전시</button>
+          </div>
+        </form>
         <div class="editorial-grid" id="editorialList" aria-live="polite">
           <!-- STATIC_EDITORIAL_START -->
 

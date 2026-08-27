@@ -34,6 +34,9 @@ test("landing page exposes the feed mounts without a hero mount", async () => {
   assert.match(source, /id="recommendedArticles"/);
   assert.match(source, /id="newsFeedList"/);
   assert.match(source, /id="loadMoreArticles"/);
+  assert.match(source, /id="festivalSearchForm"/);
+  assert.match(source, /data-search-chip="서울"/);
+  assert.match(source, /class="primary-nav nav-mega"/);
   assert.doesNotMatch(source, /id="featuredArticle"/);
 });
 
