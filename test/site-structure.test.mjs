@@ -12,7 +12,7 @@ test("every HTML page has the shared head requirements", async () => {
     .filter((entry) => entry.isFile() && entry.name.endsWith(".html"))
     .map((entry) => entry.name);
 
-  assert.equal(files.length, 11);
+  assert.equal(files.length, 12);
 
   for (const file of files) {
     const source = await readFile(path.join(root, file), "utf8");
@@ -38,6 +38,21 @@ test("landing page exposes the feed mounts without a hero mount", async () => {
   assert.match(source, /data-search-chip="서울"/);
   assert.match(source, /class="primary-nav nav-mega"/);
   assert.doesNotMatch(source, /id="featuredArticle"/);
+});
+
+test("search page exposes a crawl-safe festival search experience", async () => {
+  const source = await readFile(path.join(root, "search.html"), "utf8");
+  const script = await readFile(path.join(root, "search.js"), "utf8");
+  const redirects = await readFile(path.join(root, "_redirects"), "utf8");
+
+  assert.match(source, /name="robots" content="noindex,follow,max-image-preview:large"/);
+  assert.match(source, /<link\s+rel="canonical"\s+href="https:\/\/view1\.kr\/search"/);
+  assert.match(source, /id="searchPageForm"/);
+  assert.match(source, /id="searchResultsList"/);
+  assert.match(source, /href="\/search\?q=서울"/);
+  assert.match(script, /generated\/seoul-events\.json/);
+  assert.match(script, /portalData\.editorialPosts/);
+  assert.match(redirects, /\/search\s+\/search\.html\s+200/);
 });
 
 test("landing page includes crawlable article cards before JavaScript runs", async () => {

@@ -5069,3 +5069,234 @@ body * {
     width: 100%;
   }
 }
+
+.search-page-header {
+  position: sticky;
+  display: flex;
+  min-height: 72px;
+  padding: 0 max(22px, calc((100vw - var(--max)) / 2));
+}
+
+.search-page-header .brand {
+  grid-area: auto;
+}
+
+.search-page-header .brand small {
+  display: block;
+}
+
+.search-top-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+}
+
+.search-top-nav a {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.search-top-nav a:hover,
+.search-top-nav a:focus-visible {
+  color: var(--accent-deep);
+}
+
+.search-page-main {
+  display: grid;
+  gap: 48px;
+  width: min(var(--max), calc(100% - 32px));
+  padding: 42px 0 74px;
+}
+
+.search-hero {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 34px;
+  border-bottom: 1px solid var(--line);
+}
+
+.search-hero h1,
+.search-hero p {
+  margin: 0;
+}
+
+.search-hero h1 {
+  max-width: 760px;
+  color: var(--ink);
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.search-hero > p:not(.section-kicker) {
+  max-width: 680px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.search-page-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  max-width: 760px;
+  margin-top: 8px;
+}
+
+.search-page-form input {
+  width: 100%;
+  min-height: 54px;
+  min-width: 0;
+  padding: 0 17px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.search-page-form input:focus {
+  border-color: var(--accent);
+  outline: 3px solid rgba(29, 166, 194, 0.18);
+  background: #fff;
+}
+
+.search-page-form button {
+  min-width: 104px;
+  min-height: 54px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.search-page-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.search-page-chips a {
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.search-page-chips a:hover,
+.search-page-chips a:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+.search-results-section {
+  display: grid;
+  gap: 18px;
+}
+
+.search-results-list {
+  display: grid;
+  gap: 0;
+}
+
+.search-result-card {
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+}
+
+.search-result-card a {
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 18px;
+  min-height: 152px;
+  padding: 18px 0;
+}
+
+.search-result-card .image-frame--feed {
+  width: 180px;
+  height: 116px;
+}
+
+.search-result-card b {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.search-page-footer {
+  margin-top: 0;
+}
+
+@media (max-width: 720px) {
+  .search-page-header {
+    position: sticky;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .search-page-header .brand small {
+    display: none;
+  }
+
+  .search-top-nav {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .search-top-nav a {
+    font-size: 12px;
+  }
+
+  .search-page-main {
+    gap: 34px;
+    width: min(100% - 28px, var(--max));
+    padding-top: 28px;
+  }
+
+  .search-hero h1 {
+    font-size: 36px;
+  }
+
+  .search-page-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .search-page-form button {
+    width: 100%;
+  }
+
+  .search-result-card a {
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 13px;
+    min-height: 0;
+    padding: 14px 0;
+  }
+
+  .search-result-card .image-frame--feed {
+    width: 104px;
+    height: 82px;
+  }
+
+  .search-result-card b {
+    display: none;
+  }
+}

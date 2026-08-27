@@ -362,8 +362,8 @@ const I18N = {
 const EDITORIAL_I18N = {
   ko: {
     "nav.editorial": "서울 기획",
-    "editorial.title": "서울을 더 잘 여행하는 방법",
-    "editorial.description": "전시와 공연, 동네 산책과 교통 정보를 직접 읽고 고른 서울 여행 기획입니다.",
+    "editorial.title": "전국 축제 뉴스와 여행 준비",
+    "editorial.description": "오늘 볼 만한 전국 축제, 지역별 행사, 예약 전 체크 정보를 한 화면에서 찾을 수 있게 정리합니다.",
     "editorial.link": "최신 행사 보기",
     "latest.title": "지금 전국에서 열리는 축제",
     "latest.description": "전국 축제·문화행사 정보를 바탕으로 일정·장소·요금·문의처를 확인하고, 방문 동선과 주변 교통까지 함께 정리합니다.",
@@ -371,8 +371,8 @@ const EDITORIAL_I18N = {
   },
   en: {
     "nav.editorial": "Seoul Guides",
-    "editorial.title": "A better way to explore Seoul",
-    "editorial.description": "Editor-selected Seoul itineraries covering exhibitions, performances, neighborhood walks, and practical transport tips.",
+    "editorial.title": "Festival news and trip prep across Korea",
+    "editorial.description": "Find nationwide festivals, regional events, and pre-booking checks from one practical travel news screen.",
     "editorial.link": "See the latest events",
     "latest.title": "What is on across Korea now",
     "latest.description": "Check official festival schedules, venues, prices, contacts, nearby routes, and transport information from across Korea in one place.",
@@ -380,8 +380,8 @@ const EDITORIAL_I18N = {
   },
   ja: {
     "nav.editorial": "ソウル特集",
-    "editorial.title": "ソウルをもっと楽しむ旅の方法",
-    "editorial.description": "展示、公演、街歩き、交通情報を編集部が選び、旅の流れに合わせて紹介します。",
+    "editorial.title": "韓国全国のフェスニュースと旅の準備",
+    "editorial.description": "今日見たい全国フェス、地域別イベント、予約前チェックを一つの画面で探せるよう整理します。",
     "editorial.link": "最新イベントを見る",
     "latest.title": "今全国で開催中のフェス",
     "latest.description": "全国のフェス・文化イベント情報をもとに、日程、会場、料金、問い合わせ先、周辺交通をまとめました。",
@@ -389,8 +389,8 @@ const EDITORIAL_I18N = {
   },
   zh: {
     "nav.editorial": "首尔专题",
-    "editorial.title": "用更好的方式探索首尔",
-    "editorial.description": "精选展览、演出、街区漫步和交通信息，帮助你轻松规划首尔行程。",
+    "editorial.title": "韩国全国庆典新闻与出行准备",
+    "editorial.description": "在一个页面查找今日可看的全国庆典、地区活动和预订前确认事项。",
     "editorial.link": "查看最新活动",
     "latest.title": "全国正在举行的庆典",
     "latest.description": "根据全国庆典/文化活动信息，整理日程、地点、票价、联系方式、游览动线和交通。",
@@ -2697,7 +2697,12 @@ function bindFestivalSearch() {
   if (form && input) {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      setFestivalSearchQuery(input.value, { scroll: true });
+      const query = input.value.trim();
+      if (!query) {
+        setFestivalSearchQuery("", { scroll: true });
+        return;
+      }
+      window.location.href = `/search?q=${encodeURIComponent(query)}`;
     });
 
     input.addEventListener("input", () => {

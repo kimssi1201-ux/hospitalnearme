@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,follow,max-image-preview:large" />
+    <meta name="description" content="대한축제뉴스에서 전국 축제, 지역 행사, 여행 준비 글을 검색합니다." />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="google-adsense-account" content="ca-pub-5751319666030430" />
+    <meta property="og:title" content="축제 검색 | 대한축제뉴스" />
+    <meta property="og:description" content="축제명, 지역, 주제로 대한축제뉴스의 전국 축제 정보를 찾아보세요." />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:url" content="https://view1.kr/search" />
+    <link rel="canonical" href="https://view1.kr/search" />
+    <link rel="alternate" type="application/rss+xml" title="대한축제뉴스 RSS" href="/feed.xml" />
+    <link rel="stylesheet" href="travel.css?v=20260827-reference-search-2" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
+    <script src="travel-data.js?v=20260710-category-copy-1" defer></script>
+    <script src="search.js?v=20260827-reference-search-2" defer></script>
+    <title>축제 검색 | 대한축제뉴스</title>
+  </head>
+  <body class="search-page">
+    <header class="site-header search-page-header">
+      <a class="brand" href="/" aria-label="대한축제뉴스 홈">
+        <span class="brand-mark" aria-hidden="true">DF</span>
+        <span>
+          <strong>대한축제뉴스</strong>
+          <small>전국 축제 정보 뉴스</small>
+        </span>
+      </a>
+      <nav class="search-top-nav" aria-label="검색 페이지 메뉴">
+        <a href="/">홈</a>
+        <a href="/#placesSection">지역별 축제</a>
+        <a href="/#categoryNews">분야별 축제</a>
+        <a href="/feed.xml">RSS</a>
+      </nav>
+    </header>
+
+    <main class="search-page-main">
+      <section class="search-hero" aria-labelledby="searchTitle">
+        <p class="section-kicker">Festival Search</p>
+        <h1 id="searchTitle">대한축제뉴스 검색</h1>
+        <p>축제명, 지역, 주제를 입력하면 전국 축제와 편집 기획 글을 함께 찾아드립니다.</p>
+        <form class="search-page-form" id="searchPageForm" role="search" action="/search" method="get">
+          <label class="sr-only" for="searchPageInput">축제 검색어</label>
+          <input id="searchPageInput" name="q" type="search" autocomplete="off" placeholder="예: 서울, 야간, 가족, 무료" />
+          <button type="submit">검색</button>
+        </form>
+        <div class="search-page-chips" aria-label="추천 검색어">
+          <a href="/search?q=서울">서울</a>
+          <a href="/search?q=부산">부산</a>
+          <a href="/search?q=제주">제주</a>
+          <a href="/search?q=가족">가족</a>
+          <a href="/search?q=야간">야간</a>
+          <a href="/search?q=무료">무료</a>
+          <a href="/search?q=전시">전시</a>
+          <a href="/search?q=입장권">입장권</a>
+        </div>
+      </section>
+
+      <section class="search-results-section" aria-labelledby="searchResultsTitle">
+        <div class="tripview-section-title">
+          <div>
+            <span class="section-kicker">Results</span>
+            <h2 id="searchResultsTitle">검색 결과</h2>
+          </div>
+          <a href="/">홈으로</a>
+        </div>
+        <div class="section-status" id="searchResultsStatus">검색 결과를 준비하는 중입니다.</div>
+        <div class="search-results-list" id="searchResultsList" aria-live="polite"></div>
+        <button class="load-more-articles" id="searchLoadMore" type="button" hidden>결과 더보기</button>
+      </section>
+    </main>
+
+    <footer class="site-footer search-page-footer">
+      <div class="footer-intro">
+        <a class="brand footer-brand" href="/" aria-label="대한축제뉴스 홈">
+          <span class="brand-mark" aria-hidden="true">DF</span>
+          <span>
+            <strong>대한축제뉴스</strong>
+            <small>전국 축제 선택을 돕는 뉴스 포털</small>
+          </span>
+        </a>
+        <p>전국 축제, 문화행사 일정, 방문 준비, 교통과 주변 여행 정보를 뉴스 피드로 정리합니다.</p>
+      </div>
+      <nav class="footer-policy-links" aria-label="사이트 운영 정보">
+        <a href="/about">사이트 소개</a>
+        <a href="/editorial-policy">콘텐츠 운영정책</a>
+        <a href="/contact">문의</a>
+        <a href="/privacy">개인정보처리방침</a>
+        <a href="/terms">이용약관</a>
+        <a href="/disclaimer">책임고지</a>
+      </nav>
+    </footer>
+  </body>
+</html>
