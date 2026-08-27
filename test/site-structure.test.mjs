@@ -52,7 +52,7 @@ test("search page exposes a crawl-safe festival search experience", async () => 
   assert.match(source, /href="\/search\?q=서울"/);
   assert.match(script, /generated\/seoul-events\.json/);
   assert.match(script, /portalData\.editorialPosts/);
-  assert.match(redirects, /\/search\s+\/search\.html\s+200/);
+  assert.doesNotMatch(redirects, /\/search\s+\/search\.html/);
 });
 
 test("landing page includes crawlable article cards before JavaScript runs", async () => {
