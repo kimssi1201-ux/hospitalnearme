@@ -57,7 +57,7 @@ test("search page exposes a crawl-safe festival search experience", async () => 
 
 test("landing page includes crawlable article cards before JavaScript runs", async () => {
   const source = await readFile(path.join(root, "index.html"), "utf8");
-  const sections = ["EDITORIAL", "RECOMMENDED", "FEED"];
+  const sections = ["RECOMMENDED", "FEED"];
 
   for (const name of sections) {
     const block = source.match(new RegExp(`<!-- STATIC_${name}_START -->([\\s\\S]*?)<!-- STATIC_${name}_END -->`))?.[1] || "";

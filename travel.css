@@ -1125,40 +1125,6 @@ main {
   border-bottom: 1px solid var(--line);
 }
 
-.editorial-link-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.editorial-link-card a {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.editorial-link-card:last-child a {
-  border-bottom: 0;
-}
-
-.editorial-link-card em {
-  flex: 0 0 auto;
-  color: var(--gold);
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-}
-
-.editorial-link-card strong {
-  color: var(--ink);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.4;
-}
-
 .mrt-feed-card {
   border-color: #d8e5dd;
   background: linear-gradient(0deg, #f8fbf9, #fff);

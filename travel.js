@@ -398,90 +398,6 @@ const EDITORIAL_I18N = {
   }
 };
 
-const EDITORIAL_POST_I18N = {
-  en: {
-    "seoul-weekend-exhibition-guide": {
-      category: "Seoul Exhibitions",
-      title: "This week's Seoul exhibitions: museums and indoor culture in one route",
-      summary: "A weather-friendly itinerary with practical notes on routes, reservations, and viewing times."
-    },
-    "seoul-family-free-events": {
-      category: "Family Travel",
-      title: "Free and affordable Seoul cultural events for families",
-      summary: "Compare age limits, operating hours, and reservation rules before visiting with children."
-    },
-    "jongno-junggu-culture-route": {
-      category: "Seoul Route",
-      title: "A one-day Jongno and Jung-gu route for exhibitions and performances",
-      summary: "Plan central Seoul venues as one practical route with enough time for meals and transfers."
-    },
-    "seoul-night-event-safety-route": {
-      category: "Night Events",
-      title: "Check your return route before Seoul night performances and festivals",
-      summary: "Review the last train, taxi points, lighting, and exit routes before an evening visit."
-    },
-    "seoul-rainy-day-culture-course": {
-      category: "Indoor Seoul",
-      title: "How to choose Seoul exhibitions, performances, and experiences on a rainy day",
-      summary: "Compare cancellation policies, travel distance, and waiting time for a reliable indoor itinerary."
-    }
-  },
-  ja: {
-    "seoul-weekend-exhibition-guide": {
-      category: "ソウル展示",
-      title: "今週のソウル展示おすすめ、美術館と屋内文化施設を巡るコース",
-      summary: "天候に左右されにくい展示を中心に、移動、予約、観覧時間をまとめました。"
-    },
-    "seoul-family-free-events": {
-      category: "家族旅行",
-      title: "子どもと楽しむソウルの無料・低料金文化イベント",
-      summary: "対象年齢、運営時間、予約条件を比べてから家族の予定を組みましょう。"
-    },
-    "jongno-junggu-culture-route": {
-      category: "ソウルコース",
-      title: "鍾路・中区の展示と公演を一日で巡る文化コース",
-      summary: "都心の会場を食事時間と移動時間まで含めて効率よくつなぎます。"
-    },
-    "seoul-night-event-safety-route": {
-      category: "夜イベント",
-      title: "ソウルの夜公演・祭りは帰宅ルートから確認",
-      summary: "終電、タクシー乗り場、照明、会場出口を訪問前に確認しましょう。"
-    },
-    "seoul-rainy-day-culture-course": {
-      category: "室内旅行",
-      title: "雨の日のソウル、展示・公演・体験の選び方",
-      summary: "取消条件、移動距離、待ち時間を比べて安定した室内コースを選びます。"
-    }
-  },
-  zh: {
-    "seoul-weekend-exhibition-guide": {
-      category: "首尔展览",
-      title: "本周首尔展览推荐：美术馆与室内文化空间路线",
-      summary: "以不受天气影响的场馆为主，整理交通、预约和参观时间。"
-    },
-    "seoul-family-free-events": {
-      category: "亲子旅行",
-      title: "适合亲子的首尔免费及平价文化活动",
-      summary: "带孩子出发前，先比较年龄限制、开放时间和预约规则。"
-    },
-    "jongno-junggu-culture-route": {
-      category: "首尔路线",
-      title: "钟路与中区展览、演出一日文化路线",
-      summary: "把市中心场馆、用餐和换乘时间整理成顺畅的一日行程。"
-    },
-    "seoul-night-event-safety-route": {
-      category: "夜间活动",
-      title: "参加首尔夜间演出和庆典前先确认返程路线",
-      summary: "提前查看末班车、出租车点、照明和会场出口。"
-    },
-    "seoul-rainy-day-culture-course": {
-      category: "室内旅行",
-      title: "雨天首尔：展览、演出和体验项目的选择方法",
-      summary: "比较取消规则、移动距离和等候时间，安排更稳妥的室内行程。"
-    }
-  }
-};
-
 const $ = (selector) => document.querySelector(selector);
 
 function getStoredLanguage() {
@@ -522,7 +438,6 @@ function applyLanguage() {
   renderPlaces();
   renderBooking();
   renderCuration();
-  renderEditorialPosts();
   renderMyRealTripProducts();
   renderJulyFestivals();
   renderCategoryNewsSections();
@@ -3358,7 +3273,6 @@ function bindLoadMoreArticles() {
 function renderSeoulArticleState() {
   renderPlaces();
   renderCuration();
-  renderEditorialPosts();
   renderJulyFestivals();
   renderCategoryNewsSections();
 }
@@ -3462,7 +3376,6 @@ async function loadJulyFestivalPosts() {
     state.julyArticles = cached;
     renderJulyFestivals();
     renderCuration();
-    renderEditorialPosts();
     renderCategoryNewsSections();
     return;
   }
@@ -3498,7 +3411,6 @@ async function loadJulyFestivalPosts() {
         writeJulyFestivalCache(deduped);
         renderJulyFestivals();
         renderCuration();
-        renderEditorialPosts();
         renderCategoryNewsSections();
         return;
       } catch (error) {
@@ -3672,51 +3584,6 @@ function editorialPostsWithApiImages(posts = []) {
     used.add(match.id);
     return { ...post, image: imageUrlForItem(match, "") };
   });
-}
-
-function localizedEditorialPost(item = {}) {
-  if (state.language === "ko") return item;
-
-  const copy = EDITORIAL_POST_I18N[state.language]?.[item.id];
-  if (!copy) return item;
-
-  const minutes = String(item.readTime || "").match(/\d+/)?.[0] || "";
-  const readTime = minutes
-    ? {
-        en: `${minutes} min read`,
-        ja: `${minutes}分で読めます`,
-        zh: `${minutes}分钟阅读`
-      }[state.language]
-    : item.readTime;
-
-  return { ...item, ...copy, readTime };
-}
-
-// Kept intentionally text-light: no image, no summary, no date/readTime —
-// just enough for a crawlable link list. The full-card treatment (image,
-// summary, date) felt text-heavy sitting right at the top of the page.
-function renderEditorialPosts() {
-  const target = $("#editorialList");
-  if (!target) return;
-
-  const posts = Array.isArray(data.editorialPosts) && data.editorialPosts.length
-    ? data.editorialPosts
-    : data.articles || [];
-
-  const displayPosts = posts.slice(0, 5);
-
-  target.innerHTML = displayPosts.map((item) => {
-    const localizedItem = localizedEditorialPost(item);
-    const href = detailUrl(localizedItem);
-    return `
-      <article class="editorial-link-card">
-        <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${localizedItem.title} ${textFor("card.detail")}`)}">
-          <em>${escapeHtml(localizedItem.category || displayCategoryLabel(localizedItem))}</em>
-          <strong>${escapeHtml(localizedItem.title)}</strong>
-        </a>
-      </article>
-    `;
-  }).join("");
 }
 
 function renderCategoryGroups() {
@@ -3933,7 +3800,6 @@ function init() {
   renderPlaces();
   renderBooking();
   renderCuration();
-  renderEditorialPosts();
   renderMyRealTripProducts();
   renderCoupangProducts();
   renderCategoryNewsSections();
