@@ -79,15 +79,15 @@ const FEED_PAGE_SIZE = 12;
 const MRT_SEARCH_COPY = {
   stay: {
     title: "여행지 선택",
-    description: "지역이나 숙소명을 입력하거나 인기 지역을 선택하세요."
+    description: "숙소는 가격보다 위치와 취소 조건을 먼저 비교하세요. 지역이나 숙소명을 입력하거나 인기 지역을 선택할 수 있습니다."
   },
   tour: {
     title: "상품 선택",
-    description: "입장권, 전시, 공연, 체험 상품을 빠르게 찾아보세요."
+    description: "입장권과 현지투어는 일정을 확정하기 전에 운영 시간과 포함 사항을 먼저 비교하세요. 입장권, 전시, 공연, 체험 상품을 빠르게 찾아보세요."
   },
   flight: {
     title: "출발지 선택",
-    description: "출발지와 도착지를 선택하고 최저가 흐름을 확인하세요."
+    description: "항공권은 가격뿐 아니라 출도착 시간과 취소·변경 규정을 함께 확인하세요. 출발지와 도착지를 선택하면 최저가 흐름을 볼 수 있습니다."
   }
 };
 
@@ -103,6 +103,16 @@ const I18N = {
     "nav.july": "여행뉴스",
     "nav.places": "가볼만한 곳",
     "nav.booking": "여행검색",
+    "nav.group.explore": "둘러보기",
+    "nav.group.booking": "예약",
+    "nav.group.reading": "읽을거리",
+    "nav.categoryNews": "분야별 축제",
+    "nav.stay": "숙소 검색",
+    "nav.tour": "투어·입장권",
+    "nav.flight": "항공권",
+    "nav.latest": "최신 뉴스",
+    "nav.rss": "RSS 피드",
+    "nav.about": "사이트 소개",
     "july.title": "오늘 볼 만한 전국 축제 뉴스",
     "july.description": "전국 축제, 계절 행사, 방문 코스와 방문 전 체크 정보를 뉴스 피드 형식으로 정리했습니다.",
     "july.loading": "이번 달 전국 축제 정보를 불러오는 중입니다.",
@@ -127,7 +137,9 @@ const I18N = {
     "summary.festival": "{address}에서 열리는 축제입니다. 방문 전 운영 시간, 교통 통제, 주차와 우천 운영 여부를 확인해 보세요.",
     "summary.festivalFallback": "방문 전 행사 시간, 장소, 교통과 우천 운영 여부를 확인하면 더 편하게 즐길 수 있는 축제 정보입니다.",
     "summary.july": "{address}에서 열리는 이번 달 축제입니다. 운영 시간, 입장 방식, 교통과 우천 운영 여부를 함께 확인해 보세요.",
-    "summary.julyFallback": "이번 달 일정이 포함된 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요."
+    "summary.julyFallback": "이번 달 일정이 포함된 축제입니다. 방문 전 일정, 장소, 요금, 교통 정보를 확인해 보세요.",
+    "status.live": "진행 중",
+    "stats.summary": "진행 중 {ongoing}건 · 예정 {upcoming}건 · 총 {total}건"
   },
   en: {
     "meta.title": "Korea Festival News | Nationwide Festival Information",
@@ -140,6 +152,16 @@ const I18N = {
     "nav.july": "Travel News",
     "nav.places": "Places",
     "nav.booking": "Search",
+    "nav.group.explore": "Explore",
+    "nav.group.booking": "Book",
+    "nav.group.reading": "Read",
+    "nav.categoryNews": "By Category",
+    "nav.stay": "Stays",
+    "nav.tour": "Tours & Tickets",
+    "nav.flight": "Flights",
+    "nav.latest": "Latest News",
+    "nav.rss": "RSS Feed",
+    "nav.about": "About",
     "july.title": "Festival News to Read Today",
     "july.description": "Browse festival and travel information from across Korea in a mobile news feed with one featured story, recommended cards, and the latest list.",
     "july.loading": "Loading this month's festivals nationwide.",
@@ -164,7 +186,9 @@ const I18N = {
     "summary.festival": "A festival held at {address}. Before visiting, check operating hours, transport restrictions, parking, and rain policy.",
     "summary.festivalFallback": "Festival information to review before visiting, including time, location, transport, and rain policy.",
     "summary.july": "A festival held at {address} this month. Check operating hours, entry method, transport, and rain policy before visiting.",
-    "summary.julyFallback": "A festival scheduled for this month. Check schedule, location, fees, and transport before visiting."
+    "summary.julyFallback": "A festival scheduled for this month. Check schedule, location, fees, and transport before visiting.",
+    "status.live": "Live now",
+    "stats.summary": "{ongoing} live now · {upcoming} upcoming · {total} total"
   },
   ja: {
     "meta.title": "韓国フェスニュース | 全国フェス情報",
@@ -177,6 +201,16 @@ const I18N = {
     "nav.july": "旅行ニュース",
     "nav.places": "見どころ",
     "nav.booking": "検索",
+    "nav.group.explore": "見どころ",
+    "nav.group.booking": "予約",
+    "nav.group.reading": "読み物",
+    "nav.categoryNews": "分野別フェス",
+    "nav.stay": "宿泊施設",
+    "nav.tour": "ツアー・チケット",
+    "nav.flight": "航空券",
+    "nav.latest": "最新ニュース",
+    "nav.rss": "RSSフィード",
+    "nav.about": "サイト概要",
     "july.title": "今日読みたいフェスニュース",
     "july.description": "注目記事、推薦カード、最新リストの順に韓国全国のフェス情報を確認できます。",
     "july.loading": "今月の全国フェス一覧を読み込んでいます。",
@@ -201,7 +235,9 @@ const I18N = {
     "summary.festival": "{address}で開催されるフェスです。訪問前に運営時間、交通規制、駐車、雨天時の案内を確認しましょう。",
     "summary.festivalFallback": "訪問前に時間、場所、交通、雨天時の案内を確認したいフェス情報です。",
     "summary.july": "{address}で今月開催されるフェスです。運営時間、入場方法、交通、雨天時の案内を確認しましょう。",
-    "summary.julyFallback": "今月の日程を含むフェスです。訪問前に日程、場所、料金、交通情報を確認しましょう。"
+    "summary.julyFallback": "今月の日程を含むフェスです。訪問前に日程、場所、料金、交通情報を確認しましょう。",
+    "status.live": "開催中",
+    "stats.summary": "開催中 {ongoing}件 · 開催予定 {upcoming}件 · 合計 {total}件"
   },
   zh: {
     "meta.title": "韩国庆典新闻 | 全国庆典信息",
@@ -214,6 +250,16 @@ const I18N = {
     "nav.july": "旅行新闻",
     "nav.places": "推荐地点",
     "nav.booking": "搜索",
+    "nav.group.explore": "探索",
+    "nav.group.booking": "预订",
+    "nav.group.reading": "阅读",
+    "nav.categoryNews": "分类庆典",
+    "nav.stay": "住宿",
+    "nav.tour": "旅游·门票",
+    "nav.flight": "机票",
+    "nav.latest": "最新新闻",
+    "nav.rss": "RSS订阅",
+    "nav.about": "关于我们",
     "july.title": "今日值得关注的庆典新闻",
     "july.description": "按重点报道、推荐卡片和最新列表的顺序浏览韩国全国庆典信息。",
     "july.loading": "正在加载本月全国庆典列表。",
@@ -238,7 +284,9 @@ const I18N = {
     "summary.festival": "这是在{address}举行的庆典。出发前请确认开放时间、交通管制、停车和雨天安排。",
     "summary.festivalFallback": "出发前建议确认时间、地点、交通和雨天安排的庆典信息。",
     "summary.july": "这是本月在{address}举行的庆典。请提前确认开放时间、入场方式、交通和雨天安排。",
-    "summary.julyFallback": "这是本月举行的庆典。出发前请确认日程、地点、费用和交通信息。"
+    "summary.julyFallback": "这是本月举行的庆典。出发前请确认日程、地点、费用和交通信息。",
+    "status.live": "进行中",
+    "stats.summary": "进行中 {ongoing}件 · 即将开始 {upcoming}件 · 共 {total}件"
   }
 };
 
@@ -580,6 +628,14 @@ function articleTimingGroup(item, today) {
   return 2;
 }
 
+// Only badges items that are genuinely running right now (timing group 0),
+// derived from the same start/end dates used to sort the feed — never a
+// fabricated or estimated status.
+function statusBadgeMarkup(item, today) {
+  if (articleTimingGroup(item, today) !== 0) return "";
+  return `<span class="status-badge">${escapeHtml(textFor("status.live"))}</span>`;
+}
+
 function articleQualityScore(item = {}) {
   let score = 0;
   if (hasApiImage(item)) score += 4;
@@ -752,13 +808,14 @@ function detailUrl(item) {
   return `/articles/${encodeURIComponent(item.id)}/`;
 }
 
-function articleCard(item, variant = "") {
+function articleCard(item, variant = "", today = Number(todayCompact())) {
   const title = displayArticleTitle(item);
   const category = displayCategoryLabel(item);
   return `
     <article class="article-card ${variant}">
       <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item)}
+        ${statusBadgeMarkup(item, today)}
         <span class="category-label">${escapeHtml(category)}</span>
         <h3>${escapeHtml(title)}</h3>
         <p>${escapeHtml(displaySummary(item))}</p>
@@ -1166,8 +1223,19 @@ function renderMrtTourCard(item) {
   `;
 }
 
+// Both prices come straight from the search response (salePrice/originalPrice)
+// — the percent is just arithmetic on those two real numbers, never guessed.
+function mrtDiscountPercent(item) {
+  const sale = Number(item.salePrice || 0);
+  const original = Number(item.originalPrice || 0);
+  if (!sale || !original || original <= sale) return 0;
+  return Math.round((1 - sale / original) * 100);
+}
+
 function renderMrtStayCard(item) {
   const title = item.itemName || "서울 숙소";
+  const percent = mrtDiscountPercent(item);
+  const showOriginal = percent > 0;
   return `
     <article class="mrt-product-card">
       ${mrtImage(item.imageUrl, title)}
@@ -1175,8 +1243,12 @@ function renderMrtStayCard(item) {
         <em>${Number(item.starRating || 0) ? `${item.starRating}성급` : "숙소"}</em>
         <h3>${escapeHtml(title)}</h3>
         <p>리뷰 ${escapeHtml(item.reviewCount || 0)}개 · 평점 ${escapeHtml(item.reviewScore || "확인")}</p>
-        <small>${escapeHtml(formatWon(item.salePrice || item.originalPrice))}</small>
-        ${mrtExternalLink(item.productUrl, "숙소 보기")}
+        <p class="mrt-price-row">
+          ${showOriginal ? `<span class="mrt-discount-badge">${percent}%</span>` : ""}
+          <strong>${escapeHtml(formatWon(item.salePrice || item.originalPrice))}</strong>
+          ${showOriginal ? `<s>${escapeHtml(formatWon(item.originalPrice))}</s>` : ""}
+        </p>
+        ${mrtExternalLink(item.productUrl, "마이리얼트립에서 상세정보·예약")}
       </div>
     </article>
   `;
@@ -2301,13 +2373,14 @@ function categoryListCard(item) {
   `;
 }
 
-function categoryMagazineCard(item) {
+function categoryMagazineCard(item, today = Number(todayCompact())) {
   const title = displayArticleTitle(item);
   const category = displayCategoryLabel(item);
   return `
     <article class="category-magazine-card">
       <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "magazine")}
+        ${statusBadgeMarkup(item, today)}
         <span class="category-label">${escapeHtml(category)}</span>
         <strong>${escapeHtml(title)}</strong>
         <p>${escapeHtml(displaySummary(item))}</p>
@@ -2747,6 +2820,7 @@ function selectRegion(regionId) {
   state.placesLoaded = false;
   state.placesError = false;
   renderRegionChips();
+  renderQuickRegions();
   updateRegionHeading();
   updatePlacesStatus(`${activeRegion().label} 축제 정보를 불러오는 중입니다.`);
   renderPlaces();
@@ -2951,6 +3025,7 @@ function renderJulyFestivals() {
   const feed = $("#newsFeedList");
   const loadMore = $("#loadMoreArticles");
   const countTarget = $("#allArticleCount");
+  const statsTarget = $("#allArticleStats");
   if (!status || !recommended || !feed) return;
 
   const month = currentSeoulMonth();
@@ -2960,6 +3035,21 @@ function renderJulyFestivals() {
 
   if (countTarget) {
     countTarget.textContent = `${items.length.toLocaleString("ko-KR")}개`;
+  }
+
+  if (statsTarget) {
+    if (items.length) {
+      const today = Number(todayCompact());
+      const ongoing = items.filter((item) => articleTimingGroup(item, today) === 0).length;
+      const upcoming = items.filter((item) => articleTimingGroup(item, today) === 1).length;
+      statsTarget.textContent = textFor("stats.summary", {
+        ongoing: ongoing.toLocaleString("ko-KR"),
+        upcoming: upcoming.toLocaleString("ko-KR"),
+        total: items.length.toLocaleString("ko-KR")
+      });
+    } else {
+      statsTarget.textContent = "";
+    }
   }
 
   if (!items.length) {
@@ -3203,6 +3293,29 @@ function bindRegionChips() {
   });
 }
 
+// Renders the "TODAY" quick region shortcuts under the header. Each chip is
+// a plain data-region-id link, so the existing document-level
+// bindRegionLinks() delegate handles clicks — no separate binding needed.
+function renderQuickRegions() {
+  const target = $("#todayKeywords");
+  if (!target) return;
+
+  const regionsById = new Map((data.regions || []).map((region) => [region.id, region]));
+  const ids = data.quickRegionIds || [];
+
+  target.innerHTML = ids
+    .map((id) => regionsById.get(id))
+    .filter(Boolean)
+    .map((region) => `
+      <a
+        href="#allArticles"
+        class="${region.id === state.activeRegionId ? "is-active" : ""}"
+        data-region-id="${escapeHtml(region.id)}"
+      >${escapeHtml(region.label)}</a>
+    `)
+    .join("");
+}
+
 function renderPlaces() {
   const grid = $("#placesGrid");
   if (!grid) return;
@@ -3232,8 +3345,9 @@ function renderPlaces() {
     return;
   }
 
+  const today = Number(todayCompact());
   grid.innerHTML = items
-    .map((item) => articleCard(item))
+    .map((item) => articleCard(item, "", today))
     .join("");
 }
 
@@ -3558,6 +3672,7 @@ function bindMenu() {
 function init() {
   setNewsLoading(true);
   renderRegionChips();
+  renderQuickRegions();
   updateRegionHeading();
   renderJulyFestivals();
   renderPlaces();

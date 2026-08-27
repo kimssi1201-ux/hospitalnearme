@@ -73,7 +73,21 @@ input {
   padding: 0 max(22px, calc((100vw - var(--max)) / 2));
   border-bottom: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.94);
+}
+
+/* The blur lives on a pseudo-element, not on .site-header itself, because
+   backdrop-filter on an element establishes a containing block for any
+   position:fixed descendant (e.g. the mobile #primaryNav dropdown), which
+   would otherwise get trapped inside the header's box instead of the
+   viewport. absolute + negative z-index keeps it behind the header's own
+   flex children without becoming a flex item itself. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   backdrop-filter: blur(12px);
+  pointer-events: none;
 }
 
 .brand {
@@ -127,6 +141,19 @@ input {
 .primary-nav a:hover {
   background: transparent;
   color: var(--accent-deep);
+}
+
+/* Group labels only show inside the mobile dropdown (see .primary-nav.is-open
+   below) — on the desktop horizontal bar the nav reads as a flat link list. */
+.nav-group-label {
+  display: none;
+}
+
+/* Secondary links (booking sub-tabs, RSS, about) only show inside the mobile
+   dropdown too — nine links in one desktop row wraps every label onto two
+   lines, so the flat bar keeps just the handful of core destinations. */
+.nav-optional {
+  display: none;
 }
 
 .language-switch {
@@ -191,6 +218,23 @@ main {
   text-transform: uppercase;
 }
 
+/* Overlaid on the card image (its containing .article-card a /
+   .category-magazine-card a is position:relative) — only rendered for
+   items whose real start/end dates cover today, see statusBadgeMarkup(). */
+.status-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
 .keyword-list {
   display: flex;
   gap: 8px;
@@ -209,9 +253,35 @@ main {
   font-weight: 700;
 }
 
-.keyword-list a:hover {
+.keyword-list a:hover,
+.keyword-list a.is-active {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+}
+
+.today-keywords {
+  width: 100%;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.today-keywords-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(var(--max), calc(100% - 32px));
+  margin: 0 auto;
+  padding: 12px 0;
+}
+
+.today-keywords-inner .eyebrow {
+  flex: 0 0 auto;
+}
+
+.today-keywords-inner .keyword-list {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .hero-section {
@@ -618,7 +688,8 @@ main {
   font-weight: 900;
 }
 
-.coupang-disclosure {
+.coupang-disclosure,
+.affiliate-disclosure {
   margin: 0;
   color: var(--muted);
   font-size: 12px;
@@ -807,6 +878,13 @@ main {
 .tripview-section-title--all span {
   color: var(--gold);
   font-size: 0.72em;
+}
+
+.article-stats {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .news-feed-heading {
@@ -1047,6 +1125,7 @@ main {
 }
 
 .category-magazine-card a {
+  position: relative;
   display: grid;
   gap: 7px;
 }
@@ -1907,6 +1986,33 @@ body.booking-search-open {
 .mrt-product-card small {
   color: var(--accent);
   font-weight: 800;
+}
+
+.mrt-product-card .mrt-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.mrt-price-row strong {
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.mrt-price-row s {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.mrt-discount-badge {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .mrt-link {
@@ -3003,6 +3109,7 @@ body.booking-search-open {
 }
 
 .article-card a {
+  position: relative;
   display: grid;
   gap: 12px;
 }
@@ -3363,6 +3470,23 @@ body.booking-search-open {
     background: var(--surface);
   }
 
+  .primary-nav.is-open .nav-optional {
+    display: block;
+  }
+
+  .primary-nav.is-open .nav-group-label {
+    display: block;
+    margin: 10px 4px 0;
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+  }
+
+  .primary-nav.is-open .nav-group-label:first-child {
+    margin-top: 4px;
+  }
+
   main {
     width: min(100% - 28px, var(--max));
     padding-top: 0;
@@ -3661,8 +3785,7 @@ body.booking-search-open {
     display: none;
   }
 
-  .booking-search-panel .section-heading .eyebrow,
-  .booking-search-panel .section-heading p {
+  .booking-search-panel .section-heading .eyebrow {
     display: none;
   }
 
@@ -3670,6 +3793,12 @@ body.booking-search-open {
     max-width: calc(100% - 60px);
     font-size: 24px;
     line-height: 1.25;
+  }
+
+  .booking-search-panel .section-heading p {
+    max-width: calc(100% - 60px);
+    font-size: 14px;
+    line-height: 1.5;
   }
 
   .booking-search-panel .mrt-search-box,
@@ -4155,7 +4284,6 @@ body * {
   min-height: 72px;
   border-bottom-color: var(--line);
   background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(8px);
 }
 
 .brand {

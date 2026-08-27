@@ -41,10 +41,20 @@
         <span class="sr-only" data-i18n="nav.menu">메뉴 열기</span>
       </button>
       <nav class="primary-nav" id="primaryNav" aria-label="주요 메뉴">
+        <span class="nav-group-label" data-i18n="nav.group.explore">둘러보기</span>
         <a href="#editorial" data-i18n="nav.editorial">서울 기획</a>
-        <a href="#july" data-i18n="nav.july">최신 행사</a>
         <a href="#placesSection" data-i18n="nav.places">가볼만한 곳</a>
-        <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권" data-i18n="nav.booking">여행검색</a>
+        <a href="#categoryNews" data-i18n="nav.categoryNews">분야별 축제</a>
+
+        <span class="nav-group-label" data-i18n="nav.group.booking">예약</span>
+        <a class="nav-optional" href="#bookingSearch" data-mrt-open="stay" data-i18n="nav.stay">숙소 검색</a>
+        <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권" data-i18n="nav.tour">투어·입장권</a>
+        <a class="nav-optional" href="#bookingSearch" data-mrt-open="flight" data-i18n="nav.flight">항공권</a>
+
+        <span class="nav-group-label" data-i18n="nav.group.reading">읽을거리</span>
+        <a href="#allArticles" data-i18n="nav.latest">최신 뉴스</a>
+        <a class="nav-optional" href="/feed.xml" data-i18n="nav.rss">RSS 피드</a>
+        <a class="nav-optional" href="about.html" data-i18n="nav.about">사이트 소개</a>
       </nav>
       <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
         <button type="button" data-lang="ko">KR</button>
@@ -57,6 +67,13 @@
     <nav class="topic-nav" aria-label="축제 분야">
       <div class="category-tab-list" id="topCategoryTabs"></div>
     </nav>
+
+    <div class="today-keywords" aria-label="오늘의 지역 바로가기">
+      <div class="today-keywords-inner">
+        <span class="eyebrow">TODAY</span>
+        <div class="keyword-list" id="todayKeywords"></div>
+      </div>
+    </div>
 
     <main id="top">
       <section class="editorial-section magazine-cover" id="editorial" aria-labelledby="landingTitle">
@@ -184,6 +201,7 @@
 
         <div class="tripview-section-title tripview-section-title--all" id="allArticles">
           <h2><span class="section-kicker">Latest</span><span data-i18n="latest.list">최신 전국 축제</span> <span id="allArticleCount"></span></h2>
+          <p class="article-stats" id="allArticleStats"></p>
         </div>
         <div class="news-list-feed" id="newsFeedList">
           <!-- STATIC_FEED_START -->
@@ -339,14 +357,14 @@
         </div>
         <div class="section-status" id="coupangStatus"></div>
         <div class="coupang-grid" id="coupangGrid"></div>
-        <p class="coupang-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+        <p class="coupang-disclosure affiliate-disclosure">이 섹션은 쿠팡 파트너스 활동의 일환으로 운영되며, 링크를 통해 구매 시 일정액의 수수료를 제공받을 수 있습니다. 이용자에게 추가 비용은 발생하지 않습니다.</p>
       </section>
 
       <section class="mrt-section booking-search-panel" id="bookingSearch" aria-labelledby="bookingSearchTitle" aria-hidden="true">
         <div class="section-heading">
           <p class="eyebrow">Travel Search</p>
           <h2 id="bookingSearchTitle">여행 예약 검색</h2>
-          <p id="bookingSearchDesc">지역이나 숙소명을 입력하거나 인기 지역을 선택하세요.</p>
+          <p id="bookingSearchDesc">숙소는 가격보다 위치와 취소 조건을 먼저 비교하세요. 지역이나 숙소명을 입력하거나 인기 지역을 선택할 수 있습니다.</p>
           <button class="booking-search-close" type="button" data-booking-close aria-label="예약 검색 닫기">닫기</button>
         </div>
         <div class="mrt-search-box">
@@ -520,6 +538,7 @@
         </div>
         <div class="section-status" id="myrealtripStatus"></div>
         <div class="mrt-grid" id="myrealtripGrid"></div>
+        <p class="affiliate-disclosure">이 검색 결과는 마이리얼트립 파트너스 활동의 일환으로 제공되며, 링크를 통해 예약 시 일정액의 수수료를 제공받을 수 있습니다. 이용자에게 추가 비용은 발생하지 않습니다.</p>
       </section>
 
       <section class="faq-section" id="info" aria-labelledby="faqTitle">

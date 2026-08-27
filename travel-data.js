@@ -32,16 +32,10 @@ window.TRAVEL_PORTAL_DATA = {
     { id: "jeonnam", label: "전남", areaCode: "38" },
     { id: "jeju", label: "제주", areaCode: "39" }
   ],
-  todayKeywords: [
-    "전국 축제",
-    "주말 여행",
-    "가볼만한 곳",
-    "지역 축제",
-    "전시 정보",
-    "야간 축제",
-    "주말 나들이",
-    "실내 여행"
-  ],
+  // Quick region shortcuts shown as the "TODAY" chip row under the header.
+  // Each id must match a `regions[].id` above — clicking a chip jumps into
+  // that region's festival feed via the existing selectRegion() flow.
+  quickRegionIds: ["seoul", "busan", "jeju", "gangwon", "gyeonggi", "incheon", "daegu", "gwangju"],
   articles: [
     {
       id: "weekly-festival-guide",
