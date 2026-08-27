@@ -253,35 +253,9 @@ main {
   font-weight: 700;
 }
 
-.keyword-list a:hover,
-.keyword-list a.is-active {
+.keyword-list a:hover {
   border-color: var(--accent);
-  color: var(--accent-deep);
-  background: var(--accent-soft);
-}
-
-.today-keywords {
-  width: 100%;
-  border-bottom: 1px solid var(--line);
-  background: #fff;
-}
-
-.today-keywords-inner {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: min(var(--max), calc(100% - 32px));
-  margin: 0 auto;
-  padding: 12px 0;
-}
-
-.today-keywords-inner .eyebrow {
-  flex: 0 0 auto;
-}
-
-.today-keywords-inner .keyword-list {
-  flex: 1 1 auto;
-  min-width: 0;
+  color: var(--accent);
 }
 
 .hero-section {
@@ -4504,15 +4478,6 @@ body * {
 }
 
 @media (min-width: 861px) {
-  /* Desktop already exposes region browsing via the "가볼만한 곳" nav link and
-     has room for the full category-tab row right below it — stacking the
-     TODAY chip bar as a third full-width strip on top of that reads as
-     cluttered. Keep it for mobile/tablet, where it's the faster path since
-     the header nav collapses into a hamburger there. */
-  .today-keywords {
-    display: none;
-  }
-
   .site-header {
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas: "brand nav language";
