@@ -13,6 +13,7 @@ const editorialDataPath = path.join(rootDir, "travel-data.js");
 
 const siteOrigin = normalizeOrigin(process.env.SITE_ORIGIN || "https://view1.kr");
 const publicSiteUrl = normalizeOrigin(process.env.PUBLIC_SITE_URL || siteOrigin);
+const MIN_REFRESH_ITEMS = Number(process.env.MIN_REFRESH_ITEMS) || 24;
 
 // Korea Tourism Organization TourAPI area codes, nationwide. Kept in sync
 // with the `regions` list in travel-data.js.
@@ -271,18 +272,33 @@ async function fetchNationwideFestivalsForRange(range) {
 async function fetchNationwideFestivals() {
   const ranges = refreshDateRanges();
   const attempts = [];
+  let bestFallback = null;
 
   for (const range of ranges) {
     const items = await fetchNationwideFestivalsForRange(range);
     attempts.push({ id: range.id, start: range.start, end: range.end, count: items.length });
-    if (items.length) {
+    if (items.length >= MIN_REFRESH_ITEMS) {
       if (attempts.length > 1) {
+        const previousHadItems = attempts.slice(0, -1).some((attempt) => attempt.count > 0);
+        const reason = previousHadItems
+          ? `이전 후보 기간의 TourAPI 축제 목록이 최소 ${MIN_REFRESH_ITEMS}건에 못 미쳐`
+          : "현재 날짜 범위에 TourAPI 축제 목록이 없어";
         console.warn(
-          `현재 날짜 범위에 TourAPI 축제 목록이 없어 ${range.label} (${range.start}-${range.end}) 데이터로 갱신합니다.`
+          `${reason} ${range.label} (${range.start}-${range.end}) 데이터로 갱신합니다.`
         );
       }
       return { items, range, attempts };
     }
+    if (items.length && (!bestFallback || items.length > bestFallback.items.length)) {
+      bestFallback = { items, range };
+      console.warn(
+        `${range.label} (${range.start}-${range.end}) 데이터가 ${items.length}건뿐이라 최소 ${MIN_REFRESH_ITEMS}건 이상인 다음 후보 기간을 확인합니다.`
+      );
+    }
+  }
+
+  if (bestFallback) {
+    return { ...bestFallback, attempts };
   }
 
   return { items: [], range: ranges[0], attempts };
@@ -617,7 +633,7 @@ async function main() {
 
   console.log(`Updated ${path.relative(rootDir, outputPath)} with ${items.length} items across ${REGIONS.length} regions for ${range.start}-${range.end}.`);
   if (range.month !== requestedMonth || range.start !== `${requestedMonth}01`) {
-    console.log(`Requested ${requestedMonth}; used ${range.label} because the current date range returned no TourAPI items.`);
+    console.log(`Requested ${requestedMonth}; used ${range.label} because earlier date ranges did not meet the ${MIN_REFRESH_ITEMS}-item minimum.`);
   }
   console.log(`Updated ${path.relative(rootDir, indexPath)} with crawlable article cards.`);
   console.log(`Updated ${path.relative(rootDir, sitemapPath)} with ${urls.length} stable public URLs.`);
