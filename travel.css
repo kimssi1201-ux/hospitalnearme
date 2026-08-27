@@ -143,19 +143,6 @@ input {
   color: var(--accent-deep);
 }
 
-/* Group labels only show inside the mobile dropdown (see .primary-nav.is-open
-   below) — on the desktop horizontal bar the nav reads as a flat link list. */
-.nav-group-label {
-  display: none;
-}
-
-/* Secondary links (booking sub-tabs, RSS, about) only show inside the mobile
-   dropdown too — nine links in one desktop row wraps every label onto two
-   lines, so the flat bar keeps just the handful of core destinations. */
-.nav-optional {
-  display: none;
-}
-
 .language-switch {
   display: inline-flex;
   gap: 4px;
@@ -3442,23 +3429,6 @@ body.booking-search-open {
     padding: 10px 12px;
     border-radius: 12px;
     background: var(--surface);
-  }
-
-  .primary-nav.is-open .nav-optional {
-    display: block;
-  }
-
-  .primary-nav.is-open .nav-group-label {
-    display: block;
-    margin: 10px 4px 0;
-    color: var(--gold);
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: 0.06em;
-  }
-
-  .primary-nav.is-open .nav-group-label:first-child {
-    margin-top: 4px;
   }
 
   main {
