@@ -209,9 +209,35 @@ main {
   font-weight: 700;
 }
 
-.keyword-list a:hover {
+.keyword-list a:hover,
+.keyword-list a.is-active {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+}
+
+.today-keywords {
+  width: 100%;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.today-keywords-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(var(--max), calc(100% - 32px));
+  margin: 0 auto;
+  padding: 12px 0;
+}
+
+.today-keywords-inner .eyebrow {
+  flex: 0 0 auto;
+}
+
+.today-keywords-inner .keyword-list {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .hero-section {

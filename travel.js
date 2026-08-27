@@ -2747,6 +2747,7 @@ function selectRegion(regionId) {
   state.placesLoaded = false;
   state.placesError = false;
   renderRegionChips();
+  renderQuickRegions();
   updateRegionHeading();
   updatePlacesStatus(`${activeRegion().label} 축제 정보를 불러오는 중입니다.`);
   renderPlaces();
@@ -3203,6 +3204,29 @@ function bindRegionChips() {
   });
 }
 
+// Renders the "TODAY" quick region shortcuts under the header. Each chip is
+// a plain data-region-id link, so the existing document-level
+// bindRegionLinks() delegate handles clicks — no separate binding needed.
+function renderQuickRegions() {
+  const target = $("#todayKeywords");
+  if (!target) return;
+
+  const regionsById = new Map((data.regions || []).map((region) => [region.id, region]));
+  const ids = data.quickRegionIds || [];
+
+  target.innerHTML = ids
+    .map((id) => regionsById.get(id))
+    .filter(Boolean)
+    .map((region) => `
+      <a
+        href="#allArticles"
+        class="${region.id === state.activeRegionId ? "is-active" : ""}"
+        data-region-id="${escapeHtml(region.id)}"
+      >${escapeHtml(region.label)}</a>
+    `)
+    .join("");
+}
+
 function renderPlaces() {
   const grid = $("#placesGrid");
   if (!grid) return;
@@ -3558,6 +3582,7 @@ function bindMenu() {
 function init() {
   setNewsLoading(true);
   renderRegionChips();
+  renderQuickRegions();
   updateRegionHeading();
   renderJulyFestivals();
   renderPlaces();
