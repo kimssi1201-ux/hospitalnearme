@@ -6,6 +6,7 @@
   "scripts": {
     "generate:articles": "node scripts/generate-static-articles.mjs",
     "refresh": "node scripts/update-seoul-content.mjs",
+    "report:photos": "node scripts/report-photo-coverage.mjs",
     "test": "node --test test/*.test.mjs",
     "syntax": "node scripts/check-javascript.mjs",
     "lint": "node scripts/check-project.mjs",

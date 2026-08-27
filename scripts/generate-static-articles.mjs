@@ -83,6 +83,46 @@ function kstDate() {
   }).format(new Date()).replace(/\. /g, "-").replace(".", "");
 }
 
+// Converts the site's "2026.08.15" editorial date format into an RFC 822
+// timestamp (RSS 2.0's pubDate format), anchored to noon KST since the
+// source data only carries a day, not a time.
+function rfc822Date(value) {
+  const match = String(value || "").match(/(\d{4})\.(\d{2})\.(\d{2})/);
+  if (!match) return new Date().toUTCString();
+  const [, year, month, day] = match;
+  return new Date(`${year}-${month}-${day}T12:00:00+09:00`).toUTCString();
+}
+
+function rssXml(posts) {
+  const items = posts
+    .map((post) => {
+      const link = `${siteOrigin}/articles/${safeSlug(post.id)}/`;
+      return `    <item>
+      <title>${escapeHtml(post.title)}</title>
+      <link>${escapeHtml(link)}</link>
+      <guid isPermaLink="true">${escapeHtml(link)}</guid>
+      <description>${escapeHtml(post.summary || "")}</description>
+      <category>${escapeHtml(post.category || "")}</category>
+      <pubDate>${rfc822Date(post.date)}</pubDate>
+    </item>`;
+    })
+    .join("\n");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>대한축제뉴스</title>
+    <link>${siteOrigin}/</link>
+    <description>전국 축제, 문화행사 일정과 방문 전 체크 정보를 정리하는 뉴스 매거진입니다.</description>
+    <language>ko-kr</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    <atom:link xmlns:atom="http://www.w3.org/2005/Atom" href="${siteOrigin}/feed.xml" rel="self" type="application/rss+xml" />
+${items}
+  </channel>
+</rss>
+`;
+}
+
 function sitemapXml(posts) {
   const paths = [
     "/",
@@ -264,8 +304,9 @@ export async function generateStaticArticles() {
   }
 
   await writeFile(path.join(rootDir, "sitemap.xml"), sitemapXml(posts), "utf8");
+  await writeFile(path.join(rootDir, "feed.xml"), rssXml(posts), "utf8");
 
-  console.log(`Generated ${posts.length} editorial articles, ${eventPayload.items.length} current event pages, and sitemap.xml.`);
+  console.log(`Generated ${posts.length} editorial articles, ${eventPayload.items.length} current event pages, sitemap.xml, and feed.xml.`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
