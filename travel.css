@@ -218,6 +218,23 @@ main {
   text-transform: uppercase;
 }
 
+/* Overlaid on the card image (its containing .article-card a /
+   .category-magazine-card a is position:relative) — only rendered for
+   items whose real start/end dates cover today, see statusBadgeMarkup(). */
+.status-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
 .keyword-list {
   display: flex;
   gap: 8px;
@@ -862,6 +879,13 @@ main {
   font-size: 0.72em;
 }
 
+.article-stats {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .news-feed-heading {
   display: none;
   gap: 8px;
@@ -1100,6 +1124,7 @@ main {
 }
 
 .category-magazine-card a {
+  position: relative;
   display: grid;
   gap: 7px;
 }
@@ -3056,6 +3081,7 @@ body.booking-search-open {
 }
 
 .article-card a {
+  position: relative;
   display: grid;
   gap: 12px;
 }
