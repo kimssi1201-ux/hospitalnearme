@@ -73,7 +73,21 @@ input {
   padding: 0 max(22px, calc((100vw - var(--max)) / 2));
   border-bottom: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.94);
+}
+
+/* The blur lives on a pseudo-element, not on .site-header itself, because
+   backdrop-filter on an element establishes a containing block for any
+   position:fixed descendant (e.g. the mobile #primaryNav dropdown), which
+   would otherwise get trapped inside the header's box instead of the
+   viewport. absolute + negative z-index keeps it behind the header's own
+   flex children without becoming a flex item itself. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   backdrop-filter: blur(12px);
+  pointer-events: none;
 }
 
 .brand {
@@ -127,6 +141,19 @@ input {
 .primary-nav a:hover {
   background: transparent;
   color: var(--accent-deep);
+}
+
+/* Group labels only show inside the mobile dropdown (see .primary-nav.is-open
+   below) — on the desktop horizontal bar the nav reads as a flat link list. */
+.nav-group-label {
+  display: none;
+}
+
+/* Secondary links (booking sub-tabs, RSS, about) only show inside the mobile
+   dropdown too — nine links in one desktop row wraps every label onto two
+   lines, so the flat bar keeps just the handful of core destinations. */
+.nav-optional {
+  display: none;
 }
 
 .language-switch {
@@ -3389,6 +3416,23 @@ body.booking-search-open {
     background: var(--surface);
   }
 
+  .primary-nav.is-open .nav-optional {
+    display: block;
+  }
+
+  .primary-nav.is-open .nav-group-label {
+    display: block;
+    margin: 10px 4px 0;
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+  }
+
+  .primary-nav.is-open .nav-group-label:first-child {
+    margin-top: 4px;
+  }
+
   main {
     width: min(100% - 28px, var(--max));
     padding-top: 0;
@@ -4181,7 +4225,6 @@ body * {
   min-height: 72px;
   border-bottom-color: var(--line);
   background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(8px);
 }
 
 .brand {
