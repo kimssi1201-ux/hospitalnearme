@@ -79,9 +79,19 @@ export default {
       return handleCoupangApi(request, env);
     }
 
+    if (url.pathname === "/search" || url.pathname === "/search/") {
+      return env.ASSETS.fetch(assetRequest(request, "/search.html"));
+    }
+
     return env.ASSETS.fetch(request);
   }
 };
+
+function assetRequest(request, pathname) {
+  const url = new URL(request.url);
+  url.pathname = pathname;
+  return new Request(url.toString(), request);
+}
 
 function legacyDetailRedirect(url) {
   if (url.pathname !== "/festival-detail" && url.pathname !== "/festival-detail.html") return "";
