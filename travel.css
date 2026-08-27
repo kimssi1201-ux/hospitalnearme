@@ -1988,6 +1988,33 @@ body.booking-search-open {
   font-weight: 800;
 }
 
+.mrt-product-card .mrt-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.mrt-price-row strong {
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.mrt-price-row s {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.mrt-discount-badge {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+}
+
 .mrt-link {
   width: fit-content;
   margin-top: 4px;

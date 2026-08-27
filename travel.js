@@ -1223,8 +1223,19 @@ function renderMrtTourCard(item) {
   `;
 }
 
+// Both prices come straight from the search response (salePrice/originalPrice)
+// — the percent is just arithmetic on those two real numbers, never guessed.
+function mrtDiscountPercent(item) {
+  const sale = Number(item.salePrice || 0);
+  const original = Number(item.originalPrice || 0);
+  if (!sale || !original || original <= sale) return 0;
+  return Math.round((1 - sale / original) * 100);
+}
+
 function renderMrtStayCard(item) {
   const title = item.itemName || "서울 숙소";
+  const percent = mrtDiscountPercent(item);
+  const showOriginal = percent > 0;
   return `
     <article class="mrt-product-card">
       ${mrtImage(item.imageUrl, title)}
@@ -1232,8 +1243,12 @@ function renderMrtStayCard(item) {
         <em>${Number(item.starRating || 0) ? `${item.starRating}성급` : "숙소"}</em>
         <h3>${escapeHtml(title)}</h3>
         <p>리뷰 ${escapeHtml(item.reviewCount || 0)}개 · 평점 ${escapeHtml(item.reviewScore || "확인")}</p>
-        <small>${escapeHtml(formatWon(item.salePrice || item.originalPrice))}</small>
-        ${mrtExternalLink(item.productUrl, "숙소 보기")}
+        <p class="mrt-price-row">
+          ${showOriginal ? `<span class="mrt-discount-badge">${percent}%</span>` : ""}
+          <strong>${escapeHtml(formatWon(item.salePrice || item.originalPrice))}</strong>
+          ${showOriginal ? `<s>${escapeHtml(formatWon(item.originalPrice))}</s>` : ""}
+        </p>
+        ${mrtExternalLink(item.productUrl, "마이리얼트립에서 상세정보·예약")}
       </div>
     </article>
   `;
