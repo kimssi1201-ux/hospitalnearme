@@ -39,6 +39,16 @@ test("landing page exposes the feed mounts without a hero mount", async () => {
   assert.doesNotMatch(source, /id="featuredArticle"/);
 });
 
+test("booking search overlay covers page chrome with an opaque layer", async () => {
+  const css = await readFile(path.join(root, "travel.css"), "utf8");
+  const rule = css.match(/\.booking-search-panel\.is-open\s*\{[\s\S]*?\n\}/)?.[0] || "";
+
+  assert.match(rule, /z-index:\s*1000/);
+  assert.match(rule, /background:\s*#fff/);
+  assert.match(rule, /backdrop-filter:\s*none/);
+  assert.match(rule, /isolation:\s*isolate/);
+});
+
 test("search page exposes a crawl-safe festival search experience", async () => {
   const source = await readFile(path.join(root, "search.html"), "utf8");
   const script = await readFile(path.join(root, "search.js"), "utf8");

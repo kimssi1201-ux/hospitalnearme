@@ -1417,24 +1417,27 @@ body.booking-search-open {
 .booking-search-panel.is-open {
   position: fixed;
   inset: 0;
-  z-index: 80;
+  z-index: 1000;
   display: grid;
   align-content: start;
   gap: 16px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   width: 100%;
   max-width: none;
+  min-height: 100dvh;
   padding: 82px max(18px, calc((100vw - var(--max)) / 2)) 34px;
   border-top: 0;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(14px);
+  background: #fff;
+  backdrop-filter: none;
+  isolation: isolate;
 }
 
 .booking-search-panel .section-heading,
 .booking-search-panel .mrt-search-box,
 .booking-search-panel .section-status,
 .booking-search-panel .mrt-grid {
-  width: min(100%, 760px);
+  width: min(100%, 920px);
   margin-right: auto;
   margin-left: auto;
 }
