@@ -432,10 +432,15 @@ main {
   transform: scale(1.06);
 }
 
-/* Keep recommendation cards aligned while showing the complete API poster. */
+/* Many TourAPI/seoul.go.kr posters are portrait, not the card's 4:3 frame.
+   contain (avoiding any crop) was chosen here to show the whole poster, but
+   in a small grid thumbnail that means most of the box sits empty and the
+   poster shrinks to a thin sliver. cover fills the thumbnail like every
+   other card type on the site; the single large hero/detail images
+   elsewhere keep contain, where showing the full poster matters more. */
 .news-recommend-card .image-frame--api img,
 .news-list-card .image-frame--api img {
-  object-fit: contain !important;
+  object-fit: cover !important;
   background: transparent;
 }
 
