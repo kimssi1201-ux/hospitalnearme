@@ -31,7 +31,6 @@ test("every HTML page has the shared head requirements", async () => {
 
 test("landing page exposes the feed mounts without a hero mount", async () => {
   const source = await readFile(path.join(root, "index.html"), "utf8");
-  assert.match(source, /id="recommendedArticles"/);
   assert.match(source, /id="newsFeedList"/);
   assert.match(source, /id="loadMoreArticles"/);
   assert.match(source, /id="festivalSearchForm"/);
@@ -57,7 +56,7 @@ test("search page exposes a crawl-safe festival search experience", async () => 
 
 test("landing page includes crawlable article cards before JavaScript runs", async () => {
   const source = await readFile(path.join(root, "index.html"), "utf8");
-  const sections = ["RECOMMENDED", "FEED"];
+  const sections = ["FEED"];
 
   for (const name of sections) {
     const block = source.match(new RegExp(`<!-- STATIC_${name}_START -->([\\s\\S]*?)<!-- STATIC_${name}_END -->`))?.[1] || "";
@@ -66,7 +65,7 @@ test("landing page includes crawlable article cards before JavaScript runs", asy
   }
 
   const articleLinks = [...source.matchAll(/href="(\/(?:articles|seoul-events)\/[^"#]+)"/g)].map((match) => match[1]);
-  assert.ok(articleLinks.length >= 15, `expected at least 15 crawlable article links, received ${articleLinks.length}`);
+  assert.ok(articleLinks.length >= 10, `expected at least 10 crawlable article links, received ${articleLinks.length}`);
   assert.doesNotMatch(source, /href="festival-detail\?/);
 });
 

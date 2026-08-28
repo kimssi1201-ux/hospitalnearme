@@ -889,22 +889,6 @@ function normalizeSeoulCultureItems(items) {
   return uniqueArticles(normalized);
 }
 
-function newsRecommendCard(item) {
-  const title = displayArticleTitle(item);
-  const category = displayCategoryLabel(item);
-  return `
-    <article class="news-recommend-card">
-      <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
-        ${imageMarkup(item, "recommend")}
-        <div class="news-recommend-body">
-          <span class="category-label">${escapeHtml(category)}</span>
-          <strong>${escapeHtml(title)}</strong>
-        </div>
-      </a>
-    </article>
-  `;
-}
-
 function newsListCard(item) {
   const title = displayArticleTitle(item);
   const category = displayCategoryLabel(item);
@@ -3182,18 +3166,14 @@ function renderFestivalSearchStatus(totalCount = 0, matchCount = 0) {
 }
 
 function renderJulyFestivals() {
-  const status = $("#julyStatus");
-  const recommended = $("#recommendedArticles");
   const feed = $("#newsFeedList");
   const loadMore = $("#loadMoreArticles");
   const countTarget = $("#allArticleCount");
   const statsTarget = $("#allArticleStats");
-  if (!status || !recommended || !feed) return;
+  if (!feed) return;
 
-  const month = currentSeoulMonth();
   const allItems = primaryNewsItems();
   const items = filteredNewsItems(allItems);
-  const hasSearchQuery = Boolean(normalizeSearchQuery(state.searchQuery));
   renderTopCategoryTabs();
   renderFestivalSearchStatus(allItems.length, items.length);
 
@@ -3218,33 +3198,19 @@ function renderJulyFestivals() {
 
   if (!items.length) {
     if (state.newsLoading && !state.apiLoaded && !state.apiError) {
-      status.textContent = "";
-      status.hidden = true;
       renderNewsLoadingSkeleton();
       return;
     }
 
     setNewsLoading(false);
-    status.textContent = hasSearchQuery
-      ? textFor("search.empty", { query: normalizeSearchQuery(state.searchQuery) })
-      : state.activeCategoryFilter === "all"
-        ? `${month.label}에 표시할 축제 정보를 불러오는 중입니다.`
-        : "선택한 분류에 표시할 축제 정보가 없습니다.";
-    status.hidden = false;
-    recommended.innerHTML = "";
     feed.innerHTML = "";
     if (loadMore) loadMore.hidden = true;
     return;
   }
 
   setNewsLoading(false);
-  status.textContent = "";
-  status.hidden = true;
 
-  recommended.innerHTML = hasSearchQuery
-    ? ""
-    : items.slice(1, 5).map((item) => newsRecommendCard(item)).join("");
-  const feedItems = hasSearchQuery ? items : items.slice(5);
+  const feedItems = items;
   const visibleCount = Math.min(state.visibleFeedCount, feedItems.length);
   feed.innerHTML = buildNewsFeedMarkup(feedItems.slice(0, visibleCount));
   if (loadMore) {

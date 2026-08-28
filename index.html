@@ -20,10 +20,10 @@
     <link rel="canonical" href="https://view1.kr/" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="대한축제뉴스 RSS" href="/feed.xml" />
-    <link rel="stylesheet" href="travel.css?v=20260828-poster-cover-fix" />
+    <link rel="stylesheet" href="travel.css?v=20260828-remove-recommend-row" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
     <script src="travel-data.js?v=20260710-category-copy-1" defer></script>
-    <script src="travel.js?v=20260828-poster-cover-fix" defer></script>
+    <script src="travel.js?v=20260828-remove-recommend-row" defer></script>
     <title>대한축제뉴스 | 전국 축제 정보 뉴스</title>
   </head>
   <body class="is-loading-news">
@@ -130,58 +130,7 @@
         </form>
       </section>
 
-      <section class="mobile-news-feed landing-news-feed" id="july" aria-labelledby="julyTitle">
-        <div class="tripview-section-title">
-          <div>
-            <span class="section-kicker">Now Nationwide</span>
-            <h2 id="julyTitle" data-i18n="latest.title">지금 전국에서 열리는 축제</h2>
-            <p class="landing-lead" data-i18n="latest.description">전국 축제·문화행사 정보를 바탕으로 일정·장소·요금·문의처를 확인하고, 방문 동선과 주변 교통까지 함께 정리합니다.</p>
-          </div>
-          <a href="#allArticles" data-category-reset data-i18n="common.all">전체 보기</a>
-        </div>
-        <div class="section-status" id="julyStatus" data-i18n="july.loading">이번 달 전국 축제 정보를 불러오는 중입니다.</div>
-        <div class="recommend-news-row" id="recommendedArticles" aria-label="추천 축제 기사">
-          <!-- STATIC_RECOMMENDED_START -->
-
-          <article class="news-recommend-card">
-            <a href="/seoul-events/tour-3529946/" aria-label="2025 세종미술주간 갤러리 가는 날 자세히 보기">
-              <div class="image-frame image-frame--recommend image-frame--api"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/45/3529945_image2_1.jpg" alt="2025 세종미술주간 갤러리 가는 날" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
-              <div class="news-recommend-body">
-                <span class="category-label">세종 축제</span>
-                <strong>2025 세종미술주간 갤러리 가는 날</strong>
-              </div>
-            </a>
-          </article>
-          <article class="news-recommend-card">
-            <a href="/seoul-events/tour-3526695/" aria-label="제6회 푸른하늘의 날 기념행사 자세히 보기">
-              <div class="image-frame image-frame--recommend image-frame--api"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/94/3526694_image2_1.jpg" alt="제6회 푸른하늘의 날 기념행사" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
-              <div class="news-recommend-body">
-                <span class="category-label">서울 축제</span>
-                <strong>제6회 푸른하늘의 날 기념행사</strong>
-              </div>
-            </a>
-          </article>
-          <article class="news-recommend-card">
-            <a href="/seoul-events/tour-2406168/" aria-label="원주문화의거리 치맥축제 자세히 보기">
-              <div class="image-frame image-frame--recommend image-frame--api"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/73/3524173_image2_1.png" alt="원주문화의거리 치맥축제" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
-              <div class="news-recommend-body">
-                <span class="category-label">강원 축제</span>
-                <strong>원주문화의거리 치맥축제</strong>
-              </div>
-            </a>
-          </article>
-          <article class="news-recommend-card">
-            <a href="/seoul-events/tour-3530308/" aria-label="강화 별밤 야행 자세히 보기">
-              <div class="image-frame image-frame--recommend image-frame--api"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/91/3530291_image2_1.jpg" alt="강화 별밤 야행" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
-              <div class="news-recommend-body">
-                <span class="category-label">인천 축제</span>
-                <strong>강화 별밤 야행</strong>
-              </div>
-            </a>
-          </article>
-          <!-- STATIC_RECOMMENDED_END -->
-        </div>
-
+      <section class="mobile-news-feed landing-news-feed" id="july" aria-label="전국 축제 뉴스">
         <div class="tripview-section-title tripview-section-title--all" id="allArticles">
           <h2><span class="section-kicker">Latest</span><span data-i18n="latest.list">최신 전국 축제</span> <span id="allArticleCount"></span></h2>
           <p class="article-stats" id="allArticleStats"></p>

@@ -44,7 +44,6 @@ for (const fileName of htmlFiles) {
 }
 
 const index = await readFile(path.join(root, "index.html"), "utf8");
-if (!index.includes('id="recommendedArticles"')) fail("index.html: recommendation mount is missing");
 if (!index.includes('id="newsFeedList"')) fail("index.html: news feed mount is missing");
 if (index.includes('id="featuredArticle"')) fail("index.html: removed hero mount is still present");
 
