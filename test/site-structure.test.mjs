@@ -210,11 +210,17 @@ test("current event pages use exact public data, noindex, and the Coupang widget
   const eventRoot = path.join(root, "seoul-events");
   const directories = (await readdir(eventRoot, { withFileTypes: true })).filter((entry) => entry.isDirectory());
   assert.equal(directories.length, payload.items.length);
+  let inlinePhotoPages = 0;
 
   for (const directory of directories) {
     const source = await readFile(path.join(eventRoot, directory.name, "index.html"), "utf8");
+    const inlinePhotoCount = (source.match(/class="event-inline-photo"/g) || []).length;
+
     assert.match(source, /name="robots" content="noindex,follow,max-image-preview:large"/);
     assert.doesNotMatch(source, /adsbygoogle\.js|adsbytenping/);
+    assert.doesNotMatch(source, /class="event-gallery"/);
+    assert.ok(inlinePhotoCount <= 3, `${directory.name}: inline photos are capped (${inlinePhotoCount})`);
+    if (inlinePhotoCount > 0) inlinePhotoPages += 1;
     assert.match(source, /class="coupang-widget-ad"/);
     assert.match(source, /data-coupang-widget/);
     assert.match(source, /ads-partners\.coupang\.com\/g\.js/);
@@ -228,6 +234,21 @@ test("current event pages use exact public data, noindex, and the Coupang widget
       assert.ok(host.endsWith("seoul.go.kr") || host.endsWith("visitkorea.or.kr"), `${directory.name}: ${host}`);
     }
   }
+
+  assert.ok(inlinePhotoPages > 0, "some event pages include inline body photos");
+});
+
+test("event article images stay restrained inside the post body", async () => {
+  const css = await readFile(path.join(root, "article-static.css"), "utf8");
+  const headSource = await readFile(path.join(root, "scripts", "generate-static-articles.mjs"), "utf8");
+  const posterImageRule = css.match(/\.official-poster img\s*\{[\s\S]*?\n\}/)?.[0] || "";
+  const inlinePhotoRule = css.match(/\.event-inline-photo img\s*\{[\s\S]*?\n\}/)?.[0] || "";
+
+  assert.match(headSource, /article-static\.css\?v=20260828-event-body-1/);
+  assert.match(posterImageRule, /max-height:\s*520px/);
+  assert.match(posterImageRule, /width:\s*auto/);
+  assert.match(inlinePhotoRule, /max-height:\s*360px/);
+  assert.match(inlinePhotoRule, /width:\s*auto/);
 });
 
 test("legacy detail URLs redirect to canonical static pages", async () => {
