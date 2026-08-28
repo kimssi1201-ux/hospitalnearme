@@ -1775,7 +1775,7 @@ body.booking-search-open {
 }
 
 .mrt-grid.is-single {
-  grid-template-columns: minmax(0, 760px);
+  grid-template-columns: minmax(0, 920px);
 }
 
 .mrt-grid.is-single .mrt-panel {
@@ -1812,29 +1812,31 @@ body.booking-search-open {
 
 .mrt-card-list {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .mrt-product-card {
   display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 16px;
   align-items: center;
   min-width: 0;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--line);
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(23, 37, 43, 0.06);
 }
 
 .mrt-product-card:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
+  padding-bottom: 12px;
 }
 
 .mrt-product-card img,
 .mrt-placeholder {
-  width: 104px;
-  aspect-ratio: 1 / 1;
-  border-radius: 16px;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
   object-fit: cover;
   background: var(--surface);
 }
@@ -3941,14 +3943,17 @@ body.booking-search-open {
   }
 
   .mrt-product-card {
-    grid-template-columns: 92px minmax(0, 1fr);
-    gap: 11px;
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 12px;
+    padding: 10px;
+    border-radius: 16px;
   }
 
   .mrt-product-card img,
   .mrt-placeholder {
-    width: 92px;
-    border-radius: 14px;
+    width: 108px;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
   }
 
   .mrt-product-card h3 {

@@ -49,6 +49,18 @@ test("booking search overlay covers page chrome with an opaque layer", async () 
   assert.match(rule, /isolation:\s*isolate/);
 });
 
+test("booking search result cards emphasize product thumbnails", async () => {
+  const css = await readFile(path.join(root, "travel.css"), "utf8");
+  const gridRule = css.match(/\.mrt-grid\.is-single\s*\{[\s\S]*?\n\}/)?.[0] || "";
+  const cardRule = css.match(/\.mrt-product-card\s*\{[\s\S]*?\n\}/)?.[0] || "";
+  const imageRule = css.match(/\.mrt-product-card img,\s*\n\.mrt-placeholder\s*\{[\s\S]*?\n\}/)?.[0] || "";
+
+  assert.match(gridRule, /minmax\(0,\s*920px\)/);
+  assert.match(cardRule, /grid-template-columns:\s*150px\s+minmax\(0,\s*1fr\)/);
+  assert.match(cardRule, /border-radius:\s*18px/);
+  assert.match(imageRule, /aspect-ratio:\s*4\s*\/\s*3/);
+});
+
 test("search page exposes a crawl-safe festival search experience", async () => {
   const source = await readFile(path.join(root, "search.html"), "utf8");
   const script = await readFile(path.join(root, "search.js"), "utf8");
