@@ -4951,9 +4951,15 @@ body * {
 }
 
 /* Telltrip reference: bring image-led festival stories into the first scroll. */
+main {
+  display: flex;
+  flex-direction: column;
+}
+
 .magazine-cover {
+  order: 2;
   gap: 18px;
-  padding: 36px 0 26px;
+  padding: 30px 0 46px;
 }
 
 .magazine-cover::after {
@@ -4971,7 +4977,7 @@ body * {
 
 .magazine-section-heading--cover h1 {
   max-width: 700px;
-  font-size: clamp(34px, 3.6vw, 42px);
+  font-size: clamp(28px, 3vw, 36px);
 }
 
 .magazine-section-heading--cover p {
@@ -4998,8 +5004,29 @@ body * {
 }
 
 .landing-news-feed {
+  order: 1;
   gap: 24px !important;
-  padding: 30px 0 62px !important;
+  padding: 34px 0 56px !important;
+}
+
+.places-section {
+  order: 3;
+}
+
+.category-news-wrapper {
+  order: 4;
+}
+
+.coupang-section {
+  order: 5;
+}
+
+.booking-search-panel {
+  order: 6;
+}
+
+.faq-section {
+  order: 7;
 }
 
 .tripview-section-title--all {
@@ -5105,14 +5132,14 @@ body * {
   }
 
   .landing-news-feed {
-    padding-top: 24px !important;
+    padding-top: 32px !important;
   }
 }
 
 @media (max-width: 860px) {
   .magazine-cover {
     gap: 16px;
-    padding: 26px 0 18px;
+    padding: 28px 0 42px;
   }
 
   .magazine-section-heading--cover {
@@ -5120,11 +5147,11 @@ body * {
   }
 
   .magazine-section-heading--cover h1 {
-    font-size: 30px;
+    font-size: 28px;
   }
 
   .landing-news-feed {
-    padding: 24px 0 52px !important;
+    padding: 28px 0 48px !important;
   }
 
   .landing-news-feed .news-list-feed {
