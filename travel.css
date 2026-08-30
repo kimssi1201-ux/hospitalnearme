@@ -5423,48 +5423,69 @@ main#top {
   }
 
   main#top .category-magazine-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 32px 20px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
   }
 
-  main#top .category-magazine-card:first-child {
-    grid-column: 1 / -1;
-  }
-
-  main#top .category-magazine-card a {
+  main#top .category-magazine-card:first-child a {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
-    padding: 0;
+    padding: 0 0 20px;
+    border-bottom: 1px solid var(--line);
   }
 
-  main#top .category-magazine-card .image-frame {
+  main#top .category-magazine-card:first-child .image-frame {
     grid-row: auto;
     width: 100%;
     aspect-ratio: 16 / 9;
-    border-radius: 0;
+    border-radius: 10px;
   }
 
-  main#top .category-magazine-card .category-label,
+  main#top .category-magazine-card:not(:first-child) a {
+    display: grid;
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 14px;
+    align-items: center;
+    padding: 0 0 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  main#top .category-magazine-card:not(:first-child) .image-frame {
+    grid-row: auto;
+    width: 108px;
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+  }
+
   main#top .category-magazine-card p,
-  main#top .category-magazine-card small,
   main#top .category-magazine-card .status-badge {
     display: none;
   }
 
   main#top .category-magazine-card strong {
-    font-size: clamp(20px, 5.7vw, 24px);
-    font-weight: 850;
-    line-height: 1.34;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.4;
     letter-spacing: 0;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 2;
+  }
+
+  main#top .category-magazine-card .category-label,
+  main#top .category-magazine-card small {
+    font-size: 12px;
   }
 
   main#top .category-magazine-card:first-child strong {
-    font-size: clamp(28px, 7.6vw, 34px);
+    font-size: clamp(24px, 6.4vw, 30px);
     font-weight: 900;
     line-height: 1.24;
     -webkit-line-clamp: 3;
+  }
+
+  main#top .category-magazine-card:first-child .category-label,
+  main#top .category-magazine-card:first-child small {
+    font-size: 13px;
   }
 }
 
