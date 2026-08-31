@@ -46,6 +46,25 @@ test("worker delegates the clean search URL to Pages assets", async () => {
   assert.equal(await response.text(), "search asset");
 });
 
+test("worker rewrites nested root asset requests to the site root", async () => {
+  let requestedUrl = "";
+  const response = await worker.fetch(new Request("https://view1.kr/seoul-events/seoul-event-kp5ai2/travel.css?v=broken"), {
+    ASSETS: {
+      fetch: async (request) => {
+        requestedUrl = request.url;
+        return new Response("css asset", { status: 200, headers: { "content-type": "text/css" } });
+      }
+    }
+  });
+
+  const assetUrl = new URL(requestedUrl);
+  assert.equal(response.status, 200);
+  assert.equal(assetUrl.pathname, "/travel.css");
+  assert.equal(assetUrl.searchParams.get("v"), "broken");
+  assert.equal(response.headers.get("content-type"), "text/css");
+  assert.equal(await response.text(), "css asset");
+});
+
 test("worker protects proxy routes from wrong origins and missing keys", async (t) => {
   await t.test("wrong origin", async () => {
     const response = await worker.fetch(new Request("https://view1.kr/api/myrealtrip", {

@@ -37,6 +37,16 @@ const MYREALTRIP_POST_PATHS = new Set([
   "/v1/products/accommodation/region-autocomplete",
   "/v1/products/accommodation/search"
 ]);
+const ROOT_STATIC_ASSETS = new Set([
+  "manifest.webmanifest",
+  "travel.css",
+  "travel-data.js",
+  "travel.js",
+  "search.js",
+  "festival-detail.css",
+  "festival-detail.js",
+  "festival-mobile-fix.css"
+]);
 
 export default {
   async fetch(request, env) {
@@ -45,6 +55,11 @@ export default {
     const legacyArticleRedirect = legacyDetailRedirect(url);
     if (legacyArticleRedirect) {
       return Response.redirect(legacyArticleRedirect, 301);
+    }
+
+    const rootAssetRequest = nestedRootAssetRequest(request, url);
+    if (rootAssetRequest) {
+      return env.ASSETS.fetch(rootAssetRequest);
     }
 
     if (url.pathname === "/api/festival-ai") {
@@ -82,6 +97,16 @@ export default {
     return env.ASSETS.fetch(request);
   }
 };
+
+function nestedRootAssetRequest(request, url) {
+  const fileName = url.pathname.split("/").pop() || "";
+  if (!ROOT_STATIC_ASSETS.has(fileName)) return null;
+  if (url.pathname === `/${fileName}`) return null;
+
+  const assetUrl = new URL(request.url);
+  assetUrl.pathname = `/${fileName}`;
+  return new Request(assetUrl.toString(), request);
+}
 
 function legacyDetailRedirect(url) {
   if (url.pathname !== "/festival-detail" && url.pathname !== "/festival-detail.html") return "";
