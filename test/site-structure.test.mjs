@@ -108,6 +108,17 @@ test("local script and stylesheet references resolve", async () => {
   }
 });
 
+test("entrypoint assets are root-relative for nested fallback URLs", async () => {
+  for (const file of ["index.html", "search.html", "festival-detail.html"]) {
+    const source = await readFile(path.join(root, file), "utf8");
+    for (const match of source.matchAll(/<(?:script|link)\b[^>]+(?:src|href)=["']([^"']+)["']/gi)) {
+      const asset = match[1];
+      if (/^(?:https?:)?\/\//i.test(asset) || asset.startsWith("data:") || asset.startsWith("#")) continue;
+      assert.ok(asset.startsWith("/"), `${file}: ${asset} must start at the site root`);
+    }
+  }
+});
+
 test("ads.txt matches the active publisher ID", async () => {
   const source = await readFile(path.join(root, "ads.txt"), "utf8");
   assert.match(source, /google\.com, pub-5751319666030430, DIRECT/);
