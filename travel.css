@@ -6650,3 +6650,493 @@ main#top .festival-finder-section .portal-search {
     width: 98px;
   }
 }
+
+/* 2026-09 Telltrip-style structural pass: plain image-led news grids. */
+:root {
+  --view1-magazine-width: 860px;
+}
+
+body:has(main#top) .topic-nav,
+body:has(main#top) .language-switch {
+  display: none !important;
+}
+
+body:has(main#top) .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  min-height: 72px;
+  padding: 0 max(20px, calc((100vw - var(--view1-magazine-width)) / 2));
+  border-bottom: 1px solid #edf1f3;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: none;
+}
+
+body:has(main#top) .site-header .brand {
+  gap: 10px;
+}
+
+body:has(main#top) .site-header .brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 14px;
+}
+
+body:has(main#top) .site-header .brand strong {
+  font-size: 18px;
+  line-height: 1.08;
+}
+
+body:has(main#top) .site-header .brand small {
+  font-size: 11px;
+}
+
+body:has(main#top) .primary-nav.nav-magazine {
+  gap: clamp(20px, 2.5vw, 34px);
+}
+
+body:has(main#top) .primary-nav.nav-magazine a {
+  color: #121a1f;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body:has(main#top) .header-actions {
+  min-width: 40px;
+}
+
+main#top {
+  width: min(var(--view1-magazine-width), calc(100% - 48px));
+  max-width: none;
+  gap: 0;
+  padding-top: 12px;
+}
+
+main#top .landing-news-feed {
+  order: 1;
+  margin: 0;
+  padding: 0 0 46px !important;
+}
+
+main#top .category-news-wrapper {
+  order: 2;
+  padding: 0 0 46px;
+}
+
+main#top .places-section {
+  order: 3;
+  padding: 0 0 50px;
+}
+
+main#top .festival-finder-section {
+  order: 8;
+  margin-top: 2px;
+  padding: 34px 0 42px;
+  border-top: 1px solid #e5edf0;
+  border-bottom: 1px solid #e5edf0;
+}
+
+main#top .coupang-section {
+  order: 9;
+}
+
+main#top .booking-search-panel {
+  order: 10;
+}
+
+main#top .faq-section {
+  order: 11;
+}
+
+main#top .landing-news-feed .tripview-section-title--all {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+}
+
+main#top .landing-news-feed.is-filtered .tripview-section-title--all {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0 20px !important;
+  padding: 0 0 10px !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+  border-bottom: 4px solid #0057c8;
+}
+
+main#top .landing-news-feed.is-filtered .tripview-section-title--all h2 {
+  font-size: 24px;
+  line-height: 1.16;
+}
+
+main#top .landing-news-feed .news-list-feed,
+main#top .category-magazine-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 26px 20px !important;
+}
+
+body.is-loading-news main#top .landing-news-feed .news-list-card:nth-child(n + 7) {
+  display: none !important;
+}
+
+main#top .landing-news-feed .news-list-card,
+main#top .category-magazine-card {
+  grid-column: auto !important;
+  grid-row: auto !important;
+  min-width: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  border-bottom: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+main#top .landing-news-feed .news-list-card:nth-child(-n + 2) {
+  grid-column: span 2 !important;
+}
+
+main#top .landing-news-feed .news-list-card a,
+main#top .category-magazine-card a {
+  display: grid !important;
+  height: auto !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-content: start;
+  gap: 10px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  color: #111a20;
+  text-decoration: none;
+}
+
+main#top .landing-news-feed .news-list-card .image-frame--feed,
+main#top .category-magazine-card .image-frame {
+  width: 100% !important;
+  aspect-ratio: 16 / 9 !important;
+  border-radius: 0 !important;
+}
+
+main#top .landing-news-feed .news-list-card span {
+  display: grid;
+  gap: 5px;
+}
+
+main#top .landing-news-feed .status-badge,
+main#top .category-magazine-card .status-badge,
+main#top .category-magazine-card p {
+  display: none !important;
+}
+
+main#top .landing-news-feed .festival-card-meta,
+main#top .category-magazine-card .festival-card-meta {
+  order: 2;
+  gap: 6px;
+  min-width: 0;
+}
+
+main#top .landing-news-feed .festival-card-meta em,
+main#top .category-magazine-card .festival-card-meta em,
+main#top .landing-news-feed .festival-status-pill,
+main#top .category-magazine-card .festival-status-pill,
+main#top .landing-news-feed small,
+main#top .category-magazine-card small {
+  color: #6d7b82;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+main#top .landing-news-feed .festival-status-pill,
+main#top .category-magazine-card .festival-status-pill {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+main#top .landing-news-feed .news-list-card strong,
+main#top .category-magazine-card strong {
+  order: 1;
+  display: -webkit-box;
+  overflow: hidden;
+  color: #111a20;
+  font-size: 16px !important;
+  font-weight: 900;
+  line-height: 1.32;
+  letter-spacing: 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+main#top .landing-news-feed .news-list-card:nth-child(-n + 2) strong {
+  font-size: clamp(23px, 2.35vw, 30px) !important;
+  line-height: 1.18;
+  -webkit-line-clamp: 2;
+}
+
+main#top .landing-news-feed small,
+main#top .category-magazine-card small {
+  order: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+main#top .landing-news-feed:not(.is-filtered) .load-more-articles {
+  display: none !important;
+}
+
+main#top #categoryNewsSections {
+  display: grid;
+  gap: 48px;
+}
+
+main#top .category-news-block {
+  display: grid;
+  gap: 16px;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+main#top .category-news-heading,
+main#top .places-section .section-heading {
+  display: block;
+  margin: 0 0 14px;
+  padding: 0 0 8px;
+  border-bottom: 4px solid #0057c8;
+}
+
+main#top .category-news-heading h2,
+main#top .places-section .section-heading h2 {
+  margin: 0;
+  color: #111a20;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.14;
+  letter-spacing: 0;
+}
+
+main#top .category-news-heading .eyebrow,
+main#top .category-news-heading p,
+main#top .category-news-heading a,
+main#top .places-section .section-heading .eyebrow,
+main#top .places-section .section-heading p {
+  display: none !important;
+}
+
+main#top .places-section .card-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 26px 20px;
+}
+
+main#top .places-section .article-card,
+main#top .places-section .article-card:first-child {
+  grid-column: auto;
+  grid-row: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+main#top .places-section .article-card a,
+main#top .places-section .article-card:first-child a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 0;
+}
+
+main#top .places-section .article-card .image-frame,
+main#top .places-section .article-card:first-child .image-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0;
+}
+
+main#top .places-section .article-card h3,
+main#top .places-section .article-card:first-child h3 {
+  color: #111a20;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.32;
+  letter-spacing: 0;
+  -webkit-line-clamp: 3;
+}
+
+main#top .places-section .article-card p {
+  display: none !important;
+}
+
+main#top .region-chip-list {
+  margin: 4px 0 20px;
+}
+
+main#top .region-button {
+  min-height: 34px;
+  border-radius: 2px;
+}
+
+main#top .festival-finder-section .magazine-section-heading--cover {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+}
+
+main#top .festival-finder-section h1 {
+  max-width: 620px;
+  font-size: 28px;
+}
+
+main#top .festival-finder-section p {
+  max-width: 620px;
+}
+
+main#top .festival-finder-section .portal-search {
+  max-width: 620px;
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+main#top .image-frame--api img,
+main#top .news-list-card .image-frame--api img,
+main#top .category-magazine-card .image-frame--api img,
+main#top .article-card .image-frame--api img {
+  object-fit: contain !important;
+  object-position: center !important;
+  transform: none !important;
+}
+
+@media (min-width: 861px) {
+  body:has(main#top) .site-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) 40px;
+    grid-template-areas: "brand nav language";
+    gap: 24px;
+  }
+
+  body:has(main#top) .site-header .brand {
+    grid-area: brand;
+  }
+
+  body:has(main#top) .site-header .primary-nav {
+    grid-area: nav;
+    justify-self: end;
+  }
+
+  body:has(main#top) .site-header .header-actions {
+    grid-area: language;
+    justify-self: end;
+  }
+}
+
+@media (max-width: 860px) {
+  :root {
+    --view1-magazine-width: 620px;
+  }
+
+  main#top .landing-news-feed .news-list-feed,
+  main#top .category-magazine-grid,
+  main#top .places-section .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 24px 16px !important;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(-n + 2) {
+    grid-column: 1 / -1 !important;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(-n + 2) strong {
+    font-size: clamp(24px, 6vw, 30px) !important;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 3) a,
+  main#top .category-magazine-card a,
+  main#top .category-magazine-card:first-child a,
+  main#top .category-magazine-card:not(:first-child) a,
+  main#top .places-section .article-card a,
+  main#top .places-section .article-card:first-child a,
+  main#top .places-section .article-card:not(:first-child) a {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 9px !important;
+    align-items: start !important;
+    padding: 0 !important;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 3) .image-frame--feed,
+  main#top .category-magazine-card .image-frame,
+  main#top .category-magazine-card:first-child .image-frame,
+  main#top .category-magazine-card:not(:first-child) .image-frame,
+  main#top .places-section .article-card .image-frame,
+  main#top .places-section .article-card:first-child .image-frame,
+  main#top .places-section .article-card:not(:first-child) .image-frame {
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    border-radius: 0 !important;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 3) strong,
+  main#top .category-magazine-card strong,
+  main#top .category-magazine-card:first-child strong,
+  main#top .category-magazine-card:not(:first-child) strong,
+  main#top .places-section .article-card h3,
+  main#top .places-section .article-card:first-child h3,
+  main#top .places-section .article-card:not(:first-child) h3 {
+    font-size: 15px !important;
+    line-height: 1.34 !important;
+    -webkit-line-clamp: 3;
+  }
+}
+
+@media (max-width: 720px) {
+  body:has(main#top) .site-header {
+    min-height: 76px;
+    padding: 12px 18px;
+  }
+
+  body:has(main#top) .site-header::after {
+    content: none !important;
+  }
+
+  body:has(main#top) .site-header .brand-mark {
+    width: 40px;
+    height: 40px;
+  }
+
+  body:has(main#top) .site-header .brand strong {
+    font-size: 20px;
+  }
+
+  main#top {
+    width: min(100% - 32px, 620px);
+    padding-top: 14px;
+  }
+
+  main#top .landing-news-feed {
+    padding-bottom: 42px !important;
+  }
+
+  main#top #categoryNewsSections {
+    gap: 42px;
+  }
+
+  main#top .category-news-heading h2,
+  main#top .places-section .section-heading h2 {
+    font-size: 28px;
+  }
+
+  main#top .festival-finder-section .magazine-section-heading--cover {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

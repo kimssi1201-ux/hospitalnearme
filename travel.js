@@ -2850,15 +2850,15 @@ function buildMagazineNewsSections() {
 
   return [
     {
-      id: "weekend-festivals",
-      eyebrow: "Weekend",
-      title: "이번 주말 축제",
-      items: chooseMagazineItems([...weekend, ...upcoming, ...ongoing], items, used, 6)
+      id: "travel-news",
+      eyebrow: "News",
+      title: "여행뉴스",
+      items: chooseMagazineItems(latest, items, used, 6)
     },
     {
-      id: "regional-festivals",
-      eyebrow: "Regions",
-      title: "지역별 축제",
+      id: "domestic-travel",
+      eyebrow: "Domestic",
+      title: "국내여행",
       items: chooseMagazineItems(diverseRegionItems(items), items, used, 6)
     },
     {
@@ -2868,16 +2868,22 @@ function buildMagazineNewsSections() {
       items: chooseMagazineItems(byCategory(["festival", "exhibition", "performance", "movie"]), items, used, 6)
     },
     {
-      id: "travel-news",
-      eyebrow: "News",
-      title: "여행뉴스",
-      items: chooseMagazineItems(latest, items, used, 6)
-    },
-    {
       id: "before-trip",
       eyebrow: "Tips",
       title: "여행팁",
       items: chooseMagazineItems(visitTips, items, used, 6)
+    },
+    {
+      id: "regional-festivals",
+      eyebrow: "Regions",
+      title: "지역별 축제",
+      items: chooseMagazineItems(diverseRegionItems(items), items, used, 6)
+    },
+    {
+      id: "weekend-festivals",
+      eyebrow: "Weekend",
+      title: "이번 주말 축제",
+      items: chooseMagazineItems([...weekend, ...upcoming, ...ongoing], items, used, 6)
     }
   ].filter((group) => group.items.length);
 }
@@ -3364,6 +3370,8 @@ function renderJulyFestivals() {
 
   const allItems = primaryNewsItems();
   const items = filteredNewsItems(allItems);
+  const isFilteredView = Boolean(String(state.searchQuery || "").trim() || state.activeCategoryFilter !== "all");
+  feed.closest(".landing-news-feed")?.classList.toggle("is-filtered", isFilteredView);
   renderTopCategoryTabs();
   renderFestivalSearchStatus(allItems.length, items.length);
 
@@ -3412,7 +3420,7 @@ function renderJulyFestivals() {
       zh: `加载更多（剩余${remaining}篇）`
     };
     loadMore.textContent = labels[state.language] || labels.ko;
-    loadMore.hidden = remaining === 0;
+    loadMore.hidden = remaining === 0 || !isFilteredView;
   }
   hydrateCoupangWidgets();
 }

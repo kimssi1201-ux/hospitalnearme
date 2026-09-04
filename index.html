@@ -20,10 +20,10 @@
     <link rel="canonical" href="https://view1.kr/" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="대한축제뉴스 RSS" href="/feed.xml" />
-    <link rel="stylesheet" href="/travel.css?v=20260904-telltrip-layout-5" />
+    <link rel="stylesheet" href="/travel.css?v=20260904-telltrip-layout-6" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
     <script src="/travel-data.js?v=20260710-category-copy-1" defer></script>
-    <script src="/travel.js?v=20260904-telltrip-layout-5" defer></script>
+    <script src="/travel.js?v=20260904-telltrip-layout-6" defer></script>
     <title>대한축제뉴스 | 전국 축제 정보 뉴스</title>
   </head>
   <body class="is-loading-news">
@@ -43,7 +43,7 @@
       <nav class="primary-nav nav-magazine" id="primaryNav" aria-label="주요 메뉴">
         <a href="#top" data-i18n="nav.home">홈</a>
         <a href="#allArticles" data-category-reset data-i18n="nav.festivalEvents">축제·행사</a>
-        <a href="#placesSection" data-i18n="nav.domesticTravel">국내여행</a>
+        <a href="#domestic-travel" data-i18n="nav.domesticTravel">국내여행</a>
         <a href="#placesSection" data-i18n="nav.regions">지역별축제</a>
         <a href="#travel-news" data-i18n="nav.travelNews">여행뉴스</a>
         <a href="#before-trip" data-i18n="nav.travelTips">여행팁</a>
@@ -66,51 +66,6 @@
     </nav>
 
     <main id="top">
-      <section class="editorial-section magazine-cover festival-finder-section" id="festivalFinder" aria-labelledby="landingTitle">
-        <div class="magazine-section-heading magazine-section-heading--cover">
-          <div>
-            <span class="section-kicker">Festival Finder</span>
-            <h1 id="landingTitle" data-i18n="editorial.title">전국 축제 뉴스 매거진</h1>
-            <p data-i18n="editorial.description">사진으로 먼저 고르고, 일정·장소·요금·교통 정보는 상세페이지에서 확인하세요.</p>
-          </div>
-          <a href="#allArticles" data-i18n="editorial.link">대표 축제 보기</a>
-        </div>
-        <form class="portal-search" id="festivalSearchForm" role="search" aria-label="전국 축제 검색" action="/search" method="get">
-          <div class="portal-search-row">
-            <label class="sr-only" for="festivalSearchInput">축제 검색</label>
-            <input
-              id="festivalSearchInput"
-              name="q"
-              type="search"
-              autocomplete="off"
-              data-i18n-placeholder="search.placeholder"
-              placeholder="축제명, 지역, 주제 검색"
-            />
-            <button type="submit" data-i18n="search.submit">검색</button>
-          </div>
-          <div class="portal-search-meta">
-            <p id="festivalSearchStatus" data-i18n="search.ready">지역명이나 축제명을 입력하면 최신 목록에서 바로 찾아드립니다.</p>
-            <button class="portal-search-clear" id="festivalSearchClear" type="button" hidden data-i18n="search.clear">검색 해제</button>
-          </div>
-          <div class="portal-search-chips" aria-label="빠른 축제 검색">
-            <button type="button" data-search-chip="서울">서울</button>
-            <button type="button" data-search-chip="부산">부산</button>
-            <button type="button" data-search-chip="제주">제주</button>
-            <button type="button" data-search-chip="야간">야간</button>
-            <button type="button" data-search-chip="가족">가족</button>
-            <button type="button" data-search-chip="무료">무료</button>
-            <button type="button" data-search-chip="입장권">입장권</button>
-            <button type="button" data-search-chip="전시">전시</button>
-          </div>
-        </form>
-        <div class="festival-finder-actions" aria-label="여행 준비 바로가기">
-          <a href="#bookingSearch" data-mrt-open="stay">숙소 검색</a>
-          <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권">투어·입장권</a>
-          <a href="#bookingSearch" data-mrt-open="flight">항공권</a>
-          <a href="#coupangEssentials" data-mrt-open="tour" data-mrt-keyword="여행 준비물" data-mrt-coupon="true">여행 준비물</a>
-        </div>
-      </section>
-
       <section class="mobile-news-feed landing-news-feed" id="july" aria-label="전국 축제 뉴스">
         <div class="tripview-section-title tripview-section-title--all" id="allArticles">
           <h2><span class="section-kicker">Festival Magazine</span><span data-i18n="latest.list">지금 가볼 축제</span> <span id="allArticleCount"></span></h2>
@@ -257,6 +212,51 @@
 
       <section class="category-news-wrapper" id="categoryNews" aria-label="분야별 축제 뉴스" hidden>
         <div id="categoryNewsSections"></div>
+      </section>
+
+      <section class="editorial-section magazine-cover festival-finder-section" id="festivalFinder" aria-labelledby="landingTitle">
+        <div class="magazine-section-heading magazine-section-heading--cover">
+          <div>
+            <span class="section-kicker">Festival Finder</span>
+            <h1 id="landingTitle" data-i18n="editorial.title">전국 축제 뉴스 매거진</h1>
+            <p data-i18n="editorial.description">사진으로 먼저 고르고, 일정·장소·요금·교통 정보는 상세페이지에서 확인하세요.</p>
+          </div>
+          <a href="#allArticles" data-i18n="editorial.link">대표 축제 보기</a>
+        </div>
+        <form class="portal-search" id="festivalSearchForm" role="search" aria-label="전국 축제 검색" action="/search" method="get">
+          <div class="portal-search-row">
+            <label class="sr-only" for="festivalSearchInput">축제 검색</label>
+            <input
+              id="festivalSearchInput"
+              name="q"
+              type="search"
+              autocomplete="off"
+              data-i18n-placeholder="search.placeholder"
+              placeholder="축제명, 지역, 주제 검색"
+            />
+            <button type="submit" data-i18n="search.submit">검색</button>
+          </div>
+          <div class="portal-search-meta">
+            <p id="festivalSearchStatus" data-i18n="search.ready">지역명이나 축제명을 입력하면 최신 목록에서 바로 찾아드립니다.</p>
+            <button class="portal-search-clear" id="festivalSearchClear" type="button" hidden data-i18n="search.clear">검색 해제</button>
+          </div>
+          <div class="portal-search-chips" aria-label="빠른 축제 검색">
+            <button type="button" data-search-chip="서울">서울</button>
+            <button type="button" data-search-chip="부산">부산</button>
+            <button type="button" data-search-chip="제주">제주</button>
+            <button type="button" data-search-chip="야간">야간</button>
+            <button type="button" data-search-chip="가족">가족</button>
+            <button type="button" data-search-chip="무료">무료</button>
+            <button type="button" data-search-chip="입장권">입장권</button>
+            <button type="button" data-search-chip="전시">전시</button>
+          </div>
+        </form>
+        <div class="festival-finder-actions" aria-label="여행 준비 바로가기">
+          <a href="#bookingSearch" data-mrt-open="stay">숙소 검색</a>
+          <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권">투어·입장권</a>
+          <a href="#bookingSearch" data-mrt-open="flight">항공권</a>
+          <a href="#coupangEssentials" data-mrt-open="tour" data-mrt-keyword="여행 준비물" data-mrt-coupon="true">여행 준비물</a>
+        </div>
       </section>
 
       <section class="coupang-section" id="coupangEssentials" aria-labelledby="coupangEssentialsTitle" hidden>
