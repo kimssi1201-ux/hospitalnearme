@@ -1,0 +1,11 @@
+---
+import PageLayout from "./PageLayout.astro";
+
+const { title, description, canonical } = Astro.props;
+---
+
+<PageLayout title={title} description={description} canonical={canonical}>
+  <article>
+    <slot />
+  </article>
+</PageLayout>

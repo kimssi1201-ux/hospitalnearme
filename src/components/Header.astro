@@ -1,0 +1,12 @@
+---
+const { siteName = "대한축제뉴스" } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="/" aria-label={`${siteName} 홈`}>
+      <span>DF</span>
+      <strong>{siteName}</strong>
+    </a>
+  </div>
+</header>

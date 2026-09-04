@@ -1,0 +1,35 @@
+---
+const {
+  title = "대한축제뉴스 | 전국 축제 정보 뉴스",
+  description = "전국 축제, 여행 코스, 가볼 만한 곳과 방문 전 체크 정보를 뉴스형 카드로 모아보는 전국 축제 여행 정보 블로그입니다.",
+  canonical = "https://view1.kr/",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="google-adsense-account" content="ca-pub-5751319666030430" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:url" content={canonical} />
+    <link rel="canonical" href={canonical} />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="대한축제뉴스 RSS" href="/feed.xml" />
+    <link rel="stylesheet" href="/travel.css?v=20260830-category-grid-density-fix" />
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430"
+      crossorigin="anonymous"></script>
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
