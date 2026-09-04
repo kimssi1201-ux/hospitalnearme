@@ -10,7 +10,11 @@
     "test": "node --test test/*.test.mjs",
     "syntax": "node scripts/check-javascript.mjs",
     "lint": "node scripts/check-project.mjs",
-    "build": "npm run generate:articles && npm run lint && npm run syntax",
-    "check": "npm run lint && npm run syntax && npm test"
+    "build": "node scripts/run-astro-build.mjs && node scripts/build-astro-static.mjs",
+    "validate:migration": "node scripts/validate-astro-migration.mjs",
+    "check": "node scripts/run-astro-build.mjs && node scripts/build-astro-static.mjs && node scripts/check-project.mjs && node scripts/check-javascript.mjs && node --test test/*.test.mjs && node scripts/validate-astro-migration.mjs"
+  },
+  "devDependencies": {
+    "astro": "7.2.10"
   }
 }

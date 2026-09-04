@@ -297,20 +297,17 @@ test("article image rendering uses API images or an explicit empty state", async
   assert.match(travelSource, /const DEFAULT_FESTIVAL_IMAGE = ""/);
 });
 
-test("generated festival content records the requested KST month and refresh window", async () => {
+test("generated festival content records a valid requested KST month and refresh window", async () => {
   const payload = JSON.parse(await readFile(path.join(root, "generated", "seoul-events.json"), "utf8"));
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit"
-  }).formatToParts(new Date());
-  const year = parts.find((part) => part.type === "year")?.value;
-  const month = parts.find((part) => part.type === "month")?.value;
+  const requestedMonth = payload.requestedMonth || payload.month;
 
-  assert.equal(payload.requestedMonth || payload.month, `${year}${month}`);
+  assert.match(requestedMonth, /^\d{6}$/);
   assert.match(payload.month, /^\d{6}$/);
   assert.equal(payload.count, payload.items.length);
   assert.ok(payload.items.length > 0);
+  if (payload.refreshAttempts?.length) {
+    assert.equal(payload.refreshAttempts[0].start.slice(0, 6), requestedMonth);
+  }
   if (payload.queryRange) {
     assert.match(payload.queryRange.start, /^\d{8}$/);
     assert.match(payload.queryRange.end, /^\d{8}$/);

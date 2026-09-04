@@ -1,0 +1,17 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Navigation from "../components/Navigation.astro";
+import Footer from "../components/Footer.astro";
+
+const { title, description, canonical } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} canonical={canonical}>
+  <Header />
+  <Navigation />
+  <main>
+    <slot />
+  </main>
+  <Footer />
+</BaseLayout>

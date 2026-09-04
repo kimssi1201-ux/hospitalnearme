@@ -1,0 +1,12 @@
+---
+const links = [
+  { href: "/#allArticles", label: "최신 축제" },
+  { href: "/#editorialPicks", label: "여행 가이드" },
+  { href: "/about", label: "소개" },
+  { href: "/feed.xml", label: "RSS" },
+];
+---
+
+<nav aria-label="주요 메뉴">
+  {links.map((link) => <a href={link.href}>{link.label}</a>)}
+</nav>
