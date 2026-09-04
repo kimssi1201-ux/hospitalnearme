@@ -50,6 +50,7 @@ const state = {
   placesLoaded: false,
   placesError: false,
   julyArticles: [],
+  staticFeedArticles: [],
   myrealtrip: {
     tours: [],
     stays: [],
@@ -659,8 +660,35 @@ function sortByQualityAndDate(items = []) {
 }
 
 function primaryNewsItems() {
-  const source = state.apiArticles.length ? state.apiArticles : state.julyArticles;
+  const source = state.apiArticles.length
+    ? state.apiArticles
+    : state.julyArticles.length
+      ? state.julyArticles
+      : state.staticFeedArticles;
   return sortByQualityAndDate(uniqueArticles((source || []).map(withGroupedCategory)));
+}
+
+function collectStaticFeedArticles() {
+  const cards = [...document.querySelectorAll("#newsFeedList .news-list-card")];
+  return cards
+    .map((card, index) => {
+      const link = card.querySelector("a");
+      const href = link?.getAttribute("href") || "";
+      const slug = href.split("/").filter(Boolean).pop() || `static-feed-${index}`;
+      const smallText = card.querySelector("small")?.textContent?.trim() || "";
+      const [date = "", readTime = "축제 정보"] = smallText.split("·").map((item) => item.trim());
+      return {
+        id: slug,
+        source: "seoul",
+        category: card.querySelector("em")?.textContent?.trim() || "축제 소식",
+        title: card.querySelector("strong")?.textContent?.trim() || "",
+        summary: "",
+        date,
+        readTime,
+        image: card.querySelector("img")?.getAttribute("src") || ""
+      };
+    })
+    .filter((item) => item.title);
 }
 
 function normalizeSearchQuery(value = "") {
@@ -791,7 +819,9 @@ function mapSeoulCategory(category = "") {
     "축제-관광/체육": { category: "축제", categorySlug: "festival" },
     "축제-전통/역사": { category: "축제", categorySlug: "festival" }
   };
-  const mapped = directMap[value] || { category: "축제 소식", categorySlug: "festival" };
+  const mapped = directMap[value] || (value.includes("축제")
+    ? { category: value, categorySlug: "festival" }
+    : { category: "축제 소식", categorySlug: "festival" });
   return {
     rawCategory: value || "축제 소식",
     subCategory: value || "축제 소식",
@@ -2664,7 +2694,8 @@ function takeMagazineItems(candidates, usedKeys, limit = 6) {
 }
 
 function buildMagazineNewsSections() {
-  const items = primaryNewsItems().slice(29);
+  const primaryItems = primaryNewsItems();
+  const items = primaryItems.length > 29 ? primaryItems.slice(29) : primaryItems;
   const used = new Set();
   const latest = [...items].sort((a, b) => articleDateValue(b) - articleDateValue(a));
   const byCategory = (keys) => items.filter((item) => keys.includes(categoryKeyFor(item)));
@@ -3759,6 +3790,7 @@ function bindMenu() {
 }
 
 function init() {
+  state.staticFeedArticles = collectStaticFeedArticles();
   setNewsLoading(true);
   renderRegionChips();
   updateRegionHeading();
