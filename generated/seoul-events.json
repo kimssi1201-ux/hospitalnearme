@@ -5,7 +5,7 @@
   "month": "202509",
   "requestedMonth": "202609",
   "queryRange": {
-    "start": "20250904",
+    "start": "20250905",
     "end": "20251231",
     "label": "2025 same-season fallback",
     "fallback": true
@@ -19,20 +19,20 @@
     },
     {
       "id": "current-year-remainder",
-      "start": "20260904",
+      "start": "20260905",
       "end": "20261231",
       "count": 1
     },
     {
       "id": "previous-year-same-season",
-      "start": "20250904",
+      "start": "20250905",
       "end": "20251231",
-      "count": 205
+      "count": 199
     }
   ],
-  "updatedAt": "2026-09-04T08:17:15.486Z",
-  "count": 205,
-  "legacyCount": 46,
+  "updatedAt": "2026-09-04T22:17:23.861Z",
+  "count": 199,
+  "legacyCount": 52,
   "legacyItems": [
     {
       "id": "tour-2833343",
@@ -179,6 +179,36 @@
       "lat": "37.7487853655",
       "lng": "126.4854137407",
       "areaCode": "2"
+    },
+    {
+      "id": "tour-1063406",
+      "source": "seoul",
+      "contentId": "1063406",
+      "contentTypeId": "15",
+      "category": "강원 축제",
+      "categorySlug": "festival",
+      "title": "삼척동해왕이사부축제",
+      "summary": "강원특별자치도 삼척시 오십천로 586 (정상동) 삼척 장미공원에서 진행되는 강원 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
+      "date": "2025-09-05~2025-09-07",
+      "readTime": "강원 축제 정보",
+      "image": "https://tong.visitkorea.or.kr/cms/resource/08/3523608_image2_1.jpg",
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/98/3523598_image2_1.jpg"
+      ],
+      "address": "강원특별자치도 삼척시 오십천로 586 (정상동) 삼척 장미공원",
+      "place": "강원특별자치도 삼척시 오십천로 586 (정상동)",
+      "gu": "",
+      "tel": "033-573-7020, 033-570-3073",
+      "homepage": "",
+      "fee": "",
+      "time": "",
+      "org": "",
+      "target": "",
+      "isFree": "",
+      "updatedAt": "20250905172845",
+      "lat": "37.4323943868",
+      "lng": "129.1796900582",
+      "areaCode": "32"
     },
     {
       "id": "tour-2996726",
@@ -719,6 +749,36 @@
       "lat": "36.9320824561",
       "lng": "126.2942062523",
       "areaCode": "34"
+    },
+    {
+      "id": "tour-3535742",
+      "source": "seoul",
+      "contentId": "3535742",
+      "contentTypeId": "15",
+      "category": "인천 축제",
+      "categorySlug": "festival",
+      "title": "미추홀미디어문화축제",
+      "summary": "인천광역시 미추홀구 독정이로 87 (숭의동)에서 진행되는 인천 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
+      "date": "2025-09-20~2025-09-21",
+      "readTime": "인천 축제 정보",
+      "image": "https://tong.visitkorea.or.kr/cms/resource/59/3574759_image2_1.jpg",
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/57/3574757_image2_1.jpg"
+      ],
+      "address": "인천광역시 미추홀구 독정이로 87 (숭의동)",
+      "place": "인천광역시 미추홀구 독정이로 87 (숭의동)",
+      "gu": "",
+      "tel": "032-880-7978",
+      "homepage": "",
+      "fee": "",
+      "time": "",
+      "org": "",
+      "target": "",
+      "isFree": "",
+      "updatedAt": "20251126171517",
+      "lat": "37.4625938235",
+      "lng": "126.6505427270",
+      "areaCode": "2"
     },
     {
       "id": "tour-2554931",
@@ -1272,6 +1332,36 @@
       "areaCode": "34"
     },
     {
+      "id": "tour-3364857",
+      "source": "seoul",
+      "contentId": "3364857",
+      "contentTypeId": "15",
+      "category": "전북 축제",
+      "categorySlug": "festival",
+      "title": "군산짬뽕페스티벌",
+      "summary": "전북특별자치도 군산시 해망로 214 (장미동) 군산 백년광장 일원(장미동)에서 진행되는 전북 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
+      "date": "2025-10-09~2025-10-12",
+      "readTime": "전북 축제 정보",
+      "image": "https://tong.visitkorea.or.kr/cms/resource/05/3568605_image2_1.jpg",
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/40/3540940_image2_1.jpg"
+      ],
+      "address": "전북특별자치도 군산시 해망로 214 (장미동) 군산 백년광장 일원(장미동)",
+      "place": "전북특별자치도 군산시 해망로 214 (장미동)",
+      "gu": "",
+      "tel": "063-454-3912",
+      "homepage": "",
+      "fee": "",
+      "time": "",
+      "org": "",
+      "target": "",
+      "isFree": "",
+      "updatedAt": "20251118144537",
+      "lat": "35.9892174387",
+      "lng": "126.7141403863",
+      "areaCode": "37"
+    },
+    {
       "id": "tour-2756476",
       "source": "seoul",
       "contentId": "2756476",
@@ -1356,6 +1446,36 @@
       "areaCode": "31"
     },
     {
+      "id": "tour-790124",
+      "source": "seoul",
+      "contentId": "790124",
+      "contentTypeId": "15",
+      "category": "강원 축제",
+      "categorySlug": "festival",
+      "title": "홍천 인삼한우 명품축제",
+      "summary": "강원특별자치도 홍천군 홍천읍 갈마곡리 501 도시산림공원 토리숲에서 진행되는 강원 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
+      "date": "2025-10-30~2025-11-02",
+      "readTime": "강원 축제 정보",
+      "image": "https://tong.visitkorea.or.kr/cms/resource/66/3561066_image2_1.jpg",
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/94/2853994_image2_1.jpg"
+      ],
+      "address": "강원특별자치도 홍천군 홍천읍 갈마곡리 501 도시산림공원 토리숲",
+      "place": "강원특별자치도 홍천군 홍천읍 갈마곡리",
+      "gu": "",
+      "tel": "033-430-5855",
+      "homepage": "",
+      "fee": "",
+      "time": "",
+      "org": "",
+      "target": "",
+      "isFree": "",
+      "updatedAt": "20251104100613",
+      "lat": "37.6894650680",
+      "lng": "127.8934898344",
+      "areaCode": "32"
+    },
+    {
       "id": "tour-3020552",
       "source": "seoul",
       "contentId": "3020552",
@@ -1382,6 +1502,64 @@
       "lat": "35.2668415191",
       "lng": "129.0893638877",
       "areaCode": "6"
+    },
+    {
+      "id": "tour-3383832",
+      "source": "seoul",
+      "contentId": "3383832",
+      "contentTypeId": "15",
+      "category": "서울 축제",
+      "categorySlug": "festival",
+      "title": "케미스트릿 강남역 페스티벌",
+      "summary": "서울특별시 서초구 서초대로77길 17 (서초동) (BLOCK 77)에서 진행되는 서울 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
+      "date": "2025-11-02",
+      "readTime": "서울 축제 정보",
+      "image": "https://tong.visitkorea.or.kr/cms/resource/64/3553464_image2_1.jpg",
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/63/3553463_image2_1.jpg"
+      ],
+      "address": "서울특별시 서초구 서초대로77길 17 (서초동) (BLOCK 77)",
+      "place": "서울특별시 서초구 서초대로77길 17 (서초동)",
+      "gu": "",
+      "tel": "02-554-9795",
+      "homepage": "",
+      "fee": "",
+      "time": "",
+      "org": "",
+      "target": "",
+      "isFree": "",
+      "updatedAt": "20251103131345",
+      "lat": "37.4996073141",
+      "lng": "127.0257686102",
+      "areaCode": "1"
+    },
+    {
+      "id": "tour-3367339",
+      "source": "seoul",
+      "contentId": "3367339",
+      "contentTypeId": "15",
+      "category": "경기 축제",
+      "categorySlug": "festival",
+      "title": "2025 우리쌀 우리술 K-라이스페스타",
+      "summary": "경기도 고양시 일산서구 킨텍스로 217-60 (대화동)에서 진행되는 경기 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
+      "date": "2025-11-28~2025-11-30",
+      "readTime": "경기 축제 정보",
+      "image": "https://tong.visitkorea.or.kr/cms/resource/29/3532329_image2_1.jpg",
+      "galleryImages": [],
+      "address": "경기도 고양시 일산서구 킨텍스로 217-60 (대화동)",
+      "place": "경기도 고양시 일산서구 킨텍스로 217-60 (대화동)",
+      "gu": "",
+      "tel": "070-4681-5717",
+      "homepage": "",
+      "fee": "",
+      "time": "",
+      "org": "",
+      "target": "",
+      "isFree": "",
+      "updatedAt": "20250905144028",
+      "lat": "37.6689881691",
+      "lng": "126.7458171427",
+      "areaCode": "31"
     },
     {
       "id": "tour-2640874",
@@ -1413,36 +1591,6 @@
     }
   ],
   "items": [
-    {
-      "id": "tour-1063406",
-      "source": "seoul",
-      "contentId": "1063406",
-      "contentTypeId": "15",
-      "category": "강원 축제",
-      "categorySlug": "festival",
-      "title": "삼척동해왕이사부축제",
-      "summary": "강원특별자치도 삼척시 오십천로 586 (정상동) 삼척 장미공원에서 진행되는 강원 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
-      "date": "2025-09-05~2025-09-07",
-      "readTime": "강원 축제 정보",
-      "image": "https://tong.visitkorea.or.kr/cms/resource/08/3523608_image2_1.jpg",
-      "galleryImages": [
-        "https://tong.visitkorea.or.kr/cms/resource/98/3523598_image2_1.jpg"
-      ],
-      "address": "강원특별자치도 삼척시 오십천로 586 (정상동) 삼척 장미공원",
-      "place": "강원특별자치도 삼척시 오십천로 586 (정상동)",
-      "gu": "",
-      "tel": "033-573-7020, 033-570-3073",
-      "homepage": "",
-      "fee": "",
-      "time": "",
-      "org": "",
-      "target": "",
-      "isFree": "",
-      "updatedAt": "20250905172845",
-      "lat": "37.4323943868",
-      "lng": "129.1796900582",
-      "areaCode": "32"
-    },
     {
       "id": "tour-3378217",
       "source": "seoul",
@@ -1768,36 +1916,6 @@
       "lat": "37.5206625310",
       "lng": "126.9883603092",
       "areaCode": "1"
-    },
-    {
-      "id": "tour-3535742",
-      "source": "seoul",
-      "contentId": "3535742",
-      "contentTypeId": "15",
-      "category": "인천 축제",
-      "categorySlug": "festival",
-      "title": "미추홀미디어문화축제",
-      "summary": "인천광역시 미추홀구 독정이로 87 (숭의동)에서 진행되는 인천 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
-      "date": "2025-09-20~2025-09-21",
-      "readTime": "인천 축제 정보",
-      "image": "https://tong.visitkorea.or.kr/cms/resource/59/3574759_image2_1.jpg",
-      "galleryImages": [
-        "https://tong.visitkorea.or.kr/cms/resource/57/3574757_image2_1.jpg"
-      ],
-      "address": "인천광역시 미추홀구 독정이로 87 (숭의동)",
-      "place": "인천광역시 미추홀구 독정이로 87 (숭의동)",
-      "gu": "",
-      "tel": "032-880-7978",
-      "homepage": "",
-      "fee": "",
-      "time": "",
-      "org": "",
-      "target": "",
-      "isFree": "",
-      "updatedAt": "20251126171517",
-      "lat": "37.4625938235",
-      "lng": "126.6505427270",
-      "areaCode": "2"
     },
     {
       "id": "tour-3337617",
@@ -2886,36 +3004,6 @@
       "lat": "38.0829871310",
       "lng": "127.2085962208",
       "areaCode": "31"
-    },
-    {
-      "id": "tour-3364857",
-      "source": "seoul",
-      "contentId": "3364857",
-      "contentTypeId": "15",
-      "category": "전북 축제",
-      "categorySlug": "festival",
-      "title": "군산짬뽕페스티벌",
-      "summary": "전북특별자치도 군산시 해망로 214 (장미동) 군산 백년광장 일원(장미동)에서 진행되는 전북 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
-      "date": "2025-10-09~2025-10-12",
-      "readTime": "전북 축제 정보",
-      "image": "https://tong.visitkorea.or.kr/cms/resource/05/3568605_image2_1.jpg",
-      "galleryImages": [
-        "https://tong.visitkorea.or.kr/cms/resource/40/3540940_image2_1.jpg"
-      ],
-      "address": "전북특별자치도 군산시 해망로 214 (장미동) 군산 백년광장 일원(장미동)",
-      "place": "전북특별자치도 군산시 해망로 214 (장미동)",
-      "gu": "",
-      "tel": "063-454-3912",
-      "homepage": "",
-      "fee": "",
-      "time": "",
-      "org": "",
-      "target": "",
-      "isFree": "",
-      "updatedAt": "20251118144537",
-      "lat": "35.9892174387",
-      "lng": "126.7141403863",
-      "areaCode": "37"
     },
     {
       "id": "tour-506708",
@@ -5228,36 +5316,6 @@
       "areaCode": "32"
     },
     {
-      "id": "tour-790124",
-      "source": "seoul",
-      "contentId": "790124",
-      "contentTypeId": "15",
-      "category": "강원 축제",
-      "categorySlug": "festival",
-      "title": "홍천 인삼한우 명품축제",
-      "summary": "강원특별자치도 홍천군 홍천읍 갈마곡리 501 도시산림공원 토리숲에서 진행되는 강원 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
-      "date": "2025-10-30~2025-11-02",
-      "readTime": "강원 축제 정보",
-      "image": "https://tong.visitkorea.or.kr/cms/resource/66/3561066_image2_1.jpg",
-      "galleryImages": [
-        "https://tong.visitkorea.or.kr/cms/resource/94/2853994_image2_1.jpg"
-      ],
-      "address": "강원특별자치도 홍천군 홍천읍 갈마곡리 501 도시산림공원 토리숲",
-      "place": "강원특별자치도 홍천군 홍천읍 갈마곡리",
-      "gu": "",
-      "tel": "033-430-5855",
-      "homepage": "",
-      "fee": "",
-      "time": "",
-      "org": "",
-      "target": "",
-      "isFree": "",
-      "updatedAt": "20251104100613",
-      "lat": "37.6894650680",
-      "lng": "127.8934898344",
-      "areaCode": "32"
-    },
-    {
       "id": "tour-3381612",
       "source": "seoul",
       "contentId": "3381612",
@@ -5814,36 +5872,6 @@
       "lat": "37.2746965149",
       "lng": "126.9826871782",
       "areaCode": "31"
-    },
-    {
-      "id": "tour-3383832",
-      "source": "seoul",
-      "contentId": "3383832",
-      "contentTypeId": "15",
-      "category": "서울 축제",
-      "categorySlug": "festival",
-      "title": "케미스트릿 강남역 페스티벌",
-      "summary": "서울특별시 서초구 서초대로77길 17 (서초동) (BLOCK 77)에서 진행되는 서울 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
-      "date": "2025-11-02",
-      "readTime": "서울 축제 정보",
-      "image": "https://tong.visitkorea.or.kr/cms/resource/64/3553464_image2_1.jpg",
-      "galleryImages": [
-        "https://tong.visitkorea.or.kr/cms/resource/63/3553463_image2_1.jpg"
-      ],
-      "address": "서울특별시 서초구 서초대로77길 17 (서초동) (BLOCK 77)",
-      "place": "서울특별시 서초구 서초대로77길 17 (서초동)",
-      "gu": "",
-      "tel": "02-554-9795",
-      "homepage": "",
-      "fee": "",
-      "time": "",
-      "org": "",
-      "target": "",
-      "isFree": "",
-      "updatedAt": "20251103131345",
-      "lat": "37.4996073141",
-      "lng": "127.0257686102",
-      "areaCode": "1"
     },
     {
       "id": "tour-3524418",
@@ -6598,34 +6626,6 @@
       "areaCode": "6"
     },
     {
-      "id": "tour-3367339",
-      "source": "seoul",
-      "contentId": "3367339",
-      "contentTypeId": "15",
-      "category": "경기 축제",
-      "categorySlug": "festival",
-      "title": "2025 우리쌀 우리술 K-라이스페스타",
-      "summary": "경기도 고양시 일산서구 킨텍스로 217-60 (대화동)에서 진행되는 경기 축제입니다. 방문 전 공식 안내에서 운영 시간과 요금을 확인하세요.",
-      "date": "2025-11-28~2025-11-30",
-      "readTime": "경기 축제 정보",
-      "image": "https://tong.visitkorea.or.kr/cms/resource/29/3532329_image2_1.jpg",
-      "galleryImages": [],
-      "address": "경기도 고양시 일산서구 킨텍스로 217-60 (대화동)",
-      "place": "경기도 고양시 일산서구 킨텍스로 217-60 (대화동)",
-      "gu": "",
-      "tel": "070-4681-5717",
-      "homepage": "",
-      "fee": "",
-      "time": "",
-      "org": "",
-      "target": "",
-      "isFree": "",
-      "updatedAt": "20250905144028",
-      "lat": "37.6689881691",
-      "lng": "126.7458171427",
-      "areaCode": "31"
-    },
-    {
       "id": "tour-3422647",
       "source": "seoul",
       "contentId": "3422647",
@@ -7313,7 +7313,9 @@
       "date": "2025-12-24~2026-01-04",
       "readTime": "대구 축제 정보",
       "image": "https://tong.visitkorea.or.kr/cms/resource/12/3578312_image2_1.JPG",
-      "galleryImages": [],
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/09/3578309_image2_1.jpg"
+      ],
       "address": "대구광역시 수성구 무학로 112 (두산동) 수성못",
       "place": "대구광역시 수성구 무학로 112 (두산동)",
       "gu": "",
@@ -7341,7 +7343,9 @@
       "date": "2025-12-31",
       "readTime": "전북 축제 정보",
       "image": "https://tong.visitkorea.or.kr/cms/resource/73/3589873_image2_1.jpg",
-      "galleryImages": [],
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/74/3589874_image2_1.jpg"
+      ],
       "address": "전북특별자치도 전주시 완산구 서노송동 596-5 전주시청 앞 노송광장",
       "place": "전북특별자치도 전주시 완산구 서노송동",
       "gu": "",
@@ -7369,7 +7373,9 @@
       "date": "2025-12-31~2026-01-01",
       "readTime": "부산 축제 정보",
       "image": "https://tong.visitkorea.or.kr/cms/resource/64/3579164_image2_1.png",
-      "galleryImages": [],
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/64/3579164_image2_1.png"
+      ],
       "address": "부산광역시 수영구 광안해변로 219 (광안동) 광안리 해수욕장",
       "place": "부산광역시 수영구 광안해변로 219 (광안동)",
       "gu": "",
@@ -7397,7 +7403,9 @@
       "date": "2025-12-31~2026-01-01",
       "readTime": "울산 축제 정보",
       "image": "https://tong.visitkorea.or.kr/cms/resource/79/3588879_image2_1.jpg",
-      "galleryImages": [],
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/74/3588874_image2_1.jpg"
+      ],
       "address": "울산광역시 울주군 서생면 대송리 간절곶",
       "place": "울산광역시 울주군 서생면 대송리",
       "gu": "",
@@ -7425,7 +7433,9 @@
       "date": "2025-12-31~2026-01-01",
       "readTime": "강원 축제 정보",
       "image": "https://tong.visitkorea.or.kr/cms/resource/40/3588540_image2_1.jpg",
-      "galleryImages": [],
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/39/3588539_image2_1.png"
+      ],
       "address": "강원특별자치도 강릉시 경포로 515 (안현동) 경포해변 및 정동진 모래시계공원",
       "place": "강원특별자치도 강릉시 경포로 515 (안현동)",
       "gu": "",
