@@ -660,7 +660,7 @@ async function updateStaticLanding(items) {
   if (source.includes("STATIC_RECOMMENDED_START")) {
     source = replaceStaticBlock(source, "RECOMMENDED", items.slice(1, 5).map(recommendCardMarkup).join(""));
   }
-  source = replaceStaticBlock(source, "FEED", items.slice(5, 17).map(feedCardMarkup).join(""));
+  source = replaceStaticBlock(source, "FEED", items.slice(0, 12).map(feedCardMarkup).join(""));
   await writeFile(indexPath, source, "utf8");
 }
 

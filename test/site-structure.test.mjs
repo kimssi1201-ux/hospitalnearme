@@ -45,11 +45,17 @@ test("every HTML page has the shared head requirements", async () => {
 
 test("landing page exposes the feed mounts without a hero mount", async () => {
   const source = await readFile(path.join(root, "index.html"), "utf8");
+  const travelSource = await readFile(path.join(root, "travel.js"), "utf8");
   assert.match(source, /id="newsFeedList"/);
   assert.match(source, /id="loadMoreArticles"/);
   assert.match(source, /id="festivalSearchForm"/);
   assert.match(source, /data-search-chip="서울"/);
-  assert.match(source, /class="primary-nav nav-mega"/);
+  assert.match(source, /class="primary-nav nav-magazine"/);
+  assert.match(travelSource, /title:\s*"이번 주말 축제"/);
+  assert.match(travelSource, /title:\s*"지역별 축제"/);
+  assert.match(travelSource, /title:\s*"축제·행사"/);
+  assert.match(travelSource, /title:\s*"여행뉴스"/);
+  assert.match(travelSource, /title:\s*"여행팁"/);
   assert.doesNotMatch(source, /id="featuredArticle"/);
 });
 
@@ -274,7 +280,7 @@ test("event article images stay restrained inside the post body", async () => {
   const posterImageRule = css.match(/\.official-poster img\s*\{[\s\S]*?\n\}/)?.[0] || "";
   const inlinePhotoRule = css.match(/\.event-inline-photo img\s*\{[\s\S]*?\n\}/)?.[0] || "";
 
-  assert.match(headSource, /article-static\.css\?v=20260904-visit-info-1/);
+  assert.match(headSource, /article-static\.css\?v=20260904-magazine-detail-1/);
   assert.match(posterImageRule, /max-height:\s*520px/);
   assert.match(posterImageRule, /width:\s*auto/);
   assert.match(inlinePhotoRule, /max-height:\s*360px/);
@@ -370,8 +376,10 @@ test("affiliate sections are contextual and do not interrupt the news feed with 
   assert.match(detailStyles, /repeat\(auto-fit, minmax\(220px, 1fr\)\)/);
 
   const body = detailSource.match(/function renderTravelDetailBody[\s\S]*?\r?\n}\r?\n/)?.[0] || "";
+  const homeFeedBody = travelSource.match(/function buildNewsFeedMarkup[\s\S]*?\r?\n}\r?\n/)?.[0] || "";
   const tips = body.indexOf("CleanVisitTipSection");
   const products = body.indexOf("CoupangTravelProductsSection");
   const booking = body.indexOf("BookingCheckSection");
   assert.ok(tips >= 0 && products > tips && booking > products);
+  assert.doesNotMatch(homeFeedBody, /renderMrtFeedModuleV2|mrt-feed-module/);
 });

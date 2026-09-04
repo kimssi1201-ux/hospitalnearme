@@ -122,7 +122,7 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
 
 .official-poster--hero {
   max-width: 860px;
-  margin: 0 auto 34px;
+  margin: 16px auto 22px;
   padding: 14px;
 }
 
@@ -133,7 +133,7 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
 .poster-empty--hero {
   gap: 6px;
   min-height: 300px;
-  margin: 0 0 34px;
+  margin: 16px 0 22px;
   text-align: center;
 }
 
@@ -153,7 +153,8 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
 }
 
 .event-title-header {
-  padding-bottom: 34px;
+  padding-bottom: 22px;
+  border-bottom: 0;
 }
 
 .event-title-meta {
@@ -194,11 +195,22 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
   color: #7c8790;
 }
 
+.event-lead {
+  max-width: 760px;
+  margin: 0 auto;
+  color: var(--ink);
+  font-size: 21px !important;
+  font-weight: 700;
+  line-height: 1.78 !important;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
 .event-visit-highlights {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
-  padding: 28px 0 0;
+  padding: 30px 0 0;
   border-bottom: 0 !important;
 }
 
@@ -287,7 +299,7 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
 @media (max-width: 700px) {
   .official-poster--hero {
     padding: 10px;
-    margin-bottom: 28px;
+    margin: 12px 0 20px;
   }
 
   .official-poster--hero img {
@@ -298,6 +310,11 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
     grid-template-columns: 1fr;
     gap: 8px;
     padding-top: 24px;
+  }
+
+  .event-lead {
+    font-size: 18px !important;
+    line-height: 1.72 !important;
   }
 
   .event-visit-highlights div {

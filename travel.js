@@ -69,13 +69,13 @@ const state = {
   activeRegionId: "seoul",
   activeCategoryFilter: "all",
   searchQuery: "",
-  visibleFeedCount: 12,
+  visibleFeedCount: 6,
   newsLoading: true,
   language: getStoredLanguage()
 };
 let coupangWidgetScriptPromise = null;
 let affiliateLoadPromise = null;
-const FEED_PAGE_SIZE = 12;
+const FEED_PAGE_SIZE = 6;
 
 const MRT_SEARCH_COPY = {
   stay: {
@@ -97,10 +97,15 @@ const I18N = {
     "meta.title": "대한축제뉴스 | 전국 축제 정보 뉴스",
     "brand.name": "대한축제뉴스",
     "brand.tagline": "전국 축제 정보 뉴스",
-    "footer.tagline": "전국 축제 선택을 돕는 뉴스 포털",
+    "footer.tagline": "전국 축제 선택을 돕는 여행 매거진",
     "footer.description": "전국 축제, 문화행사 일정, 방문 준비, 교통과 주변 여행 정보를 뉴스 피드로 정리합니다.",
     "nav.menu": "메뉴 열기",
     "nav.home": "홈",
+    "nav.festivalEvents": "축제·행사",
+    "nav.domesticTravel": "국내여행",
+    "nav.regions": "지역별축제",
+    "nav.travelNews": "여행뉴스",
+    "nav.travelTips": "여행팁",
     "nav.july": "여행뉴스",
     "nav.places": "가볼만한 곳",
     "nav.booking": "여행검색",
@@ -167,6 +172,11 @@ const I18N = {
     "footer.description": "A festival news feed covering cultural events nationwide, visit preparation, transport, and nearby information.",
     "nav.menu": "Open menu",
     "nav.home": "Home",
+    "nav.festivalEvents": "Festivals",
+    "nav.domesticTravel": "Domestic Travel",
+    "nav.regions": "By Region",
+    "nav.travelNews": "Travel News",
+    "nav.travelTips": "Travel Tips",
     "nav.july": "Travel News",
     "nav.places": "Places",
     "nav.booking": "Search",
@@ -233,6 +243,11 @@ const I18N = {
     "footer.description": "全国の文化行事、フェスの日程、訪問準備、交通情報をニュース形式で整理します。",
     "nav.menu": "メニューを開く",
     "nav.home": "ホーム",
+    "nav.festivalEvents": "祭り・イベント",
+    "nav.domesticTravel": "韓国旅行",
+    "nav.regions": "地域別",
+    "nav.travelNews": "旅行ニュース",
+    "nav.travelTips": "旅のヒント",
     "nav.july": "旅行ニュース",
     "nav.places": "見どころ",
     "nav.booking": "検索",
@@ -299,6 +314,11 @@ const I18N = {
     "footer.description": "以新闻信息流整理全国文化活动、庆典日程、出行准备、交通和周边信息。",
     "nav.menu": "打开菜单",
     "nav.home": "首页",
+    "nav.festivalEvents": "庆典活动",
+    "nav.domesticTravel": "韩国旅行",
+    "nav.regions": "按地区",
+    "nav.travelNews": "旅行新闻",
+    "nav.travelTips": "旅行贴士",
     "nav.july": "旅行新闻",
     "nav.places": "推荐地点",
     "nav.booking": "搜索",
@@ -362,39 +382,39 @@ const I18N = {
 const EDITORIAL_I18N = {
   ko: {
     "nav.editorial": "서울 기획",
-    "editorial.title": "전국 축제 뉴스와 여행 준비",
-    "editorial.description": "오늘 볼 만한 전국 축제, 지역별 행사, 예약 전 체크 정보를 한 화면에서 찾을 수 있게 정리합니다.",
-    "editorial.link": "최신 행사 보기",
+    "editorial.title": "전국 축제 뉴스 매거진",
+    "editorial.description": "사진으로 먼저 고르고, 일정·장소·요금·교통 정보는 상세페이지에서 확인하세요.",
+    "editorial.link": "대표 축제 보기",
     "latest.title": "지금 전국에서 열리는 축제",
     "latest.description": "전국 축제·문화행사 정보를 바탕으로 일정·장소·요금·문의처를 확인하고, 방문 동선과 주변 교통까지 함께 정리합니다.",
-    "latest.list": "최신 전국 축제"
+    "latest.list": "지금 가볼 축제"
   },
   en: {
     "nav.editorial": "Seoul Guides",
-    "editorial.title": "Festival news and trip prep across Korea",
-    "editorial.description": "Find nationwide festivals, regional events, and pre-booking checks from one practical travel news screen.",
-    "editorial.link": "See the latest events",
+    "editorial.title": "Korea Festival Travel Magazine",
+    "editorial.description": "Choose by photo first, then check dates, venues, prices, and transport on each detail page.",
+    "editorial.link": "See featured festivals",
     "latest.title": "What is on across Korea now",
     "latest.description": "Check official festival schedules, venues, prices, contacts, nearby routes, and transport information from across Korea in one place.",
-    "latest.list": "Latest festivals nationwide"
+    "latest.list": "Festivals to visit now"
   },
   ja: {
     "nav.editorial": "ソウル特集",
-    "editorial.title": "韓国全国のフェスニュースと旅の準備",
-    "editorial.description": "今日見たい全国フェス、地域別イベント、予約前チェックを一つの画面で探せるよう整理します。",
-    "editorial.link": "最新イベントを見る",
+    "editorial.title": "韓国フェス旅行マガジン",
+    "editorial.description": "まず写真で選び、詳細ページで日程・会場・料金・交通情報を確認できます。",
+    "editorial.link": "注目フェスを見る",
     "latest.title": "今全国で開催中のフェス",
     "latest.description": "全国のフェス・文化イベント情報をもとに、日程、会場、料金、問い合わせ先、周辺交通をまとめました。",
-    "latest.list": "全国の最新フェス"
+    "latest.list": "今行きたいフェス"
   },
   zh: {
     "nav.editorial": "首尔专题",
-    "editorial.title": "韩国全国庆典新闻与出行准备",
-    "editorial.description": "在一个页面查找今日可看的全国庆典、地区活动和预订前确认事项。",
-    "editorial.link": "查看最新活动",
+    "editorial.title": "韩国庆典旅行杂志",
+    "editorial.description": "先看照片选择庆典，再到详情页确认日期、地点、票价和交通。",
+    "editorial.link": "查看精选庆典",
     "latest.title": "全国正在举行的庆典",
     "latest.description": "根据全国庆典/文化活动信息，整理日程、地点、票价、联系方式、游览动线和交通。",
-    "latest.list": "全国最新庆典"
+    "latest.list": "现在值得去的庆典"
   }
 };
 
@@ -2008,20 +2028,7 @@ function adRotationOffset(seed = "") {
 }
 
 function buildNewsFeedMarkup(feedItems, seed = "main") {
-  const blocks = [];
-  let hasInsertedMrt = false;
-
-  feedItems.forEach((item, index) => {
-    const articleNumber = index + 1;
-    blocks.push(newsListCard(item));
-
-    if (!hasInsertedMrt && articleNumber === MRT_FEED_INTERVAL && articleNumber < feedItems.length) {
-      blocks.push(renderMrtFeedModuleV2(seed, 1, item));
-      hasInsertedMrt = true;
-    }
-  });
-
-  return blocks.filter(Boolean).join("");
+  return feedItems.map((item) => newsListCard(item)).join("");
 }
 
 function buildCategoryListMarkup(items) {
@@ -2770,31 +2777,107 @@ function takeMagazineItems(candidates, usedKeys, limit = 6) {
   return picked;
 }
 
+function chooseMagazineItems(candidates, fallbackItems, usedKeys, limit = 6) {
+  const picked = takeMagazineItems(candidates, usedKeys, limit);
+  if (picked.length >= limit) return picked;
+  return [
+    ...picked,
+    ...takeMagazineItems(fallbackItems, usedKeys, limit - picked.length)
+  ];
+}
+
+function articleRegionKey(item = {}) {
+  if (item.areaCode) {
+    const matched = (data.regions || []).find((region) => String(region.areaCode) === String(item.areaCode));
+    if (matched) return matched.id;
+  }
+
+  const text = [item.category, item.address, item.place, item.title].filter(Boolean).join(" ");
+  const matched = (data.regions || []).find((region) => text.includes(region.label));
+  return matched?.id || "";
+}
+
+function diverseRegionItems(items = []) {
+  const buckets = new Map();
+
+  items.forEach((item) => {
+    const key = articleRegionKey(item) || "other";
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key).push(item);
+  });
+
+  const order = [
+    ...(data.regions || []).map((region) => region.id),
+    "other"
+  ];
+  const picked = [];
+
+  order.forEach((key) => {
+    const list = buckets.get(key) || [];
+    if (list[0]) picked.push(list[0]);
+  });
+
+  return [...picked, ...items];
+}
+
+function sectionTextIncludes(item = {}, pattern) {
+  return pattern.test([
+    item.title,
+    item.category,
+    item.summary,
+    item.address,
+    item.place,
+    item.fee,
+    item.time,
+    item.target
+  ].filter(Boolean).join(" "));
+}
+
 function buildMagazineNewsSections() {
-  const items = primaryNewsItems().slice(29);
+  const items = primaryNewsItems();
   const used = new Set();
+  const today = Number(todayCompact());
   const latest = [...items].sort((a, b) => articleDateValue(b) - articleDateValue(a));
   const byCategory = (keys) => items.filter((item) => keys.includes(categoryKeyFor(item)));
-  const fallback = (picked, offset = 0) => picked.length ? picked : items.slice(offset, offset + 6);
+  const ongoing = items.filter((item) => articleTimingGroup(item, today) === 0);
+  const upcoming = items.filter((item) => articleTimingGroup(item, today) === 1);
+  const weekend = upcoming.filter((item) => {
+    const status = festivalStatusInfo(item, today);
+    const daysUntil = compactDateDiffDays(today, articleDateRange(item).start);
+    return status?.key === "weekend" || (Number.isFinite(daysUntil) && daysUntil <= 7 && isWeekendCompact(articleDateRange(item).start));
+  });
+  const visitTips = items.filter((item) => sectionTextIncludes(item, /교통|주차|무료|가족|야간|체험|입장|요금|아이|우천|준비|예약/));
 
   return [
     {
-      id: "latest-news",
-      eyebrow: "Latest",
-      title: "최신 여행뉴스",
-      items: fallback(takeMagazineItems(latest, used, 6), 6)
+      id: "weekend-festivals",
+      eyebrow: "Weekend",
+      title: "이번 주말 축제",
+      items: chooseMagazineItems([...weekend, ...upcoming, ...ongoing], items, used, 6)
     },
     {
-      id: "scene",
-      eyebrow: "Scene",
-      title: "생생한 문화",
-      items: fallback(takeMagazineItems(byCategory(["exhibition", "performance", "movie"]), used, 6), 12)
+      id: "regional-festivals",
+      eyebrow: "Regions",
+      title: "지역별 축제",
+      items: chooseMagazineItems(diverseRegionItems(items), items, used, 6)
+    },
+    {
+      id: "festival-events",
+      eyebrow: "Festival",
+      title: "축제·행사",
+      items: chooseMagazineItems(byCategory(["festival", "exhibition", "performance", "movie"]), items, used, 6)
+    },
+    {
+      id: "travel-news",
+      eyebrow: "News",
+      title: "여행뉴스",
+      items: chooseMagazineItems(latest, items, used, 6)
     },
     {
       id: "before-trip",
-      eyebrow: "Read Before",
-      title: "여행 전 체크할 거리",
-      items: fallback(takeMagazineItems(byCategory(["experience", "festival", "event"]), used, 6), 18)
+      eyebrow: "Tips",
+      title: "여행팁",
+      items: chooseMagazineItems(visitTips, items, used, 6)
     }
   ].filter((group) => group.items.length);
 }

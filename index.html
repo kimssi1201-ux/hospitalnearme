@@ -20,10 +20,10 @@
     <link rel="canonical" href="https://view1.kr/" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="대한축제뉴스 RSS" href="/feed.xml" />
-    <link rel="stylesheet" href="/travel.css?v=20260904-telltrip-layout-1" />
+    <link rel="stylesheet" href="/travel.css?v=20260904-telltrip-layout-4" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5751319666030430" crossorigin="anonymous"></script>
     <script src="/travel-data.js?v=20260710-category-copy-1" defer></script>
-    <script src="/travel.js?v=20260904-telltrip-layout-1" defer></script>
+    <script src="/travel.js?v=20260904-telltrip-layout-4" defer></script>
     <title>대한축제뉴스 | 전국 축제 정보 뉴스</title>
   </head>
   <body class="is-loading-news">
@@ -40,43 +40,13 @@
         <span></span>
         <span class="sr-only" data-i18n="nav.menu">메뉴 열기</span>
       </button>
-      <nav class="primary-nav nav-mega" id="primaryNav" aria-label="주요 메뉴">
-        <div class="nav-menu">
-          <button class="nav-trigger" type="button" aria-expanded="false" data-i18n="nav.group.find">축제 찾기</button>
-          <div class="nav-panel">
-            <a href="#allArticles" data-category-reset data-i18n="nav.allFestivals">전체 축제</a>
-            <a href="#placesSection" data-i18n="nav.regionFestivals">지역별 축제</a>
-            <a href="#categoryNews" data-i18n="nav.categoryNews">분야별 축제</a>
-            <a href="#festivalSearchInput" data-search-focus data-i18n="nav.search">축제 검색</a>
-          </div>
-        </div>
-        <div class="nav-menu">
-          <button class="nav-trigger" type="button" aria-expanded="false" data-i18n="nav.group.booking">예약 준비</button>
-          <div class="nav-panel">
-            <a href="#bookingSearch" data-mrt-open="stay" data-i18n="nav.stay">숙소 검색</a>
-            <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권" data-i18n="nav.tour">투어·입장권</a>
-            <a href="#bookingSearch" data-mrt-open="flight" data-i18n="nav.flight">항공권</a>
-            <a href="#coupangEssentials" data-mrt-open="tour" data-mrt-keyword="여행 준비물" data-mrt-coupon="true" data-i18n="nav.essentials">여행 준비물</a>
-          </div>
-        </div>
-        <div class="nav-menu">
-          <button class="nav-trigger" type="button" aria-expanded="false" data-i18n="nav.group.reading">읽을거리</button>
-          <div class="nav-panel">
-            <a href="#editorial" data-i18n="nav.editorial">서울 기획</a>
-            <a href="#allArticles" data-i18n="nav.latest">최신 뉴스</a>
-            <a href="/feed.xml" data-i18n="nav.rss">RSS 피드</a>
-            <a href="about.html" data-i18n="nav.about">사이트 소개</a>
-          </div>
-        </div>
-        <div class="nav-menu">
-          <button class="nav-trigger" type="button" aria-expanded="false" data-i18n="nav.group.info">여행 정보</button>
-          <div class="nav-panel">
-            <a href="#allArticles" data-search-chip="무료" data-i18n="nav.free">무료 축제</a>
-            <a href="#allArticles" data-search-chip="가족" data-i18n="nav.family">가족 나들이</a>
-            <a href="#allArticles" data-search-chip="야간" data-i18n="nav.night">야간 행사</a>
-            <a href="#allArticles" data-search-chip="교통" data-i18n="nav.transport">교통·주차</a>
-          </div>
-        </div>
+      <nav class="primary-nav nav-magazine" id="primaryNav" aria-label="주요 메뉴">
+        <a href="#top" data-i18n="nav.home">홈</a>
+        <a href="#allArticles" data-category-reset data-i18n="nav.festivalEvents">축제·행사</a>
+        <a href="#placesSection" data-i18n="nav.domesticTravel">국내여행</a>
+        <a href="#placesSection" data-i18n="nav.regions">지역별축제</a>
+        <a href="#travel-news" data-i18n="nav.travelNews">여행뉴스</a>
+        <a href="#before-trip" data-i18n="nav.travelTips">여행팁</a>
       </nav>
       <div class="language-switch" id="languageSwitch" aria-label="언어 선택">
         <button type="button" data-lang="ko">KR</button>
@@ -91,14 +61,14 @@
     </nav>
 
     <main id="top">
-      <section class="editorial-section magazine-cover" id="editorial" aria-labelledby="landingTitle">
+      <section class="editorial-section magazine-cover festival-finder-section" id="festivalFinder" aria-labelledby="landingTitle">
         <div class="magazine-section-heading magazine-section-heading--cover">
           <div>
-            <span class="section-kicker">Korea Festival Journal</span>
-            <h1 id="landingTitle" data-i18n="editorial.title">전국 축제 뉴스와 여행 준비</h1>
-            <p data-i18n="editorial.description">오늘 볼 만한 전국 축제, 지역별 행사, 예약 전 체크 정보를 한 화면에서 찾을 수 있게 정리합니다.</p>
+            <span class="section-kicker">Festival Finder</span>
+            <h1 id="landingTitle" data-i18n="editorial.title">전국 축제 뉴스 매거진</h1>
+            <p data-i18n="editorial.description">사진으로 먼저 고르고, 일정·장소·요금·교통 정보는 상세페이지에서 확인하세요.</p>
           </div>
-          <a href="#allArticles" data-i18n="editorial.link">최신 행사 보기</a>
+          <a href="#allArticles" data-i18n="editorial.link">대표 축제 보기</a>
         </div>
         <form class="portal-search" id="festivalSearchForm" role="search" aria-label="전국 축제 검색" action="/search" method="get">
           <div class="portal-search-row">
@@ -128,16 +98,72 @@
             <button type="button" data-search-chip="전시">전시</button>
           </div>
         </form>
+        <div class="festival-finder-actions" aria-label="여행 준비 바로가기">
+          <a href="#bookingSearch" data-mrt-open="stay">숙소 검색</a>
+          <a href="#bookingSearch" data-mrt-open="tour" data-mrt-keyword="서울 입장권">투어·입장권</a>
+          <a href="#bookingSearch" data-mrt-open="flight">항공권</a>
+          <a href="#coupangEssentials" data-mrt-open="tour" data-mrt-keyword="여행 준비물" data-mrt-coupon="true">여행 준비물</a>
+        </div>
       </section>
 
       <section class="mobile-news-feed landing-news-feed" id="july" aria-label="전국 축제 뉴스">
         <div class="tripview-section-title tripview-section-title--all" id="allArticles">
-          <h2><span class="section-kicker">Latest</span><span data-i18n="latest.list">최신 전국 축제</span> <span id="allArticleCount"></span></h2>
+          <h2><span class="section-kicker">Festival Magazine</span><span data-i18n="latest.list">지금 가볼 축제</span> <span id="allArticleCount"></span></h2>
           <p class="article-stats" id="allArticleStats"></p>
         </div>
         <div class="news-list-feed" id="newsFeedList">
           <!-- STATIC_FEED_START -->
 
+          <article class="news-list-card">
+            <a href="/seoul-events/tour-1063406/" aria-label="삼척동해왕이사부축제 자세히 보기">
+              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/08/3523608_image2_1.jpg&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/08/3523608_image2_1.jpg" alt="삼척동해왕이사부축제" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
+              <span>
+                <div class="festival-card-meta"><em>강원 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
+                <strong>삼척동해왕이사부축제</strong>
+                <small>기간 2025-09-05~2025-09-07</small>
+              </span>
+            </a>
+          </article>
+          <article class="news-list-card">
+            <a href="/seoul-events/tour-3378217/" aria-label="춘천숲자연휴양림 설렘의 숲 페스타 &amp; 멍냥대첩 자세히 보기">
+              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/99/3538599_image2_1.png&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/99/3538599_image2_1.png" alt="춘천숲자연휴양림 설렘의 숲 페스타 &amp; 멍냥대첩" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
+              <span>
+                <div class="festival-card-meta"><em>강원 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
+                <strong>춘천숲자연휴양림 설렘의 숲 페스타 &amp; 멍냥대첩</strong>
+                <small>기간 2025-09-06~2025-10-18</small>
+              </span>
+            </a>
+          </article>
+          <article class="news-list-card">
+            <a href="/seoul-events/tour-2487791/" aria-label="서울아프리카페스티벌 자세히 보기">
+              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/10/3558510_image2_1.jpg&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/10/3558510_image2_1.jpg" alt="서울아프리카페스티벌" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
+              <span>
+                <div class="festival-card-meta"><em>서울 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
+                <strong>서울아프리카페스티벌</strong>
+                <small>기간 2025-09-12~2025-09-13</small>
+              </span>
+            </a>
+          </article>
+          <article class="news-list-card">
+            <a href="/seoul-events/tour-3532971/" aria-label="부산 서구 의료관광축제 자세히 보기">
+              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/55/3532955_image2_1.jpg&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/55/3532955_image2_1.jpg" alt="부산 서구 의료관광축제" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
+              <span>
+                <div class="festival-card-meta"><em>부산 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
+                <strong>부산 서구 의료관광축제</strong>
+                <small>기간 2025-09-12~2025-09-13</small>
+              </span>
+            </a>
+          </article>
+          <article class="news-list-card">
+            <a href="/seoul-events/tour-1690237/" aria-label="산지천축제 자세히 보기">
+              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/22/3529822_image2_1.jpg&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/22/3529822_image2_1.jpg" alt="산지천축제" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
+              <span>
+                <div class="festival-card-meta"><em>제주 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
+                <strong>산지천축제</strong>
+                <small>기간 2025-09-12~2025-09-14</small>
+              </span>
+            </a>
+          </article>
           <article class="news-list-card">
             <a href="/seoul-events/tour-3000221/" aria-label="은평청년축제 자세히 보기">
               <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/90/3534390_image2_1.jpg&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/90/3534390_image2_1.jpg" alt="은평청년축제" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
@@ -205,56 +231,6 @@
                 <div class="festival-card-meta"><em>서울 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
                 <strong>용산청년축제</strong>
                 <small>기간 2025-09-20</small>
-              </span>
-            </a>
-          </article>
-          <article class="news-list-card">
-            <a href="/seoul-events/tour-3535742/" aria-label="미추홀미디어문화축제 자세히 보기">
-              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/59/3574759_image2_1.jpg&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/59/3574759_image2_1.jpg" alt="미추홀미디어문화축제" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
-              <span>
-                <div class="festival-card-meta"><em>인천 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
-                <strong>미추홀미디어문화축제</strong>
-                <small>기간 2025-09-20~2025-09-21</small>
-              </span>
-            </a>
-          </article>
-          <article class="news-list-card">
-            <a href="/seoul-events/tour-3337617/" aria-label="화성시 도농 어울림축제 자세히 보기">
-              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/43/3498243_image2_1.jpg&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/43/3498243_image2_1.jpg" alt="화성시 도농 어울림축제" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
-              <span>
-                <div class="festival-card-meta"><em>경기 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
-                <strong>화성시 도농 어울림축제</strong>
-                <small>기간 2025-09-20~2025-09-21</small>
-              </span>
-            </a>
-          </article>
-          <article class="news-list-card">
-            <a href="/seoul-events/tour-577899/" aria-label="쇠소깍축제 자세히 보기">
-              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/80/3358380_image2_1.jpg&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/80/3358380_image2_1.jpg" alt="쇠소깍축제" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
-              <span>
-                <div class="festival-card-meta"><em>제주 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
-                <strong>쇠소깍축제</strong>
-                <small>기간 2025-09-20~2025-09-21</small>
-              </span>
-            </a>
-          </article>
-          <article class="news-list-card">
-            <a href="/seoul-events/tour-3540355/" aria-label="2025 제14회 강남구 아름다운 건축물 전시회 자세히 보기">
-              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/47/3540747_image2_1.png&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/47/3540747_image2_1.png" alt="2025 제14회 강남구 아름다운 건축물 전시회" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
-              <span>
-                <div class="festival-card-meta"><em>서울 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
-                <strong>2025 제14회 강남구 아름다운 건축물 전시회</strong>
-                <small>기간 2025-09-22~2025-09-28</small>
-              </span>
-            </a>
-          </article>
-          <article class="news-list-card">
-            <a href="/seoul-events/tour-3522298/" aria-label="2025 전주드론축구월드컵 자세히 보기">
-              <div class="image-frame image-frame--feed image-frame--api" style="--api-image: url(&quot;https://tong.visitkorea.or.kr/cms/resource/80/3536480_image2_1.jpg&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="https://tong.visitkorea.or.kr/cms/resource/80/3536480_image2_1.jpg" alt="2025 전주드론축구월드컵" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>
-              <span>
-                <div class="festival-card-meta"><em>전북 축제</em><span class="festival-status-pill festival-status-pill--past">지난 행사</span></div>
-                <strong>2025 전주드론축구월드컵</strong>
-                <small>기간 2025-09-25~2025-09-28</small>
               </span>
             </a>
           </article>
@@ -488,7 +464,7 @@
           <span class="brand-mark" aria-hidden="true">DF</span>
           <span>
             <strong data-i18n="brand.name">대한축제뉴스</strong>
-            <small data-i18n="footer.tagline">전국 축제 선택을 돕는 뉴스 포털</small>
+            <small data-i18n="footer.tagline">전국 축제 선택을 돕는 여행 매거진</small>
           </span>
         </a>
         <p data-i18n="footer.description">전국 축제, 문화행사 일정, 방문 준비, 교통과 주변 여행 정보를 뉴스 피드로 정리합니다.</p>
