@@ -1,6 +1,6 @@
 # 대한축제뉴스 (view1.kr)
 
-전국 축제, 여행 코스, 가볼 만한 곳과 방문 전 체크 정보를 뉴스형 카드로 모아 보여주는 전국 축제 여행 정보 블로그입니다. 프레임워크나 빌드 번들러 없이 정적 HTML/CSS/브라우저 JS로 만들어졌고, Cloudflare Pages에 배포됩니다. API 키가 필요한 호출은 모두 `_worker.js`(Cloudflare Worker)가 서버 측에서 프록시합니다.
+전국 축제, 여행 코스, 가볼 만한 곳과 방문 전 체크 정보를 뉴스형 카드로 모아 보여주는 전국 축제 여행 정보 블로그입니다. 현재 Astro SSG 빌드 파이프라인으로 전환 중이며, 운영 URL과 화면을 보존하기 위해 기존 정적 HTML/CSS/브라우저 JS를 `dist/` 산출물에 그대로 포함합니다. API 키가 필요한 호출은 모두 `_worker.js`(Cloudflare Worker)가 서버 측에서 프록시합니다.
 
 ## 주요 페이지
 
@@ -41,9 +41,14 @@
 
 ## Cloudflare Pages 배포 설정
 
-- Framework preset: None
-- Build command: 비워두기
-- Build output directory: `/`
+- Framework preset: Astro 또는 None
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Cloudflare Pages 프로젝트명: `hospitalnearme`
+
+## GitHub Pages 검토용 워크플로
+
+`.github/workflows/github-pages.yml`은 `main` push 또는 수동 실행 시 `npm install`, `npm run build`, `npm run validate:migration` 후 `dist/`를 GitHub Pages artifact로 업로드합니다. 현재 운영 문서와 Worker 구조는 Cloudflare Pages 기준이므로, `view1.kr` production host를 GitHub Pages로 전환할지는 PR 병합 전에 별도로 확인해야 합니다.
 
 ## 로컬 실행 / 테스트 / 배포
 
