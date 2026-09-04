@@ -126,6 +126,22 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
 .coupang-widget-label { margin-bottom: 10px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .coupang-widget-frame { display: grid; min-height: 140px; place-items: center; overflow: hidden; background: var(--soft); }
 .coupang-widget-disclosure { margin: 10px 0 0; color: var(--muted); font-size: 13px !important; line-height: 1.6 !important; }
+.coupang-products-section { display: grid; gap: 16px; padding: 24px 0; border-width: 1px 0; background: transparent; }
+.coupang-products-head { display: grid; gap: 8px; }
+.coupang-products-head h2 { margin: 0; font-size: clamp(24px, 3vw, 30px); line-height: 1.32; letter-spacing: 0; }
+.coupang-products-head p:not(.coupang-widget-label) { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; word-break: keep-all; }
+.coupang-products-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.coupang-product-card { min-width: 0; border: 1px solid var(--line); background: #fff; }
+.coupang-product-card--loading { grid-column: 1 / -1; padding: 18px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.coupang-product-card a { display: grid; color: inherit; text-decoration: none; }
+.coupang-product-card img, .coupang-product-placeholder { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; background: var(--soft); }
+.coupang-product-placeholder { display: grid; place-items: center; color: var(--accent-dark); font-size: 13px; font-weight: 900; letter-spacing: .08em; }
+.coupang-product-card span, .coupang-product-card strong, .coupang-product-card small { margin-inline: 12px; }
+.coupang-product-card span { margin-top: 12px; color: var(--warm); font-size: 11px; font-weight: 900; line-height: 1.4; }
+.coupang-product-card strong { display: -webkit-box; min-height: 46px; margin-top: 5px; overflow: hidden; font-size: 14px; line-height: 1.45; word-break: keep-all; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.coupang-product-card small { margin-top: 7px; margin-bottom: 14px; color: var(--accent-dark); font-size: 12px; font-weight: 900; line-height: 1.4; }
+.coupang-products-more { width: fit-content; padding: 9px 13px; border: 1px solid var(--line); color: var(--accent-dark); font-size: 13px; font-weight: 900; }
+.coupang-products-section.is-fallback .coupang-products-more { border-color: rgba(21, 150, 173, .35); background: var(--soft); }
 
 .site-footer { padding: 44px 0; background: #f3f6f6; }
 .site-footer > div { width: min(1120px, calc(100% - 40px)); margin: auto; }
@@ -150,6 +166,10 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
   .official-poster img { max-height: 420px; }
   .event-inline-photo { margin: 24px 0 30px; padding: 10px; }
 .event-inline-photo img { max-height: 280px; }
+  .coupang-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .coupang-products-head h2 { font-size: 23px; }
+  .coupang-products-head p:not(.coupang-widget-label) { font-size: 14px; }
+  .coupang-product-card strong { min-height: 42px; font-size: 13px; }
   th, td { display: block; width: 100%; padding: 14px 4px; }
   th { padding-bottom: 0; border-bottom: 0; font-size: 14px; }
   td { padding-top: 6px; }

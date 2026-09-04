@@ -256,10 +256,11 @@ test("current event pages use exact public data, noindex, and the Coupang widget
     assert.doesNotMatch(source, /class="event-gallery"/);
     assert.ok(inlinePhotoCount <= 3, `${directory.name}: inline photos are capped (${inlinePhotoCount})`);
     if (inlinePhotoCount > 0) inlinePhotoPages += 1;
-    assert.match(source, /class="coupang-widget-ad"/);
-    assert.match(source, /data-coupang-widget/);
-    assert.match(source, /ads-partners\.coupang\.com\/g\.js/);
-    assert.match(source, /new window\.PartnersCoupang\.G/);
+    assert.match(source, /class="coupang-widget-ad coupang-products-section"/);
+    assert.match(source, /data-coupang-products/);
+    assert.match(source, /data-coupang-keyword="[^"]*(여행|축제)[^"]*"/);
+    assert.match(source, /\/api\/coupang\?/);
+    assert.match(source, /rel="sponsored noopener noreferrer"/);
     assert.match(source, /쿠팡 파트너스 활동/);
     assert.match(source, /핵심 방문정보/);
     assert.match(source, /class="event-visit-highlights"/);
@@ -282,7 +283,7 @@ test("event article images stay restrained inside the post body", async () => {
   const posterImageRule = css.match(/\.official-poster img\s*\{[\s\S]*?\n\}/)?.[0] || "";
   const inlinePhotoRule = css.match(/\.event-inline-photo img\s*\{[\s\S]*?\n\}/)?.[0] || "";
 
-  assert.match(headSource, /article-static\.css\?v=20260904-magazine-detail-3/);
+  assert.match(headSource, /article-static\.css\?v=20260904-magazine-detail-4/);
   assert.match(css, /\.article-layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*790px\)\s*minmax\(260px,\s*320px\)/);
   assert.match(css, /\.article-sidebar-thumb img\s*\{[\s\S]*?object-fit:\s*contain/);
   assert.match(css, /\.event-opening-section \.official-poster--hero\s*\{[\s\S]*?background:\s*var\(--soft\)/);
@@ -381,12 +382,16 @@ test("affiliate sections are contextual and do not interrupt the news feed with 
   assert.match(detailSource, /function detailAffiliateKinds\(article = \{\}\)/);
   assert.match(detailSource, /copy\.cards\.filter\(\(\[kind\]\) => affiliateKinds\.includes\(kind\)\)/);
   assert.match(detailStyles, /repeat\(auto-fit, minmax\(220px, 1fr\)\)/);
+  assert.match(detailStyles, /\.coupang-product-card img,[\s\S]*?object-fit:\s*contain/);
 
   const body = detailSource.match(/function renderTravelDetailBody[\s\S]*?\r?\n}\r?\n/)?.[0] || "";
+  const productSection = detailSource.match(/function CoupangTravelProductsSection[\s\S]*?\r?\n}\r?\n/)?.[0] || "";
   const homeFeedBody = travelSource.match(/function buildNewsFeedMarkup[\s\S]*?\r?\n}\r?\n/)?.[0] || "";
   const tips = body.indexOf("CleanVisitTipSection");
   const products = body.indexOf("CoupangTravelProductsSection");
   const booking = body.indexOf("BookingCheckSection");
   assert.ok(tips >= 0 && products > tips && booking > products);
+  assert.doesNotMatch(productSection, /article\.source === "seoul"|article\.source === "tour"/);
+  assert.doesNotMatch(body, /CoupangWidgetCarouselSection/);
   assert.doesNotMatch(homeFeedBody, /renderMrtFeedModuleV2|mrt-feed-module/);
 });
