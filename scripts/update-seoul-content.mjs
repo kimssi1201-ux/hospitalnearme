@@ -472,12 +472,113 @@ function eventDetailUrl(item) {
   return `/seoul-events/${encodeURIComponent(String(item.id || "").replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-"))}/`;
 }
 
+function staticArticleDateRange(item = {}) {
+  const tokens = String(item.date || "").match(/\d{4}[-.]\d{1,2}[-.]\d{1,2}|\d{8}/g) || [];
+  const values = tokens
+    .map((token) => Number(String(token).replace(/\D/g, "")))
+    .filter((value) => Number.isFinite(value) && value > 0);
+  const start = values[0] || 0;
+  return { start, end: values[values.length - 1] || start };
+}
+
+function staticCompactDateToUtc(value) {
+  const text = String(value || "").replace(/\D/g, "");
+  if (text.length !== 8) return null;
+  const year = Number(text.slice(0, 4));
+  const month = Number(text.slice(4, 6));
+  const day = Number(text.slice(6, 8));
+  if (!year || !month || !day) return null;
+  return Date.UTC(year, month - 1, day);
+}
+
+function staticDateDiffDays(fromValue, toValue) {
+  const from = staticCompactDateToUtc(fromValue);
+  const to = staticCompactDateToUtc(toValue);
+  if (!Number.isFinite(from) || !Number.isFinite(to)) return null;
+  return Math.round((to - from) / 86400000);
+}
+
+function staticIsWeekend(value) {
+  const date = staticCompactDateToUtc(value);
+  if (!Number.isFinite(date)) return false;
+  const day = new Date(date).getUTCDay();
+  return day === 0 || day === 5 || day === 6;
+}
+
+function staticFestivalStatusInfo(item, today = Number(currentKstCompactDate())) {
+  const { start, end } = staticArticleDateRange(item);
+  if (!start) return null;
+  if (start <= today && end >= today) {
+    const daysLeft = staticDateDiffDays(today, end);
+    return Number.isFinite(daysLeft) && daysLeft <= 3
+      ? { key: "ending", label: "종료 임박" }
+      : { key: "live", label: "진행 중" };
+  }
+  if (start > today) {
+    const daysUntil = staticDateDiffDays(today, start);
+    if (Number.isFinite(daysUntil) && daysUntil <= 3 && staticIsWeekend(start)) {
+      return { key: "weekend", label: "이번 주말" };
+    }
+    if (Number.isFinite(daysUntil) && daysUntil <= 14) return { key: "soon", label: "곧 시작" };
+    return { key: "scheduled", label: "예정" };
+  }
+  return { key: "past", label: "지난 행사" };
+}
+
+function staticStatusBadgeMarkup(item) {
+  const status = staticFestivalStatusInfo(item);
+  if (!status || status.key === "past") return "";
+  return `<span class="status-badge status-badge--${escapeHtml(status.key)}">${escapeHtml(status.label)}</span>`;
+}
+
+function staticFestivalMetaMarkup(item) {
+  const status = staticFestivalStatusInfo(item);
+  return `<div class="festival-card-meta"><em>${escapeHtml(item.category || "축제")}</em>${status ? `<span class="festival-status-pill festival-status-pill--${escapeHtml(status.key)}">${escapeHtml(status.label)}</span>` : ""}</div>`;
+}
+
+function staticPeriodLabel(item) {
+  return item.date ? `기간 ${item.date}` : item.readTime || "일정 확인";
+}
+
+function eventIdentity(item) {
+  return String(item?.id || "").trim();
+}
+
+function uniqueEventItems(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const id = eventIdentity(item);
+    if (!id || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
+async function previousEventItems(currentItems) {
+  let payload;
+  try {
+    payload = JSON.parse(await readFile(outputPath, "utf8"));
+  } catch {
+    return [];
+  }
+
+  const currentIds = new Set(currentItems.map(eventIdentity).filter(Boolean));
+  const priorItems = [
+    ...(Array.isArray(payload.items) ? payload.items : []),
+    ...(Array.isArray(payload.legacyItems) ? payload.legacyItems : [])
+  ];
+
+  return uniqueEventItems(priorItems)
+    .filter((item) => !currentIds.has(eventIdentity(item)))
+    .sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")));
+}
+
 function staticImageMarkup(item, size) {
   if (!item.image) {
     return `<div class="image-frame image-frame--${size} is-empty"><span>대한축제뉴스</span></div>`;
   }
 
-  return `<div class="image-frame image-frame--${size} image-frame--api"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>`;
+  return `<div class="image-frame image-frame--${size} image-frame--api" style="--api-image: url(&quot;${escapeHtml(item.image)}&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>`;
 }
 
 function editorialCardMarkup(item, index) {
@@ -497,12 +598,14 @@ function editorialCardMarkup(item, index) {
 
 function recommendCardMarkup(item) {
   const href = eventDetailUrl(item);
+  const status = staticStatusBadgeMarkup(item);
   return `
           <article class="news-recommend-card">
             <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${item.title} 자세히 보기`)}">
-              ${staticImageMarkup(item, "recommend")}
+              ${staticImageMarkup(item, "recommend")}${status ? `
+              ${status}` : ""}
               <div class="news-recommend-body">
-                <span class="category-label">${escapeHtml(item.category)}</span>
+                ${staticFestivalMetaMarkup(item)}
                 <strong>${escapeHtml(item.title)}</strong>
               </div>
             </a>
@@ -511,14 +614,16 @@ function recommendCardMarkup(item) {
 
 function feedCardMarkup(item) {
   const href = eventDetailUrl(item);
+  const status = staticStatusBadgeMarkup(item);
   return `
           <article class="news-list-card">
             <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${item.title} 자세히 보기`)}">
-              ${staticImageMarkup(item, "feed")}
+              ${staticImageMarkup(item, "feed")}${status ? `
+              ${status}` : ""}
               <span>
-                <em>${escapeHtml(item.category)}</em>
+                ${staticFestivalMetaMarkup(item)}
                 <strong>${escapeHtml(item.title)}</strong>
-                <small>${escapeHtml(item.date)} · ${escapeHtml(item.readTime)}</small>
+                <small>${escapeHtml(staticPeriodLabel(item))}</small>
               </span>
             </a>
           </article>`;
@@ -542,17 +647,20 @@ async function readEditorialPosts() {
 }
 
 async function updateStaticLanding(items) {
-  const posts = (await readEditorialPosts()).slice(0, 5).map((post) => ({
-    ...post,
-    image: "",
-    href: `/articles/${encodeURIComponent(post.id)}/`
-  }));
-  if (!posts.length) throw new Error("No editorial posts are available for the static landing page.");
-
   let source = await readFile(indexPath, "utf8");
-  source = replaceStaticBlock(source, "EDITORIAL", posts.map(editorialCardMarkup).join(""));
-  source = replaceStaticBlock(source, "RECOMMENDED", items.slice(1, 5).map(recommendCardMarkup).join(""));
-  source = replaceStaticBlock(source, "FEED", items.slice(5, 17).map(feedCardMarkup).join(""));
+  if (source.includes("STATIC_EDITORIAL_START")) {
+    const posts = (await readEditorialPosts()).slice(0, 5).map((post) => ({
+      ...post,
+      image: "",
+      href: `/articles/${encodeURIComponent(post.id)}/`
+    }));
+    if (!posts.length) throw new Error("No editorial posts are available for the static landing page.");
+    source = replaceStaticBlock(source, "EDITORIAL", posts.map(editorialCardMarkup).join(""));
+  }
+  if (source.includes("STATIC_RECOMMENDED_START")) {
+    source = replaceStaticBlock(source, "RECOMMENDED", items.slice(1, 5).map(recommendCardMarkup).join(""));
+  }
+  source = replaceStaticBlock(source, "FEED", items.slice(0, 12).map(feedCardMarkup).join(""));
   await writeFile(indexPath, source, "utf8");
 }
 
@@ -587,6 +695,7 @@ async function main() {
   items.sort((a, b) => a.date.localeCompare(b.date));
 
   await attachGalleryImages(items);
+  const legacyItems = await previousEventItems(items);
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(
@@ -607,6 +716,8 @@ async function main() {
         refreshAttempts: attempts,
         updatedAt: new Date().toISOString(),
         count: items.length,
+        legacyCount: legacyItems.length,
+        legacyItems,
         items
       },
       null,
@@ -635,11 +746,25 @@ async function main() {
   if (range.month !== requestedMonth || range.start !== `${requestedMonth}01`) {
     console.log(`Requested ${requestedMonth}; used ${range.label} because earlier date ranges did not meet the ${MIN_REFRESH_ITEMS}-item minimum.`);
   }
+  if (legacyItems.length) {
+    console.log(`Preserved ${legacyItems.length} legacy event pages so existing /seoul-events/ URLs stay reachable.`);
+  }
   console.log(`Updated ${path.relative(rootDir, indexPath)} with crawlable article cards.`);
   console.log(`Updated ${path.relative(rootDir, sitemapPath)} with ${urls.length} stable public URLs.`);
 }
 
-main().catch((error) => {
+async function staticOnly() {
+  const payload = JSON.parse(await readFile(outputPath, "utf8"));
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  if (!items.length) throw new Error("generated/seoul-events.json has no items for static-only update.");
+  await updateStaticLanding(items);
+  await generateStaticArticles();
+  console.log(`Updated static landing and generated pages from ${path.relative(rootDir, outputPath)}.`);
+}
+
+const runner = process.argv.includes("--static-only") ? staticOnly : main;
+
+runner().catch((error) => {
   console.error(error && error.stack ? error.stack : String(error));
   process.exitCode = 1;
 });
