@@ -156,14 +156,40 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
   .action-row a { width: 100%; }
 }
 
-.official-poster--hero {
-  max-width: 860px;
-  margin: 16px auto 22px;
-  padding: 14px;
+.event-opening-section {
+  padding-top: 34px !important;
 }
 
-.official-poster--hero img {
-  max-height: 560px;
+.event-opening-section > p:last-child {
+  margin: 0;
+}
+
+.event-opening-section .official-poster--hero {
+  position: relative;
+  max-width: 100%;
+  margin: 22px 0 24px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 0;
+  border-radius: 0;
+  background: var(--soft);
+}
+
+.event-opening-section .official-poster--hero::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  z-index: -1;
+  background-image: var(--article-hero-image);
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px);
+  opacity: .22;
+  transform: scale(1.06);
+}
+
+.event-opening-section .official-poster--hero img {
+  max-height: 580px;
 }
 
 .poster-empty--hero {
