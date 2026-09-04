@@ -185,16 +185,51 @@ function sharedHead({ title, description, canonical, robots = "index,follow,max-
     <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:url" content="${escapeHtml(canonical)}" />
     ${imageMeta}
-    <link rel="stylesheet" href="/article-static.css?v=20260904-magazine-detail-1" />
+    <link rel="stylesheet" href="/article-static.css?v=20260904-magazine-detail-2" />
     ${adCode}`;
 }
 
 function siteHeader() {
-  return `<header class="site-header"><div class="site-header__inner"><a class="brand" href="/" aria-label="대한축제뉴스 홈"><span>DF</span><strong>대한축제뉴스</strong></a><nav aria-label="주요 메뉴"><a href="/">홈</a><a href="/#allArticles">축제·행사</a><a href="/#placesSection">지역별축제</a><a href="/#travel-news">여행뉴스</a><a href="/#before-trip">여행팁</a></nav></div></header>`;
+  return `<header class="site-header site-header--article"><div class="site-header__brand-row"><a class="brand brand--article" href="/" aria-label="대한축제뉴스 홈"><span>DF</span><strong>대한축제뉴스</strong><small>전국 축제 여행 인사이트</small></a></div><div class="site-header__nav-row"><nav aria-label="주요 메뉴"><a href="/">홈</a><a href="/#travel-news">여행뉴스</a><a href="/#placesSection">국내여행</a><a href="/#placesSection">지역별축제</a><a href="/#allArticles">축제·행사</a><a href="/#before-trip">여행팁</a></nav><a class="header-search-link" href="/#festivalFinder" aria-label="축제 검색"><span class="header-search-icon" aria-hidden="true"></span></a></div></header>`;
 }
 
 function siteFooter() {
   return `<footer class="site-footer"><div><strong>대한축제뉴스</strong><p>공개된 전국 축제·문화행사 정보와 직접 확인해야 할 방문 준비 사항을 구분해 전합니다.</p><nav aria-label="사이트 안내"><a href="/about">소개</a><a href="/editorial-policy">편집 원칙</a><a href="/contact">문의</a><a href="/privacy">개인정보처리방침</a><a href="/terms">이용약관</a><a href="/disclaimer">면책 안내</a></nav><small>© 2026 대한축제뉴스</small></div></footer>`;
+}
+
+function articleBreadcrumb(currentLabel, currentHref) {
+  return `<nav class="article-breadcrumb" aria-label="현재 위치"><a href="/">홈</a><span aria-hidden="true">-</span><a href="${escapeHtml(currentHref)}">${escapeHtml(currentLabel)}</a></nav>`;
+}
+
+function articleShareRow(canonical, title) {
+  const encodedUrl = encodeURIComponent(canonical);
+  const encodedTitle = encodeURIComponent(title);
+  return `<div class="article-share-row" aria-label="기사 공유"><a class="share-button share-button--kakao" href="https://story.kakao.com/share?url=${encodedUrl}" target="_blank" rel="noopener noreferrer" aria-label="카카오스토리로 공유">K</a><a class="share-button share-button--naver" href="https://share.naver.com/web/shareView?url=${encodedUrl}&title=${encodedTitle}" target="_blank" rel="noopener noreferrer" aria-label="네이버로 공유">N</a><a class="share-button share-button--facebook" href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank" rel="noopener noreferrer" aria-label="페이스북으로 공유">f</a><a class="share-button share-button--x" href="https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}" target="_blank" rel="noopener noreferrer" aria-label="X로 공유">X</a><a class="share-button share-button--link" href="${escapeHtml(canonical)}" aria-label="기사 원문 주소">URL</a></div>`;
+}
+
+function sidebarImageFor(item) {
+  const galleryImage = Array.isArray(item?.galleryImages) ? item.galleryImages.map(officialImage).find(Boolean) : "";
+  return officialImage(item?.image) || galleryImage || "";
+}
+
+function sidebarDateLabel(item) {
+  return cleanText(item?.date || item?.place || item?.category || "일정 확인");
+}
+
+function latestContentSidebar(items = [], currentId = "") {
+  const enriched = items
+    .filter((item) => item?.id && item?.title && safeSlug(item.id) !== currentId)
+    .map((item) => ({ item, image: sidebarImageFor(item) }));
+  const ordered = [
+    ...enriched.filter((entry) => entry.image),
+    ...enriched.filter((entry) => !entry.image)
+  ].slice(0, 9);
+  if (!ordered.length) return "";
+  const cards = ordered.map(({ item, image }) => {
+    const slug = safeSlug(item.id);
+    return `<a class="article-sidebar-card" href="/seoul-events/${encodeURIComponent(slug)}/">${image ? `<span class="article-sidebar-thumb" style="--sidebar-image: url(&quot;${escapeHtml(image)}&quot;)"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.title)} 썸네일" loading="lazy" decoding="async" /></span>` : `<span class="article-sidebar-thumb article-sidebar-thumb--empty"><strong>DF</strong></span>`}<span class="article-sidebar-copy"><em>${escapeHtml(item.category || "축제 소식")}</em><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(sidebarDateLabel(item))}</small></span></a>`;
+  }).join("");
+  return `<aside class="article-sidebar" aria-label="최신 콘텐츠"><h2>최신 콘텐츠</h2><div class="article-sidebar-list">${cards}</div></aside>`;
 }
 
 function categoryMatches(post, event) {
@@ -232,9 +267,12 @@ function editorialBody(post, events) {
     <section aria-labelledby="check-title"><p class="eyebrow">CHECKLIST</p><h2 id="check-title">출발 전 마지막 체크</h2><ul class="check-list"><li>행사명과 날짜가 내가 선택한 회차와 일치하는지 확인</li><li>공식 주소를 지도에 다시 입력하고 출입구 위치 확인</li><li>사전 예약, 현장 발권, 신분증 또는 증빙서류 필요 여부 확인</li><li>입장 마감과 러닝타임, 중간 입장 가능 여부 확인</li><li>우천·폭염·시설 사정에 따른 변경 공지 확인</li><li>유료 행사는 최종 가격과 취소·환불 조건 확인</li></ul><p class="closing">서울 여행 정보는 자주 바뀝니다. 이 글은 일정을 선택하는 기준을 제공하며, 실제 방문 여부는 공식 운영기관의 최신 공지를 확인한 뒤 결정하는 것이 가장 안전합니다.</p></section>`;
 }
 
-function editorialPage(post, allEvents) {
+function editorialPage(post, allEvents, sidebarItems = []) {
   const canonical = `${siteOrigin}/articles/${safeSlug(post.id)}/`;
   const related = relatedEvents(post, allEvents);
+  const breadcrumb = articleBreadcrumb(post.category || "여행 가이드", "/#editorialPicks");
+  const shareRow = articleShareRow(canonical, post.title);
+  const sidebar = latestContentSidebar(sidebarItems);
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Article",
@@ -246,7 +284,7 @@ function editorialPage(post, allEvents) {
     publisher: { "@type": "Organization", name: "대한축제뉴스", url: siteOrigin },
     mainEntityOfPage: canonical
   }).replace(/</g, "\\u003c");
-  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${post.title} | 대한축제뉴스`, description: post.summary, canonical })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main"><a class="back-link" href="/#editorialPicks">← 여행 가이드로 돌아가기</a><article class="editorial-article"><header class="article-header"><p class="eyebrow">${escapeHtml(post.category || "서울 여행 가이드")}</p><h1>${escapeHtml(post.title)}</h1><p>${escapeHtml(post.summary)}</p><div class="byline"><span>대한축제뉴스 편집부</span><time datetime="${escapeHtml(String(post.date || "").replaceAll(".", "-"))}">${escapeHtml(post.date)}</time><span>${escapeHtml(post.readTime || "읽기")}</span></div></header>${editorialBody(post, related)}<aside class="source-note"><strong>자료와 편집 기준</strong><p>서울시 공개 문화행사 자료는 일정 후보를 찾는 데 사용하고, 본문은 방문자가 실제로 확인해야 할 기준을 대한축제뉴스 편집부가 재구성했습니다. 행사 내용이 변경될 수 있어 방문 전 공식 안내 확인을 권합니다.</p><a href="/editorial-policy">편집 원칙 보기</a></aside></article></main>${siteFooter()}</body></html>`;
+  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${post.title} | 대한축제뉴스`, description: post.summary, canonical })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main article-main--with-sidebar"><div class="article-layout"><article class="editorial-article article-content">${breadcrumb}<header class="article-header"><p class="eyebrow">${escapeHtml(post.category || "서울 여행 가이드")}</p><h1>${escapeHtml(post.title)}</h1><p>${escapeHtml(post.summary)}</p><div class="byline"><span>대한축제뉴스 편집부</span><time datetime="${escapeHtml(String(post.date || "").replaceAll(".", "-"))}">${escapeHtml(post.date)}</time><span>${escapeHtml(post.readTime || "읽기")}</span></div>${shareRow}</header>${editorialBody(post, related)}<aside class="source-note"><strong>자료와 편집 기준</strong><p>서울시 공개 문화행사 자료는 일정 후보를 찾는 데 사용하고, 본문은 방문자가 실제로 확인해야 할 기준을 대한축제뉴스 편집부가 재구성했습니다. 행사 내용이 변경될 수 있어 방문 전 공식 안내 확인을 권합니다.</p><a href="/editorial-policy">편집 원칙 보기</a></aside></article>${sidebar}</div></main>${siteFooter()}</body></html>`;
 }
 
 function infoRow(label, value, note = "") {
@@ -367,7 +405,7 @@ function eventInlinePhoto(title, image, index) {
   return `<figure class="event-inline-photo"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)} 현장 이미지 ${index}" loading="lazy" /><figcaption>공개 행사 정보에 등록된 행사 이미지입니다.</figcaption></figure>`;
 }
 
-function eventPage(event, sourceLabel) {
+function eventPage(event, sourceLabel, sidebarItems = []) {
   const id = safeSlug(event.id);
   const canonical = `${siteOrigin}/seoul-events/${id}/`;
   const title = cleanText(event.title) || "축제 소식";
@@ -380,13 +418,16 @@ function eventPage(event, sourceLabel) {
   const place = cleanText(event.place || event.address);
   const mapUrl = place ? `https://map.naver.com/p/search/${encodeURIComponent(place)}` : "";
   const description = cleanText(event.summary) || `${place || "현지"}에서 열리는 ${title}의 일정과 방문 전 확인 사항입니다.`;
+  const breadcrumb = articleBreadcrumb("축제·행사", "/#allArticles");
+  const shareRow = articleShareRow(canonical, title);
+  const sidebar = latestContentSidebar(sidebarItems, id);
   const status = eventStatusMarkup(event);
   const highlights = eventVisitHighlights(event, place);
   const imageList = [heroImage, ...rawGalleryImages.filter((url) => url !== heroImage)].filter(Boolean);
   const heroMarkup = heroImage
     ? `<figure class="official-poster official-poster--hero"><img src="${escapeHtml(heroImage)}" alt="${escapeHtml(title)} 대표 이미지" /><figcaption>${primaryImage ? "공개 행사 정보에 등록된 공식 이미지입니다." : "공개 행사 정보에 등록된 대표 이미지입니다."}</figcaption></figure>`
     : `<div class="poster-empty poster-empty--hero" role="img" aria-label="등록된 행사 이미지 없음"><strong>대한축제뉴스</strong><span>축제 이미지 준비 중</span></div>`;
-  const titleHeader = `<header class="article-header event-title-header"><div class="event-title-meta"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p>${status}</div><h1>${escapeHtml(title)}</h1><div class="byline"><span>${event.date ? `일정 ${escapeHtml(event.date)}` : "일정 확인 필요"}</span><span>자료 ${escapeHtml(sourceLabel || "공공 관광 데이터")}</span><span>방문 전 공식 안내 확인</span></div></header>`;
+  const titleHeader = `<header class="article-header event-title-header"><div class="event-title-meta"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p>${status}</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p><div class="byline"><span>대한축제뉴스 편집부</span><span>${event.date ? `입력 ${escapeHtml(event.date)}` : "일정 확인 필요"}</span><span>자료 ${escapeHtml(sourceLabel || "공공 관광 데이터")}</span></div>${shareRow}</header>`;
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Event",
@@ -397,7 +438,7 @@ function eventPage(event, sourceLabel) {
     organizer: event.org ? { "@type": "Organization", name: cleanText(event.org) } : undefined,
     url: official || canonical
   }).replace(/</g, "\\u003c");
-  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${title} 일정·장소·요금 | 대한축제뉴스`, description, canonical, robots: "noindex,follow,max-image-preview:large", ads: false, image: heroImage })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main event-main"><a class="back-link" href="/#allArticles">← 이번 달 축제 소식으로 돌아가기</a><article class="event-article">${titleHeader}${heroMarkup}<p class="event-lead">${escapeHtml(description)}</p>${highlights}<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">핵심 방문정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("주소", event.address && cleanText(event.address) !== place ? event.address : "")}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("주차", event.parking || event.parkingInfo)}${infoRow("교통", event.transport || event.traffic || event.publicTransport)}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}${infoRow("공식 홈페이지", official)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section><section aria-labelledby="about-title"><p class="eyebrow">INTRODUCTION</p><h2 id="about-title">축제 소개</h2><p>${escapeHtml(description)}</p>${inlinePhotoBlocks[0] || ""}<p>공개 데이터는 행사 탐색을 돕는 자료이며 운영기관의 실시간 공지를 대신하지 않습니다. 회차별 입장 시간, 매진 여부, 현장 발권, 휴관 또는 취소 공지는 공식 안내에서 확인하세요.</p></section><section aria-labelledby="program-title"><p class="eyebrow">PROGRAM</p><h2 id="program-title">주요 프로그램 확인</h2>${programInfoMarkup(event)}${inlinePhotoBlocks[1] || ""}<p>체험 프로그램, 공연 회차, 입장 마감처럼 날짜별로 달라지는 항목은 방문 직전 공식 안내에서 다시 확인하세요.</p></section><section aria-labelledby="transport-title"><p class="eyebrow">TRANSPORT</p><h2 id="transport-title">주차·교통</h2><p>${place ? `${escapeHtml(place)}을(를) 기준으로 행사장 위치와 출입구를 먼저 확인하세요.` : "공식 안내에 표시된 정확한 장소와 출입구를 먼저 확인하세요."} 행사장 주차 정보가 제공되지 않았거나 불명확하면 대중교통을 우선 비교하고, 차량 이용 시에는 인근 공영주차장의 운영 시간과 요금을 별도로 확인하는 편이 안전합니다.</p>${inlinePhotoBlocks[2] || ""}${visitFlowMarkup(official, mapUrl)}</section><section aria-labelledby="nearby-title"><p class="eyebrow">NEARBY</p><h2 id="nearby-title">주변 같이 갈 곳</h2><p>이 행사 데이터에는 주변 관광지 목록이 별도로 포함되어 있지 않습니다. 대한축제뉴스는 확인되지 않은 주변 명소를 임의로 추천하지 않으며, 실제 방문 전에는 공식 안내와 지도에서 주변 이동 시간을 함께 확인하세요.</p></section><aside class="source-note"><strong>정보 출처</strong><p>${escapeHtml(sourceLabel || "공공 관광 데이터")}에 공개된 항목을 정리했습니다. 대한축제뉴스는 비어 있는 운영 정보를 임의로 추정하지 않습니다.</p>${official ? `<a href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">원문에서 최신 정보 확인</a>` : `<a href="/editorial-policy">편집 원칙 확인</a>`}</aside>${coupangWidgetAd(`event-${id}`)}</article></main>${siteFooter()}${coupangWidgetScript()}</body></html>`;
+  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${title} 일정·장소·요금 | 대한축제뉴스`, description, canonical, robots: "noindex,follow,max-image-preview:large", ads: false, image: heroImage })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main article-main--with-sidebar event-main"><div class="article-layout"><article class="event-article article-content">${breadcrumb}${titleHeader}${heroMarkup}${highlights}<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">핵심 방문정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("주소", event.address && cleanText(event.address) !== place ? event.address : "")}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("주차", event.parking || event.parkingInfo)}${infoRow("교통", event.transport || event.traffic || event.publicTransport)}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}${infoRow("공식 홈페이지", official)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section><section aria-labelledby="about-title"><p class="eyebrow">INTRODUCTION</p><h2 id="about-title">축제 소개</h2><p>${escapeHtml(description)}</p>${inlinePhotoBlocks[0] || ""}<p>공개 데이터는 행사 탐색을 돕는 자료이며 운영기관의 실시간 공지를 대신하지 않습니다. 회차별 입장 시간, 매진 여부, 현장 발권, 휴관 또는 취소 공지는 공식 안내에서 확인하세요.</p></section><section aria-labelledby="program-title"><p class="eyebrow">PROGRAM</p><h2 id="program-title">주요 프로그램 확인</h2>${programInfoMarkup(event)}${inlinePhotoBlocks[1] || ""}<p>체험 프로그램, 공연 회차, 입장 마감처럼 날짜별로 달라지는 항목은 방문 직전 공식 안내에서 다시 확인하세요.</p></section><section aria-labelledby="transport-title"><p class="eyebrow">TRANSPORT</p><h2 id="transport-title">주차·교통</h2><p>${place ? `${escapeHtml(place)}을(를) 기준으로 행사장 위치와 출입구를 먼저 확인하세요.` : "공식 안내에 표시된 정확한 장소와 출입구를 먼저 확인하세요."} 행사장 주차 정보가 제공되지 않았거나 불명확하면 대중교통을 우선 비교하고, 차량 이용 시에는 인근 공영주차장의 운영 시간과 요금을 별도로 확인하는 편이 안전합니다.</p>${inlinePhotoBlocks[2] || ""}${visitFlowMarkup(official, mapUrl)}</section><section aria-labelledby="nearby-title"><p class="eyebrow">NEARBY</p><h2 id="nearby-title">주변 같이 갈 곳</h2><p>이 행사 데이터에는 주변 관광지 목록이 별도로 포함되어 있지 않습니다. 대한축제뉴스는 확인되지 않은 주변 명소를 임의로 추천하지 않으며, 실제 방문 전에는 공식 안내와 지도에서 주변 이동 시간을 함께 확인하세요.</p></section><aside class="source-note"><strong>정보 출처</strong><p>${escapeHtml(sourceLabel || "공공 관광 데이터")}에 공개된 항목을 정리했습니다. 대한축제뉴스는 비어 있는 운영 정보를 임의로 추정하지 않습니다.</p>${official ? `<a href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">원문에서 최신 정보 확인</a>` : `<a href="/editorial-policy">편집 원칙 확인</a>`}</aside>${coupangWidgetAd(`event-${id}`)}</article>${sidebar}</div></main>${siteFooter()}${coupangWidgetScript()}</body></html>`;
 }
 
 export async function generateStaticArticles() {
@@ -410,11 +451,12 @@ export async function generateStaticArticles() {
   // though eventPayload.items now covers festivals nationwide.
   const seoulEvents = eventPayload.items.filter((event) => event.areaCode === "1");
   const eventPageItems = uniqueEventItems([...eventPayload.items, ...eventPayload.legacyItems]);
+  const sidebarEventItems = eventPageItems.filter((event) => event?.id && event?.title).slice(0, 24);
 
   for (const post of posts) {
     const target = path.join(articleDir, safeSlug(post.id));
     await mkdir(target, { recursive: true });
-    await writeFile(path.join(target, "index.html"), editorialPage(post, seoulEvents), "utf8");
+    await writeFile(path.join(target, "index.html"), editorialPage(post, seoulEvents, sidebarEventItems), "utf8");
   }
 
   for (const event of eventPageItems) {
@@ -422,7 +464,7 @@ export async function generateStaticArticles() {
     if (!slug) continue;
     const target = path.join(eventDir, slug);
     await mkdir(target, { recursive: true });
-    await writeFile(path.join(target, "index.html"), eventPage(event, eventPayload.source), "utf8");
+    await writeFile(path.join(target, "index.html"), eventPage(event, eventPayload.source, sidebarEventItems), "utf8");
   }
 
   await writeFile(path.join(rootDir, "sitemap.xml"), sitemapXml(posts), "utf8");

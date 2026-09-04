@@ -6175,6 +6175,43 @@ body:has(main#top) .primary-nav.nav-magazine a:focus-visible {
   text-underline-offset: 8px;
 }
 
+body:has(main#top) .header-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+}
+
+body:has(main#top) .header-search-link {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  color: var(--ink);
+}
+
+body:has(main#top) .header-search-icon {
+  position: relative;
+  width: 19px;
+  height: 19px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+body:has(main#top) .header-search-icon::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  bottom: -4px;
+  width: 9px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+
 main#top .landing-news-feed {
   order: 1;
   padding: 18px 0 62px !important;
@@ -6435,7 +6472,7 @@ main#top .festival-finder-section .portal-search {
     justify-self: center;
   }
 
-  body:has(main#top) .site-header .language-switch {
+  body:has(main#top) .site-header .header-actions {
     grid-area: language;
     justify-self: end;
   }
@@ -6470,6 +6507,21 @@ main#top .festival-finder-section .portal-search {
 }
 
 @media (max-width: 720px) {
+  body:has(main#top) .site-header::after {
+    content: none;
+  }
+
+  body:has(main#top) .site-header .header-actions {
+    grid-area: search;
+    justify-self: center;
+    display: grid;
+    width: 42px;
+  }
+
+  body:has(main#top) .site-header .header-search-link {
+    display: grid;
+  }
+
   body:has(main#top) .primary-nav.nav-magazine {
     display: none;
     gap: 0;

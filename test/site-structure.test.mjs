@@ -280,7 +280,10 @@ test("event article images stay restrained inside the post body", async () => {
   const posterImageRule = css.match(/\.official-poster img\s*\{[\s\S]*?\n\}/)?.[0] || "";
   const inlinePhotoRule = css.match(/\.event-inline-photo img\s*\{[\s\S]*?\n\}/)?.[0] || "";
 
-  assert.match(headSource, /article-static\.css\?v=20260904-magazine-detail-1/);
+  assert.match(headSource, /article-static\.css\?v=20260904-magazine-detail-2/);
+  assert.match(css, /\.article-layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*790px\)\s*minmax\(260px,\s*320px\)/);
+  assert.match(css, /\.article-sidebar-thumb img\s*\{[\s\S]*?object-fit:\s*contain/);
+  assert.match(css, /\.article-share-row\s*\{/);
   assert.match(posterImageRule, /max-height:\s*520px/);
   assert.match(posterImageRule, /width:\s*auto/);
   assert.match(inlinePhotoRule, /max-height:\s*360px/);
