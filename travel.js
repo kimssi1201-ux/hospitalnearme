@@ -3171,6 +3171,24 @@ function normalizeTourItems(items, regionOverride = activeRegion()) {
     });
 }
 
+function fallbackRegionArticles(region = activeRegion()) {
+  const label = String(region?.label || "").trim();
+  const regionText = label ? new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) : null;
+  const items = primaryNewsItems().filter((item) => {
+    if (!regionText) return true;
+    return regionText.test([
+      item.category,
+      item.rawCategory,
+      item.subCategory,
+      item.address,
+      item.place,
+      item.title
+    ].filter(Boolean).join(" "));
+  });
+
+  return items.slice(0, 12);
+}
+
 function buildTourApiUrl(areaCode = activeRegion().areaCode, dateWindow = currentFestivalDateWindows()[0]) {
   const config = data.tourApi;
   const params = new URLSearchParams({
@@ -3310,12 +3328,16 @@ async function loadTourApiPlaces() {
 
     if (requestRegionId !== state.activeRegionId) return;
 
+    if (!placesArticles.length) {
+      placesArticles = fallbackRegionArticles(region);
+    }
+
     state.placesArticles = placesArticles;
     state.placesLoaded = true;
     state.placesError = false;
 
     if (placesArticles.length) {
-      updatePlacesStatus(`${region.label} 축제 ${placesArticles.length}개를 불러왔습니다.`);
+      updatePlacesStatus(`${region.label} 축제 ${placesArticles.length}개를 표시합니다.`);
     } else {
       updatePlacesStatus(`${region.label}에 표시할 축제 정보가 아직 등록되어 있지 않습니다.`);
     }
@@ -3323,10 +3345,13 @@ async function loadTourApiPlaces() {
     renderPlaces();
   } catch (error) {
     console.warn("TourAPI request failed. Fallback content is displayed.", error);
-    state.placesArticles = [];
+    const fallbackArticles = fallbackRegionArticles(region);
+    state.placesArticles = fallbackArticles;
     state.placesLoaded = true;
-    state.placesError = true;
-    updatePlacesStatus(`${region.label} 축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.`);
+    state.placesError = !fallbackArticles.length;
+    updatePlacesStatus(fallbackArticles.length
+      ? `${region.label} 축제 ${fallbackArticles.length}개를 정적 목록에서 표시합니다.`
+      : `${region.label} 축제 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.`);
     renderPlaces();
   } finally {
     window.clearTimeout(timeoutId);
@@ -3642,9 +3667,16 @@ function renderPlaces() {
   const grid = $("#placesGrid");
   if (!grid) return;
   const region = activeRegion();
-  const items = state.placesArticles.length
+  let items = state.placesArticles.length
     ? state.placesArticles.slice(0, 12)
     : [];
+
+  if (!items.length && (state.placesLoaded || state.placesError)) {
+    items = fallbackRegionArticles(region).slice(0, 12);
+    if (items.length && state.placesError) {
+      updatePlacesStatus(`${region.label} 축제 ${items.length}개를 정적 목록에서 표시합니다.`);
+    }
+  }
 
   if (!items.length) {
     const title = state.placesError
