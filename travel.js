@@ -616,12 +616,119 @@ function articleTimingGroup(item, today) {
   return 2;
 }
 
+function compactDateToUtc(value) {
+  const text = String(value || "").replace(/\D/g, "");
+  if (text.length !== 8) return null;
+  const year = Number(text.slice(0, 4));
+  const month = Number(text.slice(4, 6));
+  const day = Number(text.slice(6, 8));
+  if (!year || !month || !day) return null;
+  return Date.UTC(year, month - 1, day);
+}
+
+function compactDateDiffDays(fromValue, toValue) {
+  const from = compactDateToUtc(fromValue);
+  const to = compactDateToUtc(toValue);
+  if (!Number.isFinite(from) || !Number.isFinite(to)) return null;
+  return Math.round((to - from) / 86400000);
+}
+
+function isWeekendCompact(value) {
+  const date = compactDateToUtc(value);
+  if (!Number.isFinite(date)) return false;
+  const day = new Date(date).getUTCDay();
+  return day === 0 || day === 5 || day === 6;
+}
+
+function statusLabelForKey(key) {
+  const copy = {
+    ko: {
+      ending: "종료 임박",
+      live: "진행 중",
+      weekend: "이번 주말",
+      soon: "곧 시작",
+      scheduled: "예정",
+      past: "지난 행사"
+    },
+    en: {
+      ending: "Ending soon",
+      live: "Live now",
+      weekend: "This weekend",
+      soon: "Starts soon",
+      scheduled: "Upcoming",
+      past: "Past event"
+    },
+    ja: {
+      ending: "まもなく終了",
+      live: "開催中",
+      weekend: "今週末",
+      soon: "まもなく開始",
+      scheduled: "開催予定",
+      past: "終了"
+    },
+    zh: {
+      ending: "即将结束",
+      live: "进行中",
+      weekend: "本周末",
+      soon: "即将开始",
+      scheduled: "即将举办",
+      past: "已结束"
+    }
+  };
+  return (copy[state.language] || copy.ko)[key] || "";
+}
+
+function festivalStatusInfo(item, today = Number(todayCompact())) {
+  const { start, end } = articleDateRange(item);
+  if (!start) return null;
+
+  if (start <= today && end >= today) {
+    const daysLeft = compactDateDiffDays(today, end);
+    if (Number.isFinite(daysLeft) && daysLeft <= 3) {
+      return { key: "ending", label: statusLabelForKey("ending") };
+    }
+    return { key: "live", label: statusLabelForKey("live") };
+  }
+
+  if (start > today) {
+    const daysUntil = compactDateDiffDays(today, start);
+    if (Number.isFinite(daysUntil) && daysUntil <= 3 && isWeekendCompact(start)) {
+      return { key: "weekend", label: statusLabelForKey("weekend") };
+    }
+    if (Number.isFinite(daysUntil) && daysUntil <= 14) {
+      return { key: "soon", label: statusLabelForKey("soon") };
+    }
+    return { key: "scheduled", label: statusLabelForKey("scheduled") };
+  }
+
+  return { key: "past", label: statusLabelForKey("past") };
+}
+
 // Only badges items that are genuinely running right now (timing group 0),
 // derived from the same start/end dates used to sort the feed — never a
 // fabricated or estimated status.
 function statusBadgeMarkup(item, today) {
-  if (articleTimingGroup(item, today) !== 0) return "";
-  return `<span class="status-badge">${escapeHtml(textFor("status.live"))}</span>`;
+  const status = festivalStatusInfo(item, today);
+  if (!status || status.key === "past") return "";
+  return `<span class="status-badge status-badge--${escapeHtml(status.key)}">${escapeHtml(status.label)}</span>`;
+}
+
+function festivalPeriodLabel(item = {}) {
+  if (!item.date) return displayReadTime(item) || "";
+  const labels = { ko: "기간", en: "Dates", ja: "期間", zh: "日期" };
+  const prefix = labels[state.language] || labels.ko;
+  return `${prefix} ${item.date}`;
+}
+
+function festivalCardMetaMarkup(item = {}, today = Number(todayCompact())) {
+  const category = displayCategoryLabel(item);
+  const status = festivalStatusInfo(item, today);
+  return `
+        <div class="festival-card-meta">
+          <em>${escapeHtml(category)}</em>
+          ${status ? `<span class="festival-status-pill festival-status-pill--${escapeHtml(status.key)}">${escapeHtml(status.label)}</span>` : ""}
+        </div>
+  `;
 }
 
 function articleQualityScore(item = {}) {
@@ -832,13 +939,12 @@ function detailUrl(item) {
 
 function articleCard(item, variant = "", today = Number(todayCompact())) {
   const title = displayArticleTitle(item);
-  const category = displayCategoryLabel(item);
   return `
     <article class="article-card ${variant}">
       <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item)}
         ${statusBadgeMarkup(item, today)}
-        <span class="category-label">${escapeHtml(category)}</span>
+        ${festivalCardMetaMarkup(item, today)}
         <h3>${escapeHtml(title)}</h3>
         <p>${escapeHtml(displaySummary(item))}</p>
         <div class="article-meta">${articleMeta(item)}</div>
@@ -847,11 +953,12 @@ function articleCard(item, variant = "", today = Number(todayCompact())) {
   `;
 }
 
-function normalizeSeoulCultureItems(items) {
+function normalizeSeoulCultureItems(items, options = {}) {
+  const { filterCurrentMonth = true } = options;
   const list = Array.isArray(items) ? items : items ? [items] : [];
   const normalized = list
     .filter((item) => item && item.title)
-    .filter((item) => overlapsCurrentMonthByDateText(item.date))
+    .filter((item) => !filterCurrentMonth || overlapsCurrentMonthByDateText(item.date))
     .map((item, index) => {
       const mapped = item.categorySlug
         ? {
@@ -891,15 +998,16 @@ function normalizeSeoulCultureItems(items) {
 
 function newsListCard(item) {
   const title = displayArticleTitle(item);
-  const category = displayCategoryLabel(item);
+  const today = Number(todayCompact());
   return `
     <article class="news-list-card">
       <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "feed")}
+        ${statusBadgeMarkup(item, today)}
         <span>
-          <em>${escapeHtml(category)}</em>
+          ${festivalCardMetaMarkup(item, today)}
           <strong>${escapeHtml(title)}</strong>
-          <small>${escapeHtml(item.date)} · ${escapeHtml(displayReadTime(item))}</small>
+          <small>${escapeHtml(festivalPeriodLabel(item))}</small>
         </span>
       </a>
     </article>
@@ -2381,16 +2489,15 @@ function categoryListCard(item) {
 
 function categoryMagazineCard(item, today = Number(todayCompact())) {
   const title = displayArticleTitle(item);
-  const category = displayCategoryLabel(item);
   return `
     <article class="category-magazine-card">
       <a href="${escapeHtml(detailUrl(item))}" aria-label="${escapeHtml(`${title} ${textFor("card.detail")}`)}">
         ${imageMarkup(item, "magazine")}
         ${statusBadgeMarkup(item, today)}
-        <span class="category-label">${escapeHtml(category)}</span>
+        ${festivalCardMetaMarkup(item, today)}
         <strong>${escapeHtml(title)}</strong>
         <p>${escapeHtml(displaySummary(item))}</p>
-        <small>${escapeHtml(item.date)} · ${escapeHtml(displayReadTime(item))}</small>
+        <small>${escapeHtml(festivalPeriodLabel(item))}</small>
       </a>
     </article>
   `;
@@ -3262,8 +3369,12 @@ async function loadGeneratedSeoulCultureArticles() {
   if (!response.ok) throw new Error(`Generated Seoul events HTTP ${response.status}`);
 
   const payload = await readApiPayload(response);
-  if (!Array.isArray(payload?.items)) return [];
-  return normalizeSeoulCultureItems(payload.items);
+  const items = [
+    ...(Array.isArray(payload?.items) ? payload.items : []),
+    ...(Array.isArray(payload?.legacyItems) ? payload.legacyItems : [])
+  ];
+  if (!items.length) return [];
+  return normalizeSeoulCultureItems(items, { filterCurrentMonth: false });
 }
 
 async function loadSeoulCultureEvents() {

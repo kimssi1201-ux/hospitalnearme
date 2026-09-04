@@ -432,15 +432,11 @@ main {
   transform: scale(1.06);
 }
 
-/* Many TourAPI/seoul.go.kr posters are portrait, not the card's 4:3 frame.
-   contain (avoiding any crop) was chosen here to show the whole poster, but
-   in a small grid thumbnail that means most of the box sits empty and the
-   poster shrinks to a thin sliver. cover fills the thumbnail like every
-   other card type on the site; the single large hero/detail images
-   elsewhere keep contain, where showing the full poster matters more. */
+/* TourAPI posters and event photos can be portrait, square, or extra wide.
+   Cards keep a consistent frame, but the original image remains fully visible. */
 .news-recommend-card .image-frame--api img,
 .news-list-card .image-frame--api img {
-  object-fit: cover !important;
+  object-fit: contain;
   background: transparent;
 }
 
@@ -5717,5 +5713,426 @@ main#top {
 
   .search-result-card b {
     display: none;
+  }
+}
+
+/* View1 festival magazine layout. Telltrip's image-led density is used as a
+   reference only; event facts, no-crop posters, and visit dates stay primary. */
+main#top {
+  display: flex;
+  flex-direction: column;
+}
+
+main#top .landing-news-feed {
+  order: 1;
+  padding: 28px 0 56px !important;
+}
+
+main#top .magazine-cover {
+  order: 2;
+}
+
+main#top .places-section {
+  order: 3;
+}
+
+main#top .category-news-wrapper {
+  order: 4;
+}
+
+main#top .coupang-section {
+  order: 11;
+}
+
+main#top .booking-search-panel {
+  order: 10;
+}
+
+main#top .faq-section {
+  order: 12;
+}
+
+.image-frame--api {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #edf4f5;
+}
+
+.image-frame--api::before {
+  content: "";
+  position: absolute;
+  inset: -18px;
+  z-index: 0;
+  display: block !important;
+  background-image: var(--api-image);
+  background-position: center;
+  background-size: cover;
+  filter: blur(18px) saturate(0.82);
+  opacity: 0.24;
+  transform: scale(1.08);
+}
+
+.image-frame--api img,
+.news-recommend-card .image-frame--api img,
+.news-list-card .image-frame--api img,
+.article-card .image-frame--api img,
+.category-magazine-card .image-frame--api img,
+.category-list-card .image-frame--api img,
+.category-feature-card .image-frame--api img,
+.category-mini-card .image-frame--api img,
+.search-result-card .image-frame--api img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: center;
+  background: transparent;
+  transform: none !important;
+}
+
+.image-frame.is-empty,
+.image-frame--api.is-empty {
+  display: grid;
+  min-height: 132px;
+  place-items: center;
+  background:
+    linear-gradient(135deg, rgba(29, 166, 194, 0.1), rgba(216, 228, 232, 0.42)),
+    #f3f8f9;
+}
+
+.image-frame.is-empty::before,
+.image-frame--api.is-empty::before {
+  display: none !important;
+}
+
+.image-frame.is-empty span,
+.image-frame.is-empty .image-fallback-text {
+  display: block !important;
+  color: var(--accent-deep);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.image-frame.is-empty span::after,
+.image-frame.is-empty .image-fallback-text::after {
+  content: "축제 이미지 준비 중";
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.news-list-card a,
+.article-card a,
+.category-magazine-card a {
+  position: relative;
+}
+
+.festival-card-meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+}
+
+.festival-card-meta em,
+.news-list-card .festival-card-meta em,
+.category-magazine-card .festival-card-meta em {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--gold);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.festival-status-pill,
+.status-badge {
+  flex: 0 0 auto;
+  border: 1px solid rgba(23, 37, 43, 0.12);
+  background: #fff;
+  color: var(--accent-deep);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.festival-status-pill {
+  padding: 5px 7px;
+  border-radius: 999px;
+}
+
+.festival-status-pill--live,
+.festival-status-pill--ending,
+.festival-status-pill--weekend,
+.status-badge--live,
+.status-badge--ending,
+.status-badge--weekend {
+  border-color: transparent;
+  background: var(--gold);
+  color: #fff;
+}
+
+.festival-status-pill--soon,
+.status-badge--soon {
+  border-color: rgba(29, 166, 194, 0.28);
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+.festival-status-pill--past {
+  background: #f4f6f7;
+  color: #7f8c93;
+}
+
+.status-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 7px 9px;
+  border-radius: 999px;
+  box-shadow: 0 8px 18px rgba(23, 37, 43, 0.12);
+}
+
+main#top .tripview-section-title--all h2 {
+  font-size: clamp(26px, 3vw, 38px);
+}
+
+main#top .landing-news-feed .news-list-feed {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 26px 20px;
+}
+
+main#top .landing-news-feed .news-list-card {
+  grid-column: auto;
+  grid-row: auto;
+  min-width: 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+
+main#top .landing-news-feed .news-list-card a {
+  display: grid;
+  height: 100%;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 11px;
+  padding: 0 0 16px;
+}
+
+main#top .landing-news-feed .news-list-card span {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  align-content: start;
+}
+
+main#top .landing-news-feed .news-list-card strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink);
+  font-weight: 900;
+  line-height: 1.32;
+  letter-spacing: 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+main#top .landing-news-feed .news-list-card small {
+  display: block;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+main#top .landing-news-feed .news-list-card .image-frame--feed {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+}
+
+main#top .landing-news-feed .news-list-card:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+main#top .landing-news-feed .news-list-card:first-child .image-frame--feed {
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+}
+
+main#top .landing-news-feed .news-list-card:first-child strong {
+  max-width: 680px;
+  font-size: clamp(30px, 3.2vw, 44px);
+  line-height: 1.16;
+  -webkit-line-clamp: 3;
+}
+
+main#top .landing-news-feed .news-list-card:not(:first-child) strong {
+  font-size: 17px;
+}
+
+main#top .landing-news-feed .news-list-card:nth-child(n + 6) {
+  grid-column: span 2;
+}
+
+main#top .landing-news-feed .news-list-card:nth-child(n + 6) a {
+  grid-template-columns: 148px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+main#top .landing-news-feed .news-list-card:nth-child(n + 6) .image-frame--feed {
+  width: 148px;
+}
+
+main#top .places-section .article-card p {
+  display: none;
+}
+
+main#top .places-section .article-card .article-meta {
+  font-size: 13px;
+}
+
+main#top .category-magazine-card p {
+  -webkit-line-clamp: 2;
+}
+
+@media (max-width: 860px) {
+  main#top .landing-news-feed .news-list-feed {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 16px;
+  }
+
+  main#top .landing-news-feed .news-list-card:first-child {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  main#top .landing-news-feed .news-list-card:first-child strong {
+    font-size: clamp(25px, 5vw, 34px);
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 6) {
+    grid-column: auto;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 6) a {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 6) .image-frame--feed {
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  main#top {
+    width: min(100% - 28px, 620px);
+  }
+
+  main#top .landing-news-feed {
+    gap: 0 !important;
+    padding: 16px 0 44px !important;
+  }
+
+  main#top .landing-news-feed .tripview-section-title--all {
+    display: none;
+  }
+
+  main#top .landing-news-feed .news-list-feed {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  main#top .landing-news-feed .news-list-card,
+  main#top .landing-news-feed .news-list-card:first-child,
+  main#top .landing-news-feed .news-list-card:nth-child(n + 6) {
+    grid-column: auto;
+    border-bottom: 1px solid var(--line);
+  }
+
+  main#top .landing-news-feed .news-list-card:first-child a,
+  main#top .landing-news-feed .news-list-card:nth-child(2) a {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 11px;
+    padding: 0 0 22px;
+  }
+
+  main#top .landing-news-feed .news-list-card:first-child .image-frame--feed,
+  main#top .landing-news-feed .news-list-card:nth-child(2) .image-frame--feed {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 10px;
+  }
+
+  main#top .landing-news-feed .news-list-card:first-child strong,
+  main#top .landing-news-feed .news-list-card:nth-child(2) strong {
+    font-size: clamp(24px, 6.3vw, 30px);
+    line-height: 1.22;
+    -webkit-line-clamp: 3;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 3) a,
+  main#top .landing-news-feed .news-list-card:nth-child(n + 6) a {
+    grid-template-columns: 112px minmax(0, 1fr);
+    gap: 13px;
+    align-items: center;
+    padding: 14px 0;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 3) .image-frame--feed,
+  main#top .landing-news-feed .news-list-card:nth-child(n + 6) .image-frame--feed {
+    width: 112px;
+    aspect-ratio: 4 / 3;
+    border-radius: 8px;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 3) strong {
+    font-size: 16px;
+    line-height: 1.38;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 3) small {
+    font-size: 12px;
+  }
+
+  .festival-card-meta {
+    gap: 5px;
+  }
+
+  .festival-card-meta em {
+    font-size: 11px;
+  }
+
+  .festival-status-pill {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  main#top .landing-news-feed .news-list-card:nth-child(n + 3) a,
+  main#top .landing-news-feed .news-list-card:nth-child(n + 6) a {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  main#top .landing-news-feed .news-list-card:nth-child(n + 3) .image-frame--feed,
+  main#top .landing-news-feed .news-list-card:nth-child(n + 6) .image-frame--feed {
+    width: 96px;
   }
 }

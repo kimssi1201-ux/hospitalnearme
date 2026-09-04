@@ -7,6 +7,20 @@ import { test } from "node:test";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const publisherId = "ca-pub-5751319666030430";
 
+function eventSlug(value) {
+  return String(value || "").replace(/[^a-zA-Z0-9_-]/g, "-").replace(/-+/g, "-");
+}
+
+function uniqueEvents(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const slug = eventSlug(item?.id);
+    if (!slug || seen.has(slug)) return false;
+    seen.add(slug);
+    return true;
+  });
+}
+
 test("every HTML page has the shared head requirements", async () => {
   const files = (await readdir(root, { withFileTypes: true }))
     .filter((entry) => entry.isFile() && entry.name.endsWith(".html"))
@@ -220,7 +234,11 @@ test("current event pages use exact public data, noindex, and the Coupang widget
   const payload = JSON.parse(await readFile(path.join(root, "generated", "seoul-events.json"), "utf8"));
   const eventRoot = path.join(root, "seoul-events");
   const directories = (await readdir(eventRoot, { withFileTypes: true })).filter((entry) => entry.isDirectory());
-  assert.equal(directories.length, payload.items.length);
+  const eventPageItems = uniqueEvents([
+    ...(Array.isArray(payload.items) ? payload.items : []),
+    ...(Array.isArray(payload.legacyItems) ? payload.legacyItems : [])
+  ]);
+  assert.equal(directories.length, eventPageItems.length);
   let inlinePhotoPages = 0;
 
   for (const directory of directories) {
@@ -237,7 +255,8 @@ test("current event pages use exact public data, noindex, and the Coupang widget
     assert.match(source, /ads-partners\.coupang\.com\/g\.js/);
     assert.match(source, /new window\.PartnersCoupang\.G/);
     assert.match(source, /쿠팡 파트너스 활동/);
-    assert.match(source, /행사 기본 정보/);
+    assert.match(source, /핵심 방문정보/);
+    assert.match(source, /class="event-visit-highlights"/);
     assert.match(source, /비어 있는 운영 정보를 임의로 추정하지 않습니다/);
     assert.match(source, /https:\/\/view1\.kr\/seoul-events\//);
     for (const match of source.matchAll(/<img\b[^>]+src="([^"]+)"/g)) {
@@ -255,11 +274,22 @@ test("event article images stay restrained inside the post body", async () => {
   const posterImageRule = css.match(/\.official-poster img\s*\{[\s\S]*?\n\}/)?.[0] || "";
   const inlinePhotoRule = css.match(/\.event-inline-photo img\s*\{[\s\S]*?\n\}/)?.[0] || "";
 
-  assert.match(headSource, /article-static\.css\?v=20260828-event-body-1/);
+  assert.match(headSource, /article-static\.css\?v=20260904-visit-info-1/);
   assert.match(posterImageRule, /max-height:\s*520px/);
   assert.match(posterImageRule, /width:\s*auto/);
   assert.match(inlinePhotoRule, /max-height:\s*360px/);
   assert.match(inlinePhotoRule, /width:\s*auto/);
+});
+
+test("festival thumbnails use no-crop API image frames", async () => {
+  const css = await readFile(path.join(root, "travel.css"), "utf8");
+  const updateSource = await readFile(path.join(root, "scripts", "update-seoul-content.mjs"), "utf8");
+
+  assert.match(css, /\.image-frame--api::before\s*\{[\s\S]*?background-image:\s*var\(--api-image\)/);
+  assert.match(css, /\.news-list-card \.image-frame--api img,[\s\S]*?object-fit:\s*contain\s*!important/);
+  assert.doesNotMatch(css, /\.news-list-card \.image-frame--api img\s*\{[\s\S]*?object-fit:\s*cover\s*!important/);
+  assert.match(updateSource, /style="--api-image: url\(&quot;\$\{escapeHtml\(item\.image\)\}&quot;\)"/);
+  assert.match(updateSource, /festival-status-pill/);
 });
 
 test("legacy detail URLs redirect to canonical static pages", async () => {

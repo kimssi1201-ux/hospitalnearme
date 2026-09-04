@@ -150,7 +150,21 @@ async function loadEditorialPosts() {
 
 async function loadEvents() {
   const payload = JSON.parse(await readFile(eventDataPath, "utf8"));
-  return { ...payload, items: Array.isArray(payload.items) ? payload.items : [] };
+  return {
+    ...payload,
+    items: Array.isArray(payload.items) ? payload.items : [],
+    legacyItems: Array.isArray(payload.legacyItems) ? payload.legacyItems : []
+  };
+}
+
+function uniqueEventItems(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const id = safeSlug(item?.id);
+    if (!id || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
 }
 
 function sharedHead({ title, description, canonical, robots = "index,follow,max-image-preview:large", ads = true, image = "" }) {
@@ -171,7 +185,7 @@ function sharedHead({ title, description, canonical, robots = "index,follow,max-
     <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:url" content="${escapeHtml(canonical)}" />
     ${imageMeta}
-    <link rel="stylesheet" href="/article-static.css?v=20260828-event-body-1" />
+    <link rel="stylesheet" href="/article-static.css?v=20260904-visit-info-1" />
     ${adCode}`;
 }
 
@@ -240,6 +254,105 @@ function infoRow(label, value, note = "") {
   return `<tr><th scope="row">${escapeHtml(label)}</th><td><strong>${escapeHtml(cleanText(value))}</strong>${note ? `<small>${escapeHtml(note)}</small>` : ""}</td></tr>`;
 }
 
+function compactDateToUtc(value) {
+  const text = String(value || "").replace(/\D/g, "");
+  if (text.length !== 8) return null;
+  const year = Number(text.slice(0, 4));
+  const month = Number(text.slice(4, 6));
+  const day = Number(text.slice(6, 8));
+  if (!year || !month || !day) return null;
+  return Date.UTC(year, month - 1, day);
+}
+
+function compactDateDiffDays(fromValue, toValue) {
+  const from = compactDateToUtc(fromValue);
+  const to = compactDateToUtc(toValue);
+  if (!Number.isFinite(from) || !Number.isFinite(to)) return null;
+  return Math.round((to - from) / 86400000);
+}
+
+function currentKstCompactDate() {
+  return kstDate().replace(/\D/g, "");
+}
+
+function eventDateRange(event = {}) {
+  const tokens = String(event.date || "").match(/\d{4}[-.]\d{1,2}[-.]\d{1,2}|\d{8}/g) || [];
+  const values = tokens
+    .map((token) => Number(String(token).replace(/\D/g, "")))
+    .filter((value) => Number.isFinite(value) && value > 0);
+  const start = values[0] || 0;
+  return { start, end: values[values.length - 1] || start };
+}
+
+function isWeekendCompact(value) {
+  const date = compactDateToUtc(value);
+  if (!Number.isFinite(date)) return false;
+  const day = new Date(date).getUTCDay();
+  return day === 0 || day === 5 || day === 6;
+}
+
+function eventStatusInfo(event = {}) {
+  const today = Number(currentKstCompactDate());
+  const { start, end } = eventDateRange(event);
+  if (!start) return null;
+  if (start <= today && end >= today) {
+    const daysLeft = compactDateDiffDays(today, end);
+    return Number.isFinite(daysLeft) && daysLeft <= 3
+      ? { key: "ending", label: "종료 임박" }
+      : { key: "live", label: "진행 중" };
+  }
+  if (start > today) {
+    const daysUntil = compactDateDiffDays(today, start);
+    if (Number.isFinite(daysUntil) && daysUntil <= 3 && isWeekendCompact(start)) {
+      return { key: "weekend", label: "이번 주말" };
+    }
+    if (Number.isFinite(daysUntil) && daysUntil <= 14) return { key: "soon", label: "곧 시작" };
+    return { key: "scheduled", label: "예정" };
+  }
+  return { key: "past", label: "지난 행사" };
+}
+
+function eventStatusMarkup(event = {}) {
+  const status = eventStatusInfo(event);
+  if (!status) return "";
+  return `<span class="event-status event-status--${escapeHtml(status.key)}">${escapeHtml(status.label)}</span>`;
+}
+
+function highlightCard(label, value) {
+  if (!cleanText(value)) return "";
+  return `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(cleanText(value))}</strong></div>`;
+}
+
+function eventVisitHighlights(event, place) {
+  const cards = [
+    highlightCard("기간", event.date),
+    highlightCard("장소", place),
+    highlightCard("요금", event.fee || (event.isFree ? "무료" : "")),
+    highlightCard("문의", event.tel)
+  ].filter(Boolean);
+  if (!cards.length) return "";
+  return `<section class="event-visit-highlights" aria-label="핵심 방문정보">${cards.join("")}</section>`;
+}
+
+function programInfoMarkup(event) {
+  const rows = [
+    cleanText(event.time) ? `<li><strong>운영 시간</strong><span>${escapeHtml(cleanText(event.time))}</span></li>` : "",
+    cleanText(event.target) ? `<li><strong>이용 대상</strong><span>${escapeHtml(cleanText(event.target))}</span></li>` : "",
+    cleanText(event.fee) ? `<li><strong>이용 요금</strong><span>${escapeHtml(cleanText(event.fee))}</span></li>` : "",
+    cleanText(event.org) ? `<li><strong>주최·기관</strong><span>${escapeHtml(cleanText(event.org))}</span></li>` : ""
+  ].filter(Boolean);
+  if (!rows.length) {
+    return `<p>공식 공개 데이터에 세부 프로그램 항목은 등록되어 있지 않습니다. 회차, 체험 프로그램, 입장 마감은 공식 안내에서 확인하세요.</p>`;
+  }
+  return `<ul class="visit-fact-list">${rows.join("")}</ul>`;
+}
+
+function visitFlowMarkup(official, mapUrl) {
+  const officialText = official ? "공식 안내에서 운영 변경과 회차를 확인합니다." : "공식 안내가 별도로 공개되면 운영 변경과 회차를 먼저 확인합니다.";
+  const mapText = mapUrl ? "지도에서 행사장 위치와 가장 가까운 출입구를 확인합니다." : "주소가 공개되면 지도에서 행사장 위치와 가장 가까운 출입구를 확인합니다.";
+  return `<ol class="visit-flow"><li><span>1</span><p>${escapeHtml(officialText)}</p></li><li><span>2</span><p>${escapeHtml(mapText)}</p></li><li><span>3</span><p>요금, 증빙서류, 현장 발권 여부를 출발 전에 다시 확인합니다.</p></li></ol>`;
+}
+
 function coupangWidgetAd(slot = "event") {
   const safeSlot = safeSlug(slot) || "event";
   return `<aside class="coupang-widget-ad" aria-label="쿠팡 파트너스 광고"><div class="coupang-widget-label">Advertisement</div><div class="coupang-widget-frame" id="coupangWidget-${escapeHtml(safeSlot)}" data-coupang-widget></div><p class="coupang-widget-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p></aside>`;
@@ -267,6 +380,8 @@ function eventPage(event, sourceLabel) {
   const place = cleanText(event.place || event.address);
   const mapUrl = place ? `https://map.naver.com/p/search/${encodeURIComponent(place)}` : "";
   const description = cleanText(event.summary) || `${place || "현지"}에서 열리는 ${title}의 일정과 방문 전 확인 사항입니다.`;
+  const status = eventStatusMarkup(event);
+  const highlights = eventVisitHighlights(event, place);
   const imageList = [heroImage, ...rawGalleryImages.filter((url) => url !== heroImage)].filter(Boolean);
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
@@ -278,7 +393,7 @@ function eventPage(event, sourceLabel) {
     organizer: event.org ? { "@type": "Organization", name: cleanText(event.org) } : undefined,
     url: official || canonical
   }).replace(/</g, "\\u003c");
-  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${title} 일정·장소·요금 | 대한축제뉴스`, description, canonical, robots: "noindex,follow,max-image-preview:large", ads: false, image: heroImage })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main event-main"><a class="back-link" href="/#allArticles">← 이번 달 축제 소식으로 돌아가기</a><article class="event-article"><header class="article-header"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p><div class="byline"><span>${escapeHtml(sourceLabel || "공공 관광 데이터")}</span><span>방문 전 공식 안내 확인</span></div></header>${heroImage ? `<figure class="official-poster"><img src="${escapeHtml(heroImage)}" alt="${escapeHtml(title)} 대표 이미지" /><figcaption>${primaryImage ? "공개 행사 정보에 등록된 공식 이미지입니다." : "공개 행사 정보에 등록된 대표 이미지입니다."}</figcaption></figure>` : `<div class="poster-empty" role="img" aria-label="등록된 행사 이미지 없음">등록된 공식 이미지가 없습니다.</div>`}<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">행사 기본 정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section><section aria-labelledby="about-title"><p class="eyebrow">VISIT GUIDE</p><h2 id="about-title">방문 전에 무엇을 확인할까요?</h2><p>${escapeHtml(description)}</p>${inlinePhotoBlocks[0] || ""}<p>공개 데이터는 행사 탐색을 돕는 자료이며 운영기관의 실시간 공지를 대신하지 않습니다. 회차별 입장 시간, 매진 여부, 현장 발권, 휴관 또는 취소 공지는 공식 안내에서 확인하세요.</p><h3>교통과 주차</h3><p>${place ? `${escapeHtml(place)}을(를) 기준으로 가장 가까운 지하철역과 버스 정류장을 먼저 확인하세요.` : "공식 안내에 표시된 정확한 장소와 출입구를 먼저 확인하세요."} 행사장 주차 정보가 제공되지 않았거나 불명확하면 대중교통을 우선 비교하고, 차량 이용 시에는 인근 공영주차장의 운영 시간과 요금을 별도로 확인하는 편이 안전합니다.</p>${inlinePhotoBlocks[1] || ""}<h3>입장과 준비물</h3><p>예매 확인서, 신분증, 할인 증빙, 보호자 동반 기준이 필요한지 살펴보세요. 어린이 대상 행사나 체험 프로그램은 참여 연령과 준비물, 보호자 입장 가능 여부가 회차마다 다를 수 있습니다.</p>${inlinePhotoBlocks[2] || ""}</section><aside class="source-note"><strong>정보 출처</strong><p>${escapeHtml(sourceLabel || "공공 관광 데이터")}에 공개된 항목을 정리했습니다. 대한축제뉴스는 비어 있는 운영 정보를 임의로 추정하지 않습니다.</p>${official ? `<a href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">원문에서 최신 정보 확인</a>` : `<a href="/editorial-policy">편집 원칙 확인</a>`}</aside>${coupangWidgetAd(`event-${id}`)}</article></main>${siteFooter()}${coupangWidgetScript()}</body></html>`;
+  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${title} 일정·장소·요금 | 대한축제뉴스`, description, canonical, robots: "noindex,follow,max-image-preview:large", ads: false, image: heroImage })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main event-main"><a class="back-link" href="/#allArticles">← 이번 달 축제 소식으로 돌아가기</a><article class="event-article">${heroImage ? `<figure class="official-poster official-poster--hero"><img src="${escapeHtml(heroImage)}" alt="${escapeHtml(title)} 대표 이미지" /><figcaption>${primaryImage ? "공개 행사 정보에 등록된 공식 이미지입니다." : "공개 행사 정보에 등록된 대표 이미지입니다."}</figcaption></figure>` : `<div class="poster-empty poster-empty--hero" role="img" aria-label="등록된 행사 이미지 없음"><strong>대한축제뉴스</strong><span>축제 이미지 준비 중</span></div>`}<header class="article-header event-title-header"><div class="event-title-meta"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p>${status}</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p><div class="byline"><span>${escapeHtml(sourceLabel || "공공 관광 데이터")}</span><span>방문 전 공식 안내 확인</span></div></header>${highlights}<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">핵심 방문정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("주소", event.address && cleanText(event.address) !== place ? event.address : "")}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section><section aria-labelledby="about-title"><p class="eyebrow">INTRODUCTION</p><h2 id="about-title">축제 소개</h2><p>${escapeHtml(description)}</p>${inlinePhotoBlocks[0] || ""}<p>공개 데이터는 행사 탐색을 돕는 자료이며 운영기관의 실시간 공지를 대신하지 않습니다. 회차별 입장 시간, 매진 여부, 현장 발권, 휴관 또는 취소 공지는 공식 안내에서 확인하세요.</p></section><section aria-labelledby="program-title"><p class="eyebrow">PROGRAM</p><h2 id="program-title">주요 프로그램 확인</h2>${programInfoMarkup(event)}${inlinePhotoBlocks[1] || ""}<p>체험 프로그램, 공연 회차, 입장 마감처럼 날짜별로 달라지는 항목은 방문 직전 공식 안내에서 다시 확인하세요.</p></section><section aria-labelledby="transport-title"><p class="eyebrow">TRANSPORT</p><h2 id="transport-title">주차·교통</h2><p>${place ? `${escapeHtml(place)}을(를) 기준으로 행사장 위치와 출입구를 먼저 확인하세요.` : "공식 안내에 표시된 정확한 장소와 출입구를 먼저 확인하세요."} 행사장 주차 정보가 제공되지 않았거나 불명확하면 대중교통을 우선 비교하고, 차량 이용 시에는 인근 공영주차장의 운영 시간과 요금을 별도로 확인하는 편이 안전합니다.</p>${inlinePhotoBlocks[2] || ""}${visitFlowMarkup(official, mapUrl)}</section><section aria-labelledby="nearby-title"><p class="eyebrow">NEARBY</p><h2 id="nearby-title">주변 같이 갈 곳</h2><p>이 행사 데이터에는 주변 관광지 목록이 별도로 포함되어 있지 않습니다. 대한축제뉴스는 확인되지 않은 주변 명소를 임의로 추천하지 않으며, 실제 방문 전에는 공식 안내와 지도에서 주변 이동 시간을 함께 확인하세요.</p></section><aside class="source-note"><strong>정보 출처</strong><p>${escapeHtml(sourceLabel || "공공 관광 데이터")}에 공개된 항목을 정리했습니다. 대한축제뉴스는 비어 있는 운영 정보를 임의로 추정하지 않습니다.</p>${official ? `<a href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">원문에서 최신 정보 확인</a>` : `<a href="/editorial-policy">편집 원칙 확인</a>`}</aside>${coupangWidgetAd(`event-${id}`)}</article></main>${siteFooter()}${coupangWidgetScript()}</body></html>`;
 }
 
 export async function generateStaticArticles() {
@@ -290,6 +405,7 @@ export async function generateStaticArticles() {
   // "related events" carousel should only ever surface Seoul events even
   // though eventPayload.items now covers festivals nationwide.
   const seoulEvents = eventPayload.items.filter((event) => event.areaCode === "1");
+  const eventPageItems = uniqueEventItems([...eventPayload.items, ...eventPayload.legacyItems]);
 
   for (const post of posts) {
     const target = path.join(articleDir, safeSlug(post.id));
@@ -297,7 +413,7 @@ export async function generateStaticArticles() {
     await writeFile(path.join(target, "index.html"), editorialPage(post, seoulEvents), "utf8");
   }
 
-  for (const event of eventPayload.items) {
+  for (const event of eventPageItems) {
     const slug = safeSlug(event.id);
     if (!slug) continue;
     const target = path.join(eventDir, slug);
@@ -308,7 +424,7 @@ export async function generateStaticArticles() {
   await writeFile(path.join(rootDir, "sitemap.xml"), sitemapXml(posts), "utf8");
   await writeFile(path.join(rootDir, "feed.xml"), rssXml(posts), "utf8");
 
-  console.log(`Generated ${posts.length} editorial articles, ${eventPayload.items.length} current event pages, sitemap.xml, and feed.xml.`);
+  console.log(`Generated ${posts.length} editorial articles, ${eventPageItems.length} event pages (${eventPayload.items.length} current, ${eventPayload.legacyItems.length} legacy), sitemap.xml, and feed.xml.`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
