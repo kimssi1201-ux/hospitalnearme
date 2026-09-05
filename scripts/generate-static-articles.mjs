@@ -185,7 +185,7 @@ function sharedHead({ title, description, canonical, robots = "index,follow,max-
     <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:url" content="${escapeHtml(canonical)}" />
     ${imageMeta}
-    <link rel="stylesheet" href="/article-static.css?v=20260905-title-body-1" />
+    <link rel="stylesheet" href="/article-static.css?v=20260905-title-body-2" />
     ${adCode}`;
 }
 
@@ -436,6 +436,18 @@ function eventOverviewParagraphs(value) {
   return paragraphs.slice(0, 5);
 }
 
+function eventOverviewSentences(value) {
+  const overview = cleanText(value);
+  if (!overview) return [];
+  const sentences = [];
+  const sentencePattern = /.+?(?:(?<!\d)[.!?。](?=\s+[가-힣A-Z0-9"'“‘])|(?<!\d)[.!?。](?=\s*$)|$)/g;
+  for (const match of overview.matchAll(sentencePattern)) {
+    const text = match[0].trim();
+    if (text) sentences.push(text);
+  }
+  return sentences;
+}
+
 function eventOverviewMarkup(event, title) {
   const chunks = eventOverviewParagraphs(event.overview || event.summary);
   if (!chunks.length) {
@@ -531,16 +543,155 @@ function eventInlinePhoto(title, image, index) {
   return `<figure class="event-inline-photo"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)} 현장 이미지 ${index}" loading="lazy" /><figcaption>공개 행사 정보에 등록된 행사 이미지입니다.</figcaption></figure>`;
 }
 
-function eventArticleHeadline(event, title) {
-  const facts = [
-    cleanText(event.date) ? "일정" : "",
-    cleanText(event.place || event.address) ? "장소" : "",
-    cleanText(event.fee) ? "요금" : "",
-    cleanText(event.parking || event.parkingInfo) ? "주차" : "",
-    cleanText(event.transport || event.traffic || event.publicTransport) ? "교통" : ""
-  ].filter(Boolean);
-  const scope = facts.length ? facts.slice(0, 4).join("·") : "방문정보";
-  return `${title}, ${scope} 한눈에 보기`;
+function eventFeatureTerms(event) {
+  const text = [
+    event.title,
+    event.summary,
+    event.overview,
+    event.program,
+    event.subevent,
+    ...(Array.isArray(event.detailInfo) ? event.detailInfo.map((item) => item?.value) : [])
+  ].map(cleanText).filter(Boolean).join(" ");
+  const patterns = [
+    ["눈썰매", /눈썰매/],
+    ["얼음썰매", /얼음썰매/],
+    ["얼음낚시", /얼음낚시|빙어|송어/],
+    ["먹거리", /먹거리|푸드|야시장|맥주|와인|커피|김장|분식|바비큐/],
+    ["포토존", /포토존|사진|야경/],
+    ["공연", /공연|콘서트|무대|음악|국악|댄스/],
+    ["체험", /체험|놀이|만들기|워크숍/],
+    ["전시", /전시|미디어아트|아트|박람회/],
+    ["꽃", /꽃|벚꽃|유채|메밀꽃|장미|국화/],
+    ["숲", /숲|정원|수목원|공원|자연/],
+    ["불꽃", /불꽃|불빛|빛축제|라이트/],
+    ["바다", /바다|해변|해수욕|물놀이/],
+    ["전통", /전통|궁궐|문화재|민속/]
+  ];
+  const terms = [];
+  for (const [label, pattern] of patterns) {
+    if (pattern.test(text) && !terms.includes(label)) terms.push(label);
+  }
+  return terms.slice(0, 3);
+}
+
+function eventKindLabel(event) {
+  const text = [event.title, event.category, event.summary, event.overview].map(cleanText).join(" ");
+  if (/눈썰매|얼음|겨울|동장군|빙어|송어/.test(text)) return "겨울 축제";
+  if (/먹거리|푸드|야시장|맥주|와인|커피|김장/.test(text)) return "먹거리 축제";
+  if (/꽃|숲|정원|수목원|자연/.test(text)) return "자연 축제";
+  if (/공연|콘서트|무대|음악|국악|댄스/.test(text)) return "공연 축제";
+  if (/전시|미디어아트|아트|박람회/.test(text)) return "전시 행사";
+  if (/불꽃|불빛|빛축제|라이트|야간/.test(text)) return "야간 축제";
+  return "축제";
+}
+
+function eventShortPlace(place) {
+  const value = cleanText(place)
+    .replace(/\([^)]*\)/g, "")
+    .replace(/\s+[가-힣A-Za-z0-9·.-]+(?:로|길)\s*\d.*$/g, "")
+    .replace(/서울특별시/g, "서울")
+    .replace(/부산광역시/g, "부산")
+    .replace(/대구광역시/g, "대구")
+    .replace(/인천광역시/g, "인천")
+    .replace(/광주광역시/g, "광주")
+    .replace(/대전광역시/g, "대전")
+    .replace(/울산광역시/g, "울산")
+    .replace(/세종특별자치시/g, "세종")
+    .replace(/경기도/g, "경기")
+    .replace(/강원특별자치도/g, "강원")
+    .replace(/충청북도/g, "충북")
+    .replace(/충청남도/g, "충남")
+    .replace(/전북특별자치도/g, "전북")
+    .replace(/전라남도/g, "전남")
+    .replace(/경상북도/g, "경북")
+    .replace(/경상남도/g, "경남")
+    .replace(/제주특별자치도/g, "제주")
+    .replace(/\s*(일원|내|앞)$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!value) return "";
+  const words = value.split(" ").filter(Boolean);
+  if (words.length > 2 && /국민관광지|관광지|일원|축제장/.test(value)) return words.slice(0, 2).join(" ");
+  if (words.length > 3) return words.slice(0, 3).join(" ");
+  return value;
+}
+
+function eventDurationLabel(event) {
+  const { start, end } = eventDateRange(event);
+  if (!start || !end || start === end) return "";
+  const diff = compactDateDiffDays(start, end);
+  if (!Number.isFinite(diff)) return "";
+  const days = diff + 1;
+  if (days < 2 || days > 180) return "";
+  return `${days}일간`;
+}
+
+function compactHeadlineHook(value, maxLength = 42) {
+  const text = cleanText(value).replace(/[“”"'‘’]/g, "").replace(/[.!?。]+$/g, "");
+  if (!text) return "";
+  if (text.length <= maxLength) return text;
+  const slice = text.slice(0, maxLength + 1);
+  const cut = Math.max(slice.lastIndexOf(" "), slice.lastIndexOf(","), slice.lastIndexOf("·"));
+  const end = cut >= 24 ? cut : maxLength;
+  return text.slice(0, end).replace(/[,.，。]\s*$/g, "");
+}
+
+function eventArticleHeadline(event, title, place) {
+  const features = eventFeatureTerms(event);
+  const kind = eventKindLabel(event);
+  const shortPlace = eventShortPlace(place || event.place || event.address);
+  const duration = eventDurationLabel(event);
+  let hook = "";
+  if (features.length >= 2 && shortPlace) {
+    hook = `${features.join("·")}까지, ${shortPlace}에서 즐기는 ${kind}`;
+  } else if (duration && shortPlace) {
+    hook = `${duration} ${shortPlace}에서 이어지는 ${kind}`;
+  } else if (features.length) {
+    hook = `${features.join("·")} 중심으로 둘러보는 ${kind}`;
+  } else {
+    hook = compactHeadlineHook(eventOverviewSentences(event.overview || event.summary)[0] || `${title}의 공식 일정과 방문 정보를 정리했습니다`);
+  }
+  return `“${compactHeadlineHook(hook, 46)}”… ${title}`;
+}
+
+function eventArticleLead(event, title, place) {
+  const features = eventFeatureTerms(event);
+  const date = cleanText(event.date);
+  const time = cleanText(event.time);
+  const fee = cleanText(event.fee);
+  const checks = [time ? "운영시간" : "", fee ? "요금" : "", cleanText(event.tel) ? "문의처" : ""].filter(Boolean);
+  const first = date && place
+    ? `${date} ${place}에서 열리는 ${title}입니다.`
+    : `${title}의 공식 일정과 방문 전 확인할 정보를 정리했습니다.`;
+  const second = features.length
+    ? `공식 소개에는 ${features.join("·")} 같은 현장 포인트가 등록되어 있습니다.`
+    : "공개 데이터에 등록된 소개와 장소 정보를 기준으로 확인했습니다.";
+  const third = checks.length
+    ? `아래 핵심정보에서 ${checks.join("·")} 항목을 바로 확인할 수 있습니다.`
+    : "비어 있는 정보는 임의로 채우지 않고 공식 확인이 필요한 항목으로 구분했습니다.";
+  return `${first} ${second} ${third}`;
+}
+
+function eventOpeningBody(event, title, place) {
+  const features = eventFeatureTerms(event);
+  const date = cleanText(event.date);
+  const intro = eventOverviewSentences(event.overview || event.summary).slice(0, 2);
+  const paragraphs = [];
+  if (intro.length) paragraphs.push(intro.join(" "));
+  const featureText = features.length
+    ? `${features.join("·")}처럼 공식 소개에 나온 즐길 거리를 먼저 보고,`
+    : "공식 소개에 나온 현장 정보를 먼저 보고,";
+  const visitText = [date ? `일정 ${date}` : "", place ? `장소 ${place}` : "", cleanText(event.fee) ? `요금 ${cleanText(event.fee)}` : ""].filter(Boolean).join(", ");
+  paragraphs.push(`${title} 방문을 준비한다면 ${featureText} 실제 출발 전에는 ${visitText || "일정과 장소"}를 다시 확인하는 편이 좋습니다.`);
+  return paragraphs.map((item) => `<p class="event-opening-summary">${escapeHtml(item)}</p>`).join("");
+}
+
+function eventOpeningTitle(event, title, place) {
+  const features = eventFeatureTerms(event);
+  const shortPlace = eventShortPlace(place || event.place || event.address);
+  if (features.length >= 2) return `${features[0]}부터 ${features[1]}까지, ${title}의 주요 장면`;
+  if (shortPlace) return `${shortPlace}에서 먼저 보는 ${title}`;
+  return `사진으로 먼저 보는 ${title}`;
 }
 
 function eventPage(event, sourceLabel, sidebarItems = []) {
@@ -565,10 +716,10 @@ function eventPage(event, sourceLabel, sidebarItems = []) {
   const heroMarkup = heroImage
     ? `<figure class="official-poster official-poster--hero" style="--article-hero-image: url(&quot;${escapeHtml(heroImage)}&quot;)"><img src="${escapeHtml(heroImage)}" alt="${escapeHtml(title)} 대표 이미지" /><figcaption>${primaryImage ? "공개 행사 정보에 등록된 공식 이미지입니다." : "공개 행사 정보에 등록된 대표 이미지입니다."}</figcaption></figure>`
     : `<div class="poster-empty poster-empty--hero" role="img" aria-label="등록된 행사 이미지 없음"><strong>대한축제뉴스</strong><span>축제 이미지 준비 중</span></div>`;
-  const articleHeadline = eventArticleHeadline(event, title);
-  const openingCopy = `${event.date ? `공개 일정은 ${cleanText(event.date)}입니다. ` : ""}${place ? `방문지는 ${place}입니다. ` : ""}공식 공개 데이터에 등록된 소개, 운영 시간, 요금, 문의처, 위치 정보를 중심으로 방문 전 필요한 항목을 정리했습니다.`;
-  const openingSection = `<section class="event-opening-section" aria-labelledby="opening-title"><h2 id="opening-title" class="sr-only">대표 이미지와 방문 개요</h2>${heroMarkup}<p class="event-opening-summary">${escapeHtml(openingCopy)}</p></section>`;
-  const titleHeader = `<header class="article-header event-title-header"><div class="event-title-meta"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p>${status}</div><h1>${escapeHtml(articleHeadline)}</h1><p class="event-lead">${escapeHtml(description)}</p><div class="byline"><span>대한축제뉴스 편집부</span><span>입력 ${escapeHtml(kstDate())}</span><span>자료 ${escapeHtml(sourceLabel || "공공 관광 데이터")}</span></div>${shareRow}</header>`;
+  const articleHeadline = eventArticleHeadline(event, title, place);
+  const articleLead = eventArticleLead(event, title, place);
+  const openingSection = `<section class="event-opening-section" aria-labelledby="opening-title"><p class="eyebrow">ON SITE</p><h2 id="opening-title">${escapeHtml(eventOpeningTitle(event, title, place))}</h2>${heroMarkup}<div class="event-opening-copy">${eventOpeningBody(event, title, place)}</div></section>`;
+  const titleHeader = `<header class="article-header event-title-header"><div class="event-title-meta"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p>${status}</div><h1>${escapeHtml(articleHeadline)}</h1><p class="event-lead">${escapeHtml(articleLead)}</p><div class="byline"><span>대한축제뉴스 편집부</span><span>입력 ${escapeHtml(kstDate())}</span><span>자료 ${escapeHtml(sourceLabel || "공공 관광 데이터")}</span></div>${shareRow}</header>`;
   const coupangKeyword = eventCoupangKeyword(event);
   const basicInfoSection = `<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">핵심 방문정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("주소", event.address && cleanText(event.address) !== place ? event.address : "")}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("주차", event.parking || event.parkingInfo)}${infoRow("교통", event.transport || event.traffic || event.publicTransport)}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}${infoRow("예매처", event.booking)}${infoRow("공식 홈페이지", official)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section>`;
   const aboutSection = `<section aria-labelledby="about-title"><p class="eyebrow">INTRODUCTION</p><h2 id="about-title">축제 소개</h2>${eventOverviewMarkup(event, title)}${inlinePhotoBlocks[0] || ""}<p>위 내용은 공개 관광 데이터에 등록된 소개와 기본 정보를 바탕으로 정리했습니다. 운영기관의 실시간 공지를 대신하지 않으므로 방문 전 회차, 입장 마감, 취소 여부를 다시 확인하세요.</p></section>`;
