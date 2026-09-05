@@ -171,11 +171,20 @@ function formatEventPeriod(start, end) {
 }
 
 function normalizeUrl(value) {
-  const text = String(value || "").trim();
+  const href = String(value || "").match(/\bhref=["']([^"']+)["']/i)?.[1];
+  const text = String(href || value || "").replace(/<[^>]*>/g, " ").trim();
   if (!text) return "";
   const url = text.startsWith("//") ? `https:${text}` : text;
   if (!/^https?:\/\//i.test(url)) return "";
   return url.replace(/^http:/i, "https:");
+}
+
+function cleanText(value) {
+  return String(value || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 // Normalizes a raw TourAPI searchFestival2 item into the shape the site's
@@ -436,6 +445,143 @@ async function fetchFestivalGallery(item, regionLabel) {
   return images;
 }
 
+function normalizeApiItem(item) {
+  return Array.isArray(item) ? item[0] : item || {};
+}
+
+function normalizeApiItems(item) {
+  if (Array.isArray(item)) return item;
+  return item ? [item] : [];
+}
+
+function addDetailInfo(details, label, value) {
+  const clean = cleanText(value);
+  if (!clean || clean === "0" || clean === "선택안함") return;
+  if (details.some((item) => item.label === label && item.value === clean)) return;
+  details.push({ label, value: clean });
+}
+
+function collectTourDetailInfo(commonItem, introItem, detailInfoItems) {
+  const details = [];
+  addDetailInfo(details, "행사 장소", introItem?.eventplace);
+  addDetailInfo(details, "행사 시간", introItem?.playtime);
+  addDetailInfo(details, "이용 요금", introItem?.usetimefestival);
+  addDetailInfo(details, "주최 기관", introItem?.sponsor1);
+  addDetailInfo(details, "주관 기관", introItem?.sponsor2);
+  addDetailInfo(details, "문의 전화", introItem?.sponsor1tel || commonItem?.tel);
+  addDetailInfo(details, "행사 프로그램", introItem?.program);
+  addDetailInfo(details, "부대 행사", introItem?.subevent);
+  addDetailInfo(details, "관람 소요시간", introItem?.spendtimefestival);
+  addDetailInfo(details, "참가 연령", introItem?.agelimit);
+  addDetailInfo(details, "예매처", introItem?.bookingplace);
+  addDetailInfo(details, "행사장 위치 안내", introItem?.placeinfo);
+  addDetailInfo(details, "할인 정보", introItem?.discountinfofestival);
+  addDetailInfo(details, "축제 등급", introItem?.festivalgrade);
+
+  detailInfoItems.forEach((item) => {
+    addDetailInfo(details, item?.infoname || item?.serialnum || "상세 정보", item?.infotext);
+  });
+
+  return details;
+}
+
+async function fetchFestivalOfficialDetails(item) {
+  if (!item.contentId) return {};
+
+  const baseQuery = {
+    contentId: item.contentId,
+    contentTypeId: item.contentTypeId || "15"
+  };
+  const detailUrl = (endpoint, extra = {}) => {
+    const query = new URLSearchParams({ endpoint, ...baseQuery, ...extra });
+    return `${siteOrigin}/api/tour-detail?${query.toString()}`;
+  };
+
+  const [commonResult, introResult, infoResult] = await Promise.allSettled([
+    fetchJson(detailUrl("detailCommon2", {
+      defaultYN: "Y",
+      firstImageYN: "Y",
+      areacodeYN: "Y",
+      catcodeYN: "Y",
+      addrinfoYN: "Y",
+      mapinfoYN: "Y",
+      overviewYN: "Y"
+    })),
+    fetchJson(detailUrl("detailIntro2")),
+    fetchJson(detailUrl("detailInfo2", { numOfRows: "30", pageNo: "1" }))
+  ]);
+
+  const commonPayload = commonResult.status === "fulfilled" ? commonResult.value : {};
+  const introPayload = introResult.status === "fulfilled" ? introResult.value : {};
+  const infoPayload = infoResult.status === "fulfilled" ? infoResult.value : {};
+  const commonItem = normalizeApiItem(commonPayload?.response?.body?.items?.item);
+  const introItem = normalizeApiItem(introPayload?.response?.body?.items?.item);
+  const detailInfoItems = normalizeApiItems(infoPayload?.response?.body?.items?.item);
+
+  if (!commonItem?.title && !introItem?.contentid && !detailInfoItems.length) {
+    const error = [commonResult, introResult, infoResult].find((result) => result.status === "rejected")?.reason;
+    if (error) console.warn(`${item.title || item.id} 상세 정보를 불러오지 못했습니다.`, error?.message || error);
+    return {};
+  }
+
+  const start = compactDate(introItem?.eventstartdate);
+  const end = compactDate(introItem?.eventenddate);
+  const detailDate = start || end ? (start && end && start !== end ? `${start}~${end}` : start || end) : "";
+  const address = [commonItem?.addr1, commonItem?.addr2].filter(Boolean).join(" ").trim();
+  const place = cleanText(introItem?.eventplace || commonItem?.addr2 || commonItem?.addr1);
+  const homepage = normalizeUrl(commonItem?.homepage || introItem?.eventhomepage);
+  const org = [cleanText(introItem?.sponsor1), cleanText(introItem?.sponsor2)].filter(Boolean).join(" / ");
+  const detailInfo = collectTourDetailInfo(commonItem, introItem, detailInfoItems);
+  const summary = cleanText(commonItem?.overview) || item.summary;
+
+  return {
+    summary,
+    overview: cleanText(commonItem?.overview),
+    date: detailDate || item.date,
+    image: normalizeUrl(commonItem?.firstimage || commonItem?.firstimage2) || item.image,
+    address: address || item.address,
+    place: place || item.place,
+    tel: cleanText(introItem?.sponsor1tel || commonItem?.tel) || item.tel,
+    homepage: homepage || item.homepage,
+    fee: cleanText(introItem?.usetimefestival) || item.fee,
+    time: cleanText(introItem?.playtime) || item.time,
+    org: org || item.org,
+    target: cleanText(introItem?.agelimit) || item.target,
+    program: cleanText(introItem?.program),
+    subevent: cleanText(introItem?.subevent),
+    booking: cleanText(introItem?.bookingplace),
+    placeInfo: cleanText(introItem?.placeinfo),
+    discountInfo: cleanText(introItem?.discountinfofestival),
+    spendTime: cleanText(introItem?.spendtimefestival),
+    festivalGrade: cleanText(introItem?.festivalgrade),
+    detailInfo,
+    lat: cleanText(commonItem?.mapy) || item.lat,
+    lng: cleanText(commonItem?.mapx) || item.lng,
+    updatedAt: cleanText(commonItem?.modifiedtime || commonItem?.createdtime) || item.updatedAt
+  };
+}
+
+const DETAIL_FETCH_CONCURRENCY = 6;
+const DETAIL_FETCH_LIMIT = Number(process.env.DETAIL_FETCH_LIMIT) || 260;
+
+async function attachOfficialDetails(items) {
+  const targets = items.slice(0, DETAIL_FETCH_LIMIT);
+  const queue = [...targets];
+
+  async function worker() {
+    while (queue.length) {
+      const item = queue.shift();
+      const details = await fetchFestivalOfficialDetails(item);
+      Object.assign(item, details);
+    }
+  }
+
+  await Promise.all(Array.from({ length: DETAIL_FETCH_CONCURRENCY }, worker));
+  const withOverview = targets.filter((item) => cleanText(item.overview)).length;
+  const withFees = targets.filter((item) => cleanText(item.fee)).length;
+  console.log(`${targets.length}개 축제의 TourAPI 상세 정보를 확인했고, 소개 ${withOverview}개 · 요금 ${withFees}개를 보강했습니다.`);
+}
+
 // Runs gallery lookups with limited concurrency so a run with hundreds of
 // festivals doesn't fire hundreds of simultaneous requests at once.
 async function attachGalleryImages(items) {
@@ -694,6 +840,7 @@ async function main() {
   // Sort so the freshest/soonest-starting festivals lead the feed.
   items.sort((a, b) => a.date.localeCompare(b.date));
 
+  await attachOfficialDetails(items);
   await attachGalleryImages(items);
   const legacyItems = await previousEventItems(items);
 

@@ -378,6 +378,112 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
   margin: 0;
 }
 
+.event-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 10px 0 24px;
+}
+
+.event-insight-grid article {
+  min-width: 0;
+  padding: 18px;
+  border-top: 3px solid var(--accent-dark);
+  background: var(--soft);
+}
+
+.event-insight-grid strong,
+.event-insight-grid p,
+.event-insight-grid small {
+  display: block;
+}
+
+.event-insight-grid strong {
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.event-insight-grid p {
+  margin: 9px 0 0;
+  color: var(--ink);
+  font-size: 18px !important;
+  font-weight: 800;
+  line-height: 1.55 !important;
+}
+
+.event-insight-grid small {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.event-body-note {
+  margin: 22px 0 0;
+  padding: 16px 18px;
+  border-left: 4px solid var(--accent);
+  background: #f9fbfb;
+  color: var(--muted);
+  font-size: 16px !important;
+  line-height: 1.75 !important;
+}
+
+.event-checklist {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.event-checklist li {
+  position: relative;
+  min-height: 48px;
+  padding: 13px 16px 13px 46px;
+  border: 1px solid var(--line);
+  background: #fff;
+  font-size: 16px !important;
+  line-height: 1.65 !important;
+}
+
+.event-checklist li::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 22px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.event-place-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.event-place-actions a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  color: var(--accent-dark);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.event-place-actions a:hover,
+.event-place-actions a:focus-visible {
+  background: var(--accent);
+  color: #fff;
+}
+
 @media (max-width: 700px) {
   .official-poster--hero {
     padding: 10px;

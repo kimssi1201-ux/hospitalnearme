@@ -185,7 +185,7 @@ function sharedHead({ title, description, canonical, robots = "index,follow,max-
     <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:url" content="${escapeHtml(canonical)}" />
     ${imageMeta}
-    <link rel="stylesheet" href="/article-static.css?v=20260904-magazine-detail-4" />
+    <link rel="stylesheet" href="/article-static.css?v=20260905-rich-detail-1" />
     ${adCode}`;
 }
 
@@ -362,9 +362,12 @@ function highlightCard(label, value) {
 }
 
 function eventVisitHighlights(event, place) {
+  const status = eventStatusInfo(event);
   const cards = [
+    status ? highlightCard("상태", status.label) : "",
     highlightCard("기간", event.date),
     highlightCard("장소", place),
+    highlightCard("시간", event.time),
     highlightCard("요금", event.fee || (event.isFree ? "무료" : "")),
     highlightCard("문의", event.tel)
   ].filter(Boolean);
@@ -375,20 +378,110 @@ function eventVisitHighlights(event, place) {
 function programInfoMarkup(event) {
   const rows = [
     cleanText(event.time) ? `<li><strong>운영 시간</strong><span>${escapeHtml(cleanText(event.time))}</span></li>` : "",
+    cleanText(event.program) ? `<li><strong>행사 프로그램</strong><span>${escapeHtml(cleanText(event.program))}</span></li>` : "",
+    cleanText(event.subevent) ? `<li><strong>부대 행사</strong><span>${escapeHtml(cleanText(event.subevent))}</span></li>` : "",
+    cleanText(event.spendTime) ? `<li><strong>관람 소요시간</strong><span>${escapeHtml(cleanText(event.spendTime))}</span></li>` : "",
     cleanText(event.target) ? `<li><strong>이용 대상</strong><span>${escapeHtml(cleanText(event.target))}</span></li>` : "",
     cleanText(event.fee) ? `<li><strong>이용 요금</strong><span>${escapeHtml(cleanText(event.fee))}</span></li>` : "",
-    cleanText(event.org) ? `<li><strong>주최·기관</strong><span>${escapeHtml(cleanText(event.org))}</span></li>` : ""
+    cleanText(event.booking) ? `<li><strong>예매처</strong><span>${escapeHtml(cleanText(event.booking))}</span></li>` : "",
+    cleanText(event.org) ? `<li><strong>주최·기관</strong><span>${escapeHtml(cleanText(event.org))}</span></li>` : "",
+    cleanText(event.discountInfo) ? `<li><strong>할인 정보</strong><span>${escapeHtml(cleanText(event.discountInfo))}</span></li>` : ""
   ].filter(Boolean);
   if (!rows.length) {
-    return `<p>공식 공개 데이터에 세부 프로그램 항목은 등록되어 있지 않습니다. 회차, 체험 프로그램, 입장 마감은 공식 안내에서 확인하세요.</p>`;
+    return `<p>공식 공개 데이터에 세부 프로그램 항목은 아직 등록되어 있지 않습니다. 회차, 체험 프로그램, 입장 마감은 행사 주최 측 공지에서 확인하세요.</p>`;
   }
   return `<ul class="visit-fact-list">${rows.join("")}</ul>`;
+}
+
+function eventOfficialDetailList(event) {
+  const details = Array.isArray(event.detailInfo) ? event.detailInfo : [];
+  const repeated = new Set(["행사소개", "행사 장소", "행사 시간", "이용 요금", "주최 기관", "주관 기관", "문의 전화", "행사 프로그램", "부대 행사", "관람 소요시간", "참가 연령", "예매처"]);
+  const rows = details
+    .filter((item) => cleanText(item?.label) && cleanText(item?.value))
+    .filter((item) => !repeated.has(cleanText(item.label)))
+    .slice(0, 10)
+    .map((item) => `<li><strong>${escapeHtml(cleanText(item.label))}</strong><span>${escapeHtml(cleanText(item.value))}</span></li>`);
+  return rows.length ? `<ul class="visit-fact-list visit-fact-list--official">${rows.join("")}</ul>` : "";
+}
+
+function eventOverviewParagraphs(value) {
+  const overview = cleanText(value);
+  if (!overview) return [];
+  const hardBreaks = overview
+    .split(/\n+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (hardBreaks.length > 1) return hardBreaks.slice(0, 5);
+
+  const sentences = [];
+  const sentencePattern = /.+?(?:(?<!\d)[.!?。](?=\s+[가-힣A-Z0-9"'“‘])|(?<!\d)[.!?。](?=\s*$)|$)/g;
+  for (const match of overview.matchAll(sentencePattern)) {
+    const text = match[0].trim();
+    if (text) sentences.push(text);
+  }
+  if (sentences.length <= 2) return [overview];
+
+  const paragraphs = [];
+  let buffer = "";
+  sentences.forEach((sentence) => {
+    const next = buffer ? `${buffer} ${sentence}` : sentence;
+    if (next.length > 180 && buffer) {
+      paragraphs.push(buffer);
+      buffer = sentence;
+    } else {
+      buffer = next;
+    }
+  });
+  if (buffer) paragraphs.push(buffer);
+  return paragraphs.slice(0, 5);
+}
+
+function eventOverviewMarkup(event, title) {
+  const chunks = eventOverviewParagraphs(event.overview || event.summary);
+  if (!chunks.length) {
+    return `<p>${escapeHtml(title)}의 공식 소개문은 공개 데이터에 별도로 제공되지 않았습니다. 이 페이지에서는 현재 확인 가능한 일정, 장소, 문의처와 방문 전 체크 항목을 중심으로 정리했습니다.</p>`;
+  }
+  return chunks.map((item) => `<p>${escapeHtml(item)}</p>`).join("");
+}
+
+function eventPlanningSection(event, place, official, mapUrl) {
+  const status = eventStatusInfo(event);
+  const periodText = cleanText(event.date) || "공식 일정 확인";
+  const timeText = cleanText(event.time) || "날짜별 운영 시간이 다를 수 있어 공식 공지를 확인해야 합니다.";
+  const feeText = cleanText(event.fee) || "요금 정보가 공개되지 않았거나 현장 프로그램별로 다를 수 있습니다.";
+  const placeText = place || "공식 안내의 행사장 주소";
+  const officialText = official ? "공식 홈페이지 연결 가능" : "공식 홈페이지가 공개 데이터에 별도로 등록되지 않음";
+
+  return `<section aria-labelledby="planning-title"><p class="eyebrow">VISIT PLAN</p><h2 id="planning-title">방문 전에 이렇게 확인하세요</h2><div class="event-insight-grid"><article><strong>일정</strong><p>${escapeHtml(periodText)}</p><small>${status ? `${escapeHtml(status.label)} 상태로 분류됩니다.` : "날짜 기준 상태는 공식 일정을 기준으로 다시 확인하세요."}</small></article><article><strong>운영</strong><p>${escapeHtml(timeText)}</p><small>공연, 체험, 먹거리 부스는 전체 운영시간과 다르게 마감될 수 있습니다.</small></article><article><strong>요금</strong><p>${escapeHtml(feeText)}</p><small>무료 행사도 체험·먹거리·주차 비용은 별도일 수 있습니다.</small></article><article><strong>장소</strong><p>${escapeHtml(placeText)}</p><small>${mapUrl ? "지도에서 출입구와 주변 이동 시간을 확인하세요." : "정확한 출입구는 방문 전 공식 안내를 확인하세요."}</small></article></div><p class="event-body-note">${escapeHtml(officialText)}. 날짜, 시간, 요금, 장소는 현장 사정이나 날씨에 따라 바뀔 수 있으므로 출발 전 최신 공지를 한 번 더 확인하는 것이 좋습니다.</p></section>`;
 }
 
 function visitFlowMarkup(official, mapUrl) {
   const officialText = official ? "공식 안내에서 운영 변경과 회차를 확인합니다." : "공식 안내가 별도로 공개되면 운영 변경과 회차를 먼저 확인합니다.";
   const mapText = mapUrl ? "지도에서 행사장 위치와 가장 가까운 출입구를 확인합니다." : "주소가 공개되면 지도에서 행사장 위치와 가장 가까운 출입구를 확인합니다.";
   return `<ol class="visit-flow"><li><span>1</span><p>${escapeHtml(officialText)}</p></li><li><span>2</span><p>${escapeHtml(mapText)}</p></li><li><span>3</span><p>요금, 증빙서류, 현장 발권 여부를 출발 전에 다시 확인합니다.</p></li></ol>`;
+}
+
+function eventChecklistMarkup(event, official, mapUrl) {
+  const checklist = [
+    cleanText(event.date) ? `방문하려는 날짜가 ${cleanText(event.date)} 기간 안에 있는지 확인` : "방문 날짜와 실제 운영일 확인",
+    cleanText(event.time) ? `운영 시간 ${cleanText(event.time)}와 마지막 입장·마감 시간을 구분해서 확인` : "운영 시간과 마지막 입장 시간 확인",
+    cleanText(event.fee) ? `이용 요금 ${cleanText(event.fee)}와 별도 체험비·주차비 확인` : "입장료, 체험비, 주차비 등 별도 비용 확인",
+    mapUrl ? "지도에서 행사장 출입구, 주차 위치, 도보 이동 시간을 미리 확인" : "행사장 주소와 출입구 위치 확인",
+    cleanText(event.tel) ? `문의처 ${cleanText(event.tel)} 또는 공식 안내에서 변경 공지 확인` : "문의처 또는 공식 안내에서 변경 공지 확인",
+    official ? "공식 안내 페이지에서 우천·취소·매진 여부 확인" : "우천·취소·매진 여부는 주최 측 공지에서 확인"
+  ];
+  return `<section aria-labelledby="checklist-title"><p class="eyebrow">CHECKLIST</p><h2 id="checklist-title">출발 전 체크리스트</h2><ul class="event-checklist">${checklist.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>`;
+}
+
+function eventNearbyMarkup(event, place, mapUrl) {
+  const queryBase = place || cleanText(event.address);
+  const mapLinks = queryBase ? [
+    ["주변 관광지", `${queryBase} 주변 가볼만한곳`],
+    ["주변 맛집", `${queryBase} 맛집`],
+    ["주변 주차", `${queryBase} 주차장`]
+  ].map(([label, query]) => `<a href="https://map.naver.com/p/search/${encodeURIComponent(query)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)} 찾기</a>`).join("") : "";
+
+  return `<section aria-labelledby="nearby-title"><p class="eyebrow">NEARBY</p><h2 id="nearby-title">주변 동선 잡기</h2><p>${queryBase ? `${escapeHtml(queryBase)} 주변은 행사 당일 교통량과 보행 동선이 달라질 수 있습니다.` : "행사장 주변 동선은 방문 전 지도와 공식 안내를 함께 확인하세요."} 대한축제뉴스는 확인되지 않은 명소를 임의로 추천하지 않고, 실제 지도 검색으로 이동 시간을 확인할 수 있게 정리합니다.</p>${mapLinks ? `<div class="event-place-actions">${mapLinks}</div>` : ""}${mapUrl ? `<p class="event-body-note">행사장 검색 결과는 지도 서비스의 최신 정보에 따라 달라질 수 있습니다.</p>` : ""}</section>`;
 }
 
 function eventMonth(event = {}) {
@@ -461,10 +554,14 @@ function eventPage(event, sourceLabel, sidebarItems = []) {
     ? `<figure class="official-poster official-poster--hero" style="--article-hero-image: url(&quot;${escapeHtml(heroImage)}&quot;)"><img src="${escapeHtml(heroImage)}" alt="${escapeHtml(title)} 대표 이미지" /><figcaption>${primaryImage ? "공개 행사 정보에 등록된 공식 이미지입니다." : "공개 행사 정보에 등록된 대표 이미지입니다."}</figcaption></figure>`
     : `<div class="poster-empty poster-empty--hero" role="img" aria-label="등록된 행사 이미지 없음"><strong>대한축제뉴스</strong><span>축제 이미지 준비 중</span></div>`;
   const openingTitle = `${title}, 방문 전 먼저 볼 것`;
-  const openingCopy = `${event.date ? `공개 일정은 ${cleanText(event.date)}입니다. ` : ""}${place ? `방문지는 ${place}입니다. ` : ""}아래에는 요금, 교통, 주차처럼 방문 전에 확인해야 할 항목을 공식 공개 데이터 중심으로 정리했습니다.`;
+  const openingCopy = `${event.date ? `공개 일정은 ${cleanText(event.date)}입니다. ` : ""}${place ? `방문지는 ${place}입니다. ` : ""}공식 공개 데이터에 등록된 소개, 운영 시간, 요금, 문의처, 위치 정보를 중심으로 방문 전 필요한 항목을 정리했습니다.`;
   const openingSection = `<section class="event-opening-section" aria-labelledby="opening-title"><p class="eyebrow">FESTIVAL STORY</p><h2 id="opening-title">${escapeHtml(openingTitle)}</h2>${heroMarkup}<p>${escapeHtml(openingCopy)}</p></section>`;
   const titleHeader = `<header class="article-header event-title-header"><div class="event-title-meta"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p>${status}</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p><div class="byline"><span>대한축제뉴스 편집부</span><span>입력 ${escapeHtml(kstDate())}</span><span>자료 ${escapeHtml(sourceLabel || "공공 관광 데이터")}</span></div>${shareRow}</header>`;
   const coupangKeyword = eventCoupangKeyword(event);
+  const basicInfoSection = `<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">핵심 방문정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("주소", event.address && cleanText(event.address) !== place ? event.address : "")}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("주차", event.parking || event.parkingInfo)}${infoRow("교통", event.transport || event.traffic || event.publicTransport)}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}${infoRow("예매처", event.booking)}${infoRow("공식 홈페이지", official)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section>`;
+  const aboutSection = `<section aria-labelledby="about-title"><p class="eyebrow">INTRODUCTION</p><h2 id="about-title">축제 소개</h2>${eventOverviewMarkup(event, title)}${inlinePhotoBlocks[0] || ""}<p>위 내용은 공개 관광 데이터에 등록된 소개와 기본 정보를 바탕으로 정리했습니다. 운영기관의 실시간 공지를 대신하지 않으므로 방문 전 회차, 입장 마감, 취소 여부를 다시 확인하세요.</p></section>`;
+  const programSection = `<section aria-labelledby="program-title"><p class="eyebrow">PROGRAM</p><h2 id="program-title">주요 프로그램과 이용 조건</h2>${programInfoMarkup(event)}${eventOfficialDetailList(event)}${inlinePhotoBlocks[1] || ""}<p>프로그램은 날짜와 시간대에 따라 운영 여부가 달라질 수 있습니다. 인기 체험, 공연, 먹거리 부스는 조기 마감될 수 있으니 가장 보고 싶은 항목부터 확인하는 편이 좋습니다.</p></section>`;
+  const transportSection = `<section aria-labelledby="transport-title"><p class="eyebrow">TRANSPORT</p><h2 id="transport-title">주차·교통</h2><p>${place ? `${escapeHtml(place)} 기준으로 행사장 위치와 출입구를 먼저 확인하세요.` : "공식 안내에 표시된 정확한 장소와 출입구를 먼저 확인하세요."} 행사장 주차 정보가 제공되지 않았거나 불명확하면 대중교통을 우선 비교하고, 차량 이용 시에는 인근 공영주차장의 운영 시간과 요금을 별도로 확인하는 편이 안전합니다.</p>${inlinePhotoBlocks[2] || ""}${visitFlowMarkup(official, mapUrl)}</section>`;
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Event",
@@ -475,7 +572,7 @@ function eventPage(event, sourceLabel, sidebarItems = []) {
     organizer: event.org ? { "@type": "Organization", name: cleanText(event.org) } : undefined,
     url: official || canonical
   }).replace(/</g, "\\u003c");
-  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${title} 일정·장소·요금 | 대한축제뉴스`, description, canonical, robots: "noindex,follow,max-image-preview:large", ads: false, image: heroImage })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main article-main--with-sidebar event-main"><div class="article-layout"><article class="event-article article-content">${breadcrumb}${titleHeader}${openingSection}${highlights}<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">핵심 방문정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("주소", event.address && cleanText(event.address) !== place ? event.address : "")}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("주차", event.parking || event.parkingInfo)}${infoRow("교통", event.transport || event.traffic || event.publicTransport)}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}${infoRow("공식 홈페이지", official)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section><section aria-labelledby="about-title"><p class="eyebrow">INTRODUCTION</p><h2 id="about-title">축제 소개</h2>${inlinePhotoBlocks[0] || ""}<p>공개 데이터는 행사 탐색을 돕는 자료이며 운영기관의 실시간 공지를 대신하지 않습니다. 회차별 입장 시간, 매진 여부, 현장 발권, 휴관 또는 취소 공지는 공식 안내에서 확인하세요.</p></section><section aria-labelledby="program-title"><p class="eyebrow">PROGRAM</p><h2 id="program-title">주요 프로그램 확인</h2>${programInfoMarkup(event)}${inlinePhotoBlocks[1] || ""}<p>체험 프로그램, 공연 회차, 입장 마감처럼 날짜별로 달라지는 항목은 방문 직전 공식 안내에서 다시 확인하세요.</p></section><section aria-labelledby="transport-title"><p class="eyebrow">TRANSPORT</p><h2 id="transport-title">주차·교통</h2><p>${place ? `${escapeHtml(place)}을(를) 기준으로 행사장 위치와 출입구를 먼저 확인하세요.` : "공식 안내에 표시된 정확한 장소와 출입구를 먼저 확인하세요."} 행사장 주차 정보가 제공되지 않았거나 불명확하면 대중교통을 우선 비교하고, 차량 이용 시에는 인근 공영주차장의 운영 시간과 요금을 별도로 확인하는 편이 안전합니다.</p>${inlinePhotoBlocks[2] || ""}${visitFlowMarkup(official, mapUrl)}</section><section aria-labelledby="nearby-title"><p class="eyebrow">NEARBY</p><h2 id="nearby-title">주변 같이 갈 곳</h2><p>이 행사 데이터에는 주변 관광지 목록이 별도로 포함되어 있지 않습니다. 대한축제뉴스는 확인되지 않은 주변 명소를 임의로 추천하지 않으며, 실제 방문 전에는 공식 안내와 지도에서 주변 이동 시간을 함께 확인하세요.</p></section><aside class="source-note"><strong>정보 출처</strong><p>${escapeHtml(sourceLabel || "공공 관광 데이터")}에 공개된 항목을 정리했습니다. 대한축제뉴스는 비어 있는 운영 정보를 임의로 추정하지 않습니다.</p>${official ? `<a href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">원문에서 최신 정보 확인</a>` : `<a href="/editorial-policy">편집 원칙 확인</a>`}</aside>${coupangTravelProductsAd(`event-${id}`, coupangKeyword)}</article>${sidebar}</div></main>${siteFooter()}${coupangTravelProductsScript()}</body></html>`;
+  return `<!doctype html><html lang="ko"><head>${sharedHead({ title: `${title} 일정·장소·요금 | 대한축제뉴스`, description, canonical, robots: "noindex,follow,max-image-preview:large", ads: false, image: heroImage })}<script type="application/ld+json">${jsonLd}</script></head><body>${siteHeader()}<main class="article-main article-main--with-sidebar event-main"><div class="article-layout"><article class="event-article article-content">${breadcrumb}${titleHeader}${openingSection}${highlights}${basicInfoSection}${eventPlanningSection(event, place, official, mapUrl)}${aboutSection}${programSection}${transportSection}${eventChecklistMarkup(event, official, mapUrl)}${eventNearbyMarkup(event, place, mapUrl)}<aside class="source-note"><strong>정보 출처</strong><p>${escapeHtml(sourceLabel || "공공 관광 데이터")}에 공개된 항목을 정리했습니다. 대한축제뉴스는 비어 있는 운영 정보를 임의로 추정하지 않습니다.</p>${official ? `<a href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">원문에서 최신 정보 확인</a>` : `<a href="/editorial-policy">편집 원칙 확인</a>`}</aside>${coupangTravelProductsAd(`event-${id}`, coupangKeyword)}</article>${sidebar}</div></main>${siteFooter()}${coupangTravelProductsScript()}</body></html>`;
 }
 
 export async function generateStaticArticles() {

@@ -10,7 +10,7 @@
     "test": "node --test test/*.test.mjs",
     "syntax": "node scripts/check-javascript.mjs",
     "lint": "node scripts/check-project.mjs",
-    "build": "npm run generate:articles && npm run lint && npm run syntax",
-    "check": "npm run lint && npm run syntax && npm test"
+    "build": "node scripts/generate-static-articles.mjs && node scripts/check-project.mjs && node scripts/check-javascript.mjs",
+    "check": "node scripts/check-project.mjs && node scripts/check-javascript.mjs && node --test test/*.test.mjs"
   }
 }
