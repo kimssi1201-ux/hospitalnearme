@@ -267,6 +267,10 @@ test("current event pages use exact public data, noindex, and the Coupang widget
     assert.match(source, /비어 있는 운영 정보를 임의로 추정하지 않습니다/);
     assert.match(source, /class="event-opening-section"/);
     assert.match(source, /id="opening-title"/);
+    assert.match(source, /class="sr-only">대표 이미지와 방문 개요/);
+    assert.match(source, /<h1>[^<]+, [^<]+ 한눈에 보기<\/h1>/);
+    assert.match(source, /class="event-lead"/);
+    assert.match(source, /class="event-opening-summary"/);
     assert.match(source, /https:\/\/view1\.kr\/seoul-events\//);
     for (const match of source.matchAll(/<img\b[^>]+src="([^"]+)"/g)) {
       const host = new URL(match[1].replaceAll("&amp;", "&")).hostname;
@@ -283,8 +287,11 @@ test("event article images stay restrained inside the post body", async () => {
   const posterImageRule = css.match(/\.official-poster img\s*\{[\s\S]*?\n\}/)?.[0] || "";
   const inlinePhotoRule = css.match(/\.event-inline-photo img\s*\{[\s\S]*?\n\}/)?.[0] || "";
 
-  assert.match(headSource, /article-static\.css\?v=20260905-rich-detail-1/);
+  assert.match(headSource, /article-static\.css\?v=20260905-title-body-1/);
   assert.match(css, /\.article-layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*790px\)\s*minmax\(260px,\s*320px\)/);
+  assert.match(css, /\.event-title-header h1\s*\{[\s\S]*?font-size:\s*clamp\(42px,\s*4\.4vw,\s*58px\)/);
+  assert.match(css, /\.event-title-header \.event-lead\s*\{[\s\S]*?line-height:\s*1\.72\s*!important/);
+  assert.match(css, /\.event-opening-summary\s*\{[\s\S]*?line-height:\s*1\.86\s*!important/);
   assert.match(css, /\.article-sidebar-thumb img\s*\{[\s\S]*?object-fit:\s*contain/);
   assert.match(css, /\.event-opening-section \.official-poster--hero\s*\{[\s\S]*?background:\s*var\(--soft\)/);
   assert.match(css, /\.event-opening-section \.official-poster--hero img\s*\{[\s\S]*?max-height:\s*580px/);

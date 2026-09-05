@@ -610,3 +610,222 @@ td small { margin-top: 6px; color: var(--muted); font-size: 14px; }
     width: 112px;
   }
 }
+
+/* 2026-09 article title/body reference pass: stronger magazine headline, leaner body rhythm. */
+:root {
+  --article-blue: #0057c8;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.event-main .article-layout {
+  grid-template-columns: minmax(0, 760px) minmax(260px, 320px);
+}
+
+.event-title-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.event-title-header h1 {
+  max-width: 760px;
+  color: #111820;
+  font-size: clamp(42px, 4.4vw, 58px);
+  font-weight: 900;
+  line-height: 1.12;
+}
+
+.event-title-header .event-lead {
+  max-width: 720px;
+  margin: 22px 0 0;
+  color: #26323a;
+  font-size: 20px !important;
+  font-weight: 400;
+  line-height: 1.72 !important;
+}
+
+.event-title-header .byline {
+  margin-top: 20px;
+  color: #46525b;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.event-title-header .article-share-row {
+  margin-top: 18px;
+}
+
+.event-opening-section {
+  padding: 24px 0 46px !important;
+  border-bottom: 0 !important;
+}
+
+.event-opening-section .official-poster--hero {
+  margin: 0 0 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.event-opening-section .official-poster--hero img {
+  width: 100%;
+  max-height: 560px;
+}
+
+.event-opening-summary {
+  max-width: 700px;
+  margin: 0;
+  color: #242b31;
+  font-size: 19px !important;
+  font-weight: 500;
+  line-height: 1.86 !important;
+}
+
+.event-article > section:not(.event-opening-section):not(.event-visit-highlights) {
+  padding: 46px 0;
+  border-bottom-color: #edf2f4;
+}
+
+.event-article h2,
+.editorial-article h2 {
+  max-width: 720px;
+  color: #111820;
+  font-size: clamp(30px, 3.4vw, 38px);
+  font-weight: 900;
+  line-height: 1.22;
+}
+
+.event-article section > p,
+.editorial-article section > p {
+  max-width: 700px;
+  margin: 0 0 22px;
+  color: #252d33;
+  font-size: 18.5px !important;
+  line-height: 1.9 !important;
+}
+
+.event-article section > p:last-child,
+.editorial-article section > p:last-child {
+  margin-bottom: 0;
+}
+
+.event-inline-photo {
+  max-width: 720px;
+  margin: 34px 0 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.event-inline-photo img {
+  width: 100%;
+  max-height: 460px;
+  border-radius: 0;
+}
+
+.event-inline-photo figcaption {
+  margin-top: 8px;
+  color: #6b747c;
+  text-align: left;
+}
+
+.event-visit-highlights {
+  padding: 22px 0 8px;
+}
+
+.event-visit-highlights div,
+.event-insight-grid article,
+.visit-fact-list li,
+.event-checklist li {
+  border-color: #e3eaed;
+  background: #f8fbfb;
+}
+
+.article-sidebar h2 {
+  border-bottom-color: var(--article-blue);
+}
+
+@media (max-width: 980px) {
+  .event-main .article-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .article-main--with-sidebar {
+    width: calc(100% - 28px);
+    padding-top: 18px;
+  }
+
+  .article-breadcrumb {
+    margin-bottom: 18px;
+  }
+
+  .event-title-header {
+    padding-bottom: 18px;
+  }
+
+  .event-title-header h1 {
+    font-size: clamp(31px, 8.8vw, 42px);
+    line-height: 1.18;
+  }
+
+  .event-title-header .event-lead {
+    margin-top: 18px;
+    font-size: 18px !important;
+    line-height: 1.72 !important;
+  }
+
+  .event-title-header .byline {
+    gap: 7px 12px;
+    font-size: 13px;
+  }
+
+  .event-opening-section {
+    padding: 20px 0 40px !important;
+  }
+
+  .event-opening-section .official-poster--hero {
+    margin-bottom: 18px;
+  }
+
+  .event-opening-section .official-poster--hero img {
+    max-height: 420px;
+  }
+
+  .event-opening-summary,
+  .event-article section > p,
+  .editorial-article section > p {
+    font-size: 17px !important;
+    line-height: 1.86 !important;
+  }
+
+  .event-article h2,
+  .editorial-article h2 {
+    font-size: clamp(27px, 7.2vw, 34px);
+    line-height: 1.25;
+  }
+
+  .event-article > section:not(.event-opening-section):not(.event-visit-highlights) {
+    padding: 40px 0;
+  }
+
+  .event-inline-photo {
+    margin: 28px 0 30px;
+  }
+
+  .event-inline-photo img {
+    max-height: 330px;
+  }
+}

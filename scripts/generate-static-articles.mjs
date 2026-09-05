@@ -185,7 +185,7 @@ function sharedHead({ title, description, canonical, robots = "index,follow,max-
     <meta property="og:description" content="${escapeHtml(description)}" />
     <meta property="og:url" content="${escapeHtml(canonical)}" />
     ${imageMeta}
-    <link rel="stylesheet" href="/article-static.css?v=20260905-rich-detail-1" />
+    <link rel="stylesheet" href="/article-static.css?v=20260905-title-body-1" />
     ${adCode}`;
 }
 
@@ -531,6 +531,18 @@ function eventInlinePhoto(title, image, index) {
   return `<figure class="event-inline-photo"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)} 현장 이미지 ${index}" loading="lazy" /><figcaption>공개 행사 정보에 등록된 행사 이미지입니다.</figcaption></figure>`;
 }
 
+function eventArticleHeadline(event, title) {
+  const facts = [
+    cleanText(event.date) ? "일정" : "",
+    cleanText(event.place || event.address) ? "장소" : "",
+    cleanText(event.fee) ? "요금" : "",
+    cleanText(event.parking || event.parkingInfo) ? "주차" : "",
+    cleanText(event.transport || event.traffic || event.publicTransport) ? "교통" : ""
+  ].filter(Boolean);
+  const scope = facts.length ? facts.slice(0, 4).join("·") : "방문정보";
+  return `${title}, ${scope} 한눈에 보기`;
+}
+
 function eventPage(event, sourceLabel, sidebarItems = []) {
   const id = safeSlug(event.id);
   const canonical = `${siteOrigin}/seoul-events/${id}/`;
@@ -553,10 +565,10 @@ function eventPage(event, sourceLabel, sidebarItems = []) {
   const heroMarkup = heroImage
     ? `<figure class="official-poster official-poster--hero" style="--article-hero-image: url(&quot;${escapeHtml(heroImage)}&quot;)"><img src="${escapeHtml(heroImage)}" alt="${escapeHtml(title)} 대표 이미지" /><figcaption>${primaryImage ? "공개 행사 정보에 등록된 공식 이미지입니다." : "공개 행사 정보에 등록된 대표 이미지입니다."}</figcaption></figure>`
     : `<div class="poster-empty poster-empty--hero" role="img" aria-label="등록된 행사 이미지 없음"><strong>대한축제뉴스</strong><span>축제 이미지 준비 중</span></div>`;
-  const openingTitle = `${title}, 방문 전 먼저 볼 것`;
+  const articleHeadline = eventArticleHeadline(event, title);
   const openingCopy = `${event.date ? `공개 일정은 ${cleanText(event.date)}입니다. ` : ""}${place ? `방문지는 ${place}입니다. ` : ""}공식 공개 데이터에 등록된 소개, 운영 시간, 요금, 문의처, 위치 정보를 중심으로 방문 전 필요한 항목을 정리했습니다.`;
-  const openingSection = `<section class="event-opening-section" aria-labelledby="opening-title"><p class="eyebrow">FESTIVAL STORY</p><h2 id="opening-title">${escapeHtml(openingTitle)}</h2>${heroMarkup}<p>${escapeHtml(openingCopy)}</p></section>`;
-  const titleHeader = `<header class="article-header event-title-header"><div class="event-title-meta"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p>${status}</div><h1>${escapeHtml(title)}</h1><p>${escapeHtml(description)}</p><div class="byline"><span>대한축제뉴스 편집부</span><span>입력 ${escapeHtml(kstDate())}</span><span>자료 ${escapeHtml(sourceLabel || "공공 관광 데이터")}</span></div>${shareRow}</header>`;
+  const openingSection = `<section class="event-opening-section" aria-labelledby="opening-title"><h2 id="opening-title" class="sr-only">대표 이미지와 방문 개요</h2>${heroMarkup}<p class="event-opening-summary">${escapeHtml(openingCopy)}</p></section>`;
+  const titleHeader = `<header class="article-header event-title-header"><div class="event-title-meta"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p>${status}</div><h1>${escapeHtml(articleHeadline)}</h1><p class="event-lead">${escapeHtml(description)}</p><div class="byline"><span>대한축제뉴스 편집부</span><span>입력 ${escapeHtml(kstDate())}</span><span>자료 ${escapeHtml(sourceLabel || "공공 관광 데이터")}</span></div>${shareRow}</header>`;
   const coupangKeyword = eventCoupangKeyword(event);
   const basicInfoSection = `<section aria-labelledby="basic-title"><p class="eyebrow">BASIC INFO</p><h2 id="basic-title">핵심 방문정보</h2><div class="table-scroll"><table><tbody>${infoRow("일정", event.date, "날짜별 운영 시간은 공식 안내에서 확인하세요.")}${infoRow("장소", place)}${infoRow("주소", event.address && cleanText(event.address) !== place ? event.address : "")}${infoRow("운영 시간", event.time)}${infoRow("이용 요금", event.fee, "할인·무료 대상은 증빙 기준을 확인하세요.")}${infoRow("주차", event.parking || event.parkingInfo)}${infoRow("교통", event.transport || event.traffic || event.publicTransport)}${infoRow("이용 대상", event.target)}${infoRow("문의", event.tel)}${infoRow("주최·기관", event.org)}${infoRow("예매처", event.booking)}${infoRow("공식 홈페이지", official)}</tbody></table></div><div class="action-row">${official ? `<a class="primary-button" href="${escapeHtml(official)}" target="_blank" rel="noopener noreferrer">공식 안내 보기</a>` : ""}${mapUrl ? `<a class="secondary-button" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer">지도에서 장소 보기</a>` : ""}</div></section>`;
   const aboutSection = `<section aria-labelledby="about-title"><p class="eyebrow">INTRODUCTION</p><h2 id="about-title">축제 소개</h2>${eventOverviewMarkup(event, title)}${inlinePhotoBlocks[0] || ""}<p>위 내용은 공개 관광 데이터에 등록된 소개와 기본 정보를 바탕으로 정리했습니다. 운영기관의 실시간 공지를 대신하지 않으므로 방문 전 회차, 입장 마감, 취소 여부를 다시 확인하세요.</p></section>`;
