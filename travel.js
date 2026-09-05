@@ -12,6 +12,9 @@ const COUPANG_WIDGET_CONFIG = {
 };
 const DEFAULT_EVENT_IMAGE = "";
 const DEFAULT_FESTIVAL_IMAGE = "";
+const FEED_PAGE_SIZE = 6;
+const MOBILE_FEED_PAGE_SIZE = 5;
+const MOBILE_FEED_QUERY = "(max-width: 720px)";
 const IMAGE_FIELD_NAMES = [
   "image",
   "MAIN_IMG",
@@ -44,6 +47,12 @@ function seasonalTravelProductKeyword(date = new Date()) {
   return "겨울 여행 필수품";
 }
 
+function initialFeedPageSize() {
+  return typeof window !== "undefined" && window.matchMedia?.(MOBILE_FEED_QUERY).matches
+    ? MOBILE_FEED_PAGE_SIZE
+    : FEED_PAGE_SIZE;
+}
+
 const state = {
   apiArticles: [],
   placesArticles: [],
@@ -69,13 +78,12 @@ const state = {
   activeRegionId: "seoul",
   activeCategoryFilter: "all",
   searchQuery: "",
-  visibleFeedCount: 6,
+  visibleFeedCount: initialFeedPageSize(),
   newsLoading: true,
   language: getStoredLanguage()
 };
 let coupangWidgetScriptPromise = null;
 let affiliateLoadPromise = null;
-const FEED_PAGE_SIZE = 6;
 
 const MRT_SEARCH_COPY = {
   stay: {
@@ -2667,7 +2675,7 @@ function bindTopCategoryTabs() {
     const button = event.target.closest("[data-category-filter]");
     if (!button) return;
     state.activeCategoryFilter = button.getAttribute("data-category-filter") || "all";
-    state.visibleFeedCount = FEED_PAGE_SIZE;
+    state.visibleFeedCount = initialFeedPageSize();
     target.querySelectorAll(".category-tab").forEach((item) => {
       const isActive = item === button;
       item.classList.toggle("is-active", isActive);
@@ -2683,14 +2691,14 @@ function bindCategoryResetLinks() {
     if (!link) return;
     state.activeCategoryFilter = "all";
     state.searchQuery = "";
-    state.visibleFeedCount = FEED_PAGE_SIZE;
+    state.visibleFeedCount = initialFeedPageSize();
     renderJulyFestivals();
   });
 }
 
 function setFestivalSearchQuery(value = "", options = {}) {
   state.searchQuery = String(value || "").trim();
-  state.visibleFeedCount = FEED_PAGE_SIZE;
+  state.visibleFeedCount = initialFeedPageSize();
   renderJulyFestivals();
 
   if (options.focus) {
@@ -2850,18 +2858,6 @@ function buildMagazineNewsSections() {
 
   return [
     {
-      id: "travel-news",
-      eyebrow: "News",
-      title: "여행뉴스",
-      items: chooseMagazineItems(latest, items, used, 6)
-    },
-    {
-      id: "domestic-travel",
-      eyebrow: "Domestic",
-      title: "국내여행",
-      items: chooseMagazineItems(diverseRegionItems(items), items, used, 6)
-    },
-    {
       id: "festival-events",
       eyebrow: "Festival",
       title: "축제·행사",
@@ -2872,6 +2868,18 @@ function buildMagazineNewsSections() {
       eyebrow: "Tips",
       title: "여행팁",
       items: chooseMagazineItems(visitTips, items, used, 6)
+    },
+    {
+      id: "domestic-travel",
+      eyebrow: "Domestic",
+      title: "국내여행",
+      items: chooseMagazineItems(diverseRegionItems(items), items, used, 6)
+    },
+    {
+      id: "travel-news",
+      eyebrow: "News",
+      title: "여행뉴스",
+      items: chooseMagazineItems(latest, items, used, 6)
     },
     {
       id: "regional-festivals",
