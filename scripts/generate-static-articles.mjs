@@ -227,7 +227,8 @@ function latestContentSidebar(items = [], currentId = "") {
   if (!ordered.length) return "";
   const cards = ordered.map(({ item, image }) => {
     const slug = safeSlug(item.id);
-    return `<a class="article-sidebar-card" href="/seoul-events/${encodeURIComponent(slug)}/">${image ? `<span class="article-sidebar-thumb" style="--sidebar-image: url(&quot;${escapeHtml(image)}&quot;)"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.title)} 썸네일" loading="lazy" decoding="async" /></span>` : `<span class="article-sidebar-thumb article-sidebar-thumb--empty"><strong>DF</strong></span>`}<span class="article-sidebar-copy"><em>${escapeHtml(item.category || "축제 소식")}</em><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(sidebarDateLabel(item))}</small></span></a>`;
+    const title = cleanText(item.articleTitle || item.displayTitle || item.headline) || cleanText(item.title) || "축제 소식";
+    return `<a class="article-sidebar-card" href="/seoul-events/${encodeURIComponent(slug)}/">${image ? `<span class="article-sidebar-thumb" style="--sidebar-image: url(&quot;${escapeHtml(image)}&quot;)"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)} 썸네일" loading="lazy" decoding="async" /></span>` : `<span class="article-sidebar-thumb article-sidebar-thumb--empty"><strong>DF</strong></span>`}<span class="article-sidebar-copy"><em>${escapeHtml(item.category || "축제 소식")}</em><strong>${escapeHtml(title)}</strong><small>${escapeHtml(sidebarDateLabel(item))}</small></span></a>`;
   }).join("");
   return `<aside class="article-sidebar" aria-label="최신 콘텐츠"><h2>최신 콘텐츠</h2><div class="article-sidebar-list">${cards}</div></aside>`;
 }
@@ -716,7 +717,7 @@ function eventPage(event, sourceLabel, sidebarItems = []) {
   const heroMarkup = heroImage
     ? `<figure class="official-poster official-poster--hero" style="--article-hero-image: url(&quot;${escapeHtml(heroImage)}&quot;)"><img src="${escapeHtml(heroImage)}" alt="${escapeHtml(title)} 대표 이미지" /><figcaption>${primaryImage ? "공개 행사 정보에 등록된 공식 이미지입니다." : "공개 행사 정보에 등록된 대표 이미지입니다."}</figcaption></figure>`
     : `<div class="poster-empty poster-empty--hero" role="img" aria-label="등록된 행사 이미지 없음"><strong>대한축제뉴스</strong><span>축제 이미지 준비 중</span></div>`;
-  const articleHeadline = eventArticleHeadline(event, title, place);
+  const articleHeadline = cleanText(event.articleTitle || event.displayTitle || event.headline) || eventArticleHeadline(event, title, place);
   const articleLead = eventArticleLead(event, title, place);
   const openingSection = `<section class="event-opening-section" aria-labelledby="opening-title"><p class="eyebrow">ON SITE</p><h2 id="opening-title">${escapeHtml(eventOpeningTitle(event, title, place))}</h2>${heroMarkup}<div class="event-opening-copy">${eventOpeningBody(event, title, place)}</div></section>`;
   const titleHeader = `<header class="article-header event-title-header"><div class="event-title-meta"><p class="eyebrow">${escapeHtml(event.category || "축제 소식")}</p>${status}</div><h1>${escapeHtml(articleHeadline)}</h1><p class="event-lead">${escapeHtml(articleLead)}</p><div class="byline"><span>대한축제뉴스 편집부</span><span>입력 ${escapeHtml(kstDate())}</span><span>자료 ${escapeHtml(sourceLabel || "공공 관광 데이터")}</span></div>${shareRow}</header>`;

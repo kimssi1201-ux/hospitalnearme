@@ -316,6 +316,25 @@ test("festival thumbnails use no-crop API image frames", async () => {
   assert.match(updateSource, /festival-status-pill/);
 });
 
+test("festival listing cards use magazine article headlines", async () => {
+  const payload = JSON.parse(await readFile(path.join(root, "generated", "seoul-events.json"), "utf8"));
+  const indexSource = await readFile(path.join(root, "index.html"), "utf8");
+  const travelSource = await readFile(path.join(root, "travel.js"), "utf8");
+  const css = await readFile(path.join(root, "travel.css"), "utf8");
+  const items = [
+    ...(Array.isArray(payload.items) ? payload.items : []),
+    ...(Array.isArray(payload.legacyItems) ? payload.legacyItems : [])
+  ];
+
+  assert.ok(items.length > 0, "festival payload has items");
+  assert.ok(items.slice(0, 10).every((item) => /“[^”]+”… .+/.test(item.articleTitle || "")));
+  assert.match(indexSource, /<strong>“[^<]+”… [^<]+<\/strong>/);
+  assert.match(travelSource, /articleTitle:\s*item\.articleTitle/);
+  assert.match(travelSource, /function buildMagazineArticleTitle/);
+  assert.match(css, /article-style headlines/);
+  assert.match(css, /-webkit-line-clamp:\s*4\s*!important/);
+});
+
 test("legacy detail URLs redirect to canonical static pages", async () => {
   const workerSource = await readFile(path.join(root, "_worker.js"), "utf8");
   assert.match(workerSource, /function legacyDetailRedirect/);

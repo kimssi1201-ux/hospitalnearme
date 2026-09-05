@@ -501,6 +501,14 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function plainText(value) {
+  return String(value || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function safeExternalUrl(value) {
   const text = String(value || "").trim();
   if (!text) return "";
@@ -897,8 +905,139 @@ function displayEventDate(item = {}) {
   return item.date || "";
 }
 
+function articleDisplayText(item = {}) {
+  return [
+    item.title,
+    item.category,
+    item.subCategory,
+    item.rawCategory,
+    item.summary,
+    item.overview,
+    item.program,
+    item.subevent,
+    item.place,
+    item.address,
+    item.summaryParams?.address,
+    ...(Array.isArray(item.detailInfo) ? item.detailInfo.map((entry) => entry?.value) : [])
+  ].map(plainText).filter(Boolean).join(" ");
+}
+
+function articleFeatureTerms(item = {}) {
+  const text = articleDisplayText(item);
+  const patterns = [
+    ["눈썰매", /눈썰매/],
+    ["얼음썰매", /얼음썰매/],
+    ["얼음낚시", /얼음낚시|빙어|송어/],
+    ["먹거리", /먹거리|푸드|야시장|맥주|와인|커피|김장|분식|바비큐|치맥|소맥|짬뽕|한우|인삼|갈치/],
+    ["포토존", /포토존|사진|야경/],
+    ["공연", /공연|콘서트|무대|음악|국악|댄스|포크|실연자/],
+    ["체험", /체험|놀이|만들기|워크숍|레저|힐링/],
+    ["전시", /전시|미디어아트|아트|박람회|미술|갤러리|웹툰/],
+    ["꽃", /꽃|벚꽃|유채|메밀꽃|장미|국화|코스모스/],
+    ["숲", /숲|정원|수목원|공원|자연|휴양림/],
+    ["불꽃", /불꽃|불빛|빛축제|라이트|미디어파사드/],
+    ["바다", /바다|해변|해수욕|물놀이|선셋|노을|포구/],
+    ["전통", /전통|궁궐|문화재|국가유산|민속|유교|야행|왕릉|아라가야/],
+    ["영화", /영화|단편영화/]
+  ];
+  const terms = [];
+  for (const [label, pattern] of patterns) {
+    if (pattern.test(text) && !terms.includes(label)) terms.push(label);
+  }
+  return terms.slice(0, 3);
+}
+
+function articleKindLabel(item = {}) {
+  const text = articleDisplayText(item);
+  if (/눈썰매|얼음|겨울|동장군|빙어|송어/.test(text)) return "겨울 축제";
+  if (/먹거리|푸드|야시장|맥주|와인|커피|김장|분식|바비큐|치맥|소맥|짬뽕|한우|인삼|갈치/.test(text)) return "먹거리 축제";
+  if (/꽃|숲|정원|수목원|자연|휴양림|코스모스|메밀꽃/.test(text)) return "자연 축제";
+  if (/공연|콘서트|무대|음악|국악|댄스|포크|실연자/.test(text)) return "공연 축제";
+  if (/전시|미디어아트|아트|박람회|미술|갤러리|웹툰/.test(text)) return "전시 행사";
+  if (/불꽃|불빛|빛축제|라이트|야간|별밤|미디어파사드/.test(text)) return "야간 축제";
+  if (/전통|궁궐|문화재|국가유산|민속|유교|야행|왕릉|아라가야/.test(text)) return "전통 문화 축제";
+  if (/영화|단편영화/.test(text)) return "영화제";
+  return "축제";
+}
+
+function articleShortPlace(value = "") {
+  const text = plainText(value)
+    .replace(/\([^)]*\)/g, "")
+    .replace(/\s+[가-힣A-Za-z0-9·.-]+(?:로|길)\s*\d.*$/g, "")
+    .replace(/서울특별시/g, "서울")
+    .replace(/부산광역시/g, "부산")
+    .replace(/대구광역시/g, "대구")
+    .replace(/인천광역시/g, "인천")
+    .replace(/광주광역시/g, "광주")
+    .replace(/대전광역시/g, "대전")
+    .replace(/울산광역시/g, "울산")
+    .replace(/세종특별자치시/g, "세종")
+    .replace(/경기도/g, "경기")
+    .replace(/강원특별자치도/g, "강원")
+    .replace(/충청북도/g, "충북")
+    .replace(/충청남도/g, "충남")
+    .replace(/전북특별자치도/g, "전북")
+    .replace(/전라남도/g, "전남")
+    .replace(/경상북도/g, "경북")
+    .replace(/경상남도/g, "경남")
+    .replace(/제주특별자치도/g, "제주")
+    .replace(/[，,]\s*/g, " ")
+    .replace(/\s*(일원|내|앞)$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return "";
+  const words = text.split(" ").filter(Boolean);
+  if (words.length > 2) return words.slice(0, 2).join(" ");
+  return text;
+}
+
+function articleDurationLabel(item = {}) {
+  const { start, end } = articleDateRange(item);
+  if (!start || !end || start === end) return "";
+  const diff = compactDateDiffDays(start, end);
+  if (!Number.isFinite(diff)) return "";
+  const days = diff + 1;
+  if (days < 2 || days > 180) return "";
+  return `${days}일간`;
+}
+
+function compactArticleHook(value, maxLength = 54) {
+  const text = plainText(value).replace(/[“”"'‘’]/g, "").replace(/[.!?。]+$/g, "");
+  if (!text) return "";
+  if (text.length <= maxLength) return text;
+  const slice = text.slice(0, maxLength + 1);
+  const cut = Math.max(slice.lastIndexOf(" "), slice.lastIndexOf(","), slice.lastIndexOf("·"));
+  const end = cut >= 28 ? cut : maxLength;
+  return text.slice(0, end).replace(/[,.，。]\s*$/g, "");
+}
+
+function buildMagazineArticleTitle(item = {}) {
+  const title = plainText(item.title) || "축제 소식";
+  const features = articleFeatureTerms(item);
+  const kind = articleKindLabel(item);
+  const shortPlace = articleShortPlace(item.place || item.address || item.summaryParams?.address || item.category);
+  const duration = articleDurationLabel(item);
+  let hook = "";
+
+  if (features.length >= 2 && shortPlace) {
+    hook = `${features.join("·")}까지, ${shortPlace}에서 즐기는 ${kind}`;
+  } else if (features.length && shortPlace) {
+    hook = `${features[0]} 중심으로 ${shortPlace}에서 만나는 ${kind}`;
+  } else if (duration && shortPlace) {
+    hook = `${duration} ${shortPlace}에서 이어지는 ${kind}, 방문 전 일정 확인`;
+  } else if (shortPlace) {
+    hook = `${shortPlace}에서 만나는 ${kind}, 일정·장소·요금까지 확인`;
+  } else {
+    hook = `${title}의 공식 일정과 방문 정보`;
+  }
+
+  return `“${compactArticleHook(hook, 56)}”… ${title}`;
+}
+
 function displayArticleTitle(item = {}) {
-  if (state.language === "ko") return item.title || "";
+  if (state.language === "ko") {
+    return plainText(item.articleTitle || item.displayTitle || item.headline) || buildMagazineArticleTitle(item);
+  }
   const category = displayCategoryLabel(item);
   const date = displayEventDate(item);
   const templates = {
@@ -1001,6 +1140,7 @@ function normalizeSeoulCultureItems(items, options = {}) {
         source: "seoul",
         ...mapped,
         title: item.title,
+        articleTitle: item.articleTitle || item.displayTitle || item.headline || "",
         summary: item.summary || `${item.address || "현지"}에서 진행되는 문화행사입니다.`,
         date: item.date || "일정 확인 필요",
         readTime: item.readTime || "축제 정보",
@@ -3166,6 +3306,7 @@ function normalizeTourItems(items, regionOverride = activeRegion()) {
         contentTypeId: item.contenttypeid || 15,
         category,
         title: item.title,
+        articleTitle: item.articleTitle || item.displayTitle || item.headline || "",
         summaryKey: address ? "summary.festival" : "summary.festivalFallback",
         summaryParams: { address },
         date: period,
@@ -3292,6 +3433,7 @@ function normalizeJulyFestivalItems(items, dateWindow = currentFestivalDateWindo
         contentTypeId: item.contenttypeid || 15,
         category: `${region} ${label} 축제`,
         title: item.title,
+        articleTitle: item.articleTitle || item.displayTitle || item.headline || "",
         summaryKey: address ? "summary.july" : "summary.julyFallback",
         summaryParams: { address },
         date: period,

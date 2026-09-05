@@ -686,6 +686,152 @@ function staticPeriodLabel(item) {
   return item.date ? `기간 ${item.date}` : item.readTime || "일정 확인";
 }
 
+function staticEventText(item = {}) {
+  return [
+    item.title,
+    item.category,
+    item.subCategory,
+    item.rawCategory,
+    item.summary,
+    item.overview,
+    item.program,
+    item.subevent,
+    item.place,
+    item.address,
+    ...(Array.isArray(item.detailInfo) ? item.detailInfo.map((entry) => entry?.value) : [])
+  ].map(cleanText).filter(Boolean).join(" ");
+}
+
+function staticFeatureTerms(item = {}) {
+  const text = staticEventText(item);
+  const patterns = [
+    ["눈썰매", /눈썰매/],
+    ["얼음썰매", /얼음썰매/],
+    ["얼음낚시", /얼음낚시|빙어|송어/],
+    ["먹거리", /먹거리|푸드|야시장|맥주|와인|커피|김장|분식|바비큐|치맥|소맥|짬뽕|한우|인삼|갈치/],
+    ["포토존", /포토존|사진|야경/],
+    ["공연", /공연|콘서트|무대|음악|국악|댄스|포크|실연자/],
+    ["체험", /체험|놀이|만들기|워크숍|레저|힐링/],
+    ["전시", /전시|미디어아트|아트|박람회|미술|갤러리|웹툰/],
+    ["꽃", /꽃|벚꽃|유채|메밀꽃|장미|국화|코스모스/],
+    ["숲", /숲|정원|수목원|공원|자연|휴양림/],
+    ["불꽃", /불꽃|불빛|빛축제|라이트|미디어파사드/],
+    ["바다", /바다|해변|해수욕|물놀이|선셋|노을|포구/],
+    ["전통", /전통|궁궐|문화재|국가유산|민속|유교|야행|왕릉|아라가야/],
+    ["영화", /영화|단편영화/]
+  ];
+  const terms = [];
+  for (const [label, pattern] of patterns) {
+    if (pattern.test(text) && !terms.includes(label)) terms.push(label);
+  }
+  return terms.slice(0, 3);
+}
+
+function staticEventKindLabel(item = {}) {
+  const text = staticEventText(item);
+  if (/눈썰매|얼음|겨울|동장군|빙어|송어/.test(text)) return "겨울 축제";
+  if (/먹거리|푸드|야시장|맥주|와인|커피|김장|분식|바비큐|치맥|소맥|짬뽕|한우|인삼|갈치/.test(text)) return "먹거리 축제";
+  if (/꽃|숲|정원|수목원|자연|휴양림|코스모스|메밀꽃/.test(text)) return "자연 축제";
+  if (/공연|콘서트|무대|음악|국악|댄스|포크|실연자/.test(text)) return "공연 축제";
+  if (/전시|미디어아트|아트|박람회|미술|갤러리|웹툰/.test(text)) return "전시 행사";
+  if (/불꽃|불빛|빛축제|라이트|야간|별밤|미디어파사드/.test(text)) return "야간 축제";
+  if (/전통|궁궐|문화재|국가유산|민속|유교|야행|왕릉|아라가야/.test(text)) return "전통 문화 축제";
+  if (/영화|단편영화/.test(text)) return "영화제";
+  return "축제";
+}
+
+function staticShortPlace(value = "") {
+  const text = cleanText(value)
+    .replace(/\([^)]*\)/g, "")
+    .replace(/\s+[가-힣A-Za-z0-9·.-]+(?:로|길)\s*\d.*$/g, "")
+    .replace(/서울특별시/g, "서울")
+    .replace(/부산광역시/g, "부산")
+    .replace(/대구광역시/g, "대구")
+    .replace(/인천광역시/g, "인천")
+    .replace(/광주광역시/g, "광주")
+    .replace(/대전광역시/g, "대전")
+    .replace(/울산광역시/g, "울산")
+    .replace(/세종특별자치시/g, "세종")
+    .replace(/경기도/g, "경기")
+    .replace(/강원특별자치도/g, "강원")
+    .replace(/충청북도/g, "충북")
+    .replace(/충청남도/g, "충남")
+    .replace(/전북특별자치도/g, "전북")
+    .replace(/전라남도/g, "전남")
+    .replace(/경상북도/g, "경북")
+    .replace(/경상남도/g, "경남")
+    .replace(/제주특별자치도/g, "제주")
+    .replace(/[，,]\s*/g, " ")
+    .replace(/\s*(일원|내|앞)$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return "";
+  const words = text.split(" ").filter(Boolean);
+  if (words.length > 2) return words.slice(0, 2).join(" ");
+  return text;
+}
+
+function staticDurationLabel(item = {}) {
+  const { start, end } = staticArticleDateRange(item);
+  if (!start || !end || start === end) return "";
+  const diff = staticDateDiffDays(start, end);
+  if (!Number.isFinite(diff)) return "";
+  const days = diff + 1;
+  if (days < 2 || days > 180) return "";
+  return `${days}일간`;
+}
+
+function staticOverviewSentences(value = "") {
+  return cleanText(value)
+    .split(/(?<=[.!?。])\s+|(?<=다\.)\s+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function staticCompactHeadlineHook(value, maxLength = 54) {
+  const text = cleanText(value).replace(/[“”"'‘’]/g, "").replace(/[.!?。]+$/g, "");
+  if (!text) return "";
+  if (text.length <= maxLength) return text;
+  const slice = text.slice(0, maxLength + 1);
+  const cut = Math.max(slice.lastIndexOf(" "), slice.lastIndexOf(","), slice.lastIndexOf("·"));
+  const end = cut >= 28 ? cut : maxLength;
+  return text.slice(0, end).replace(/[,.，。]\s*$/g, "");
+}
+
+function staticArticleHeadline(item = {}) {
+  const title = cleanText(item.title) || "축제 소식";
+  const features = staticFeatureTerms(item);
+  const kind = staticEventKindLabel(item);
+  const shortPlace = staticShortPlace(item.place || item.address || item.category);
+  const duration = staticDurationLabel(item);
+  let hook = "";
+
+  if (features.length >= 2 && shortPlace) {
+    hook = `${features.join("·")}까지, ${shortPlace}에서 즐기는 ${kind}`;
+  } else if (features.length && shortPlace) {
+    hook = `${features[0]} 중심으로 ${shortPlace}에서 만나는 ${kind}`;
+  } else if (duration && shortPlace) {
+    hook = `${duration} ${shortPlace}에서 이어지는 ${kind}, 방문 전 일정 확인`;
+  } else if (shortPlace) {
+    hook = `${shortPlace}에서 만나는 ${kind}, 일정·장소·요금까지 확인`;
+  } else {
+    hook = staticOverviewSentences(item.overview || item.summary)[0] || `${title}의 공식 일정과 방문 정보`;
+  }
+
+  return `“${staticCompactHeadlineHook(hook, 56)}”… ${title}`;
+}
+
+function staticDisplayTitle(item = {}) {
+  return cleanText(item.articleTitle || item.displayTitle || item.headline) || staticArticleHeadline(item);
+}
+
+function withStaticArticleHeadline(item = {}) {
+  return {
+    ...item,
+    articleTitle: staticArticleHeadline(item)
+  };
+}
+
 function eventIdentity(item) {
   return String(item?.id || "").trim();
 }
@@ -724,7 +870,7 @@ function staticImageMarkup(item, size) {
     return `<div class="image-frame image-frame--${size} is-empty"><span>대한축제뉴스</span></div>`;
   }
 
-  return `<div class="image-frame image-frame--${size} image-frame--api" style="--api-image: url(&quot;${escapeHtml(item.image)}&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>`;
+  return `<div class="image-frame image-frame--${size} image-frame--api" style="--api-image: url(&quot;${escapeHtml(item.image)}&quot;)"><span class="image-fallback-text" aria-hidden="true">대한축제뉴스</span><img src="${escapeHtml(item.image)}" alt="${escapeHtml(staticDisplayTitle(item))}" loading="lazy" width="640" height="480" onerror="this.onerror=null;this.closest('.image-frame').classList.add('is-empty');this.remove()"></div>`;
 }
 
 function editorialCardMarkup(item, index) {
@@ -745,14 +891,15 @@ function editorialCardMarkup(item, index) {
 function recommendCardMarkup(item) {
   const href = eventDetailUrl(item);
   const status = staticStatusBadgeMarkup(item);
+  const title = staticDisplayTitle(item);
   return `
           <article class="news-recommend-card">
-            <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${item.title} 자세히 보기`)}">
+            <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${title} 자세히 보기`)}">
               ${staticImageMarkup(item, "recommend")}${status ? `
               ${status}` : ""}
               <div class="news-recommend-body">
                 ${staticFestivalMetaMarkup(item)}
-                <strong>${escapeHtml(item.title)}</strong>
+                <strong>${escapeHtml(title)}</strong>
               </div>
             </a>
           </article>`;
@@ -761,14 +908,15 @@ function recommendCardMarkup(item) {
 function feedCardMarkup(item) {
   const href = eventDetailUrl(item);
   const status = staticStatusBadgeMarkup(item);
+  const title = staticDisplayTitle(item);
   return `
           <article class="news-list-card">
-            <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${item.title} 자세히 보기`)}">
+            <a href="${escapeHtml(href)}" aria-label="${escapeHtml(`${title} 자세히 보기`)}">
               ${staticImageMarkup(item, "feed")}${status ? `
               ${status}` : ""}
               <span>
                 ${staticFestivalMetaMarkup(item)}
-                <strong>${escapeHtml(item.title)}</strong>
+                <strong>${escapeHtml(title)}</strong>
                 <small>${escapeHtml(staticPeriodLabel(item))}</small>
               </span>
             </a>
@@ -842,7 +990,8 @@ async function main() {
 
   await attachOfficialDetails(items);
   await attachGalleryImages(items);
-  const legacyItems = await previousEventItems(items);
+  const legacyItems = (await previousEventItems(items)).map(withStaticArticleHeadline);
+  const headlineItems = items.map(withStaticArticleHeadline);
 
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(
@@ -862,10 +1011,10 @@ async function main() {
         },
         refreshAttempts: attempts,
         updatedAt: new Date().toISOString(),
-        count: items.length,
+        count: headlineItems.length,
         legacyCount: legacyItems.length,
         legacyItems,
-        items
+        items: headlineItems
       },
       null,
       2
@@ -873,7 +1022,7 @@ async function main() {
     "utf8"
   );
 
-  await updateStaticLanding(items);
+  await updateStaticLanding(headlineItems);
   await generateStaticArticles();
 
   const editorialUrls = await editorialArticleUrls();
@@ -889,7 +1038,7 @@ async function main() {
   ];
   await writeFile(sitemapPath, sitemapXml(urls, todayKstIso()), "utf8");
 
-  console.log(`Updated ${path.relative(rootDir, outputPath)} with ${items.length} items across ${REGIONS.length} regions for ${range.start}-${range.end}.`);
+  console.log(`Updated ${path.relative(rootDir, outputPath)} with ${headlineItems.length} items across ${REGIONS.length} regions for ${range.start}-${range.end}.`);
   if (range.month !== requestedMonth || range.start !== `${requestedMonth}01`) {
     console.log(`Requested ${requestedMonth}; used ${range.label} because earlier date ranges did not meet the ${MIN_REFRESH_ITEMS}-item minimum.`);
   }
@@ -902,8 +1051,14 @@ async function main() {
 
 async function staticOnly() {
   const payload = JSON.parse(await readFile(outputPath, "utf8"));
-  const items = Array.isArray(payload.items) ? payload.items : [];
+  const items = Array.isArray(payload.items) ? payload.items.map(withStaticArticleHeadline) : [];
   if (!items.length) throw new Error("generated/seoul-events.json has no items for static-only update.");
+  const legacyItems = Array.isArray(payload.legacyItems) ? payload.legacyItems.map(withStaticArticleHeadline) : [];
+  await writeFile(
+    outputPath,
+    `${JSON.stringify({ ...payload, items, legacyItems }, null, 2)}\n`,
+    "utf8"
+  );
   await updateStaticLanding(items);
   await generateStaticArticles();
   console.log(`Updated static landing and generated pages from ${path.relative(rootDir, outputPath)}.`);

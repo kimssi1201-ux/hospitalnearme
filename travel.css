@@ -7311,3 +7311,42 @@ main#top .category-news-block#regional-festivals .category-magazine-card:first-c
     font-size: clamp(18px, 5.2vw, 22px) !important;
   }
 }
+
+/* 2026-09 article-style headlines: card titles should read like magazine
+   headlines, so the lead and section feature cards get enough lines. */
+main#top .landing-news-feed .news-list-card strong,
+main#top .category-magazine-card strong,
+main#top .places-section .article-card h3,
+.article-sidebar-card strong {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+main#top .landing-news-feed .news-list-card strong,
+main#top .category-magazine-card strong,
+main#top .places-section .article-card h3 {
+  -webkit-line-clamp: 4 !important;
+}
+
+main#top .landing-news-feed:not(.is-filtered) .news-list-card:first-child strong,
+main#top .landing-news-feed:not(.is-filtered) .news-list-card:nth-child(2) strong,
+main#top .category-news-block#domestic-travel .category-magazine-card:first-child strong,
+main#top .category-news-block#regional-festivals .category-magazine-card:first-child strong {
+  -webkit-line-clamp: 4 !important;
+}
+
+@media (max-width: 720px) {
+  main#top .landing-news-feed:not(.is-filtered) .news-list-card:first-child strong,
+  main#top .category-news-block#domestic-travel .category-magazine-card:first-child strong,
+  main#top .category-news-block#regional-festivals .category-magazine-card:first-child strong {
+    -webkit-line-clamp: 4 !important;
+  }
+
+  main#top .landing-news-feed:not(.is-filtered) .news-list-card:nth-child(2) strong,
+  main#top .landing-news-feed:not(.is-filtered) .news-list-card:nth-child(n + 3) strong,
+  main#top .category-magazine-card strong,
+  main#top .places-section .article-card h3 {
+    -webkit-line-clamp: 5 !important;
+  }
+}
