@@ -1,0 +1,18 @@
+---
+const { categories = [] } = Astro.props;
+---
+
+<section class="category-nav" aria-labelledby="category-nav-title">
+  <div class="section-heading">
+    <p>Category</p>
+    <h2 id="category-nav-title">관심 분야로 빠르게 찾기</h2>
+  </div>
+  <div class="category-nav__list">
+    {categories.map((category) => (
+      <a href={`/category/${category.slug}/`}>
+        <strong>{category.name}</strong>
+        <span>{category.description}</span>
+      </a>
+    ))}
+  </div>
+</section>

@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CampaignGrid from "../../components/CampaignGrid.astro";
+import CategoryNav from "../../components/CategoryNav.astro";
+import { getCategories, getCategoryBySlug } from "../../lib/categories.mjs";
+import { getCampaignsByCategory } from "../../lib/campaigns.mjs";
+import { absoluteUrl, breadcrumbSchema, webPageSchema } from "../../lib/seo.mjs";
+
+export async function getStaticPaths() {
+  return (await getCategories()).map((category) => ({
+    params: { slug: category.slug },
+    props: { category }
+  }));
+}
+
+const { category } = Astro.props;
+const categories = await getCategories();
+const campaigns = await getCampaignsByCategory(category.slug);
+const canonical = absoluteUrl(`/category/${category.slug}/`);
+const seo = {
+  title: `${category.name} 이벤트 | VIEW1`,
+  description: category.description || `${category.name} 분야 이벤트를 확인하세요.`,
+  canonical,
+  structuredData: [
+    webPageSchema({ title: `${category.name} 이벤트`, description: category.description, url: canonical }),
+    breadcrumbSchema([
+      { name: "홈", url: "/" },
+      { name: `${category.name} 이벤트`, url: `/category/${category.slug}/` }
+    ])
+  ]
+};
+---
+
+<BaseLayout {...seo}>
+  <main class="portal-main">
+    <section class="category-hero">
+      <p>Category</p>
+      <h1>{category.name} 이벤트</h1>
+      <span>{category.description}</span>
+    </section>
+    <CategoryNav categories={categories} />
+    <CampaignGrid id="category-campaigns" title={`${category.name} 전체 이벤트`} kicker="Campaigns" campaigns={campaigns} categories={categories} emptyText={`${category.name} 분야의 활성 이벤트가 없습니다.`} />
+  </main>
+</BaseLayout>

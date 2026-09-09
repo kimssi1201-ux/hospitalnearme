@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import { absoluteUrl, webPageSchema } from "../../lib/seo.mjs";
+import { getEditorialPosts } from "../../lib/legacy-content.mjs";
+
+const articles = await getEditorialPosts(40);
+const seo = {
+  title: "생활/정보 콘텐츠 | VIEW1",
+  description: "기존 대한축제뉴스의 생활·축제 방문 정보 콘텐츠를 확인하세요.",
+  canonical: absoluteUrl("/articles/"),
+  structuredData: webPageSchema({
+    title: "생활/정보 콘텐츠",
+    description: "기존 기사 콘텐츠 목록",
+    url: absoluteUrl("/articles/")
+  })
+};
+---
+
+<BaseLayout {...seo}>
+  <main class="portal-main">
+    <section class="category-hero">
+      <p>Articles</p>
+      <h1>생활/정보 콘텐츠</h1>
+      <span>기존 개별 기사 URL은 <code>/articles/slug/</code> 형태로 그대로 유지됩니다.</span>
+    </section>
+    <div class="article-grid article-grid--dense">
+      {articles.map((item) => <ArticleCard item={item} />)}
+    </div>
+  </main>
+</BaseLayout>

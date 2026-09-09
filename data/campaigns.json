@@ -1,0 +1,41 @@
+[
+  {
+    "id": "demo-wedding-001",
+    "slug": "demo-wedding-fair",
+    "title": "데모 웨딩박람회 무료초대권",
+    "shortTitle": "데모 웨딩박람회",
+    "category": "wedding",
+    "description": "운영자가 campaigns.json 구조를 확인할 수 있도록 둔 비활성 데모 캠페인입니다. 실제 제휴 이벤트가 아니며 목록과 sitemap에는 노출되지 않습니다.",
+    "image": "/images/campaigns/demo-event.svg",
+    "badge": "DEMO",
+    "benefit": "비활성 데모 데이터",
+    "ctaText": "신청 링크 없음",
+    "ctaUrl": "",
+    "provider": "VIEW1 데모",
+    "featured": true,
+    "popular": true,
+    "active": false,
+    "demo": true,
+    "priority": 100,
+    "startDate": "2026-09-01",
+    "endDate": "2026-09-02",
+    "disclosure": "이 항목은 데모이며 실제 제휴 수익이 발생하지 않습니다.",
+    "target": [
+      "운영 구조를 확인하려는 관리자"
+    ],
+    "benefits": [
+      "데이터 구조 확인",
+      "비활성 캠페인 처리 확인"
+    ],
+    "details": [
+      "실제 캠페인 등록 시 이 항목을 복사하지 말고 docs/CAMPAIGN-GUIDE.md의 템플릿을 사용하세요.",
+      "active를 true로 바꾸기 전에는 실제 ctaUrl과 이미지를 반드시 입력해야 합니다."
+    ],
+    "faq": [
+      {
+        "question": "이 캠페인은 운영 사이트에 노출되나요?",
+        "answer": "아니요. demo:true이고 active:false라 메인, 카테고리, sitemap에서 제외됩니다."
+      }
+    ]
+  }
+]

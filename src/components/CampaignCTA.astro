@@ -1,0 +1,15 @@
+---
+const { campaign, compact = false } = Astro.props;
+const label = campaign?.ctaText || "자세히 보기";
+---
+
+{campaign?.ctaUrl && (
+  <a
+    class:list={["campaign-cta", compact && "campaign-cta--compact"]}
+    href={campaign.ctaUrl}
+    target="_blank"
+    rel="sponsored noopener"
+  >
+    {label}
+  </a>
+)}

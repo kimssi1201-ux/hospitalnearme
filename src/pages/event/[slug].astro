@@ -1,0 +1,129 @@
+---
+import CampaignLayout from "../../layouts/CampaignLayout.astro";
+import CampaignCTA from "../../components/CampaignCTA.astro";
+import Disclosure from "../../components/Disclosure.astro";
+import RelatedCampaigns from "../../components/RelatedCampaigns.astro";
+import { getAllCampaigns, getRelatedCampaigns } from "../../lib/campaigns.mjs";
+import { getCategories, getCategoryBySlug } from "../../lib/categories.mjs";
+import { absoluteUrl, breadcrumbSchema, campaignCanonical, campaignTitle, webPageSchema } from "../../lib/seo.mjs";
+
+export async function getStaticPaths() {
+  const campaigns = await getAllCampaigns();
+  return campaigns.map((campaign) => ({
+    params: { slug: campaign.slug },
+    props: { campaign }
+  }));
+}
+
+const { campaign } = Astro.props;
+const categories = await getCategories();
+const category = await getCategoryBySlug(campaign.category);
+const related = await getRelatedCampaigns(campaign, { limit: 3 });
+const canonical = campaignCanonical(campaign);
+const isUnavailable = !campaign.listable;
+const seo = {
+  title: campaignTitle(campaign),
+  description: campaign.description,
+  canonical,
+  ogType: "website",
+  image: campaign.image ? absoluteUrl(campaign.image) : "",
+  robots: isUnavailable ? "noindex,follow,max-image-preview:large" : "index,follow,max-image-preview:large",
+  structuredData: [
+    webPageSchema({ title: campaign.title, description: campaign.description, url: canonical }),
+    breadcrumbSchema([
+      { name: "홈", url: "/" },
+      { name: category?.name || campaign.category, url: `/category/${campaign.category}/` },
+      { name: campaign.title, url: `/event/${campaign.slug}/` }
+    ])
+  ]
+};
+---
+
+<CampaignLayout seo={seo}>
+  <article class="campaign-detail">
+    <nav class="breadcrumb" aria-label="현재 위치">
+      <a href="/">홈</a>
+      <span aria-hidden="true">/</span>
+      <a href={`/category/${campaign.category}/`}>{category?.name || campaign.category}</a>
+    </nav>
+
+    {isUnavailable && (
+      <aside class="campaign-ended" aria-label="종료 이벤트 안내">
+        <strong>현재 종료된 이벤트입니다.</strong>
+        <p>목록과 sitemap에서는 제외되며, 같은 카테고리의 활성 이벤트가 있으면 아래에 추천됩니다.</p>
+      </aside>
+    )}
+
+    <header class="campaign-detail__header">
+      {campaign.image && (
+        <figure class="campaign-detail__image">
+          <img src={campaign.image} alt={`${campaign.title} 대표 이미지`} width="1200" height="800" loading="eager" decoding="async" />
+        </figure>
+      )}
+      <div class="campaign-detail__intro">
+        <p class="campaign-detail__meta">{[category?.name, campaign.badge, campaign.provider].filter(Boolean).join(" · ")}</p>
+        <h1>{campaign.title}</h1>
+        <p>{campaign.description}</p>
+        {campaign.benefit && <strong class="benefit-line">{campaign.benefit}</strong>}
+        {!isUnavailable && <CampaignCTA campaign={campaign} />}
+      </div>
+    </header>
+
+    <section class="detail-panel" aria-labelledby="benefits-title">
+      <p class="section-kicker">Benefits</p>
+      <h2 id="benefits-title">주요 혜택</h2>
+      {campaign.benefits.length ? (
+        <ul class="check-list">
+          {campaign.benefits.map((item) => <li>{item}</li>)}
+        </ul>
+      ) : (
+        <p>등록된 혜택 설명이 없습니다. 운영자가 benefits 값을 추가하면 자동 표시됩니다.</p>
+      )}
+    </section>
+
+    <section class="detail-panel" aria-labelledby="target-title">
+      <p class="section-kicker">Target</p>
+      <h2 id="target-title">신청 대상</h2>
+      {campaign.target.length ? (
+        <ul class="check-list">
+          {campaign.target.map((item) => <li>{item}</li>)}
+        </ul>
+      ) : (
+        <p>대상 정보가 등록되지 않았습니다.</p>
+      )}
+    </section>
+
+    <section class="detail-panel" aria-labelledby="details-title">
+      <p class="section-kicker">Guide</p>
+      <h2 id="details-title">상세 안내</h2>
+      {campaign.details.length ? campaign.details.map((item) => <p>{item}</p>) : <p>상세 안내는 공식 이벤트 페이지에서 확인하세요.</p>}
+    </section>
+
+    {campaign.faq.length > 0 && (
+      <section class="detail-panel" aria-labelledby="faq-title">
+        <p class="section-kicker">FAQ</p>
+        <h2 id="faq-title">자주 묻는 질문</h2>
+        <div class="faq-list">
+          {campaign.faq.map((item) => (
+            <details>
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <Disclosure text={campaign.disclosure} />
+    <RelatedCampaigns campaigns={related} categories={categories} />
+
+    {!isUnavailable && (
+      <section class="final-cta" aria-label="최종 신청">
+        <strong>{campaign.title}</strong>
+        <p>신청 조건과 제공 혜택은 제휴 페이지에서 최종 확인하세요.</p>
+        <CampaignCTA campaign={campaign} />
+      </section>
+    )}
+  </article>
+  {!isUnavailable && campaign.ctaUrl && <CampaignCTA campaign={campaign} compact />}
+</CampaignLayout>

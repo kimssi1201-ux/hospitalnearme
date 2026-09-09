@@ -1,0 +1,20 @@
+---
+import CampaignCard from "./CampaignCard.astro";
+
+const { campaigns = [], categories = [] } = Astro.props;
+const categoryMap = new Map(categories.map((category) => [category.slug, category.name]));
+---
+
+{campaigns.length > 0 && (
+  <section class="related-campaigns" aria-labelledby="related-campaigns-title">
+    <div class="section-heading">
+      <p>Related</p>
+      <h2 id="related-campaigns-title">같이 볼 만한 이벤트</h2>
+    </div>
+    <div class="campaign-grid campaign-grid--related">
+      {campaigns.map((campaign) => (
+        <CampaignCard campaign={campaign} variant="related" categoryLabel={categoryMap.get(campaign.category) || campaign.category} />
+      ))}
+    </div>
+  </section>
+)}

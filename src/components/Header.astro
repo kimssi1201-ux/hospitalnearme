@@ -1,0 +1,22 @@
+---
+import { getCategories } from "../lib/categories.mjs";
+
+const categories = await getCategories();
+---
+
+<header class="portal-header">
+  <a class="portal-brand" href="/" aria-label="VIEW1 홈">
+    <span class="portal-brand__mark" aria-hidden="true">V1</span>
+    <span>
+      <strong>VIEW1</strong>
+      <small>이벤트 정보 포털</small>
+    </span>
+  </a>
+  <nav class="portal-nav" aria-label="주요 메뉴">
+    <a href="/">홈</a>
+    <a href="/#popular">인기 이벤트</a>
+    <a href="/#latest">신규 이벤트</a>
+    {categories.map((category) => <a href={`/category/${category.slug}/`}>{category.name}</a>)}
+    <a href="/festival/">축제 정보</a>
+  </nav>
+</header>

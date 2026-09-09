@@ -1,0 +1,14 @@
+---
+const { item } = Astro.props;
+---
+
+<article class="article-card">
+  <a class="article-card__image" href={item.url}>
+    {item.image ? <img src={item.image} alt={`${item.title} 대표 이미지`} width="640" height="420" loading="lazy" decoding="async" /> : <span>VIEW1</span>}
+  </a>
+  <div>
+    <p>{item.category}</p>
+    <h3><a href={item.url}>{item.title}</a></h3>
+    {item.date && <small>{item.date}</small>}
+  </div>
+</article>

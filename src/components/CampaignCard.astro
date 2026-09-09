@@ -1,0 +1,27 @@
+---
+import CampaignCTA from "./CampaignCTA.astro";
+
+const { campaign, variant = "default" } = Astro.props;
+const categoryLabel = Astro.props.categoryLabel || campaign.category;
+const href = `/event/${campaign.slug}/`;
+const meta = [categoryLabel, campaign.badge, campaign.benefit].filter(Boolean).join(" · ");
+---
+
+<article class={`campaign-card campaign-card--${variant}`} data-campaign-card data-title={campaign.title} data-category={campaign.category}>
+  <a class="campaign-card__media" href={href} aria-label={`${campaign.title} 상세 보기`}>
+    {campaign.image ? (
+      <img src={campaign.image} alt={`${campaign.title} 대표 이미지`} width="720" height="480" loading={variant === "lead" ? "eager" : "lazy"} decoding="async" />
+    ) : (
+      <span class="campaign-card__placeholder">VIEW1</span>
+    )}
+  </a>
+  <div class="campaign-card__body">
+    <p class="campaign-card__meta">{meta}</p>
+    <h3><a href={href}>{campaign.title}</a></h3>
+    <p>{campaign.description}</p>
+    <div class="campaign-card__actions">
+      <a class="text-link" href={href}>상세 보기</a>
+      <CampaignCTA campaign={campaign} compact />
+    </div>
+  </div>
+</article>

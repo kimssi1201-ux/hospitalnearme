@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+  <title id="title">VIEW1 캠페인 데모 이미지</title>
+  <desc id="desc">실제 운영 캠페인이 아닌 비활성 데모용 이미지입니다.</desc>
+  <rect width="1200" height="800" fill="#f5f7fb"/>
+  <rect x="80" y="80" width="1040" height="640" rx="36" fill="#ffffff" stroke="#d9e1ec" stroke-width="4"/>
+  <circle cx="260" cy="265" r="92" fill="#0f766e" opacity=".14"/>
+  <rect x="390" y="205" width="430" height="38" rx="19" fill="#0f766e" opacity=".22"/>
+  <rect x="390" y="278" width="620" height="34" rx="17" fill="#2563eb" opacity=".18"/>
+  <rect x="390" y="342" width="520" height="34" rx="17" fill="#94a3b8" opacity=".28"/>
+  <rect x="160" y="500" width="880" height="96" rx="24" fill="#0f172a"/>
+  <text x="600" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" font-weight="700" fill="#ffffff">VIEW1 Campaign Demo</text>
+</svg>

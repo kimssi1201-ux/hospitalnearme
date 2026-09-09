@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import { absoluteUrl, webPageSchema } from "../../lib/seo.mjs";
+import { getFestivalItems } from "../../lib/legacy-content.mjs";
+
+const festivals = await getFestivalItems(24);
+const seo = {
+  title: "축제·여행 정보 | VIEW1",
+  description: "기존 대한축제뉴스의 TourAPI 기반 전국 축제 정보를 유지합니다.",
+  canonical: absoluteUrl("/festival/"),
+  structuredData: webPageSchema({
+    title: "축제·여행 정보",
+    description: "전국 축제 자동 갱신 콘텐츠",
+    url: absoluteUrl("/festival/")
+  })
+};
+---
+
+<BaseLayout {...seo}>
+  <main class="portal-main">
+    <section class="category-hero">
+      <p>Festival</p>
+      <h1>축제·여행 정보</h1>
+      <span>기존 `/seoul-events/` 상세 URL은 그대로 유지됩니다.</span>
+    </section>
+    <div class="article-grid article-grid--dense">
+      {festivals.map((item) => <ArticleCard item={item} />)}
+    </div>
+  </main>
+</BaseLayout>

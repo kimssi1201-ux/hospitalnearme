@@ -2,15 +2,21 @@
   "name": "hospitalnearme-publish",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@11.19.0",
   "type": "module",
   "scripts": {
+    "dev": "astro dev",
     "generate:articles": "node scripts/generate-static-articles.mjs",
     "refresh": "node scripts/update-seoul-content.mjs",
     "report:photos": "node scripts/report-photo-coverage.mjs",
     "test": "node --test test/*.test.mjs",
     "syntax": "node scripts/check-javascript.mjs",
-    "lint": "node scripts/check-project.mjs",
-    "build": "node scripts/generate-static-articles.mjs && node scripts/check-project.mjs && node scripts/check-javascript.mjs",
-    "check": "node scripts/check-project.mjs && node scripts/check-javascript.mjs && node --test test/*.test.mjs"
+    "lint": "node scripts/check-project.mjs && node scripts/validate-campaigns.mjs",
+    "build": "node scripts/generate-static-articles.mjs && astro build && node scripts/copy-legacy-static.mjs && node scripts/check-dist.mjs",
+    "check": "node scripts/check-project.mjs && node scripts/validate-campaigns.mjs && node scripts/check-javascript.mjs && node --test test/*.test.mjs",
+    "preview": "astro preview"
+  },
+  "devDependencies": {
+    "astro": "7.3.2"
   }
 }

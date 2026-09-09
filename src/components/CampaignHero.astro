@@ -1,0 +1,38 @@
+---
+import CampaignCTA from "./CampaignCTA.astro";
+import CampaignCard from "./CampaignCard.astro";
+
+const { campaigns = [], categories = [] } = Astro.props;
+const categoryMap = new Map(categories.map((category) => [category.slug, category.name]));
+const [lead, ...side] = campaigns;
+---
+
+<section class="portal-hero" aria-labelledby="portal-hero-title">
+  {lead ? (
+    <>
+      <article class="portal-hero__lead">
+        <a class="portal-hero__image" href={`/event/${lead.slug}/`} aria-label={`${lead.title} 상세 보기`}>
+          {lead.image ? <img src={lead.image} alt={`${lead.title} 대표 이미지`} width="1080" height="720" loading="eager" decoding="async" /> : <span>VIEW1</span>}
+        </a>
+        <div class="portal-hero__copy">
+          <p>{[categoryMap.get(lead.category), lead.badge].filter(Boolean).join(" · ")}</p>
+          <h1 id="portal-hero-title">{lead.title}</h1>
+          <span>{lead.description}</span>
+          <CampaignCTA campaign={lead} />
+        </div>
+      </article>
+      <div class="portal-hero__side" aria-label="추천 이벤트">
+        {side.slice(0, 4).map((campaign) => (
+          <CampaignCard campaign={campaign} variant="side" categoryLabel={categoryMap.get(campaign.category) || campaign.category} />
+        ))}
+      </div>
+    </>
+  ) : (
+    <div class="portal-hero__empty">
+      <p>VIEW1 이벤트 포털</p>
+      <h1 id="portal-hero-title">등록된 활성 이벤트가 없습니다.</h1>
+      <span>실제 CPA 캠페인을 `data/campaigns.json`에 추가하면 메인 추천, 카테고리, 상세페이지, sitemap까지 자동 반영됩니다.</span>
+      <a class="text-link" href="/festival/">기존 축제·여행 정보 보기</a>
+    </div>
+  )}
+</section>

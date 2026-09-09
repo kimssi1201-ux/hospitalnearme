@@ -1,0 +1,28 @@
+---
+import CampaignCard from "./CampaignCard.astro";
+
+const { id, title, kicker = "Campaign", description = "", campaigns = [], categories = [], variant = "default", emptyText = "현재 노출 중인 이벤트가 없습니다." } = Astro.props;
+const categoryMap = new Map(categories.map((category) => [category.slug, category.name]));
+---
+
+<section class="campaign-section" id={id} aria-labelledby={`${id}-title`}>
+  <div class="section-heading section-heading--row">
+    <div>
+      <p>{kicker}</p>
+      <h2 id={`${id}-title`}>{title}</h2>
+      {description && <span>{description}</span>}
+    </div>
+  </div>
+  {campaigns.length ? (
+    <div class={`campaign-grid campaign-grid--${variant}`}>
+      {campaigns.map((campaign) => (
+        <CampaignCard campaign={campaign} variant={variant} categoryLabel={categoryMap.get(campaign.category) || campaign.category} />
+      ))}
+    </div>
+  ) : (
+    <div class="empty-panel">
+      <strong>{emptyText}</strong>
+      <p>실제 캠페인을 등록하면 이 영역은 자동으로 채워집니다.</p>
+    </div>
+  )}
+</section>

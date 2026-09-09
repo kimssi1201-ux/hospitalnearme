@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const ignored = new Set([".git", "node_modules", ".wrangler"]);
+const ignored = new Set([".git", "node_modules", ".wrangler", ".astro", "dist"]);
 
 async function collectJavaScript(directory) {
   const entries = await readdir(directory, { withFileTypes: true });

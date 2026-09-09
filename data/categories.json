@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "health",
+    "name": "건강",
+    "description": "건강 상담, 생활 관리, 웰니스 관련 이벤트",
+    "order": 1
+  },
+  {
+    "slug": "wedding",
+    "name": "웨딩",
+    "description": "웨딩박람회, 결혼 준비, 무료초대권 이벤트",
+    "order": 2
+  },
+  {
+    "slug": "education",
+    "name": "교육",
+    "description": "학습, 자격, 설명회, 교육 상담 이벤트",
+    "order": 3
+  },
+  {
+    "slug": "life",
+    "name": "생활",
+    "description": "생활 서비스, 금융, 법률, 렌탈 등 생활형 이벤트",
+    "order": 4
+  },
+  {
+    "slug": "travel",
+    "name": "여행",
+    "description": "여행 예약, 축제, 숙소, 나들이 관련 이벤트",
+    "order": 5
+  }
+]
