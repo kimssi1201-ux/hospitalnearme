@@ -5,7 +5,7 @@
   "month": "202510",
   "requestedMonth": "202610",
   "queryRange": {
-    "start": "20251010",
+    "start": "20251011",
     "end": "20251231",
     "label": "2025 same-season fallback",
     "fallback": true
@@ -19,18 +19,18 @@
     },
     {
       "id": "current-year-remainder",
-      "start": "20261010",
+      "start": "20261011",
       "end": "20261231",
       "count": 0
     },
     {
       "id": "previous-year-same-season",
-      "start": "20251010",
+      "start": "20251011",
       "end": "20251231",
       "count": 85
     }
   ],
-  "updatedAt": "2026-10-09T23:56:10.050Z",
+  "updatedAt": "2026-10-10T23:23:09.538Z",
   "count": 85,
   "legacyCount": 166,
   "legacyItems": [
