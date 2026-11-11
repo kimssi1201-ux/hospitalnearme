@@ -5,7 +5,7 @@
   "month": "202511",
   "requestedMonth": "202611",
   "queryRange": {
-    "start": "20251110",
+    "start": "20251111",
     "end": "20251231",
     "label": "2025 same-season fallback",
     "fallback": true
@@ -19,20 +19,20 @@
     },
     {
       "id": "current-year-remainder",
-      "start": "20261110",
+      "start": "20261111",
       "end": "20261231",
       "count": 0
     },
     {
       "id": "previous-year-same-season",
-      "start": "20251110",
+      "start": "20251111",
       "end": "20251231",
-      "count": 27
+      "count": 26
     }
   ],
-  "updatedAt": "2026-11-10T02:37:50.654Z",
-  "count": 27,
-  "legacyCount": 224,
+  "updatedAt": "2026-11-11T00:30:45.890Z",
+  "count": 26,
+  "legacyCount": 225,
   "legacyItems": [
     {
       "id": "tour-2833343",
@@ -12028,6 +12028,59 @@
       "articleTitle": "“먹거리·공연·체험까지, 코엑스 동측광장에서 즐기는 먹거리 축제”… 제2회 고메 잇 강남"
     },
     {
+      "id": "tour-3460731",
+      "source": "seoul",
+      "contentId": "3460731",
+      "contentTypeId": "15",
+      "category": "광주 축제",
+      "categorySlug": "festival",
+      "title": "광주여성영화제",
+      "summary": "매년 광주에서 열리는 이 축제는 영화 상영뿐만 아니라 워크숍, 세미나, 패널 토크 등도 진행되어, 영화에 대한 심도 깊은 논의와 함께 여성 영화인의 창작 환경을 향상시키는 데 기여한다. 광주여성영화제는 여성 영화인의 네트워크를 활성화시키고, 성평등과 사회적 메시지를 전파하는 중요한 문화 행사로 자리 잡았다.",
+      "date": "2025-11-06~2025-11-10",
+      "readTime": "광주 축제 정보",
+      "image": "https://tong.visitkorea.or.kr/cms/resource/26/3460726_image2_1.jpg",
+      "galleryImages": [
+        "https://tong.visitkorea.or.kr/cms/resource/23/3460723_image2_1.jpg"
+      ],
+      "address": "전남광주통합특별시 동구 중앙로160번길 16-7 (불로동)",
+      "place": "전남광주통합특별시 동구 중앙로160번길 16-7 (불로동)",
+      "gu": "",
+      "tel": "062-515-6560",
+      "homepage": "https://www.wffig.com/",
+      "fee": "티켓 5,000원(장애인 좌석 예약 별도 문의)",
+      "time": "",
+      "org": "",
+      "target": "",
+      "isFree": "",
+      "updatedAt": "20260630184428",
+      "lat": "35.1468609363",
+      "lng": "126.9146634529",
+      "areaCode": "5",
+      "overview": "매년 광주에서 열리는 이 축제는 영화 상영뿐만 아니라 워크숍, 세미나, 패널 토크 등도 진행되어, 영화에 대한 심도 깊은 논의와 함께 여성 영화인의 창작 환경을 향상시키는 데 기여한다. 광주여성영화제는 여성 영화인의 네트워크를 활성화시키고, 성평등과 사회적 메시지를 전파하는 중요한 문화 행사로 자리 잡았다.",
+      "program": "",
+      "subevent": "",
+      "booking": "",
+      "placeInfo": "",
+      "discountInfo": "",
+      "spendTime": "",
+      "festivalGrade": "",
+      "detailInfo": [
+        {
+          "label": "이용 요금",
+          "value": "티켓 5,000원(장애인 좌석 예약 별도 문의)"
+        },
+        {
+          "label": "문의 전화",
+          "value": "062-515-6560"
+        },
+        {
+          "label": "행사소개",
+          "value": "매년 광주에서 열리는 이 축제는 영화 상영뿐만 아니라 워크숍, 세미나, 패널 토크 등도 진행되어, 영화에 대한 심도 깊은 논의와 함께 여성 영화인의 창작 환경을 향상시키는 데 기여한다. 광주여성영화제는 여성 영화인의 네트워크를 활성화시키고, 성평등과 사회적 메시지를 전파하는 중요한 문화 행사로 자리 잡았다."
+        }
+      ],
+      "articleTitle": "“체험·영화까지, 전남광주통합특별시 동구에서 즐기는 영화제”… 광주여성영화제"
+    },
+    {
       "id": "tour-1855589",
       "source": "seoul",
       "contentId": "1855589",
@@ -13965,59 +14018,6 @@
     }
   ],
   "items": [
-    {
-      "id": "tour-3460731",
-      "source": "seoul",
-      "contentId": "3460731",
-      "contentTypeId": "15",
-      "category": "광주 축제",
-      "categorySlug": "festival",
-      "title": "광주여성영화제",
-      "summary": "매년 광주에서 열리는 이 축제는 영화 상영뿐만 아니라 워크숍, 세미나, 패널 토크 등도 진행되어, 영화에 대한 심도 깊은 논의와 함께 여성 영화인의 창작 환경을 향상시키는 데 기여한다. 광주여성영화제는 여성 영화인의 네트워크를 활성화시키고, 성평등과 사회적 메시지를 전파하는 중요한 문화 행사로 자리 잡았다.",
-      "date": "2025-11-06~2025-11-10",
-      "readTime": "광주 축제 정보",
-      "image": "https://tong.visitkorea.or.kr/cms/resource/26/3460726_image2_1.jpg",
-      "galleryImages": [
-        "https://tong.visitkorea.or.kr/cms/resource/23/3460723_image2_1.jpg"
-      ],
-      "address": "전남광주통합특별시 동구 중앙로160번길 16-7 (불로동)",
-      "place": "전남광주통합특별시 동구 중앙로160번길 16-7 (불로동)",
-      "gu": "",
-      "tel": "062-515-6560",
-      "homepage": "https://www.wffig.com/",
-      "fee": "티켓 5,000원(장애인 좌석 예약 별도 문의)",
-      "time": "",
-      "org": "",
-      "target": "",
-      "isFree": "",
-      "updatedAt": "20260630184428",
-      "lat": "35.1468609363",
-      "lng": "126.9146634529",
-      "areaCode": "5",
-      "overview": "매년 광주에서 열리는 이 축제는 영화 상영뿐만 아니라 워크숍, 세미나, 패널 토크 등도 진행되어, 영화에 대한 심도 깊은 논의와 함께 여성 영화인의 창작 환경을 향상시키는 데 기여한다. 광주여성영화제는 여성 영화인의 네트워크를 활성화시키고, 성평등과 사회적 메시지를 전파하는 중요한 문화 행사로 자리 잡았다.",
-      "program": "",
-      "subevent": "",
-      "booking": "",
-      "placeInfo": "",
-      "discountInfo": "",
-      "spendTime": "",
-      "festivalGrade": "",
-      "detailInfo": [
-        {
-          "label": "이용 요금",
-          "value": "티켓 5,000원(장애인 좌석 예약 별도 문의)"
-        },
-        {
-          "label": "문의 전화",
-          "value": "062-515-6560"
-        },
-        {
-          "label": "행사소개",
-          "value": "매년 광주에서 열리는 이 축제는 영화 상영뿐만 아니라 워크숍, 세미나, 패널 토크 등도 진행되어, 영화에 대한 심도 깊은 논의와 함께 여성 영화인의 창작 환경을 향상시키는 데 기여한다. 광주여성영화제는 여성 영화인의 네트워크를 활성화시키고, 성평등과 사회적 메시지를 전파하는 중요한 문화 행사로 자리 잡았다."
-        }
-      ],
-      "articleTitle": "“체험·영화까지, 전남광주통합특별시 동구에서 즐기는 영화제”… 광주여성영화제"
-    },
     {
       "id": "tour-629742",
       "source": "seoul",
