@@ -19,13 +19,13 @@
     },
     {
       "id": "current-year-remainder",
-      "start": "20261123",
+      "start": "20261124",
       "end": "20261231",
       "count": 0
     },
     {
       "id": "previous-year-same-season",
-      "start": "20251123",
+      "start": "20251124",
       "end": "20251231",
       "count": 15
     },
@@ -36,7 +36,7 @@
       "count": 18
     }
   ],
-  "updatedAt": "2026-11-23T00:42:11.953Z",
+  "updatedAt": "2026-11-24T04:41:05.334Z",
   "count": 18,
   "legacyCount": 234,
   "legacyItems": [
